@@ -464,3 +464,26 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 .fixcell { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 40px; border-radius: 10px; }
 .fixcell:active { background: var(--press); }
 .dropcard .sc-note { padding: 8px 12px 0; text-align: center; }
+
+/* Change-a-score sheet */
+.scrim { animation: fade .18s ease-out; }
+.sheet.fixs { border-radius: 24px 24px 0 0; padding: 8px 20px calc(20px + env(safe-area-inset-bottom, 0px)); text-align: center; background: var(--card); box-shadow: 0 -10px 40px rgba(0, 0, 0, .25); animation: slideup .22s ease-out; }
+.grab { width: 40px; height: 5px; border-radius: 3px; background: #CFD8D2; margin: 4px auto 14px; }
+.fx-head { display: flex; flex-direction: column; gap: 2px; }
+.fx-head .b { font-size: 1.25rem; }
+.fx-step { display: grid; grid-template-columns: 76px 1fr 76px; align-items: center; gap: 8px; margin: 18px 0 6px; }
+.st.round { width: 76px; height: 76px; border-radius: 50%; font-size: 2.4rem; background: var(--fill); }
+.st.round:active { background: var(--press); }
+.fx-val { font-size: 5.2rem; font-weight: 800; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--pine); }
+.fx-val.pu { color: var(--sub); }
+.fx-val sup { font-size: 1.4rem; font-weight: 600; margin-left: 2px; }
+.fx-line { color: var(--sub); margin-bottom: 14px; }
+.fx-line .b { color: var(--text); }
+.fx-pu { min-height: 44px; padding: 0 20px; border-radius: 22px; background: var(--fill); font-size: var(--t-sub); font-weight: 600; margin-bottom: 4px; }
+.fx-pu.on { background: var(--pine); color: #fff; }
+.sheet.fixs .btn { margin-top: 12px; }
+.sheet.fixs .btn:disabled { opacity: .4; box-shadow: none; }
+.fx-cancel { display: flex; margin: 6px auto 0; justify-content: center; }
+@keyframes slideup { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .scrim, .sheet.fixs { animation: none; } }

@@ -59,7 +59,21 @@ const ACT = {
     render();
   },
   mgroup: el => { UI.matchGroup = el.dataset.gid; UI.scrollCur = true; render(); },
-  'fix-hole': el => { UI.playRid = el.dataset.rid; UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: el.dataset.rid }); },
+  'fix-hole': el => {
+    const rid = el.dataset.rid, pid = el.dataset.pid, n = Number(el.dataset.n);
+    const cur = (D.scores(rid)[pid] || {})[n];
+    UI.fix = { rid, pid, n, v: E.isEntered(cur) ? cur : null, base: cur === undefined ? null : cur };
+    render();
+  },
+  'fix-step': el => {
+    const f = UI.fix; if (!f) return;
+    f.v = Number.isInteger(f.v) ? Math.max(1, f.v + Number(el.dataset.d)) : holeOf(f.rid, f.n).par;
+    render();
+  },
+  'fix-pu': () => { const f = UI.fix; if (!f) return; f.v = f.v === 'P' ? holeOf(f.rid, f.n).par : 'P'; render(); },
+  'fix-save': () => { if (UI.fix && UI.fix.v !== UI.fix.base) fixSave(); },
+  'fix-cancel': () => { UI.fix = null; render(); },
+  'fix-scrim': (el, e) => { if (e.target !== el) return; UI.fix = null; render(); },
   'edit-hole': el => { UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: playRid() }); },
   board: el => { UI.board = el.dataset.id; render(); },
   results: el => go('results', { rid: el.dataset.rid }),
@@ -344,6 +358,7 @@ function render() {
       <div class="nav"><span class="b">Test cards</span><button class="link" data-act="sheet-close">Cancel</button></div>
       ${cardOf(list.map(([k, c]) => `<button class="row" data-act="test-card-pick" data-seg="${UI.testSheet}" data-key="${k}"><span>${esc(c.label)}</span>${chev}</button>`).join(''))}</div></div>`;
   }
+  if (UI.fix) overlay += fixSheet();
   if (UI.photoFull) overlay += `<div class="full" data-act="photo-close" role="dialog" aria-label="Card photo"><img src="${UI.photoFull}" alt="Card photo"><button class="link full-close" data-act="photo-close">Close</button></div>`;
   if (UI.shareImg) overlay += `<div class="full" role="dialog" aria-label="Results image"><img src="${UI.shareImg}" alt="Results"><a class="btn dl" href="${UI.shareImg}" download="results.png">Save image</a><button class="link full-close" data-act="share-close">Close</button></div>`;
   const active = document.activeElement;

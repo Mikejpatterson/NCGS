@@ -203,3 +203,19 @@ test('first-time setup works before Drive access is granted (photos folder is on
     ['PropertiesService', 'CacheService', 'LockService', 'SpreadsheetApp', 'DriveApp', 'ContentService'].forEach(k => delete global[k]);
   }
 });
+
+test('changing one player\'s past score leaves the rest of the group alone, and a stale change is refused', () => {
+  for (const [kind, s] of servers().list) {
+    s.api({ op: 'seed', data: { rounds: [ROUND] } });
+    s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 2, scores: { a: { v: 4, base: null }, b: { v: 5, base: null }, c: { v: 6, base: null } }, by: 'Al' });
+    const fix = s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 2, scores: { b: { v: 4, base: 5 } }, by: 'Al', names: { b: 'Bo' } });
+    assert.deepEqual(fix.conflicts, [], kind);
+    const at = () => Object.fromEntries(s.api({ op: 'load' }).tables.scores.filter(x => x.hole === 2).map(x => [x.player, x.strokes]));
+    assert.deepEqual(at(), { a: 4, b: 4, c: 6 }, kind);
+    // another phone had already changed Bo to 7 while this sheet still showed 4 -> refused, nothing lost
+    s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 2, scores: { b: { v: 7, base: 4 } }, by: 'Phone 2' });
+    const stale = s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 2, scores: { b: { v: 3, base: 4 } }, by: 'Al' });
+    assert.deepEqual(stale.conflicts, [{ player: 'b', server: 7, mine: 3 }], kind);
+    assert.deepEqual(at(), { a: 4, b: 7, c: 6 }, kind);
+  }
+});

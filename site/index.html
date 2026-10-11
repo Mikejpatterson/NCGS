@@ -474,9 +474,32 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 .fixcell { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 40px; border-radius: 10px; }
 .fixcell:active { background: var(--press); }
 .dropcard .sc-note { padding: 8px 12px 0; text-align: center; }
+
+/* Change-a-score sheet */
+.scrim { animation: fade .18s ease-out; }
+.sheet.fixs { border-radius: 24px 24px 0 0; padding: 8px 20px calc(20px + env(safe-area-inset-bottom, 0px)); text-align: center; background: var(--card); box-shadow: 0 -10px 40px rgba(0, 0, 0, .25); animation: slideup .22s ease-out; }
+.grab { width: 40px; height: 5px; border-radius: 3px; background: #CFD8D2; margin: 4px auto 14px; }
+.fx-head { display: flex; flex-direction: column; gap: 2px; }
+.fx-head .b { font-size: 1.25rem; }
+.fx-step { display: grid; grid-template-columns: 76px 1fr 76px; align-items: center; gap: 8px; margin: 18px 0 6px; }
+.st.round { width: 76px; height: 76px; border-radius: 50%; font-size: 2.4rem; background: var(--fill); }
+.st.round:active { background: var(--press); }
+.fx-val { font-size: 5.2rem; font-weight: 800; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--pine); }
+.fx-val.pu { color: var(--sub); }
+.fx-val sup { font-size: 1.4rem; font-weight: 600; margin-left: 2px; }
+.fx-line { color: var(--sub); margin-bottom: 14px; }
+.fx-line .b { color: var(--text); }
+.fx-pu { min-height: 44px; padding: 0 20px; border-radius: 22px; background: var(--fill); font-size: var(--t-sub); font-weight: 600; margin-bottom: 4px; }
+.fx-pu.on { background: var(--pine); color: #fff; }
+.sheet.fixs .btn { margin-top: 12px; }
+.sheet.fixs .btn:disabled { opacity: .4; box-shadow: none; }
+.fx-cancel { display: flex; margin: 6px auto 0; justify-content: center; }
+@keyframes slideup { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .scrim, .sheet.fixs { animation: none; } }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610112010"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610112016"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1913,7 +1936,7 @@ function logEntry(action, detail) { put('log', [{ id: 'C' + Date.now() + Math.ra
 const UI = {
   stack: [{ v: 'home', p: {} }],
   org: false, orgUnlocked: false, orgStack: [{ v: 'home', p: {} }],
-  toast: null, flash: false, contestSheet: false, after: null, open: {}, scrollCur: false, scrollTop: false,
+  toast: null, flash: false, contestSheet: false, fix: null, after: null, open: {}, scrollCur: false, scrollTop: false,
   playRid: null, hole: null, edit: false, matchGroup: null, board: null,
   draft: null, sel: null, testSheet: null, photoFull: null, confirm: null, pinError: false, formError: null,
   wx: {}, shareImg: null, checkSeg: null, photos: {}
@@ -2133,7 +2156,7 @@ function dropRow(rid, x, inner, cls = 'lrow') {
   const key = `bd-${rid}-${x.id}`, open = !!UI.open[key];
   const mine = myGroup(rid);
   const fix = r.status === 'live' && !!mine && mine.teams.flat().includes(x.id);
-  return `<button class="${cls} drop${open ? ' open' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}">${inner}</button>${open ? `<div class="dropcard">${cardParts(r, pl, fix).table}${fix ? '<p class="cap sc-note">Tap a score to change it</p>' : ''}</div>` : ''}`;
+  return `<button class="${cls} drop${open ? ' open' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}">${inner}</button>${open ? `<div class="dropcard">${cardParts(r, pl, fix, x.id).table}${fix ? '<p class="cap sc-note">Tap a score to change it</p>' : ''}</div>` : ''}`;
 }
 const dropChev = `<span class="chev dn">${chev}</span>`;
 
@@ -2245,7 +2268,7 @@ function markCell(gross, par, shots) {
   if (gross === 'P') return `<span class="mk pu" title="Picked up">${E.pickupStrokes(par, shots || 0)}<sup>p</sup></span>`;
   return `<span class="mk ${E.scoreMark(gross, par)}">${gross}</span>`;
 }
-function cardParts(r, pl, fix) {
+function cardParts(r, pl, fix, pid) {
   const holes = holesOf(r);
   const half = hs => {
     // Running total of the strokes entered so far, the same way points run. A pick-up counts as the strokes that net 0 points.
@@ -2259,7 +2282,7 @@ function cardParts(r, pl, fix) {
   const line = (a, b) => {
     const cell = h => {
       const hp = pl.holes[h.n];
-      return `<td class="hn">${h.n}${hp.shots ? ` <span class="sd">${hp.shots > 0 ? '●'.repeat(hp.shots) : '○'.repeat(-hp.shots)}</span>` : ''}</td><td class="par">${h.par}</td><td>${fix && hp.gross !== null && hp.gross !== undefined ? `<button class="fixcell" data-act="fix-hole" data-rid="${r.id}" data-n="${h.n}" aria-label="Change hole ${h.n}">${markCell(hp.gross, h.par, hp.shots)}</button>` : markCell(hp.gross, h.par, hp.shots)}</td><td class="pts">${hp.points === null ? '' : `<span class="pp p${Math.min(hp.points, 4)}">${hp.points}</span>`}</td>`;
+      return `<td class="hn">${h.n}${hp.shots ? ` <span class="sd">${hp.shots > 0 ? '●'.repeat(hp.shots) : '○'.repeat(-hp.shots)}</span>` : ''}</td><td class="par">${h.par}</td><td>${fix && hp.gross !== null && hp.gross !== undefined ? `<button class="fixcell" data-act="fix-hole" data-rid="${r.id}" data-pid="${pid}" data-n="${h.n}" aria-label="Change hole ${h.n}">${markCell(hp.gross, h.par, hp.shots)}</button>` : markCell(hp.gross, h.par, hp.shots)}</td><td class="pts">${hp.points === null ? '' : `<span class="pp p${Math.min(hp.points, 4)}">${hp.points}</span>`}</td>`;
     };
     return `<tr>${cell(a)}<td class="gap"></td>${cell(b)}</tr>`;
   };
@@ -2400,7 +2423,7 @@ function entryRow(pid, val, shots, par, rid) {
   const atOne = num && val <= 1;
   return `<div class="pr${flash}">
     <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dots(shots, true)}${dpl ? dropChev : ''}</button><div class="pr-score">${score}</div></div>
-    ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid)).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
+    ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
     <div class="stepper" role="group" aria-label="Strokes for ${name}">
       <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
       <div class="stv${num ? '' : ' none'}" data-pid="${pid}" aria-live="polite">${num ? val : (val === 'P' ? 'Out' : 'Par ' + par)}</div>
@@ -3023,6 +3046,48 @@ async function shareCard(rid) {
   }
 }
 
+
+/* ----- Change one past score: a small sheet over whatever screen you are on ----- */
+function fixSheet() {
+  const f = UI.fix;
+  const r = D.round(f.rid), comp = computeR(f.rid), pl = comp && comp.players[f.pid];
+  if (!r || !pl) return '';
+  const h = holeOf(f.rid, f.n), shots = pl.holes[f.n].shots || 0;
+  const num = Number.isInteger(f.v);
+  const big = num ? f.v : E.pickupStrokes(h.par, shots);
+  const pts = E.stablefordPoints(f.v, h.par, shots);
+  const name = f.v === 'P' ? 'Picked up' : E.scoreName(f.v, h.par);
+  const same = f.v === f.base;
+  return `<div class="scrim" data-act="fix-scrim"><div class="sheet fixs" role="dialog" aria-label="Change score">
+    <div class="grab"></div>
+    <div class="fx-head"><span class="b">${esc(pl.name)}</span><span class="sub">Hole ${f.n} · Par ${h.par} · Index ${h.si}${shots ? ` · ${shots > 0 ? plural(shots, 'shot') : 'gives ' + plural(-shots, 'shot')}` : ''}</span></div>
+    <div class="fx-step">
+      <button class="st round" data-act="fix-step" data-d="-1" aria-label="One fewer stroke"${num && f.v <= 1 ? ' disabled' : ''}>\u2212</button>
+      <div class="fx-val${f.v === 'P' ? ' pu' : ''}" aria-live="polite">${big}${f.v === 'P' ? '<sup>p</sup>' : ''}</div>
+      <button class="st round" data-act="fix-step" data-d="1" aria-label="One more stroke">+</button>
+    </div>
+    <p class="fx-line"><span class="b">${esc(name)}</span> \u00b7 ${plural(pts, 'point')}</p>
+    <button class="fx-pu${f.v === 'P' ? ' on' : ''}" data-act="fix-pu" aria-pressed="${f.v === 'P'}">Pick up</button>
+    <button class="btn" data-act="fix-save"${same ? ' disabled' : ''}>Save</button>
+    <button class="link fx-cancel" data-act="fix-cancel">Cancel</button>
+  </div></div>`;
+}
+function fixSave() {
+  const f = UI.fix;
+  const r = D.round(f.rid);
+  if (r.status === 'final') { UI.fix = null; toast('This round is final. Reopen it to change scores.'); return; }
+  const g = (r.groups || []).find(x => x.teams.flat().includes(f.pid));
+  if (!g) { UI.fix = null; render(); return; }
+  send({
+    op: 'saveHole', round: f.rid, grp: g.id, hole: f.n, scores: { [f.pid]: { v: f.v, base: f.base } }, by: byMe(),
+    names: { [f.pid]: D.nameOf(f.pid) }, label: `${roundName(r)} \u00b7 Group ${g.n} \u00b7 Hole ${f.n}`
+  });
+  UI.fix = null;
+  tick();
+  render();
+  toast(`${D.nameOf(f.pid)}, hole ${f.n}: ${f.v === 'P' ? 'picked up' : f.v}`);
+}
+
 /* ---- 40-org.js ---- */
 /* ================= ORGANISER ================= */
 const ORG = {};
@@ -3440,7 +3505,21 @@ const ACT = {
     render();
   },
   mgroup: el => { UI.matchGroup = el.dataset.gid; UI.scrollCur = true; render(); },
-  'fix-hole': el => { UI.playRid = el.dataset.rid; UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: el.dataset.rid }); },
+  'fix-hole': el => {
+    const rid = el.dataset.rid, pid = el.dataset.pid, n = Number(el.dataset.n);
+    const cur = (D.scores(rid)[pid] || {})[n];
+    UI.fix = { rid, pid, n, v: E.isEntered(cur) ? cur : null, base: cur === undefined ? null : cur };
+    render();
+  },
+  'fix-step': el => {
+    const f = UI.fix; if (!f) return;
+    f.v = Number.isInteger(f.v) ? Math.max(1, f.v + Number(el.dataset.d)) : holeOf(f.rid, f.n).par;
+    render();
+  },
+  'fix-pu': () => { const f = UI.fix; if (!f) return; f.v = f.v === 'P' ? holeOf(f.rid, f.n).par : 'P'; render(); },
+  'fix-save': () => { if (UI.fix && UI.fix.v !== UI.fix.base) fixSave(); },
+  'fix-cancel': () => { UI.fix = null; render(); },
+  'fix-scrim': (el, e) => { if (e.target !== el) return; UI.fix = null; render(); },
   'edit-hole': el => { UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: playRid() }); },
   board: el => { UI.board = el.dataset.id; render(); },
   results: el => go('results', { rid: el.dataset.rid }),
@@ -3725,6 +3804,7 @@ function render() {
       <div class="nav"><span class="b">Test cards</span><button class="link" data-act="sheet-close">Cancel</button></div>
       ${cardOf(list.map(([k, c]) => `<button class="row" data-act="test-card-pick" data-seg="${UI.testSheet}" data-key="${k}"><span>${esc(c.label)}</span>${chev}</button>`).join(''))}</div></div>`;
   }
+  if (UI.fix) overlay += fixSheet();
   if (UI.photoFull) overlay += `<div class="full" data-act="photo-close" role="dialog" aria-label="Card photo"><img src="${UI.photoFull}" alt="Card photo"><button class="link full-close" data-act="photo-close">Close</button></div>`;
   if (UI.shareImg) overlay += `<div class="full" role="dialog" aria-label="Results image"><img src="${UI.shareImg}" alt="Results"><a class="btn dl" href="${UI.shareImg}" download="results.png">Save image</a><button class="link full-close" data-act="share-close">Close</button></div>`;
   const active = document.activeElement;

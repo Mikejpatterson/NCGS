@@ -2,7 +2,7 @@
 const UI = {
   stack: [{ v: 'home', p: {} }],
   org: false, orgUnlocked: false, orgStack: [{ v: 'home', p: {} }],
-  toast: null, flash: false, contestSheet: false, after: null, open: {}, scrollCur: false, scrollTop: false,
+  toast: null, flash: false, contestSheet: false, fix: null, after: null, open: {}, scrollCur: false, scrollTop: false,
   playRid: null, hole: null, edit: false, matchGroup: null, board: null,
   draft: null, sel: null, testSheet: null, photoFull: null, confirm: null, pinError: false, formError: null,
   wx: {}, shareImg: null, checkSeg: null, photos: {}

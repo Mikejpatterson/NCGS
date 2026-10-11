@@ -101,7 +101,7 @@ function entryRow(pid, val, shots, par, rid) {
   const atOne = num && val <= 1;
   return `<div class="pr${flash}">
     <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dots(shots, true)}${dpl ? dropChev : ''}</button><div class="pr-score">${score}</div></div>
-    ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid)).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
+    ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
     <div class="stepper" role="group" aria-label="Strokes for ${name}">
       <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
       <div class="stv${num ? '' : ' none'}" data-pid="${pid}" aria-live="polite">${num ? val : (val === 'P' ? 'Out' : 'Par ' + par)}</div>
@@ -722,4 +722,46 @@ async function shareCard(rid) {
     if (e && (e.name === 'AbortError' || e.code === 'declined')) return;
     toast('The image could not be made. Take a screenshot instead.');
   }
+}
+
+
+/* ----- Change one past score: a small sheet over whatever screen you are on ----- */
+function fixSheet() {
+  const f = UI.fix;
+  const r = D.round(f.rid), comp = computeR(f.rid), pl = comp && comp.players[f.pid];
+  if (!r || !pl) return '';
+  const h = holeOf(f.rid, f.n), shots = pl.holes[f.n].shots || 0;
+  const num = Number.isInteger(f.v);
+  const big = num ? f.v : E.pickupStrokes(h.par, shots);
+  const pts = E.stablefordPoints(f.v, h.par, shots);
+  const name = f.v === 'P' ? 'Picked up' : E.scoreName(f.v, h.par);
+  const same = f.v === f.base;
+  return `<div class="scrim" data-act="fix-scrim"><div class="sheet fixs" role="dialog" aria-label="Change score">
+    <div class="grab"></div>
+    <div class="fx-head"><span class="b">${esc(pl.name)}</span><span class="sub">Hole ${f.n} · Par ${h.par} · Index ${h.si}${shots ? ` · ${shots > 0 ? plural(shots, 'shot') : 'gives ' + plural(-shots, 'shot')}` : ''}</span></div>
+    <div class="fx-step">
+      <button class="st round" data-act="fix-step" data-d="-1" aria-label="One fewer stroke"${num && f.v <= 1 ? ' disabled' : ''}>\u2212</button>
+      <div class="fx-val${f.v === 'P' ? ' pu' : ''}" aria-live="polite">${big}${f.v === 'P' ? '<sup>p</sup>' : ''}</div>
+      <button class="st round" data-act="fix-step" data-d="1" aria-label="One more stroke">+</button>
+    </div>
+    <p class="fx-line"><span class="b">${esc(name)}</span> \u00b7 ${plural(pts, 'point')}</p>
+    <button class="fx-pu${f.v === 'P' ? ' on' : ''}" data-act="fix-pu" aria-pressed="${f.v === 'P'}">Pick up</button>
+    <button class="btn" data-act="fix-save"${same ? ' disabled' : ''}>Save</button>
+    <button class="link fx-cancel" data-act="fix-cancel">Cancel</button>
+  </div></div>`;
+}
+function fixSave() {
+  const f = UI.fix;
+  const r = D.round(f.rid);
+  if (r.status === 'final') { UI.fix = null; toast('This round is final. Reopen it to change scores.'); return; }
+  const g = (r.groups || []).find(x => x.teams.flat().includes(f.pid));
+  if (!g) { UI.fix = null; render(); return; }
+  send({
+    op: 'saveHole', round: f.rid, grp: g.id, hole: f.n, scores: { [f.pid]: { v: f.v, base: f.base } }, by: byMe(),
+    names: { [f.pid]: D.nameOf(f.pid) }, label: `${roundName(r)} \u00b7 Group ${g.n} \u00b7 Hole ${f.n}`
+  });
+  UI.fix = null;
+  tick();
+  render();
+  toast(`${D.nameOf(f.pid)}, hole ${f.n}: ${f.v === 'P' ? 'picked up' : f.v}`);
 }
