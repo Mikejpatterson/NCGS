@@ -259,3 +259,15 @@ test('holes not yet saved in the app are not checked; unreadable cells are raise
   assert.equal(r.checked, 2);
   assert.deepEqual(r.issues.map(i => i.kind), ['unreadable']);
 });
+
+test('a pick-up is shown as the strokes that net 0 points, and still scores 0', () => {
+  const P = E.pickupStrokes;
+  assert.equal(P(4, 0), 6);
+  assert.equal(P(4, 2), 8);
+  assert.equal(P(3, -1), 4);
+  [[4, 0], [4, 2], [3, -1], [5, 1]].forEach(([par, shots]) => {
+    assert.equal(E.stablefordPoints(P(par, shots), par, shots), 0);
+    assert.equal(E.stablefordPoints(P(par, shots) - 1, par, shots), 1);
+    assert.equal(E.stablefordPoints('P', par, shots), 0);
+  });
+});

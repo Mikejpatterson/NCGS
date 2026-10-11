@@ -59,6 +59,9 @@
     return Math.max(0, par + shots - gross + 2);
   }
 
+  /** The strokes that make a pick-up worth nothing: the first score that earns 0 points. Display only; a pick-up still scores 0. */
+  function pickupStrokes(par, shots) { return par + shots + 2; }
+
   /** What golfers call the gross score: Par, Bogey, Double... */
   function scoreName(gross, par) {
     if (gross === 'P') return 'Picked up';
@@ -566,6 +569,6 @@
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,
     teamsFor, groupSizes, addMinutes, teeTimesFrom, makeGroups, randomDraw, shuffle, kbPairsFor,
-    countbackKey, compareKeys, rankByKey, finalOrder, kbStandings, goyStandings, scoreMark
+    countbackKey, compareKeys, rankByKey, finalOrder, kbStandings, goyStandings, scoreMark, pickupStrokes
   };
 });
