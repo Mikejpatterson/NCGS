@@ -447,3 +447,12 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 .sc td:last-child, .sc th:last-child { padding-right: 10px; }
 .sc td:first-child, .sc th:first-child { padding-left: 12px; }
 .sc thead th.hn { font-size: .66rem; }
+
+/* Scorecard v3: plain golf marks, no colour coding. Only the striping, header band and totals row carry colour. */
+.pp, .pp.p0, .pp.p1, .pp.p2, .pp.p3, .pp.p4 { background: none; color: var(--text); min-width: 0; height: auto; border-radius: 0; font-weight: 600; }
+.mk { color: var(--text); background: none; font-weight: 500; }
+.mk.birdie { background: none; border: 1.5px solid var(--pine); border-radius: 50%; color: var(--text); }
+.mk.eagle { background: none; border: 1.5px solid var(--pine); border-radius: 50%; outline: 1.5px solid var(--pine); outline-offset: 2px; color: var(--text); font-weight: 500; }
+.mk.bogey { background: none; border: 1.5px solid var(--pine); border-radius: 0; color: var(--text); }
+.mk.double { background: none; border: 1.5px solid var(--pine); border-radius: 0; outline: 1.5px solid var(--pine); outline-offset: 2px; color: var(--text); font-weight: 500; }
+.sc .sd { color: var(--text); }
