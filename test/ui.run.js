@@ -17,7 +17,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
   const shot = async (name, full) => page.screenshot({ path: path.join(SHOTS, name + '.png'), fullPage: !!full });
-  const stepTo = async (pg, pid, v) => { for (let i = 0; i < 12; i++) { const cur = await pg.$eval(`.stv[data-pid="${pid}"]`, e => e.textContent.trim()); const n = Number(cur); if (n === v) return; await pg.click(`[data-act="set"][data-pid="${pid}"][data-dir="${Number.isInteger(n) && n > v ? 'down' : 'up'}"]`); await pg.waitForTimeout(60); } throw new Error('could not step to ' + v); };
+  const stepTo = async (pg, pid, v) => { for (let i = 0; i < 12; i++) { const cur = await pg.$eval(`.stv[data-pid="${pid}"]`, e => e.dataset.n); const n = cur === '' ? NaN : Number(cur); if (n === v) return; await pg.click(`[data-act="set"][data-pid="${pid}"][data-dir="${Number.isInteger(n) && n > v ? 'down' : 'up'}"]`); await pg.waitForTimeout(60); } throw new Error('could not step to ' + v); };
   const tap = async sel => { await page.click(sel); await page.waitForTimeout(120); };
   const text = async () => page.textContent('#app');
   const fits = async () => page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight + 1);
@@ -81,12 +81,22 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   for (const pid of pids) await stepTo(page, pid, 3);
   await shot('06-entry');
   { const pid = pids[0];
+    const mid = () => page.$eval(`.stv[data-pid="${pid}"]`, e => ({ n: Number(e.dataset.n), text: e.textContent, row: e.closest('.pr').textContent }));
+    const btn = sel => page.$eval(`[data-pid="${pid}"]${sel}`, e => ({ off: e.disabled, on: e.classList.contains('on'), bg: getComputedStyle(e).backgroundColor }));
+    await stepTo(page, pid, 4);
+    let m = await mid();
+    check('entry: strokes carry their points, the word sits under them', /^\d+\d$/.test(m.text.replace(/[^\d]/g, '')) && m.n === 4 && !!(await page.$eval(`.stv[data-pid="${pid}"] small`, e => e.textContent.trim())) && !(await page.$(`.pr-score`)));
     await page.click(`[data-pid="${pid}"][data-v="P"]`); await page.waitForTimeout(80);
-    const row = await page.$eval(`.stv[data-pid="${pid}"]`, e => e.closest('.pr').textContent);
-    const shown = Number(await page.$eval(`.stv[data-pid="${pid}"]`, e => e.textContent));
-    check('entry: a pick-up shows the strokes that net 0 points', Number.isInteger(shown) && /Picked up/.test(row) && /0/.test(row));
+    m = await mid(); const pu = m.n;
+    check('entry: a pick-up shows its scratch strokes with 0 points and the word Scratch', pu > 4 && /Scratch/.test(m.text) && /0$/.test(m.text.replace(/Scratch/, '')) && !/Picked up/.test(m.row));
+    let up = await btn('[data-dir="up"]'), pk = await btn('.pu');
+    check('entry: on a scratch + is off and Pick up is green', up.off && pk.on && pk.bg !== (await page.$eval(`[data-pid="${pid}"][data-dir="down"]`, e => getComputedStyle(e).backgroundColor)));
     await page.click(`[data-act="set"][data-pid="${pid}"][data-dir="down"]`); await page.waitForTimeout(80);
-    check('entry: minus from a pick-up goes down one from those strokes', Number(await page.$eval(`.stv[data-pid="${pid}"]`, e => e.textContent)) === shown - 1);
+    m = await mid();
+    check('entry: minus from a pick-up goes down one from those strokes', m.n === pu - 1 && !/Scratch/.test(m.text));
+    await page.click(`[data-act="set"][data-pid="${pid}"][data-dir="up"]`); await page.waitForTimeout(80);
+    m = await mid(); pk = await btn('.pu');
+    check('entry: plus up to 0 points becomes a pick-up and stops there', m.n === pu && /Scratch/.test(m.text) && pk.on);
     await stepTo(page, pid, 3); }
   t = await text();
   check('entry: save button ready', /Save hole 15/.test(t));

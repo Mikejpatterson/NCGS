@@ -504,3 +504,12 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 html { background: #fff; }
 body::before { content: none; }
 .stv.out { color: var(--faint); }
+
+/* Strokes with points beside them, the word under (Scratch = 0 points, the same as a pick-up) */
+.stv { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.stv b { font-size: 2.6rem; font-weight: 800; line-height: 1; letter-spacing: -.03em; }
+.stv b sup { font-size: 1.1rem; font-weight: 700; margin-left: 2px; letter-spacing: 0; }
+.stv small { font-size: var(--t-cap); font-weight: 600; letter-spacing: 0; color: var(--sub); line-height: 1; }
+.stv.out b { color: var(--faint); }
+.stepper .pu.on { background: var(--green); color: #fff; }
+.stepper .st:disabled { opacity: .35; }

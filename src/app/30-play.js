@@ -91,24 +91,28 @@ function entryRow(pid, val, shots, par, rid) {
   const name = esc(D.nameOf(pid));
   const dkey = `bd-${rid}-${pid}`, dopen = !!UI.open[dkey];
   const dcomp = computeR(rid), dpl = dcomp && dcomp.players[pid];
-  let score = '';
   const puN = E.pickupStrokes(par, shots);
-  if (val === 'P') score = `<span class="sub">Picked up</span><span class="s">${puN}<sup>0</sup></span>`;
-  else if (E.isEntered(val)) score = `<span class="sub">${E.scoreName(val, par)}</span><span class="s">${val}<sup>${E.stablefordPoints(val, par, shots)}</sup></span>`;
   const flash = UI.flash && !E.isEntered(val) ? ' flash' : '';
-  // The first tap on either button lands on par, then the buttons move one stroke at a time.
   const num = Number.isInteger(val);
-  const base = val === 'P' ? puN : val;
-  const up = base !== null && Number.isInteger(base) ? base + 1 : par, down = Number.isInteger(base) ? Math.max(1, base - 1) : par;
-  const atOne = Number.isInteger(base) && base <= 1;
+  const pts = val === 'P' ? 0 : num ? E.stablefordPoints(val, par, shots) : null;
+  const scratch = pts === 0;
+  const shown = val === 'P' ? puN : val;
+  const word = scratch ? 'Scratch' : num ? E.scoreName(val, par) : '';
+  // The first tap on either button lands on par, then the buttons move one stroke at a time. Reaching 0 points is a pick-up, and + stops there.
+  const base = Number.isInteger(shown) ? shown : null;
+  const up = base === null ? par : (base + 1 >= puN ? 'P' : base + 1), down = base === null ? par : Math.max(1, base - 1);
+  const atOne = base !== null && base <= 1;
+  const mid = base === null
+    ? `<div class="stv none" data-pid="${pid}" data-n="" aria-live="polite">Par ${par}</div>`
+    : `<div class="stv${scratch ? ' out' : ''}" data-pid="${pid}" data-n="${base}" aria-live="polite"><b>${base}<sup>${pts}</sup></b><small>${word}</small></div>`;
   return `<div class="pr${flash}">
-    <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dots(shots, true)}${dpl ? dropChev : ''}</button><div class="pr-score">${score}</div></div>
+    <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dots(shots, true)}${dpl ? dropChev : ''}</button></div>
     ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
     <div class="stepper" role="group" aria-label="Strokes for ${name}">
       <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
-      <div class="stv${num ? '' : val === 'P' ? ' out' : ' none'}" data-pid="${pid}" aria-live="polite">${num ? val : (val === 'P' ? puN : 'Par ' + par)}</div>
-      <button class="st" data-act="set" data-dir="up" data-pid="${pid}" data-v="${up}" aria-label="One more stroke for ${name}">+</button>
-      <button class="pu ${val === 'P' ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="P" aria-pressed="${val === 'P'}">Pick up</button>
+      ${mid}
+      <button class="st" data-act="set" data-dir="up" data-pid="${pid}" data-v="${up}" aria-label="One more stroke for ${name}"${scratch ? ' disabled' : ''}>+</button>
+      <button class="pu ${scratch ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="P" aria-pressed="${scratch}">Pick up</button>
     </div></div>`;
 }
 
