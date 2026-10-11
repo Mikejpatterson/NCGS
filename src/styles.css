@@ -457,3 +457,7 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 .mk.double { background: none; border: 1.5px solid var(--pine); border-radius: 0; outline: 1.5px solid var(--pine); outline-offset: 2px; color: var(--text); font-weight: 500; }
 .sc .sd { color: var(--text); }
 .mk.pu { color: var(--sub); } .mk.pu sup { font-size: .6rem; margin-left: 1px; }
+.sc .mk.par { color: var(--text); font-weight: 500; }
+.sc thead th { font-size: .6rem; padding-inline: 2px; }
+.sc thead th.hn { font-size: .6rem; padding-left: 12px; }
+.sc th:nth-child(3), .sc th:nth-child(7) { padding-inline: 6px; }
