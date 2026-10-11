@@ -92,19 +92,21 @@ function entryRow(pid, val, shots, par, rid) {
   const dkey = `bd-${rid}-${pid}`, dopen = !!UI.open[dkey];
   const dcomp = computeR(rid), dpl = dcomp && dcomp.players[pid];
   let score = '';
-  if (val === 'P') score = `<span class="sub">Picked up</span>`;
+  const puN = E.pickupStrokes(par, shots);
+  if (val === 'P') score = `<span class="sub">Picked up</span><span class="s">${puN}<sup>0</sup></span>`;
   else if (E.isEntered(val)) score = `<span class="sub">${E.scoreName(val, par)}</span><span class="s">${val}<sup>${E.stablefordPoints(val, par, shots)}</sup></span>`;
   const flash = UI.flash && !E.isEntered(val) ? ' flash' : '';
   // The first tap on either button lands on par, then the buttons move one stroke at a time.
   const num = Number.isInteger(val);
-  const up = num ? val + 1 : par, down = num ? Math.max(1, val - 1) : par;
-  const atOne = num && val <= 1;
+  const base = val === 'P' ? puN : val;
+  const up = base !== null && Number.isInteger(base) ? base + 1 : par, down = Number.isInteger(base) ? Math.max(1, base - 1) : par;
+  const atOne = Number.isInteger(base) && base <= 1;
   return `<div class="pr${flash}">
     <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dots(shots, true)}${dpl ? dropChev : ''}</button><div class="pr-score">${score}</div></div>
     ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
     <div class="stepper" role="group" aria-label="Strokes for ${name}">
       <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
-      <div class="stv${num ? '' : ' none'}" data-pid="${pid}" aria-live="polite">${num ? val : (val === 'P' ? 'Out' : 'Par ' + par)}</div>
+      <div class="stv${num ? '' : val === 'P' ? ' out' : ' none'}" data-pid="${pid}" aria-live="polite">${num ? val : (val === 'P' ? puN : 'Par ' + par)}</div>
       <button class="st" data-act="set" data-dir="up" data-pid="${pid}" data-v="${up}" aria-label="One more stroke for ${name}">+</button>
       <button class="pu ${val === 'P' ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="P" aria-pressed="${val === 'P'}">Pick up</button>
     </div></div>`;

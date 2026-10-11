@@ -503,3 +503,4 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 /* Home-screen app: a solid black status bar (no iOS glass), and the page background matches the tab bar so any spare strip below it is invisible. */
 html { background: #fff; }
 body::before { content: none; }
+.stv.out { color: var(--faint); }
