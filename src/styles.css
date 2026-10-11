@@ -494,8 +494,13 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 .hero { padding-top: calc(env(safe-area-inset-top, 0px) + 20px); }
 .hero.c { padding-top: calc(env(safe-area-inset-top, 0px) + 18px); }
 
-/* Pull to refresh */
-#ptr { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 10px); width: 40px; height: 40px; margin-left: -20px; border-radius: 50%; background: #fff; box-shadow: var(--lift); z-index: 60; display: flex; align-items: center; justify-content: center; opacity: 0; transform: translateY(-56px); pointer-events: none; }
-.ptr-ring { width: 20px; height: 20px; border-radius: 50%; border: 3px solid var(--fill); border-top-color: var(--green); display: block; }
+/* Pull to refresh: the page slides down and this sits in the gap */
+#ptr { position: fixed; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px) + 14px); z-index: 1; display: none; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; color: var(--green); font-size: var(--t-sub); font-weight: 600; }
+.ptr-ring { width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--press); border-top-color: var(--green); display: block; }
 #ptr.spin .ptr-ring { animation: ptrspin .8s linear infinite; transform: none !important; }
 @keyframes ptrspin { to { transform: rotate(360deg); } }
+
+/* The green header runs all the way up behind the clock and battery (iOS draws them in white on top). */
+body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top, 0px); background: linear-gradient(90deg, var(--pine-2), #11503A 70%, var(--pine)); z-index: 50; }
+#app { padding-top: env(safe-area-inset-top, 0px); }
+.hero { margin-top: calc(-1 * env(safe-area-inset-top, 0px)); }

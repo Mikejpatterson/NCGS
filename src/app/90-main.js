@@ -434,52 +434,58 @@ if (window.claude && typeof window.claude.use === 'function') {
 }
 
 /* Pull down to refresh. A phone's home-screen app has no built-in pull-to-refresh, so this one fetches the latest scores,
-   sends anything waiting to go, and reloads if a newer version of the app has been published. */
+   sends anything waiting to go, and reloads if a newer version of the app has been published.
+   The page slides down to show "Pull to refresh" in the gap, the way a native list does. */
 (function pullToRefresh() {
   const standalone = window.navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.NCGS_FORCE_PTR;
   if (!standalone) return;   // in the browser the browser does it
   const ind = document.createElement('div');
-  ind.id = 'ptr'; ind.setAttribute('aria-hidden', 'true'); ind.innerHTML = '<span class="ptr-ring"></span>';
+  ind.id = 'ptr'; ind.setAttribute('aria-hidden', 'true');
+  ind.innerHTML = '<span class="ptr-ring"></span><span class="ptr-txt">Pull to refresh</span>';
   document.body.appendChild(ind);
-  const GO = 90;
-  let y0 = null, dy = 0, busy = false;
+  const ring = ind.firstChild, txt = ind.lastChild, page = document.getElementById('app');
+  const GO = 70, HOLD = 64;
+  let y0 = null, p = 0, busy = false;
   const blocked = t => UI.fix || UI.contestSheet || UI.testSheet || UI.photoFull || UI.shareImg || (t && t.closest && t.closest('input,textarea,select'));
-  const show = p => {   // p: how far down the indicator sits, 0..60
-    ind.style.opacity = String(Math.min(1, p / 40));
-    ind.style.transform = `translateY(${p - 56}px)`;
-    ind.firstChild.style.transform = `rotate(${p * 5}deg)`;
+  const lay = (dist, animate) => {
+    page.style.transition = animate ? 'transform .25s ease-out' : 'none';
+    page.style.transform = dist > 0 ? `translateY(${dist}px)` : '';
+    ind.style.display = dist > 0 || busy ? 'flex' : 'none';
+    ind.style.opacity = String(Math.min(1, dist / 36));
+    if (!busy) { ring.style.transform = `rotate(${dist * 6}deg)`; txt.textContent = dist >= GO ? 'Release to refresh' : 'Pull to refresh'; }
   };
   document.addEventListener('touchstart', e => {
     if (busy || e.touches.length !== 1 || window.scrollY > 0 || blocked(e.target)) { y0 = null; return; }
-    y0 = e.touches[0].clientY; dy = 0;
+    y0 = e.touches[0].clientY; p = 0;
   }, { passive: true });
   document.addEventListener('touchmove', e => {
     if (y0 === null) return;
-    if (window.scrollY > 0) { y0 = null; show(0); return; }
-    dy = Math.max(0, e.touches[0].clientY - y0);
-    show(Math.min(60, dy * 0.5));
-  }, { passive: true });
-  const finish = () => {
-    ind.classList.remove('spin'); ind.style.transition = ''; show(0); busy = false;
-  };
+    const dy = e.touches[0].clientY - y0;
+    if (window.scrollY > 0 || dy <= 0) { if (p) { p = 0; lay(0, false); } if (dy <= 0) y0 = e.touches[0].clientY; return; }
+    p = Math.min(110, dy * 0.55);
+    if (e.cancelable) e.preventDefault();   // no native bounce while we show the gap
+    lay(p, false);
+  }, { passive: false });
+  const done = () => { busy = false; ind.classList.remove('spin'); lay(0, true); setTimeout(() => { if (!busy) ind.style.display = 'none'; }, 260); };
   const end = () => {
     if (y0 === null) return;
-    const pulled = dy; y0 = null; dy = 0;
-    if (pulled < GO) { show(0); return; }
-    busy = true; ind.classList.add('spin'); show(48);
-    const minimum = new Promise(r => setTimeout(r, 700));
+    y0 = null;
+    if (p < GO) { p = 0; lay(0, true); return; }
+    p = 0; busy = true; ind.classList.add('spin'); txt.textContent = 'Refreshing'; ring.style.transform = '';
+    lay(HOLD, true);
+    const minimum = new Promise(r => setTimeout(r, 800));
     Promise.all([flush().then(() => sync()).catch(() => {}), minimum]).then(async () => {
       let newer = false;
       if (BOOT.mode === 'live' && BOOT.version) {
         try { const t = await (await fetch('sw.js?' + Date.now(), { cache: 'no-store' })).text(); const m = /ncgs-(\d+)/.exec(t); newer = !!(m && m[1] !== BOOT.version); } catch (x) { /* offline */ }
       }
       if (newer) { location.reload(); return; }
-      finish();
+      done();
       toast(DB.online ? 'Up to date' : 'No signal. Showing the last scores this phone saw.');
     });
   };
   document.addEventListener('touchend', end, { passive: true });
-  document.addEventListener('touchcancel', () => { y0 = null; show(0); }, { passive: true });
+  document.addEventListener('touchcancel', () => { if (!busy) { y0 = null; p = 0; lay(0, true); } }, { passive: true });
 })();
 
 /* Open where the phone left off: in the round if one is live and this phone is playing. */
