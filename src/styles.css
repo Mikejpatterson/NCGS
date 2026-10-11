@@ -489,3 +489,7 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 @media (prefers-reduced-motion: reduce) { .scrim, .sheet.fixs { animation: none; } }
 .fx-step .st.round, .fx-pu { transition: none; -webkit-user-select: none; user-select: none; }
 .scrim.still, .sheet.fixs.still { animation: none; }
+
+/* iOS 26 fades the top of the screen under the status bar (the "glass" edge). Start heroes a little lower so the first line is never hazy. */
+.hero { padding-top: calc(env(safe-area-inset-top, 0px) + 20px); }
+.hero.c { padding-top: calc(env(safe-area-inset-top, 0px) + 18px); }
