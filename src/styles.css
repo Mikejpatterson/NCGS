@@ -407,3 +407,7 @@ button.btn:has(> svg) { flex-direction: row; }
 .dropcard .sc td { height: 32px; }
 .lrow.drop .chev.dn { transform: rotate(90deg); }
 .lrow.drop.open .chev.dn { transform: rotate(-90deg); }
+.row.drop { text-align: left; }
+.row.drop .chev.dn { transform: rotate(90deg); transition: transform .2s; }
+.row.drop.open .chev.dn { transform: rotate(-90deg); }
+.card > .dropcard + .row, .card > .dropcard + .lrow { border-top: .5px solid var(--line); }

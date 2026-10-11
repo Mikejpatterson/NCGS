@@ -509,7 +509,7 @@ VIEWS.finish = () => {
   const gc = comp.groups.find(x => x.id === g.id);
   const submitted = D.card(rid, g.id);
   const buggies = gc.teams.length === 2;
-  const players = gc.teams.map((t, i) => t.map(pid => `<button class="row" data-act="card" data-rid="${rid}" data-pid="${pid}"><span style="display:flex;align-items:center;gap:8px">${buggies ? dot(i) : ''}${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${comp.players[pid].total}</span>${chev}</span></button>`).join('')).join('');
+  const players = gc.teams.map((t, i) => t.map(pid => dropRow(rid, { id: pid }, `<span style="display:flex;align-items:center;gap:8px">${buggies ? dot(i) : ''}${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${comp.players[pid].total}</span>${dropChev}</span>`, 'row')).join('')).join('');
   const bw = buggies ? ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${status(gc.matches[s].status)}</div>`).join('') : '';
   const missing = 18 - gc.holesDone;
   const checks = ['front', 'back'].map(sg => checkRow(sg, D.check(rid, g.id, sg))).join('');
@@ -617,10 +617,8 @@ VIEWS.board = () => {
   const comp = res.comp;
   const pillTxt = r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r);
   html += sec(`${label(esc(roundName(r)))}${pillTxt}`, cardOf(res.rows.map(x => {
-    const pl = res.source === 'app' && comp ? comp.players[x.id] : null;
-    if (!pl) return `<button class="lrow" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="b r">${x.total}</span></button>`;
-    const key = `bd-${sel}-${x.id}`, open = !!UI.open[key];
-    return `<button class="lrow drop${open ? ' open' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}"><span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span><span class="chev dn">${chev}</span></span></button>${open ? `<div class="dropcard">${cardParts(r, pl).table}</div>` : ''}`;
+    const inner = `<span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
+    return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')), true);
   if (res.kb.length) html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join('')));
   if (comp && comp.groups.some(g => g.teams.length === 2)) {

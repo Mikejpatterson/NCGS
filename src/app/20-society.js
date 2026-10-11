@@ -176,13 +176,22 @@ function groupsBlock(r, interactive) {
   return html;
 }
 
+/* A leaderboard row that drops the player's card down underneath it when tapped. */
+function dropRow(rid, x, inner, cls = 'lrow') {
+  const r = D.round(rid), comp = computeR(rid), pl = comp && comp.players[x.id];
+  if (!r || !pl) return `<button class="${cls}" data-act="player" data-pid="${x.id}">${inner}</button>`;
+  const key = `bd-${rid}-${x.id}`, open = !!UI.open[key];
+  return `<button class="${cls} drop${open ? ' open' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}">${inner}</button>${open ? `<div class="dropcard">${cardParts(r, pl).table}</div>` : ''}`;
+}
+const dropChev = `<span class="chev dn">${chev}</span>`;
+
 function resultsBlock(r) {
   const res = resultsOf(r.id);
   if (!res) return '';
   const app = res.source === 'app';
   let html = sec(label('Stableford'), cardOf(res.rows.map(x => {
-    const tap = app ? `data-act="card" data-rid="${r.id}" data-pid="${x.id}"` : `data-act="player" data-pid="${x.id}"`;
-    return `<button class="lrow" ${tap}><span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="b r">${x.total}</span></button>`;
+    const inner = `<span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
+    return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')) + (res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : res.source === 'sheet' ? '<p class="cap note">From the 2026 sheet</p>' : ''));
   if (res.kb.length) {
     html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join('')));

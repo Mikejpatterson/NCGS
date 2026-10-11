@@ -417,9 +417,13 @@ button.btn:has(> svg) { flex-direction: row; }
 .dropcard .sc td { height: 32px; }
 .lrow.drop .chev.dn { transform: rotate(90deg); }
 .lrow.drop.open .chev.dn { transform: rotate(-90deg); }
+.row.drop { text-align: left; }
+.row.drop .chev.dn { transform: rotate(90deg); transition: transform .2s; }
+.row.drop.open .chev.dn { transform: rotate(-90deg); }
+.card > .dropcard + .row, .card > .dropcard + .lrow { border-top: .5px solid var(--line); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610111929"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610111934"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2066,13 +2070,22 @@ function groupsBlock(r, interactive) {
   return html;
 }
 
+/* A leaderboard row that drops the player's card down underneath it when tapped. */
+function dropRow(rid, x, inner, cls = 'lrow') {
+  const r = D.round(rid), comp = computeR(rid), pl = comp && comp.players[x.id];
+  if (!r || !pl) return `<button class="${cls}" data-act="player" data-pid="${x.id}">${inner}</button>`;
+  const key = `bd-${rid}-${x.id}`, open = !!UI.open[key];
+  return `<button class="${cls} drop${open ? ' open' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}">${inner}</button>${open ? `<div class="dropcard">${cardParts(r, pl).table}</div>` : ''}`;
+}
+const dropChev = `<span class="chev dn">${chev}</span>`;
+
 function resultsBlock(r) {
   const res = resultsOf(r.id);
   if (!res) return '';
   const app = res.source === 'app';
   let html = sec(label('Stableford'), cardOf(res.rows.map(x => {
-    const tap = app ? `data-act="card" data-rid="${r.id}" data-pid="${x.id}"` : `data-act="player" data-pid="${x.id}"`;
-    return `<button class="lrow" ${tap}><span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="b r">${x.total}</span></button>`;
+    const inner = `<span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
+    return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')) + (res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : res.source === 'sheet' ? '<p class="cap note">From the 2026 sheet</p>' : ''));
   if (res.kb.length) {
     html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join('')));
@@ -2735,7 +2748,7 @@ VIEWS.finish = () => {
   const gc = comp.groups.find(x => x.id === g.id);
   const submitted = D.card(rid, g.id);
   const buggies = gc.teams.length === 2;
-  const players = gc.teams.map((t, i) => t.map(pid => `<button class="row" data-act="card" data-rid="${rid}" data-pid="${pid}"><span style="display:flex;align-items:center;gap:8px">${buggies ? dot(i) : ''}${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${comp.players[pid].total}</span>${chev}</span></button>`).join('')).join('');
+  const players = gc.teams.map((t, i) => t.map(pid => dropRow(rid, { id: pid }, `<span style="display:flex;align-items:center;gap:8px">${buggies ? dot(i) : ''}${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${comp.players[pid].total}</span>${dropChev}</span>`, 'row')).join('')).join('');
   const bw = buggies ? ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${status(gc.matches[s].status)}</div>`).join('') : '';
   const missing = 18 - gc.holesDone;
   const checks = ['front', 'back'].map(sg => checkRow(sg, D.check(rid, g.id, sg))).join('');
@@ -2843,10 +2856,8 @@ VIEWS.board = () => {
   const comp = res.comp;
   const pillTxt = r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r);
   html += sec(`${label(esc(roundName(r)))}${pillTxt}`, cardOf(res.rows.map(x => {
-    const pl = res.source === 'app' && comp ? comp.players[x.id] : null;
-    if (!pl) return `<button class="lrow" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="b r">${x.total}</span></button>`;
-    const key = `bd-${sel}-${x.id}`, open = !!UI.open[key];
-    return `<button class="lrow drop${open ? ' open' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}"><span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span><span class="chev dn">${chev}</span></span></button>${open ? `<div class="dropcard">${cardParts(r, pl).table}</div>` : ''}`;
+    const inner = `<span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
+    return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')), true);
   if (res.kb.length) html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join('')));
   if (comp && comp.groups.some(g => g.teams.length === 2)) {
