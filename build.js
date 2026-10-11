@@ -45,7 +45,7 @@ out('preview.html', `${head()}<title>NCGS</title><style>${css}</style></head><bo
 const live = { mode: 'live', api: deploy.api || '', version };
 out('site/index.html', `${head(`<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="NCGS">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">

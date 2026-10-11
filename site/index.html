@@ -3,7 +3,7 @@
 <meta name="theme-color" content="#0B3D2E">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="NCGS">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
@@ -510,13 +510,12 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 #ptr.spin .ptr-ring { animation: ptrspin .8s linear infinite; transform: none !important; }
 @keyframes ptrspin { to { transform: rotate(360deg); } }
 
-/* The green header runs all the way up behind the clock and battery (iOS draws them in white on top). */
-body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top, 0px); background: linear-gradient(90deg, var(--pine-2), #11503A 70%, var(--pine)); z-index: 50; }
-#app { padding-top: env(safe-area-inset-top, 0px); }
-.hero { margin-top: calc(-1 * env(safe-area-inset-top, 0px)); }
+/* Home-screen app: a solid black status bar (no iOS glass), and the page background matches the tab bar so any spare strip below it is invisible. */
+html { background: #fff; }
+body::before { content: none; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610112102"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610112119"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.

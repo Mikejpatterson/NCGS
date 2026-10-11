@@ -500,7 +500,6 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 #ptr.spin .ptr-ring { animation: ptrspin .8s linear infinite; transform: none !important; }
 @keyframes ptrspin { to { transform: rotate(360deg); } }
 
-/* The green header runs all the way up behind the clock and battery (iOS draws them in white on top). */
-body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top, 0px); background: linear-gradient(90deg, var(--pine-2), #11503A 70%, var(--pine)); z-index: 50; }
-#app { padding-top: env(safe-area-inset-top, 0px); }
-.hero { margin-top: calc(-1 * env(safe-area-inset-top, 0px)); }
+/* Home-screen app: a solid black status bar (no iOS glass), and the page background matches the tab bar so any spare strip below it is invisible. */
+html { background: #fff; }
+body::before { content: none; }
