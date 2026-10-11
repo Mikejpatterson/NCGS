@@ -445,7 +445,6 @@ var NCGS = (function () {
         var first = ss.getSheetByName('Sheet1');
         if (first && ss.getSheets().length > 1) ss.deleteSheet(first);
         var r = seed ? s.api({ op: 'seed', data: seed, note: 'NCGS 2026 season from Marbella_2026_Final_Workbook.xlsx' }) : { ok: true };
-        folder();
         return { sheet: ss.getUrl(), seeded: r };
       }
     };

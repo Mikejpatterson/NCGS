@@ -176,3 +176,30 @@ test('a re-created score is newer than the tombstone that deleted it', () => {
   const tomb = d.tables.deleted.find(x => x.tbl === 'scores');
   assert.ok(row.ver > tomb.ver);
 });
+
+test('first-time setup works before Drive access is granted (photos folder is only made when a photo is saved)', () => {
+  const ss = fakeSpreadsheet();
+  ss.getSheets = () => Object.values(ss.sheets);
+  ss.deleteSheet = () => {};
+  ss.getUrl = () => 'u';
+  ss.getId = () => 'sid';
+  const props = fakeProps();
+  let driveCalls = 0;
+  global.PropertiesService = { getScriptProperties: () => props };
+  global.CacheService = { getScriptCache: fakeCache };
+  global.LockService = fakeLock;
+  global.SpreadsheetApp = { create: () => ss, openById: () => ss };
+  global.DriveApp = { createFolder() { driveCalls++; throw new Error('Specified permissions are not sufficient to call DriveApp.createFolder'); }, getFolderById() { throw new Error('no'); } };
+  global.ContentService = { createTextOutput: t => ({ t, setMimeType() { return this; } }), MimeType: { JSON: 'json' } };
+  try {
+    const app = N.appsScript({ members: [{ id: 'a', name: 'A', full: 'A', index: 10, active: true }] });
+    const hit = o => JSON.parse(app.http({ postData: { contents: JSON.stringify(o) } }).t);
+    const first = hit({ op: 'load' });
+    assert.equal(first.error, undefined);
+    assert.equal(first.tables.members.length, 1);
+    assert.equal(props.getProperty('READY'), '1');
+    assert.equal(driveCalls, 0);
+  } finally {
+    ['PropertiesService', 'CacheService', 'LockService', 'SpreadsheetApp', 'DriveApp', 'ContentService'].forEach(k => delete global[k]);
+  }
+});
