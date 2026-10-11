@@ -433,6 +433,55 @@ if (window.claude && typeof window.claude.use === 'function') {
   window.claude.use('downloads').then(d => { downloads = d; }).catch(() => {});
 }
 
+/* Pull down to refresh. A phone's home-screen app has no built-in pull-to-refresh, so this one fetches the latest scores,
+   sends anything waiting to go, and reloads if a newer version of the app has been published. */
+(function pullToRefresh() {
+  const standalone = window.navigator.standalone || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.NCGS_FORCE_PTR;
+  if (!standalone) return;   // in the browser the browser does it
+  const ind = document.createElement('div');
+  ind.id = 'ptr'; ind.setAttribute('aria-hidden', 'true'); ind.innerHTML = '<span class="ptr-ring"></span>';
+  document.body.appendChild(ind);
+  const GO = 90;
+  let y0 = null, dy = 0, busy = false;
+  const blocked = t => UI.fix || UI.contestSheet || UI.testSheet || UI.photoFull || UI.shareImg || (t && t.closest && t.closest('input,textarea,select'));
+  const show = p => {   // p: how far down the indicator sits, 0..60
+    ind.style.opacity = String(Math.min(1, p / 40));
+    ind.style.transform = `translateY(${p - 56}px)`;
+    ind.firstChild.style.transform = `rotate(${p * 5}deg)`;
+  };
+  document.addEventListener('touchstart', e => {
+    if (busy || e.touches.length !== 1 || window.scrollY > 0 || blocked(e.target)) { y0 = null; return; }
+    y0 = e.touches[0].clientY; dy = 0;
+  }, { passive: true });
+  document.addEventListener('touchmove', e => {
+    if (y0 === null) return;
+    if (window.scrollY > 0) { y0 = null; show(0); return; }
+    dy = Math.max(0, e.touches[0].clientY - y0);
+    show(Math.min(60, dy * 0.5));
+  }, { passive: true });
+  const finish = () => {
+    ind.classList.remove('spin'); ind.style.transition = ''; show(0); busy = false;
+  };
+  const end = () => {
+    if (y0 === null) return;
+    const pulled = dy; y0 = null; dy = 0;
+    if (pulled < GO) { show(0); return; }
+    busy = true; ind.classList.add('spin'); show(48);
+    const minimum = new Promise(r => setTimeout(r, 700));
+    Promise.all([flush().then(() => sync()).catch(() => {}), minimum]).then(async () => {
+      let newer = false;
+      if (BOOT.mode === 'live' && BOOT.version) {
+        try { const t = await (await fetch('sw.js?' + Date.now(), { cache: 'no-store' })).text(); const m = /ncgs-(\d+)/.exec(t); newer = !!(m && m[1] !== BOOT.version); } catch (x) { /* offline */ }
+      }
+      if (newer) { location.reload(); return; }
+      finish();
+      toast(DB.online ? 'Up to date' : 'No signal. Showing the last scores this phone saw.');
+    });
+  };
+  document.addEventListener('touchend', end, { passive: true });
+  document.addEventListener('touchcancel', () => { y0 = null; show(0); }, { passive: true });
+})();
+
 /* Open where the phone left off: in the round if one is live and this phone is playing. */
 (function start() {
   const rid = liveRid();

@@ -493,3 +493,9 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 /* iOS 26 fades the top of the screen under the status bar (the "glass" edge). Start heroes a little lower so the first line is never hazy. */
 .hero { padding-top: calc(env(safe-area-inset-top, 0px) + 20px); }
 .hero.c { padding-top: calc(env(safe-area-inset-top, 0px) + 18px); }
+
+/* Pull to refresh */
+#ptr { position: fixed; left: 50%; top: calc(env(safe-area-inset-top, 0px) + 10px); width: 40px; height: 40px; margin-left: -20px; border-radius: 50%; background: #fff; box-shadow: var(--lift); z-index: 60; display: flex; align-items: center; justify-content: center; opacity: 0; transform: translateY(-56px); pointer-events: none; }
+.ptr-ring { width: 20px; height: 20px; border-radius: 50%; border: 3px solid var(--fill); border-top-color: var(--green); display: block; }
+#ptr.spin .ptr-ring { animation: ptrspin .8s linear infinite; transform: none !important; }
+@keyframes ptrspin { to { transform: rotate(360deg); } }
