@@ -59,6 +59,7 @@ const ACT = {
     render();
   },
   mgroup: el => { UI.matchGroup = el.dataset.gid; UI.scrollCur = true; render(); },
+  'fix-hole': el => { UI.playRid = el.dataset.rid; UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: el.dataset.rid }); },
   'edit-hole': el => { UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: playRid() }); },
   board: el => { UI.board = el.dataset.id; render(); },
   results: el => go('results', { rid: el.dataset.rid }),

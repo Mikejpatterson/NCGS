@@ -101,7 +101,7 @@ function entryRow(pid, val, shots, par, rid) {
   const atOne = num && val <= 1;
   return `<div class="pr${flash}">
     <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dots(shots, true)}${dpl ? dropChev : ''}</button><div class="pr-score">${score}</div></div>
-    ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl).table}</div>` : ''}
+    ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid)).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
     <div class="stepper" role="group" aria-label="Strokes for ${name}">
       <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
       <div class="stv${num ? '' : ' none'}" data-pid="${pid}" aria-live="polite">${num ? val : (val === 'P' ? 'Out' : 'Par ' + par)}</div>
@@ -194,6 +194,13 @@ function saveHole() {
   send(req);
   tick();
   if (ctx.mode === 'org') { back(); toast(`Hole ${ctx.n} saved`); return; }
+  if (ctx.edit) {
+    // A past hole was corrected: straight back to the hole being played.
+    UI.edit = false; UI.after = null;
+    replaceTop('tee', { rid: ctx.rid });
+    toast(`Hole ${ctx.n} changed`);
+    return;
+  }
   UI.after = { rid: ctx.rid, gid: ctx.gid, n: ctx.n, before, prev, claimBefore: claimsBefore ? claimsBefore.pid : null, hadClaim: req.claim !== undefined, draft: draftCopy, wasEdit: ctx.edit };
   UI.edit = false;
   replaceTop('after', { rid: ctx.rid });

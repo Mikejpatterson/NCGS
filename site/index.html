@@ -471,9 +471,12 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 .sc thead th { font-size: .6rem; padding-inline: 2px; }
 .sc thead th.hn { font-size: .6rem; padding-left: 12px; }
 .sc th:nth-child(3), .sc th:nth-child(7) { padding-inline: 6px; }
+.fixcell { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 40px; border-radius: 10px; }
+.fixcell:active { background: var(--press); }
+.dropcard .sc-note { padding: 8px 12px 0; text-align: center; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610111959"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610112010"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2128,7 +2131,9 @@ function dropRow(rid, x, inner, cls = 'lrow') {
   const r = D.round(rid), comp = computeR(rid), pl = comp && comp.players[x.id];
   if (!r || !pl) return `<button class="${cls}" data-act="player" data-pid="${x.id}">${inner}</button>`;
   const key = `bd-${rid}-${x.id}`, open = !!UI.open[key];
-  return `<button class="${cls} drop${open ? ' open' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}">${inner}</button>${open ? `<div class="dropcard">${cardParts(r, pl).table}</div>` : ''}`;
+  const mine = myGroup(rid);
+  const fix = r.status === 'live' && !!mine && mine.teams.flat().includes(x.id);
+  return `<button class="${cls} drop${open ? ' open' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}">${inner}</button>${open ? `<div class="dropcard">${cardParts(r, pl, fix).table}${fix ? '<p class="cap sc-note">Tap a score to change it</p>' : ''}</div>` : ''}`;
 }
 const dropChev = `<span class="chev dn">${chev}</span>`;
 
@@ -2240,7 +2245,7 @@ function markCell(gross, par, shots) {
   if (gross === 'P') return `<span class="mk pu" title="Picked up">${E.pickupStrokes(par, shots || 0)}<sup>p</sup></span>`;
   return `<span class="mk ${E.scoreMark(gross, par)}">${gross}</span>`;
 }
-function cardParts(r, pl) {
+function cardParts(r, pl, fix) {
   const holes = holesOf(r);
   const half = hs => {
     // Running total of the strokes entered so far, the same way points run. A pick-up counts as the strokes that net 0 points.
@@ -2254,7 +2259,7 @@ function cardParts(r, pl) {
   const line = (a, b) => {
     const cell = h => {
       const hp = pl.holes[h.n];
-      return `<td class="hn">${h.n}${hp.shots ? ` <span class="sd">${hp.shots > 0 ? '●'.repeat(hp.shots) : '○'.repeat(-hp.shots)}</span>` : ''}</td><td class="par">${h.par}</td><td>${markCell(hp.gross, h.par, hp.shots)}</td><td class="pts">${hp.points === null ? '' : `<span class="pp p${Math.min(hp.points, 4)}">${hp.points}</span>`}</td>`;
+      return `<td class="hn">${h.n}${hp.shots ? ` <span class="sd">${hp.shots > 0 ? '●'.repeat(hp.shots) : '○'.repeat(-hp.shots)}</span>` : ''}</td><td class="par">${h.par}</td><td>${fix && hp.gross !== null && hp.gross !== undefined ? `<button class="fixcell" data-act="fix-hole" data-rid="${r.id}" data-n="${h.n}" aria-label="Change hole ${h.n}">${markCell(hp.gross, h.par, hp.shots)}</button>` : markCell(hp.gross, h.par, hp.shots)}</td><td class="pts">${hp.points === null ? '' : `<span class="pp p${Math.min(hp.points, 4)}">${hp.points}</span>`}</td>`;
     };
     return `<tr>${cell(a)}<td class="gap"></td>${cell(b)}</tr>`;
   };
@@ -2395,7 +2400,7 @@ function entryRow(pid, val, shots, par, rid) {
   const atOne = num && val <= 1;
   return `<div class="pr${flash}">
     <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dots(shots, true)}${dpl ? dropChev : ''}</button><div class="pr-score">${score}</div></div>
-    ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl).table}</div>` : ''}
+    ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid)).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
     <div class="stepper" role="group" aria-label="Strokes for ${name}">
       <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
       <div class="stv${num ? '' : ' none'}" data-pid="${pid}" aria-live="polite">${num ? val : (val === 'P' ? 'Out' : 'Par ' + par)}</div>
@@ -2488,6 +2493,13 @@ function saveHole() {
   send(req);
   tick();
   if (ctx.mode === 'org') { back(); toast(`Hole ${ctx.n} saved`); return; }
+  if (ctx.edit) {
+    // A past hole was corrected: straight back to the hole being played.
+    UI.edit = false; UI.after = null;
+    replaceTop('tee', { rid: ctx.rid });
+    toast(`Hole ${ctx.n} changed`);
+    return;
+  }
   UI.after = { rid: ctx.rid, gid: ctx.gid, n: ctx.n, before, prev, claimBefore: claimsBefore ? claimsBefore.pid : null, hadClaim: req.claim !== undefined, draft: draftCopy, wasEdit: ctx.edit };
   UI.edit = false;
   replaceTop('after', { rid: ctx.rid });
@@ -3428,6 +3440,7 @@ const ACT = {
     render();
   },
   mgroup: el => { UI.matchGroup = el.dataset.gid; UI.scrollCur = true; render(); },
+  'fix-hole': el => { UI.playRid = el.dataset.rid; UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: el.dataset.rid }); },
   'edit-hole': el => { UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: playRid() }); },
   board: el => { UI.board = el.dataset.id; render(); },
   results: el => go('results', { rid: el.dataset.rid }),

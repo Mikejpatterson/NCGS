@@ -181,7 +181,9 @@ function dropRow(rid, x, inner, cls = 'lrow') {
   const r = D.round(rid), comp = computeR(rid), pl = comp && comp.players[x.id];
   if (!r || !pl) return `<button class="${cls}" data-act="player" data-pid="${x.id}">${inner}</button>`;
   const key = `bd-${rid}-${x.id}`, open = !!UI.open[key];
-  return `<button class="${cls} drop${open ? ' open' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}">${inner}</button>${open ? `<div class="dropcard">${cardParts(r, pl).table}</div>` : ''}`;
+  const mine = myGroup(rid);
+  const fix = r.status === 'live' && !!mine && mine.teams.flat().includes(x.id);
+  return `<button class="${cls} drop${open ? ' open' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}">${inner}</button>${open ? `<div class="dropcard">${cardParts(r, pl, fix).table}${fix ? '<p class="cap sc-note">Tap a score to change it</p>' : ''}</div>` : ''}`;
 }
 const dropChev = `<span class="chev dn">${chev}</span>`;
 
@@ -293,7 +295,7 @@ function markCell(gross, par, shots) {
   if (gross === 'P') return `<span class="mk pu" title="Picked up">${E.pickupStrokes(par, shots || 0)}<sup>p</sup></span>`;
   return `<span class="mk ${E.scoreMark(gross, par)}">${gross}</span>`;
 }
-function cardParts(r, pl) {
+function cardParts(r, pl, fix) {
   const holes = holesOf(r);
   const half = hs => {
     // Running total of the strokes entered so far, the same way points run. A pick-up counts as the strokes that net 0 points.
@@ -307,7 +309,7 @@ function cardParts(r, pl) {
   const line = (a, b) => {
     const cell = h => {
       const hp = pl.holes[h.n];
-      return `<td class="hn">${h.n}${hp.shots ? ` <span class="sd">${hp.shots > 0 ? '●'.repeat(hp.shots) : '○'.repeat(-hp.shots)}</span>` : ''}</td><td class="par">${h.par}</td><td>${markCell(hp.gross, h.par, hp.shots)}</td><td class="pts">${hp.points === null ? '' : `<span class="pp p${Math.min(hp.points, 4)}">${hp.points}</span>`}</td>`;
+      return `<td class="hn">${h.n}${hp.shots ? ` <span class="sd">${hp.shots > 0 ? '●'.repeat(hp.shots) : '○'.repeat(-hp.shots)}</span>` : ''}</td><td class="par">${h.par}</td><td>${fix && hp.gross !== null && hp.gross !== undefined ? `<button class="fixcell" data-act="fix-hole" data-rid="${r.id}" data-n="${h.n}" aria-label="Change hole ${h.n}">${markCell(hp.gross, h.par, hp.shots)}</button>` : markCell(hp.gross, h.par, hp.shots)}</td><td class="pts">${hp.points === null ? '' : `<span class="pp p${Math.min(hp.points, 4)}">${hp.points}</span>`}</td>`;
     };
     return `<tr>${cell(a)}<td class="gap"></td>${cell(b)}</tr>`;
   };

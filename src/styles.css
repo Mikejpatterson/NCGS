@@ -461,3 +461,6 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 .sc thead th { font-size: .6rem; padding-inline: 2px; }
 .sc thead th.hn { font-size: .6rem; padding-left: 12px; }
 .sc th:nth-child(3), .sc th:nth-child(7) { padding-inline: 6px; }
+.fixcell { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 40px; border-radius: 10px; }
+.fixcell:active { background: var(--press); }
+.dropcard .sc-note { padding: 8px 12px 0; text-align: center; }
