@@ -1,0 +1,76 @@
+{
+  "tripName": "Marbella golf trip",
+  "allowance": 0.95,
+  "notes": {
+    "players": "Demo players and handicap indexes. Replace with the real group.",
+    "course": "Cabopino par, stroke index and distances come from two published scorecards (The Social Golfer, GolfingRecord). Distances are metres and shown in yards; Golfshot GPS readings on holes 1 to 3 agree. Hole 12 is listed as 391 m on one card and 415 m on the other; 391 m matches the published 5,170 m total. Slope 130 and rating 69.1 for the yellow tees are from The Social Golfer and should be confirmed with the club."
+  },
+  "course": {
+    "id": "cabopino",
+    "name": "Cabopino",
+    "fullName": "Cabopino Golf Marbella",
+    "tees": {
+      "yellow": { "name": "Yellow", "rating": 69.1, "slope": 130, "par": 71, "verified": false }
+    },
+    "holes": [
+      { "n": 1, "par": 4, "si": 15, "metres": 309 },
+      { "n": 2, "par": 4, "si": 13, "metres": 275 },
+      { "n": 3, "par": 4, "si": 5, "metres": 288 },
+      { "n": 4, "par": 4, "si": 17, "metres": 243 },
+      { "n": 5, "par": 4, "si": 1, "metres": 378 },
+      { "n": 6, "par": 4, "si": 9, "metres": 264 },
+      { "n": 7, "par": 3, "si": 7, "metres": 152 },
+      { "n": 8, "par": 4, "si": 11, "metres": 277 },
+      { "n": 9, "par": 4, "si": 3, "metres": 327 },
+      { "n": 10, "par": 4, "si": 8, "metres": 327 },
+      { "n": 11, "par": 4, "si": 6, "metres": 336 },
+      { "n": 12, "par": 5, "si": 4, "metres": 391 },
+      { "n": 13, "par": 3, "si": 16, "metres": 134 },
+      { "n": 14, "par": 5, "si": 2, "metres": 456 },
+      { "n": 15, "par": 3, "si": 14, "metres": 135 },
+      { "n": 16, "par": 4, "si": 12, "metres": 305 },
+      { "n": 17, "par": 4, "si": 10, "metres": 268 },
+      { "n": 18, "par": 4, "si": 18, "metres": 305 }
+    ]
+  },
+  "players": [
+    { "id": "brendan", "name": "Brendan", "index": 22.5 },
+    { "id": "declan", "name": "Declan", "index": 13.0 },
+    { "id": "dermot", "name": "Dermot", "index": 20.1 },
+    { "id": "frank", "name": "Frank", "index": 24.8 },
+    { "id": "ger", "name": "Ger", "index": 6.2 },
+    { "id": "joe", "name": "Joe", "index": 11.7 },
+    { "id": "liam", "name": "Liam", "index": 10.9 },
+    { "id": "mick", "name": "Mick", "index": 8.6 },
+    { "id": "noel", "name": "Noel", "index": 16.3 },
+    { "id": "pat", "name": "Pat", "index": 12.4 },
+    { "id": "sean", "name": "Seán", "index": 14.8 },
+    { "id": "tommy", "name": "Tommy", "index": 18.7 }
+  ],
+  "rounds": [
+    {
+      "id": "r1", "n": 1, "date": "2026-10-14", "dateLabel": "Wednesday 14 October", "tee": "yellow", "status": "live",
+      "contests": [ { "hole": 7, "type": "ntp" }, { "hole": 12, "type": "ld" }, { "hole": 15, "type": "ntp" } ],
+      "groups": [
+        { "id": "g1", "n": 1, "teeTime": "10:00", "startHole": 1, "teams": [["pat", "dermot"], ["sean", "mick"]] },
+        { "id": "g2", "n": 2, "teeTime": "10:08", "startHole": 1, "teams": [["ger", "tommy"], ["liam", "noel"]] },
+        { "id": "g3", "n": 3, "teeTime": "10:16", "startHole": 1, "teams": [["brendan", "declan"], ["frank", "joe"]] }
+      ]
+    },
+    {
+      "id": "r2", "n": 2, "date": "2026-10-15", "dateLabel": "Thursday 15 October", "tee": "yellow", "status": "upcoming",
+      "contests": [ { "hole": 7, "type": "ntp" }, { "hole": 14, "type": "ld" }, { "hole": 13, "type": "ntp" } ],
+      "groups": [
+        { "id": "g1", "n": 1, "teeTime": "10:00", "startHole": 1, "teams": [["ger", "noel"], ["brendan", "joe"]] },
+        { "id": "g2", "n": 2, "teeTime": "10:08", "startHole": 1, "teams": [["pat", "liam"], ["dermot", "frank"]] },
+        { "id": "g3", "n": 3, "teeTime": "10:16", "startHole": 1, "teams": [["sean", "tommy"], ["mick", "declan"]] }
+      ]
+    },
+    {
+      "id": "r3", "n": 3, "date": "2026-10-16", "dateLabel": "Friday 16 October", "tee": "yellow", "status": "upcoming",
+      "contests": [ { "hole": 15, "type": "ntp" }, { "hole": 12, "type": "ld" } ],
+      "groups": null,
+      "teeTimes": ["10:00", "10:08", "10:16"]
+    }
+  ]
+}

@@ -1,0 +1,176 @@
+{
+ "app_scores_round1_group1": {
+  "Pat": [
+   4,
+   5,
+   5,
+   5,
+   5,
+   4,
+   3,
+   5,
+   4,
+   5,
+   6,
+   5,
+   3,
+   6,
+   3,
+   4,
+   5,
+   4
+  ],
+  "Dermot": [
+   6,
+   5,
+   6,
+   7,
+   5,
+   6,
+   4,
+   5,
+   6,
+   5,
+   6,
+   6,
+   "P",
+   7,
+   4,
+   5,
+   6,
+   5
+  ],
+  "Seán": [
+   5,
+   6,
+   4,
+   5,
+   6,
+   5,
+   4,
+   4,
+   6,
+   5,
+   5,
+   6,
+   4,
+   5,
+   2,
+   4,
+   4,
+   5
+  ],
+  "Mick": [
+   4,
+   5,
+   5,
+   4,
+   5,
+   5,
+   3,
+   5,
+   5,
+   4,
+   5,
+   6,
+   4,
+   6,
+   "P",
+   4,
+   5,
+   4
+  ]
+ },
+ "cards": [
+  {
+   "file": "card-a-front-nine-vertical.jpg",
+   "layout": "Holes down, A B C D across. Key: A Pat, B Dermot, C Seán, D Mick.",
+   "differences": [
+    {
+     "hole": 4,
+     "player": "Seán (C)",
+     "card": 6,
+     "app": 5
+    },
+    {
+     "hole": 8,
+     "player": "Pat (A)",
+     "card": 6,
+     "app": 5,
+     "note": "5 rubbed out, 6 written over the ghost"
+    }
+   ],
+   "traps": [
+    {
+     "hole": 7,
+     "player": "Mick (D)",
+     "note": "Scrawled 3 that matches the app"
+    }
+   ]
+  },
+  {
+   "file": "card-b-back-nine-spanish.jpg",
+   "layout": "Spanish card. Holes across, Jugador A-D down. Key: A Pat, B Dermot, C Seán, D Mick.",
+   "differences": [
+    {
+     "hole": 17,
+     "player": "Mick (D)",
+     "card": 6,
+     "app": 5
+    },
+    {
+     "hole": 18,
+     "player": "Pat (A)",
+     "card": 5,
+     "app": 4
+    }
+   ],
+   "traps": [
+    {
+     "hole": 13,
+     "player": "Dermot (B)",
+     "note": "X = picked up, matches"
+    },
+    {
+     "hole": 15,
+     "player": "Mick (D)",
+     "note": "Dash = picked up, matches"
+    },
+    {
+     "hole": 16,
+     "player": "Seán (C)",
+     "note": "Open 4 that looks like 9; must not be read as 9"
+    },
+    {
+     "hole": "middle",
+     "player": "any",
+     "note": "Glare: unreadable cells must be flagged, not guessed"
+    }
+   ]
+  },
+  {
+   "file": "card-c-front-nine-reordered.jpg",
+   "layout": "Holes down. Key in a different order: A Mick, B Seán, C Pat, D \"Derm\".",
+   "differences": [
+    {
+     "hole": 5,
+     "player": "Dermot (D)",
+     "card": 6,
+     "app": 5
+    }
+   ],
+   "traps": [
+    {
+     "hole": "all",
+     "player": "Pat (C)",
+     "note": "Writes strokes with points small beside them (4 2); read the strokes"
+    },
+    {
+     "hole": "all",
+     "player": "Dermot (D)",
+     "note": "Written as \"Derm\"; match by key name or by scores"
+    }
+   ]
+  }
+ ]
+}

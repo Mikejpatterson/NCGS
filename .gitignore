@@ -1,0 +1,7 @@
+# Real society data stays out of this public repository. It lives in the Google Sheet.
+data/ncgs-2026.json
+data/seed.json
+deploy.json
+dist/
+node_modules/
+test/shots/

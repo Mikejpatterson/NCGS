@@ -1,0 +1,700 @@
+{
+ "note": "Readings recorded from a blind run of the card reader on the synthetic test cards (11 October 2026). Used for tests, and as the reading when a test card is used where live reading is unavailable.",
+ "cards": {
+  "card-a-front-nine-vertical.jpg": {
+   "label": "Front nine · holes down the card",
+   "nine": "front",
+   "reading": {
+    "layout": "holes down",
+    "holes": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "players": [
+     {
+      "letter": "A",
+      "name": "Pat",
+      "handicap": 12,
+      "scores": {
+       "1": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "2": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "3": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "4": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "5": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "6": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "7": {
+        "value": 3,
+        "confidence": "high",
+        "note": ""
+       },
+       "8": {
+        "value": 6,
+        "confidence": "high",
+        "note": "Faint rubbed-out 5 under the 6; final score 6"
+       },
+       "9": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       }
+      }
+     },
+     {
+      "letter": "B",
+      "name": "Dermot",
+      "handicap": 20,
+      "scores": {
+       "1": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "2": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "3": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "4": {
+        "value": 7,
+        "confidence": "high",
+        "note": ""
+       },
+       "5": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "6": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "7": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "8": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "9": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       }
+      }
+     },
+     {
+      "letter": "C",
+      "name": "Seán",
+      "handicap": 14,
+      "scores": {
+       "1": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "2": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "3": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "4": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "5": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "6": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "7": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "8": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "9": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       }
+      }
+     },
+     {
+      "letter": "D",
+      "name": "Mick",
+      "handicap": 8,
+      "scores": {
+       "1": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "2": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "3": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "4": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "5": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "6": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "7": {
+        "value": 3,
+        "confidence": "high",
+        "note": ""
+       },
+       "8": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "9": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       }
+      }
+     }
+    ],
+    "problems": [
+     "Card photographed at an angle",
+     "Shadow over the lower right"
+    ]
+   }
+  },
+  "card-b-back-nine-spanish.jpg": {
+   "label": "Back nine · Spanish card, holes across",
+   "nine": "back",
+   "reading": {
+    "layout": "holes across",
+    "holes": [
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18
+    ],
+    "players": [
+     {
+      "letter": "A",
+      "name": "Pat",
+      "handicap": 12,
+      "scores": {
+       "10": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "11": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "12": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "13": {
+        "value": 3,
+        "confidence": "high",
+        "note": "Faded by glare"
+       },
+       "14": {
+        "value": 6,
+        "confidence": "low",
+        "note": "Washed out by glare and very faint"
+       },
+       "15": {
+        "value": 3,
+        "confidence": "high",
+        "note": ""
+       },
+       "16": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "17": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "18": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       }
+      }
+     },
+     {
+      "letter": "B",
+      "name": "Dermot",
+      "handicap": 20,
+      "scores": {
+       "10": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "11": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "12": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "13": {
+        "value": "P",
+        "confidence": "high",
+        "note": "Written as X"
+       },
+       "14": {
+        "value": 7,
+        "confidence": "high",
+        "note": ""
+       },
+       "15": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "16": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "17": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "18": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       }
+      }
+     },
+     {
+      "letter": "C",
+      "name": "Seán",
+      "handicap": 14,
+      "scores": {
+       "10": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "11": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "12": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "13": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "14": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "15": {
+        "value": 2,
+        "confidence": "high",
+        "note": ""
+       },
+       "16": {
+        "value": 9,
+        "confidence": "high",
+        "note": "Clearly written 9 on a par 4"
+       },
+       "17": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "18": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       }
+      }
+     },
+     {
+      "letter": "D",
+      "name": "Mick",
+      "handicap": 8,
+      "scores": {
+       "10": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "11": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "12": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "13": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "14": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "15": {
+        "value": "P",
+        "confidence": "high",
+        "note": "Written as a dash"
+       },
+       "16": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "17": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "18": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       }
+      }
+     }
+    ],
+    "problems": [
+     "Strong glare over holes 13 to 15 in rows A and B"
+    ]
+   }
+  },
+  "card-c-front-nine-reordered.jpg": {
+   "label": "Front nine · key in a different order",
+   "nine": "front",
+   "reading": {
+    "layout": "holes down",
+    "holes": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "players": [
+     {
+      "letter": "A",
+      "name": "Mick",
+      "handicap": 8,
+      "scores": {
+       "1": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "2": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "3": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "4": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "5": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "6": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "7": {
+        "value": 3,
+        "confidence": "high",
+        "note": ""
+       },
+       "8": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "9": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       }
+      }
+     },
+     {
+      "letter": "B",
+      "name": "Seán",
+      "handicap": 14,
+      "scores": {
+       "1": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "2": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "3": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "4": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "5": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "6": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "7": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "8": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "9": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       }
+      }
+     },
+     {
+      "letter": "C",
+      "name": "Pat",
+      "handicap": 12,
+      "scores": {
+       "1": {
+        "value": 4,
+        "confidence": "high",
+        "note": "Small points beside it ignored"
+       },
+       "2": {
+        "value": 5,
+        "confidence": "high",
+        "note": "Small points beside it ignored"
+       },
+       "3": {
+        "value": 5,
+        "confidence": "high",
+        "note": "Small points beside it ignored"
+       },
+       "4": {
+        "value": 5,
+        "confidence": "high",
+        "note": "Small points beside it ignored"
+       },
+       "5": {
+        "value": 5,
+        "confidence": "high",
+        "note": "Small points beside it ignored"
+       },
+       "6": {
+        "value": 4,
+        "confidence": "high",
+        "note": "Small points beside it ignored"
+       },
+       "7": {
+        "value": 3,
+        "confidence": "high",
+        "note": "Small points beside it ignored"
+       },
+       "8": {
+        "value": 5,
+        "confidence": "high",
+        "note": "Small points beside it ignored"
+       },
+       "9": {
+        "value": 4,
+        "confidence": "high",
+        "note": "Small points beside it ignored"
+       }
+      }
+     },
+     {
+      "letter": "D",
+      "name": "Derm",
+      "handicap": 20,
+      "scores": {
+       "1": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "2": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "3": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "4": {
+        "value": 7,
+        "confidence": "high",
+        "note": ""
+       },
+       "5": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "6": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       },
+       "7": {
+        "value": 4,
+        "confidence": "high",
+        "note": ""
+       },
+       "8": {
+        "value": 5,
+        "confidence": "high",
+        "note": ""
+       },
+       "9": {
+        "value": 6,
+        "confidence": "high",
+        "note": ""
+       }
+      }
+     }
+    ],
+    "problems": [
+     "Card tilted about 10 degrees",
+     "Shadow over the lower right"
+    ]
+   }
+  }
+ }
+}
