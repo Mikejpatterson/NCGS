@@ -283,15 +283,8 @@ function markCell(gross, par) {
   const k = E.scoreMark(gross, par);
   return `<span class="mk ${k}">${gross === 'P' ? '–' : gross}</span>`;
 }
-VIEWS.card = p => {
-  const r = D.round(p.rid);
-  const comp = computeR(p.rid);
-  const pl = comp ? comp.players[p.pid] : null;
-  if (!r || !pl) return { html: `${navBack('Back')}<div class="head"><h1 class="title">No card</h1></div>` };
+function cardParts(r, pl) {
   const holes = holesOf(r);
-  const tee = teeOf(r);
-  const res = resultsOf(r.id);
-  const me = res.rows.find(x => x.id === p.pid);
   const half = hs => {
     const g = hs.map(h => pl.holes[h.n].gross);
     const grossTot = g.some(v => v === null || v === 'P') ? '–' : g.reduce((s, v) => s + v, 0);
@@ -307,15 +300,27 @@ VIEWS.card = p => {
     };
     return `<tr>${cell(a)}<td class="gap"></td>${cell(b)}</tr>`;
   };
+  const table = `<table class="sc"><thead><tr><th class="hn">Hole</th><th>Par</th><th></th><th>Pts</th><th class="gap"></th><th class="hn">Hole</th><th>Par</th><th></th><th>Pts</th></tr></thead>
+    <tbody>${front.map((h, i) => line(h, backNine[i])).join('')}
+    <tr class="tot"><td class="hn">Out</td><td>${F.par}</td><td>${F.grossTot}</td><td>${F.pts}</td><td class="gap"></td><td class="hn">In</td><td>${B.par}</td><td>${B.grossTot}</td><td>${B.pts}</td></tr></tbody></table>`;
+  return { F, B, table };
+}
+VIEWS.card = p => {
+  const r = D.round(p.rid);
+  const comp = computeR(p.rid);
+  const pl = comp ? comp.players[p.pid] : null;
+  if (!r || !pl) return { html: `${navBack('Back')}<div class="head"><h1 class="title">No card</h1></div>` };
+  const tee = teeOf(r);
+  const res = resultsOf(r.id);
+  const me = res.rows.find(x => x.id === p.pid);
+  const { F, B, table } = cardParts(r, pl);
   const sub = [r.date ? fmtDate(r.date, true) : roundWhenShort(r), tee ? `${tee.name} · Par ${tee.par}` : '', `Playing hcp ${pl.ph}`].filter(Boolean).join(' · ');
   const html = `<header class="hero s">${navBack('Back')}
     <div class="head"><h1 class="title">${esc(pl.name)}</h1>${me && r.status === 'final' ? `<span class="sub">${posWord(me.posLabel)}</span>` : ''}</div>
     <p class="sub"><button class="link inline" data-act="round" data-rid="${r.id}">${esc(roundName(r))}</button> · ${esc(sub)}</p>
     ${isDemo(r) ? '<div class="note"><span class="pill w">Demo scores</span></div>' : ''}
     <div class="tiles"><div class="tile flag"><span class="cap">Points</span><span class="bignum">${pl.total}</span></div><div class="tile"><span class="cap">Out</span><span class="bignum">${F.pts}</span></div><div class="tile"><span class="cap">In</span><span class="bignum">${B.pts}</span></div></div></header>
-    <div class="card sc-wrap"><table class="sc"><thead><tr><th class="hn">Hole</th><th>Par</th><th></th><th>Pts</th><th class="gap"></th><th class="hn">Hole</th><th>Par</th><th></th><th>Pts</th></tr></thead>
-    <tbody>${front.map((h, i) => line(h, backNine[i])).join('')}
-    <tr class="tot"><td class="hn">Out</td><td>${F.par}</td><td>${F.grossTot}</td><td>${F.pts}</td><td class="gap"></td><td class="hn">In</td><td>${B.par}</td><td>${B.grossTot}</td><td>${B.pts}</td></tr></tbody></table></div>`;
+    <div class="card sc-wrap">${table}</div>`;
   return { html };
 };
 

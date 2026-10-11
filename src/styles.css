@@ -396,3 +396,14 @@ button.btn:has(> svg) { flex-direction: row; }
 .lnk { min-height: 112px; padding: 16px; gap: 2px; justify-content: flex-end; }
 .lnk-ic { width: 44px; height: 44px; border-radius: 12px; background: var(--green-soft); color: var(--green); display: inline-flex; align-items: center; justify-content: center; margin-bottom: auto; }
 .lnk-t { font-size: 1.12rem; }
+
+/* Leaderboard: tap a name to drop down their card */
+.lrow.drop { width: 100%; text-align: left; grid-template-columns: 36px minmax(0, 1fr) auto; }
+.lrow.drop .r { display: inline-flex; align-items: center; gap: 8px; }
+.lrow .chev.dn { transition: transform .2s; }
+.lrow.drop.open .chev.dn { transform: rotate(90deg); }
+.dropcard { padding: 4px 8px 8px; background: var(--fill); border-top: .5px solid var(--line); }
+.dropcard .sc { font-size: var(--t-sub); }
+.dropcard .sc td { height: 32px; }
+.lrow.drop .chev.dn { transform: rotate(90deg); }
+.lrow.drop.open .chev.dn { transform: rotate(-90deg); }
