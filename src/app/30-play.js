@@ -697,7 +697,7 @@ function loadScript(src) {
 async function shareCard(rid) {
   try {
     if (!window.html2canvas) await loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
-    const canvas = await window.html2canvas(document.getElementById('rcard'), { scale: 3, backgroundColor: '#F2F2F7' });
+    const canvas = await window.html2canvas(document.getElementById('rcard'), { scale: 3, backgroundColor: '#0A0F0D' });
     const blob = await new Promise(res => canvas.toBlob(res, 'image/png'));
     const name = `${D.society()}-${roundName(D.round(rid))}-results.png`.replace(/\s+/g, '-').toLowerCase();
     const file = new File([blob], name, { type: 'image/png' });
