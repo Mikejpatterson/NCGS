@@ -487,3 +487,5 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 @keyframes slideup { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .scrim, .sheet.fixs { animation: none; } }
+.fx-step .st.round, .fx-pu { transition: none; -webkit-user-select: none; user-select: none; }
+.scrim.still, .sheet.fixs.still { animation: none; }

@@ -67,10 +67,13 @@ const ACT = {
   },
   'fix-step': el => {
     const f = UI.fix; if (!f) return;
-    f.v = Number.isInteger(f.v) ? Math.max(1, f.v + Number(el.dataset.d)) : holeOf(f.rid, f.n).par;
-    render();
+    const d = Number(el.dataset.d);
+    // From a pick-up, plus and minus move from the strokes it is shown as, not from par.
+    const from = Number.isInteger(f.v) ? f.v : E.pickupStrokes(holeOf(f.rid, f.n).par, fixShots(f));
+    f.v = Math.max(1, from + d);
+    refreshFix();
   },
-  'fix-pu': () => { const f = UI.fix; if (!f) return; f.v = f.v === 'P' ? holeOf(f.rid, f.n).par : 'P'; render(); },
+  'fix-pu': () => { const f = UI.fix; if (!f) return; f.v = f.v === 'P' ? (Number.isInteger(f.base) ? f.base : holeOf(f.rid, f.n).par) : 'P'; refreshFix(); },
   'fix-save': () => { if (UI.fix && UI.fix.v !== UI.fix.base) fixSave(); },
   'fix-cancel': () => { UI.fix = null; render(); },
   'fix-scrim': (el, e) => { if (e.target !== el) return; UI.fix = null; render(); },

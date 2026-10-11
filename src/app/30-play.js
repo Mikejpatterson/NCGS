@@ -726,7 +726,12 @@ async function shareCard(rid) {
 
 
 /* ----- Change one past score: a small sheet over whatever screen you are on ----- */
-function fixSheet() {
+function fixShots(f) {
+  const comp = computeR(f.rid), pl = comp && comp.players[f.pid];
+  return pl ? (pl.holes[f.n].shots || 0) : 0;
+}
+/* What the sheet shows for the current choice. A pick-up shows the strokes that net no points. */
+function fixBody() {
   const f = UI.fix;
   const r = D.round(f.rid), comp = computeR(f.rid), pl = comp && comp.players[f.pid];
   if (!r || !pl) return '';
@@ -736,9 +741,8 @@ function fixSheet() {
   const pts = E.stablefordPoints(f.v, h.par, shots);
   const name = f.v === 'P' ? 'Picked up' : E.scoreName(f.v, h.par);
   const same = f.v === f.base;
-  return `<div class="scrim" data-act="fix-scrim"><div class="sheet fixs" role="dialog" aria-label="Change score">
-    <div class="grab"></div>
-    <div class="fx-head"><span class="b">${esc(pl.name)}</span><span class="sub">Hole ${f.n} · Par ${h.par} · Index ${h.si}${shots ? ` · ${shots > 0 ? plural(shots, 'shot') : 'gives ' + plural(-shots, 'shot')}` : ''}</span></div>
+  return `<div class="grab"></div>
+    <div class="fx-head"><span class="b">${esc(pl.name)}</span><span class="sub">Hole ${f.n} \u00b7 Par ${h.par} \u00b7 Index ${h.si}${shots ? ` \u00b7 ${shots > 0 ? plural(shots, 'shot') : 'gives ' + plural(-shots, 'shot')}` : ''}</span></div>
     <div class="fx-step">
       <button class="st round" data-act="fix-step" data-d="-1" aria-label="One fewer stroke"${num && f.v <= 1 ? ' disabled' : ''}>\u2212</button>
       <div class="fx-val${f.v === 'P' ? ' pu' : ''}" aria-live="polite">${big}${f.v === 'P' ? '<sup>p</sup>' : ''}</div>
@@ -747,8 +751,17 @@ function fixSheet() {
     <p class="fx-line"><span class="b">${esc(name)}</span> \u00b7 ${plural(pts, 'point')}</p>
     <button class="fx-pu${f.v === 'P' ? ' on' : ''}" data-act="fix-pu" aria-pressed="${f.v === 'P'}">Pick up</button>
     <button class="btn" data-act="fix-save"${same ? ' disabled' : ''}>Save</button>
-    <button class="link fx-cancel" data-act="fix-cancel">Cancel</button>
-  </div></div>`;
+    <button class="link fx-cancel" data-act="fix-cancel">Cancel</button>`;
+}
+function fixSheet() {
+  const first = !UI.fix.shown; UI.fix.shown = true;   // slide in once; later redraws (sync, tick) stay still
+  return `<div class="scrim${first ? '' : ' still'}" data-act="fix-scrim"><div class="sheet fixs${first ? '' : ' still'}" role="dialog" aria-label="Change score">${fixBody()}</div></div>`;
+}
+/* Plus, minus and Pick up redraw only the sheet, so nothing behind it flickers or jumps. */
+function refreshFix() {
+  const box = document.querySelector('.sheet.fixs');
+  if (!box) { render(); return; }
+  box.innerHTML = fixBody();
 }
 function fixSave() {
   const f = UI.fix;

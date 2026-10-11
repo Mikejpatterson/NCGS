@@ -497,9 +497,11 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 @keyframes slideup { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .scrim, .sheet.fixs { animation: none; } }
+.fx-step .st.round, .fx-pu { transition: none; -webkit-user-select: none; user-select: none; }
+.scrim.still, .sheet.fixs.still { animation: none; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610112016"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610112030"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3048,7 +3050,12 @@ async function shareCard(rid) {
 
 
 /* ----- Change one past score: a small sheet over whatever screen you are on ----- */
-function fixSheet() {
+function fixShots(f) {
+  const comp = computeR(f.rid), pl = comp && comp.players[f.pid];
+  return pl ? (pl.holes[f.n].shots || 0) : 0;
+}
+/* What the sheet shows for the current choice. A pick-up shows the strokes that net no points. */
+function fixBody() {
   const f = UI.fix;
   const r = D.round(f.rid), comp = computeR(f.rid), pl = comp && comp.players[f.pid];
   if (!r || !pl) return '';
@@ -3058,9 +3065,8 @@ function fixSheet() {
   const pts = E.stablefordPoints(f.v, h.par, shots);
   const name = f.v === 'P' ? 'Picked up' : E.scoreName(f.v, h.par);
   const same = f.v === f.base;
-  return `<div class="scrim" data-act="fix-scrim"><div class="sheet fixs" role="dialog" aria-label="Change score">
-    <div class="grab"></div>
-    <div class="fx-head"><span class="b">${esc(pl.name)}</span><span class="sub">Hole ${f.n} · Par ${h.par} · Index ${h.si}${shots ? ` · ${shots > 0 ? plural(shots, 'shot') : 'gives ' + plural(-shots, 'shot')}` : ''}</span></div>
+  return `<div class="grab"></div>
+    <div class="fx-head"><span class="b">${esc(pl.name)}</span><span class="sub">Hole ${f.n} \u00b7 Par ${h.par} \u00b7 Index ${h.si}${shots ? ` \u00b7 ${shots > 0 ? plural(shots, 'shot') : 'gives ' + plural(-shots, 'shot')}` : ''}</span></div>
     <div class="fx-step">
       <button class="st round" data-act="fix-step" data-d="-1" aria-label="One fewer stroke"${num && f.v <= 1 ? ' disabled' : ''}>\u2212</button>
       <div class="fx-val${f.v === 'P' ? ' pu' : ''}" aria-live="polite">${big}${f.v === 'P' ? '<sup>p</sup>' : ''}</div>
@@ -3069,8 +3075,17 @@ function fixSheet() {
     <p class="fx-line"><span class="b">${esc(name)}</span> \u00b7 ${plural(pts, 'point')}</p>
     <button class="fx-pu${f.v === 'P' ? ' on' : ''}" data-act="fix-pu" aria-pressed="${f.v === 'P'}">Pick up</button>
     <button class="btn" data-act="fix-save"${same ? ' disabled' : ''}>Save</button>
-    <button class="link fx-cancel" data-act="fix-cancel">Cancel</button>
-  </div></div>`;
+    <button class="link fx-cancel" data-act="fix-cancel">Cancel</button>`;
+}
+function fixSheet() {
+  const first = !UI.fix.shown; UI.fix.shown = true;   // slide in once; later redraws (sync, tick) stay still
+  return `<div class="scrim${first ? '' : ' still'}" data-act="fix-scrim"><div class="sheet fixs${first ? '' : ' still'}" role="dialog" aria-label="Change score">${fixBody()}</div></div>`;
+}
+/* Plus, minus and Pick up redraw only the sheet, so nothing behind it flickers or jumps. */
+function refreshFix() {
+  const box = document.querySelector('.sheet.fixs');
+  if (!box) { render(); return; }
+  box.innerHTML = fixBody();
 }
 function fixSave() {
   const f = UI.fix;
@@ -3513,10 +3528,13 @@ const ACT = {
   },
   'fix-step': el => {
     const f = UI.fix; if (!f) return;
-    f.v = Number.isInteger(f.v) ? Math.max(1, f.v + Number(el.dataset.d)) : holeOf(f.rid, f.n).par;
-    render();
+    const d = Number(el.dataset.d);
+    // From a pick-up, plus and minus move from the strokes it is shown as, not from par.
+    const from = Number.isInteger(f.v) ? f.v : E.pickupStrokes(holeOf(f.rid, f.n).par, fixShots(f));
+    f.v = Math.max(1, from + d);
+    refreshFix();
   },
-  'fix-pu': () => { const f = UI.fix; if (!f) return; f.v = f.v === 'P' ? holeOf(f.rid, f.n).par : 'P'; render(); },
+  'fix-pu': () => { const f = UI.fix; if (!f) return; f.v = f.v === 'P' ? (Number.isInteger(f.base) ? f.base : holeOf(f.rid, f.n).par) : 'P'; refreshFix(); },
   'fix-save': () => { if (UI.fix && UI.fix.v !== UI.fix.base) fixSave(); },
   'fix-cancel': () => { UI.fix = null; render(); },
   'fix-scrim': (el, e) => { if (e.target !== el) return; UI.fix = null; render(); },
