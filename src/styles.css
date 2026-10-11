@@ -415,3 +415,35 @@ button.nm.drop { display: flex; align-items: center; gap: 10px; min-height: 36px
 button.nm.drop .chev.dn { transform: rotate(90deg); transition: transform .2s; }
 button.nm.drop.open .chev.dn { transform: rotate(-90deg); }
 .dropcard.in { margin: 0 -16px 8px; }
+
+/* Scorecard v2: pine header band, soft row stripes, coloured marks and points */
+.sc-wrap { padding: 0 0 8px; overflow: hidden; }
+.dropcard { padding: 0 0 8px; background: var(--card); }
+table.sc { border-collapse: separate; border-spacing: 0; }
+.sc thead th { background: var(--pine); color: #fff; font-size: var(--t-cap); font-weight: 700; letter-spacing: .04em; text-transform: uppercase; padding: 8px 0; }
+.sc thead th.gap { background: var(--pine); }
+.sc thead th.hn { color: #BFD6C8; }
+.sc tbody tr:nth-child(even) td:not(.gap) { background: #F3F7F4; }
+.sc td { height: 40px; }
+.sc .hn { padding-left: 12px; color: var(--pine); font-weight: 700; }
+.sc .sd { font-size: 8px; letter-spacing: 3px; margin-left: 4px; color: var(--green); vertical-align: 2px; }
+.sc .par { color: var(--faint); }
+.sc .gap { width: 6px; background: var(--card); }
+.sc tr.tot td { border-top: 0; background: var(--green-soft) !important; color: var(--pine); font-weight: 800; height: 44px; }
+.sc tr.tot .hn { color: var(--pine); }
+.pp { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; border-radius: 14px; font-weight: 700; background: var(--fill); color: var(--sub); }
+.pp.p0 { background: #FBE3E3; color: #A31F1F; }
+.pp.p1 { background: #FFF1CC; color: #7A4300; }
+.pp.p2 { background: var(--fill); color: var(--pine); }
+.pp.p3 { background: var(--green-soft); color: #0F6A38; }
+.pp.p4 { background: var(--green); color: #fff; }
+.mk { width: 30px; height: 30px; font-weight: 600; }
+.mk.birdie { background: var(--green); border: 0; color: #fff; border-radius: 50%; }
+.mk.eagle { background: var(--flag); color: var(--pine); border: 0; border-radius: 50%; outline: 2px solid var(--flag); outline-offset: 2px; font-weight: 800; }
+.mk.bogey { background: #FBE3E3; border: 1.5px solid #E7A3A3; color: #8F1D1D; border-radius: 8px; }
+.mk.double { background: var(--red); border: 0; color: #fff; border-radius: 8px; outline: 0; font-weight: 700; }
+.sc-note { padding: 4px 12px 0; }
+.sc thead th { letter-spacing: 0; font-size: .66rem; }
+.sc td:last-child, .sc th:last-child { padding-right: 10px; }
+.sc td:first-child, .sc th:first-child { padding-left: 12px; }
+.sc thead th.hn { font-size: .66rem; }

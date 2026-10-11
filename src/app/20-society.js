@@ -296,7 +296,10 @@ function cardParts(r, pl) {
   const holes = holesOf(r);
   const half = hs => {
     const g = hs.map(h => pl.holes[h.n].gross);
-    const grossTot = g.some(v => v === null || v === 'P') ? '–' : g.reduce((s, v) => s + v, 0);
+    const nums = g.filter(v => typeof v === 'number');
+    const picked = g.includes('P');
+    // Running total of the strokes entered so far, the same way points run.
+    const grossTot = nums.length ? nums.reduce((s, v) => s + v, 0) + (picked ? '*' : '') : '–';
     const pts = hs.reduce((s, h) => s + (pl.holes[h.n].points || 0), 0);
     return { grossTot, pts, par: hs.reduce((s, h) => s + h.par, 0) };
   };
@@ -305,13 +308,13 @@ function cardParts(r, pl) {
   const line = (a, b) => {
     const cell = h => {
       const hp = pl.holes[h.n];
-      return `<td class="hn">${h.n}${hp.shots ? ` <span class="sd">${hp.shots > 0 ? '●'.repeat(hp.shots) : '○'.repeat(-hp.shots)}</span>` : ''}</td><td class="par">${h.par}</td><td>${markCell(hp.gross, h.par)}</td><td class="pts">${hp.points === null ? '' : hp.points}</td>`;
+      return `<td class="hn">${h.n}${hp.shots ? ` <span class="sd">${hp.shots > 0 ? '●'.repeat(hp.shots) : '○'.repeat(-hp.shots)}</span>` : ''}</td><td class="par">${h.par}</td><td>${markCell(hp.gross, h.par)}</td><td class="pts">${hp.points === null ? '' : `<span class="pp p${Math.min(hp.points, 4)}">${hp.points}</span>`}</td>`;
     };
     return `<tr>${cell(a)}<td class="gap"></td>${cell(b)}</tr>`;
   };
-  const table = `<table class="sc"><thead><tr><th class="hn">Hole</th><th>Par</th><th></th><th>Pts</th><th class="gap"></th><th class="hn">Hole</th><th>Par</th><th></th><th>Pts</th></tr></thead>
+  const table = `<table class="sc"><thead><tr><th class="hn">Hole</th><th>Par</th><th>Score</th><th>Pts</th><th class="gap"></th><th class="hn">Hole</th><th>Par</th><th>Score</th><th>Pts</th></tr></thead>
     <tbody>${front.map((h, i) => line(h, backNine[i])).join('')}
-    <tr class="tot"><td class="hn">Out</td><td>${F.par}</td><td>${F.grossTot}</td><td>${F.pts}</td><td class="gap"></td><td class="hn">In</td><td>${B.par}</td><td>${B.grossTot}</td><td>${B.pts}</td></tr></tbody></table>`;
+    <tr class="tot"><td class="hn">Out</td><td>${F.par}</td><td>${F.grossTot}</td><td>${F.pts}</td><td class="gap"></td><td class="hn">In</td><td>${B.par}</td><td>${B.grossTot}</td><td>${B.pts}</td></tr></tbody></table>${F.grossTot.toString().endsWith('*') || B.grossTot.toString().endsWith('*') ? '<p class="cap sc-note">* pick-ups are not counted in the strokes</p>' : ''}`;
   return { F, B, table };
 }
 VIEWS.card = p => {
