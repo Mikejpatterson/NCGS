@@ -8,6 +8,7 @@ const ACT = {
   card: el => go('card', { rid: el.dataset.rid, pid: el.dataset.pid }),
   goy: () => go('goy'),
   players: () => go('players'),
+  rounds: () => go('rounds'),
   who: () => go('who', { then: null }),
   pick: el => {
     DB.prefs.me = el.dataset.id;

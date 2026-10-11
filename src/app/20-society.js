@@ -66,15 +66,25 @@ VIEWS.home = () => {
     ${feature ? nowCard(feature) : '<div class="now"><div class="now-main"><span class="now-name">No round booked</span><span class="now-line">The organiser adds the next one.</span></div></div>'}</header>`;
   const table = goy(season);
   const lead = table[0];
+  const pastAll = D.rounds().filter(r => r.status === 'final').reverse();
+  const tile = (act, icon, t, s2) => `<button class="lnk" data-act="${act}"><span class="lnk-ic">${sized(icon, 24)}</span><span class="lnk-t">${t}</span><span class="lnk-s">${s2}</span></button>`;
   html += `<div class="links">
-    <button class="lnk" data-act="goy"><span class="lnk-t">Standings</span><span class="lnk-s">${lead ? `${esc(lead.name)} leads on ${lead.total}` : 'Golfer of the Year'}</span></button>
-    <button class="lnk" data-act="players"><span class="lnk-t">Players</span><span class="lnk-s">${plural(D.active().length, 'golfer')}</span></button>
+    ${tile('rounds', ICON.history, 'Past rounds', pastAll.length ? `${pastAll.length} played` : 'None played yet')}
+    ${tile('goy', ICON.trophy, 'Standings', lead ? `${esc(lead.name)} leads on ${lead.total}` : 'Golfer of the Year')}
+    ${tile('players', ICON.users, 'Players', plural(D.active().length, 'golfer'))}
+    ${tile('org', ICON.lock, 'Organiser', 'PIN needed')}
   </div>`;
-  if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')), true);
-  const past = D.rounds().filter(r => r.status === 'final').reverse();
-  if (past.length) html += sec(label(`Past rounds · ${plural(played.length, 'round')} this season`), cardOf(past.map(r => roundRow(r, winnerText(r))).join('')));
-  html += `<div class="foot"><button class="link" data-act="org">Organiser</button></div>`;
+  if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   return { html };
+};
+
+VIEWS.rounds = () => {
+  const season = seasonOf();
+  const past = D.rounds().filter(r => r.status === 'final').reverse();
+  return {
+    html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Past rounds</h1></div><p class="sub">${season} season · tap a round for the scorecards</p></header>
+      ${past.length ? sec('', cardOf(past.map(r => roundRow(r, winnerText(r))).join('')), false) : sec('', '<div class="prose">No rounds played yet.</div>', false)}`
+  };
 };
 
 VIEWS.players = () => {

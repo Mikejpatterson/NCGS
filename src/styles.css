@@ -390,3 +390,9 @@ button.btn:has(> svg) { flex-direction: row; }
 .stv.none { color: var(--faint); font-weight: 600; font-size: 1.05rem; letter-spacing: 0; }
 .stepper .pu { height: 56px; border-radius: 14px; background: var(--fill); font-size: var(--t-sub); text-align: center; }
 .stepper .pu.on { background: var(--pine); color: #fff; font-weight: 700; }
+
+/* Front page tiles: big, with an icon */
+.links { gap: 12px; margin-top: 20px; }
+.lnk { min-height: 112px; padding: 16px; gap: 2px; justify-content: flex-end; }
+.lnk-ic { width: 44px; height: 44px; border-radius: 12px; background: var(--green-soft); color: var(--green); display: inline-flex; align-items: center; justify-content: center; margin-bottom: auto; }
+.lnk-t { font-size: 1.12rem; }
