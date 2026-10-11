@@ -390,9 +390,19 @@ button.btn:has(> svg) { flex-direction: row; }
 .lnk-t { font-weight: 700; color: var(--pine); }
 .lnk-s { font-size: var(--t-sub); color: var(--sub); }
 .now-acts.one { grid-template-columns: 1fr; }
+
+/* Score stepper: minus, the number, plus. First tap lands on par. */
+.stepper { display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px 84px; gap: 8px; align-items: center; }
+.st { height: 56px; border-radius: 14px; background: var(--fill); color: var(--pine); font-size: 2rem; font-weight: 500; line-height: 1; text-align: center; display: flex; align-items: center; justify-content: center; }
+.st:active { background: var(--press); }
+.st:disabled { opacity: .35; }
+.stv { text-align: center; font-size: 2.6rem; font-weight: 800; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--pine); }
+.stv.none { color: var(--faint); font-weight: 600; font-size: 1.05rem; letter-spacing: 0; }
+.stepper .pu { height: 56px; border-radius: 14px; background: var(--fill); font-size: var(--t-sub); text-align: center; }
+.stepper .pu.on { background: var(--pine); color: #fff; font-weight: 700; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610111851"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610111910"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1413,7 +1423,6 @@ var NCGS = (function () {
         var first = ss.getSheetByName('Sheet1');
         if (first && ss.getSheets().length > 1) ss.deleteSheet(first);
         var r = seed ? s.api({ op: 'seed', data: seed, note: 'NCGS 2026 season from Marbella_2026_Final_Workbook.xlsx' }) : { ok: true };
-        folder();
         return { sheet: ss.getUrl(), seeded: r };
       }
     };
@@ -2273,17 +2282,20 @@ function clearDraft(ctx) { const byGroup = draftsFor(ctx); delete byGroup[ctx.n]
 
 function entryRow(pid, val, shots, par) {
   const name = esc(D.nameOf(pid));
-  const nums = [];
-  for (let v = Math.max(1, par - 2); v <= par + 4; v++) nums.push(v);
-  if (Number.isInteger(val) && !nums.includes(val)) { nums.push(val); nums.sort((a, b) => a - b); }
   let score = '';
   if (val === 'P') score = `<span class="sub">Picked up</span>`;
   else if (E.isEntered(val)) score = `<span class="sub">${E.scoreName(val, par)}</span><span class="s">${val}<sup>${E.stablefordPoints(val, par, shots)}</sup></span>`;
   const flash = UI.flash && !E.isEntered(val) ? ' flash' : '';
+  // The first tap on either button lands on par, then the buttons move one stroke at a time.
+  const num = Number.isInteger(val);
+  const up = num ? val + 1 : par, down = num ? Math.max(1, val - 1) : par;
+  const atOne = num && val <= 1;
   return `<div class="pr${flash}">
     <div class="pr-top"><div class="nm"><span>${name}</span>${dots(shots, true)}</div><div class="pr-score">${score}</div></div>
-    <div class="picker" role="group" aria-label="Strokes for ${name}">
-      ${nums.map(v => `<button class="${val === v ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="${v}" aria-pressed="${val === v}">${v}</button>`).join('')}
+    <div class="stepper" role="group" aria-label="Strokes for ${name}">
+      <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
+      <div class="stv${num ? '' : ' none'}" data-pid="${pid}" aria-live="polite">${num ? val : (val === 'P' ? 'Out' : 'Par ' + par)}</div>
+      <button class="st" data-act="set" data-dir="up" data-pid="${pid}" data-v="${up}" aria-label="One more stroke for ${name}">+</button>
       <button class="pu ${val === 'P' ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="P" aria-pressed="${val === 'P'}">Pick up</button>
     </div></div>`;
 }

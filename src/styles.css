@@ -380,3 +380,13 @@ button.btn:has(> svg) { flex-direction: row; }
 .lnk-t { font-weight: 700; color: var(--pine); }
 .lnk-s { font-size: var(--t-sub); color: var(--sub); }
 .now-acts.one { grid-template-columns: 1fr; }
+
+/* Score stepper: minus, the number, plus. First tap lands on par. */
+.stepper { display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px 84px; gap: 8px; align-items: center; }
+.st { height: 56px; border-radius: 14px; background: var(--fill); color: var(--pine); font-size: 2rem; font-weight: 500; line-height: 1; text-align: center; display: flex; align-items: center; justify-content: center; }
+.st:active { background: var(--press); }
+.st:disabled { opacity: .35; }
+.stv { text-align: center; font-size: 2.6rem; font-weight: 800; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--pine); }
+.stv.none { color: var(--faint); font-weight: 600; font-size: 1.05rem; letter-spacing: 0; }
+.stepper .pu { height: 56px; border-radius: 14px; background: var(--fill); font-size: var(--t-sub); text-align: center; }
+.stepper .pu.on { background: var(--pine); color: #fff; font-weight: 700; }
