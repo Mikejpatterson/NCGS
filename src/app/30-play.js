@@ -32,7 +32,7 @@ VIEWS.tee = () => {
   const hasDraft = d && Object.keys(d).some(k => k[0] !== '_');
   const contest = contestOn(rid, n);
   const buggies = gc.teams.length === 2;
-  const teams = gc.teams.map((t, i) => sec(buggies ? pill(i) : '', cardOf(t.map(pid => `<div class="row"><span>${esc(D.nameOf(pid))}</span>${dots(comp.players[pid].holes[n].shots)}</div>`).join('')), i === 1)).join('');
+  const teams = gc.teams.map((t, i) => sec(buggies ? pill(i) : '', cardOf(t.map(pid => dropRow(rid, { id: pid }, `<span>${esc(D.nameOf(pid))}</span><span class="right">${dots(comp.players[pid].holes[n].shots)}${dropChev}</span>`, 'row')).join('')), i === 1)).join('');
   const checkRows = ['front', 'back'].filter(sg => nineComplete(gc, sg)).map(sg => {
     const c = D.check(rid, g.id, sg);
     return c && c.resolved ? '' : checkRow(sg, c);
@@ -87,8 +87,10 @@ function ensureDraft(ctx) {
 }
 function clearDraft(ctx) { const byGroup = draftsFor(ctx); delete byGroup[ctx.n]; }
 
-function entryRow(pid, val, shots, par) {
+function entryRow(pid, val, shots, par, rid) {
   const name = esc(D.nameOf(pid));
+  const dkey = `bd-${rid}-${pid}`, dopen = !!UI.open[dkey];
+  const dcomp = computeR(rid), dpl = dcomp && dcomp.players[pid];
   let score = '';
   if (val === 'P') score = `<span class="sub">Picked up</span>`;
   else if (E.isEntered(val)) score = `<span class="sub">${E.scoreName(val, par)}</span><span class="s">${val}<sup>${E.stablefordPoints(val, par, shots)}</sup></span>`;
@@ -98,7 +100,8 @@ function entryRow(pid, val, shots, par) {
   const up = num ? val + 1 : par, down = num ? Math.max(1, val - 1) : par;
   const atOne = num && val <= 1;
   return `<div class="pr${flash}">
-    <div class="pr-top"><div class="nm"><span>${name}</span>${dots(shots, true)}</div><div class="pr-score">${score}</div></div>
+    <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dots(shots, true)}${dpl ? dropChev : ''}</button><div class="pr-score">${score}</div></div>
+    ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl).table}</div>` : ''}
     <div class="stepper" role="group" aria-label="Strokes for ${name}">
       <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
       <div class="stv${num ? '' : ' none'}" data-pid="${pid}" aria-live="polite">${num ? val : (val === 'P' ? 'Out' : 'Par ' + par)}</div>
@@ -123,7 +126,7 @@ VIEWS.entry = () => {
   if (final) html += `<div class="banner" style="margin-top:12px">This round is final.</div>${ctx.mode === 'org' ? '<button class="btn quiet" data-act="reopen">Reopen round</button>' : ''}`;
   const clash = DB.conflicts.filter(c => c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n);
   if (clash.length) html += `<div class="banner" style="margin-top:12px">Another phone saved ${clash.map(c => `${esc(D.nameOf(c.player))} ${fmtGross(c.server)}`).join(', ')}</div>`;
-  html += gc.teams.map((t, i) => sec(buggies ? pill(i) : '', cardOf(t.map(pid => entryRow(pid, d[pid], comp.players[pid].holes[ctx.n].shots, h.par)).join('')))).join('');
+  html += gc.teams.map((t, i) => sec(buggies ? pill(i) : '', cardOf(t.map(pid => entryRow(pid, d[pid], comp.players[pid].holes[ctx.n].shots, h.par, ctx.rid)).join('')))).join('');
   const contest = contestOn(ctx.rid, ctx.n);
   if (contest) {
     const lead = claimLeader(ctx.rid, ctx.n, ctx.gid);
