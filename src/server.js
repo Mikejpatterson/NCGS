@@ -419,8 +419,17 @@ var NCGS = (function () {
       return createServer(sheetStore(ss, props, CacheService.getScriptCache(), LockService, folder));
     }
     function json(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
-    return {
+    function ensureReady() {
+      if (!seed || props.getProperty('READY')) return;
+      var lock = LockService.getScriptLock();
+      lock.waitLock(30000);
+      try {
+        if (!props.getProperty('READY')) { api.setup(); props.setProperty('READY', '1'); }
+      } finally { lock.releaseLock(); }
+    }
+    var api = {
       http: function (e) {
+        ensureReady();
         var req = {};
         try {
           if (e && e.postData && e.postData.contents) req = JSON.parse(e.postData.contents);
@@ -440,6 +449,7 @@ var NCGS = (function () {
         return { sheet: ss.getUrl(), seeded: r };
       }
     };
+    return api;
   }
 
   var api = { SCHEMA: SCHEMA, TABLES: TABLES, keyOf: keyOf, memoryStore: memoryStore, sheetStore: sheetStore, createServer: createServer, appsScript: appsScript, toCell: toCell, fromCell: fromCell };

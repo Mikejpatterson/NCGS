@@ -392,7 +392,7 @@ button.btn:has(> svg) { flex-direction: row; }
 .now-acts.one { grid-template-columns: 1fr; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"","version":"202610111626"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"","version":"202610111640"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1387,8 +1387,17 @@ var NCGS = (function () {
       return createServer(sheetStore(ss, props, CacheService.getScriptCache(), LockService, folder));
     }
     function json(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
-    return {
+    function ensureReady() {
+      if (!seed || props.getProperty('READY')) return;
+      var lock = LockService.getScriptLock();
+      lock.waitLock(30000);
+      try {
+        if (!props.getProperty('READY')) { api.setup(); props.setProperty('READY', '1'); }
+      } finally { lock.releaseLock(); }
+    }
+    var api = {
       http: function (e) {
+        ensureReady();
         var req = {};
         try {
           if (e && e.postData && e.postData.contents) req = JSON.parse(e.postData.contents);
@@ -1408,6 +1417,7 @@ var NCGS = (function () {
         return { sheet: ss.getUrl(), seeded: r };
       }
     };
+    return api;
   }
 
   var api = { SCHEMA: SCHEMA, TABLES: TABLES, keyOf: keyOf, memoryStore: memoryStore, sheetStore: sheetStore, createServer: createServer, appsScript: appsScript, toCell: toCell, fromCell: fromCell };
