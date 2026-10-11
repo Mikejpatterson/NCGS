@@ -37,7 +37,7 @@ const previewBody = `<title>NCGS</title>\n<style>\n${css}\n</style>\n${body({ mo
 out('golf-trip.html', previewBody);
 const head = extra => `<!doctype html><html lang="en-IE"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#07100C">
+<meta name="theme-color" content="#F2F2F7">
 ${extra || ''}<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px)}[hidden]{display:none!important}</style>`;
 out('preview.html', `${head()}<title>NCGS</title><style>${css}</style></head><body>${body({ mode: 'local' })}</body></html>`);
 
@@ -53,7 +53,7 @@ out('site/index.html', `${head(`<meta name="apple-mobile-web-app-capable" conten
 `)}<title>NCGS</title><style>${css}</style></head><body>${body(live)}</body></html>`);
 out('site/manifest.webmanifest', JSON.stringify({
   name: 'NCGS', short_name: 'NCGS', start_url: './', scope: './', display: 'standalone',
-  background_color: '#07100C', theme_color: '#07100C',
+  background_color: '#F2F2F7', theme_color: '#F2F2F7',
   icons: [{ src: 'icon-192.png', sizes: '192x192', type: 'image/png' }, { src: 'icon-512.png', sizes: '512x512', type: 'image/png' }, { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }]
 }, null, 1));
 // Offline: the app shell is cached, data always comes from the network (and the phone's own copy).
