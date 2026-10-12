@@ -561,10 +561,10 @@ button.stv:active { background: var(--press); }
 .askbar .x svg { width: 22px; height: 22px; }
 .askbar .stop { background: var(--fill); }
 .askbar .stop i { width: 16px; height: 16px; border-radius: 3px; background: var(--text); display: block; }
-.askbar .x, .askbar .stop, .askbar .eq { display: none; }
-body.hearing .askbar .x, body.hearing .askbar .stop { display: grid; }
-body.hearing .askbar .eq { display: flex; }
-body.hearing .askbar .mic { display: none; }
+.askbar .arow .x, .askbar .arow .stop, .askbar .arow .eq { display: none; }
+body.hearing .askbar .arow .x, body.hearing .askbar .arow .stop { display: grid; }
+body.hearing .askbar .arow .eq { display: flex; }
+body.hearing .askbar .arow .mic { display: none; }
 .eq { flex: 1; min-width: 0; height: 48px; align-items: center; justify-content: space-between; overflow: hidden; padding: 0 4px; }
 .eq i { flex: none; width: 3px; height: 4px; border-radius: 2px; background: var(--text); transition: height 70ms linear; }
 body.typing .tabs, body.hearing .tabs { display: none; }

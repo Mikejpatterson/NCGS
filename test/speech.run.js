@@ -14,6 +14,7 @@ const { chromium } = require('playwright');
   await pg.goto('http://localhost:8765/preview.html'); await pg.waitForTimeout(600);
   await pg.evaluate(() => { window.__ncgs.UI.stack = [{ v: 'rules', p: {} }]; window.__ncgs.render(); });
   const said = t => pg.evaluate(t => window.__sr.onresult({ results: [[{ transcript: t }]] }), t);
+  check('at rest only the microphone and send show', await pg.evaluate(() => { const d = s => getComputedStyle(document.querySelector('.askbar ' + s)).display; return d('.x') === 'none' && d('.stop') === 'none' && d('.eq') === 'none' && d('.mic') !== 'none' && d('.send') !== 'none'; }));
   await pg.tap('.askbar .mic'); await pg.waitForTimeout(300);
   check('tapping the microphone shows the listening panel with a level meter, X and Stop', await pg.evaluate(() => document.body.classList.contains('hearing') && getComputedStyle(document.querySelector('.askbar .eq')).display !== 'none' && getComputedStyle(document.querySelector('.askbar .x')).display !== 'none' && getComputedStyle(document.querySelector('.askbar .stop')).display !== 'none' && getComputedStyle(document.querySelector('.askbar .mic')).display === 'none' && getComputedStyle(document.querySelector('.askbar .send')).display !== 'none' && document.querySelectorAll('.eq i').length > 10));
   await said('my ball is'); await said('my ball is in the water');
