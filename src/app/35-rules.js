@@ -43,81 +43,95 @@ function askThread() {
     + `<p class="cap ask-note">Checked against the official Rules of Golf (R&amp;A and USGA). For anything close, play a second ball and ask the organiser.</p>`;
 }
 
-/* ----- Speaking a question: live words, a level meter, Stop, X to cancel, then Send ----- */
-const EQ_BARS = 30;
-const eqHtml = () => Array.from({ length: EQ_BARS }, (_, i) => `<i style="--d:${(i * 0.07).toFixed(2)}s"></i>`).join('');
+/* ----- Speaking a question: words fill the box as you speak, a waveform shows your voice, Stop / X / Send ----- */
+const EQ_BARS = 36;
+const eqHtml = () => Array.from({ length: EQ_BARS }, () => '<i></i>').join('');
 let listening = null, meter = null;
 
+// The waveform fills from the left, one bar every moment, and scrolls once full. Quiet shows as a dot.
 function stopMeter() {
   if (!meter) return;
-  cancelAnimationFrame(meter.raf);
-  try { meter.stream.getTracks().forEach(t => t.stop()); } catch (e) { /* already stopped */ }
-  try { meter.ctx.close(); } catch (e) { /* already closed */ }
+  clearInterval(meter.timer);
+  try { meter.stream && meter.stream.getTracks().forEach(t => t.stop()); } catch (e) { /* already stopped */ }
+  try { meter.ctx && meter.ctx.close(); } catch (e) { /* already closed */ }
   meter = null;
-  document.querySelectorAll('.eq i').forEach(i => { i.style.transform = ''; });
+  document.querySelectorAll('.eq i').forEach(i => { i.style.height = ''; });
 }
-// The meter is only for show. If the phone will not share the microphone with speech recognition, the bars just pulse.
+function drawMeter() {
+  const bars = document.querySelectorAll('.eq i');
+  bars.forEach((el, i) => { const v = meter.levels[i]; el.style.height = v == null ? '' : Math.max(4, Math.round(v * 34)) + 'px'; });
+}
 function startMeter() {
-  const eq = document.querySelector('.eq');
-  if (eq) eq.classList.add('fake');
+  stopMeter();
+  meter = { levels: [], timer: 0, an: null, buf: null, stream: null, ctx: null, lastWords: 0 };
+  const m = meter;
+  m.timer = setInterval(() => {
+    let v;
+    if (m.an) { m.an.getByteTimeDomainData(m.buf); let sum = 0; for (let k = 0; k < m.buf.length; k++) { const d = (m.buf[k] - 128) / 128; sum += d * d; } v = Math.min(1, Math.sqrt(sum / m.buf.length) * 5); }
+    else v = Date.now() - UI.askWordsAt < 700 ? 0.25 + Math.random() * 0.6 : 0.03;   // no microphone access for the meter: move while words arrive
+    m.levels.push(v); if (m.levels.length > EQ_BARS) m.levels.shift();
+    drawMeter();
+  }, 70);
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
   navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-    if (!listening) { stream.getTracks().forEach(t => t.stop()); return; }
+    if (meter !== m) { stream.getTracks().forEach(t => t.stop()); return; }
     const AC = window.AudioContext || window.webkitAudioContext;
     const ctx = new AC();
-    const an = ctx.createAnalyser(); an.fftSize = 128; an.smoothingTimeConstant = 0.7;
+    const an = ctx.createAnalyser(); an.fftSize = 512;
     ctx.createMediaStreamSource(stream).connect(an);
-    const data = new Uint8Array(an.frequencyBinCount);
-    meter = { stream, ctx, raf: 0 };
-    const tick = () => {
-      an.getByteFrequencyData(data);
-      const bars = document.querySelectorAll('.eq i');
-      bars.forEach((el, i) => { const v = data[Math.min(data.length - 1, 1 + Math.floor(i * 0.9))] / 255; el.style.transform = `scaleY(${(0.12 + v * 0.95).toFixed(2)})`; });
-      meter.raf = requestAnimationFrame(tick);
-    };
-    const live = document.querySelector('.eq'); if (live) live.classList.remove('fake');
-    tick();
-  }).catch(() => { /* keep the pulsing bars */ });
+    m.stream = stream; m.ctx = ctx; m.an = an; m.buf = new Uint8Array(an.fftSize);
+  }).catch(() => { /* keep the fallback */ });
 }
 
 function showLive(on) {
   document.body.classList.toggle('hearing', on);
-  const lt = document.getElementById('asklive');
-  if (lt) lt.textContent = UI.askLive || (on ? 'Listening…' : '');
+  sizeAsk();
+}
+// The box grows with the words; the thread keeps clear of it.
+function sizeAsk() {
+  const bar = document.querySelector('.askbar');
+  document.documentElement.style.setProperty('--askh', (bar ? bar.offsetHeight : 76) + 'px');
 }
 
 function askListen() {
   if (listening) return;
   if (!SPEECH) return askKeyboard('Tap the microphone on your keyboard to speak.');
+  const box = document.getElementById('askin');
+  const base = (box ? box.value : UI.askDraft).trim();
   const r = new SPEECH();
-  r.lang = 'en-IE'; r.interimResults = true; r.maxAlternatives = 1; r.continuous = false;
-  UI.askLive = '';
-  let failed = false, cancelled = false;
-  r.onstart = () => { listening = r; r.cancel = () => { cancelled = true; try { r.abort(); } catch (e) { /* not running */ } }; showLive(true); startMeter(); };
+  r.lang = 'en-IE'; r.interimResults = true; r.maxAlternatives = 1; r.continuous = true;
+  UI.askWordsAt = 0;
+  let cancelled = false;
+  r.onstart = () => {
+    listening = r;
+    r.cancel = () => { cancelled = true; try { r.abort(); } catch (e) { /* not running */ } };
+    showLive(true); startMeter();
+  };
   r.onresult = ev => {
-    UI.askLive = Array.from(ev.results).map(x => x[0].transcript).join(' ').trim();
-    const lt = document.getElementById('asklive'); if (lt) lt.textContent = UI.askLive || 'Listening…';
+    UI.askWordsAt = Date.now();
+    const said = Array.from(ev.results).map(x => x[0].transcript).join(' ').replace(/\s+/g, ' ').trim();
+    UI.askDraft = (base ? base + ' ' : '') + said;
+    const input = document.getElementById('askin');
+    if (input) { input.value = UI.askDraft; growAsk(input); input.scrollTop = input.scrollHeight; }
   };
   r.onerror = ev => {
-    failed = true;
     if (ev.error !== 'no-speech' && ev.error !== 'aborted') askKeyboard("Dictation isn't available here. Tap the microphone on your keyboard instead.");
   };
   r.onend = () => {
-    listening = null; stopMeter();
-    const said = cancelled || failed ? '' : UI.askLive;
-    UI.askLive = '';
+    if (listening === r) listening = null;
+    stopMeter();
     showLive(false);
-    if (said) {
-      UI.askDraft = (UI.askDraft ? UI.askDraft.trim() + ' ' : '') + said;
+    if (cancelled) {
+      UI.askDraft = base;
       const input = document.getElementById('askin');
-      if (input) { input.value = UI.askDraft; growAsk(input); }
+      if (input) { input.value = base; growAsk(input); }
     }
   };
   try { r.start(); } catch (e) { listening = null; askKeyboard('Tap the microphone on your keyboard to speak.'); }
 }
 function askStop() { if (listening) { try { listening.stop(); } catch (e) { /* already stopped */ } } }
 function askCancel() { if (listening && listening.cancel) listening.cancel(); }
-function growAsk(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+function growAsk(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 168) + 'px'; sizeAsk(); }
 function askKeyboard(msg) { const i = document.getElementById('askin'); if (i) i.focus(); if (msg) toast(msg); }
 
 VIEWS.rules = () => ({
@@ -125,9 +139,16 @@ VIEWS.rules = () => ({
   html: `<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">Ruling</h1>${UI.chat.length ? '<button class="link" data-act="ask-clear">New question</button>' : ''}</div></header>
     <div id="thread" class="thread">${askThread()}</div>
     <form class="askbar" data-form="ask" autocomplete="off">
-      <div class="live"><div id="asklive" class="lt" aria-live="polite">${esc(UI.askLive || 'Listening…')}</div>
-        <div class="lrow2"><button class="x" type="button" data-act="ask-cancel" aria-label="Cancel">${ICON.x}</button><div class="eq" aria-hidden="true">${eqHtml()}</div><button class="stop" type="button" data-act="ask-stop" aria-label="Stop"><i></i></button></div></div>
-      <div class="typed"><textarea id="askin" rows="1" enterkeyhint="send" maxlength="600" placeholder="What happened?" aria-label="Your rules question">${esc(UI.askDraft)}</textarea><button class="mic" type="button" data-act="ask-mic" aria-label="Speak your question">${ICON.mic}</button><button class="send" type="submit" aria-label="Ask">${ICON.send}</button></div>
+      <div class="card">
+        <textarea id="askin" rows="1" enterkeyhint="send" maxlength="600" placeholder="What happened?" aria-label="Your rules question">${esc(UI.askDraft)}</textarea>
+        <div class="arow">
+          <button class="x" type="button" data-act="ask-cancel" aria-label="Cancel">${ICON.x}</button>
+          <div class="eq" aria-hidden="true">${eqHtml()}</div>
+          <button class="stop" type="button" data-act="ask-stop" aria-label="Stop"><i></i></button>
+          <button class="mic" type="button" data-act="ask-mic" aria-label="Speak your question">${ICON.mic}</button>
+          <button class="send" type="submit" aria-label="Ask">${ICON.send}</button>
+        </div>
+      </div>
     </form>`
 });
 
@@ -144,6 +165,7 @@ function refreshThread() {
 function askQuestion(q) {
   q = String(q || '').trim();
   if (!q || UI.chatBusy) return;
+  if (listening) { const l = listening; l.cancel = null; try { l.abort(); } catch (e) { /* not running */ } }
   UI.chat.push({ role: 'user', text: q });
   UI.askDraft = '';
   const input = document.getElementById('askin');

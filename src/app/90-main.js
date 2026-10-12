@@ -381,6 +381,7 @@ function render() {
   app.classList.toggle('no-tabs', !showTabs);
   tabs.hidden = !showTabs;
   if (showTabs) document.documentElement.style.setProperty('--tabh', tabs.offsetHeight + 'px');
+  sizeAsk();
   tabs.querySelectorAll('.tab').forEach(b => {
     const on = b.dataset.tab === out.tabs;
     b.classList.toggle('on', on);
