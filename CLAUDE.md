@@ -9,3 +9,9 @@
 - The real data (`data/ncgs-2026.json`, `data/seed.json`) is never committed. This repository is public.
 - Design: pine green header bands, flag-yellow accent, system font, big touch targets, readable outdoors.
 - Run `node --test test/engine.test.js test/server.test.js` before every push.
+
+# Working with the owner
+- The owner is not a software developer. Assume no technical knowledge: no jargon without a plain explanation, and never assume they know where a menu or setting is.
+- When asking them to do something by hand (Google Drive, Apps Script, GitHub and so on), give ONE step at a time, say exactly what they should see on screen, and wait for their reply before the next step. Ask for a screenshot when that is quicker than describing.
+- Do not guess facts about their situation (which round is real, what is live). Check, or ask.
+- Keep replies short and plain. Own mistakes briefly and carry on.
