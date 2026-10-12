@@ -40,7 +40,7 @@ If the player who asks the most questions would need to ask more than two "how d
   - Light only, because the app is read outdoors.
 - **Team marker:** above player lists, a "Buggy 1" or "Buggy 2" pill, not the players' names again.
 - **Touch targets:** 44 pt minimum. Text follows the phone's text-size setting.
-- **Tab bar:** Hole, Buggy Wars, Leaderboard. Hidden during score entry.
+- **Tab bar:** Results, Hole, Ruling. Hidden during score entry.
 
 ## The hole loop
 
