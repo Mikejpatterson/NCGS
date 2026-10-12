@@ -529,3 +529,5 @@ body { min-height: 100vh; }
 .stv { height: 70px; justify-content: center; }
 button.stv { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--pine); width: 100%; border-radius: 14px; -webkit-user-select: none; user-select: none; }
 button.stv:active { background: var(--press); }
+/* The header starts in exactly the body green, so it joins the strip behind the clock with no visible seam. */
+.hero { background: linear-gradient(180deg, var(--pine), var(--pine-2)); }
