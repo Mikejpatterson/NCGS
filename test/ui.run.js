@@ -85,6 +85,13 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   for (const pid of pids) await stepTo(page, pid, 3);
   await shot('06-entry');
   { const pid = pids[0];
+    await page.waitForTimeout(50);
+    const rowH = () => page.$eval(`.stepper:has([data-pid="${pid}"])`, e => Math.round(e.closest('.pr').getBoundingClientRect().height));
+    const h0 = await rowH();
+    await page.click(`[data-act="set"][data-pid="${pid}"][data-dir="up"]`); await page.waitForTimeout(80);
+    check('entry: the row does not jump in height when a score goes in', (await rowH()) === h0);
+    await page.click(`[data-act="clear"][data-pid="${pid}"]`); await page.waitForTimeout(80);
+    check('entry: tapping the score clears it back to par', (await page.$eval(`.stv[data-pid="${pid}"]`, e => e.dataset.n)) === '' && /Par \d/.test(await page.$eval(`.stv[data-pid="${pid}"]`, e => e.textContent)) && (await rowH()) === h0);
     const mid = () => page.$eval(`.stv[data-pid="${pid}"]`, e => ({ n: Number(e.dataset.n), text: e.textContent, row: e.closest('.pr').textContent }));
     const btn = sel => page.$eval(`[data-pid="${pid}"]${sel}`, e => ({ off: e.disabled, on: e.classList.contains('on'), bg: getComputedStyle(e).backgroundColor }));
     await stepTo(page, pid, 4);

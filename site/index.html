@@ -534,9 +534,14 @@ body { min-height: 100vh; }
 .pill.b.soft { background: rgba(207, 42, 42, .13); color: var(--red); }
 .row .right { display: flex; align-items: center; gap: 6px; }
 .tee .sec { margin-top: 16px; } .tee .sec-label { min-height: 22px; margin-bottom: 6px; } .tee .row, .tee .drop { min-height: 44px; }
+
+/* The strokes cell is always the same height, so the row does not jump when a score goes in. Tapping a score clears it. */
+.stv { height: 70px; justify-content: center; }
+button.stv { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--pine); width: 100%; border-radius: 14px; -webkit-user-select: none; user-select: none; }
+button.stv:active { background: var(--press); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610120654"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610120703"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2475,7 +2480,7 @@ function entryRow(pid, val, shots, par, rid) {
   const atOne = base !== null && base <= 1;
   const mid = base === null
     ? `<div class="stv none" data-pid="${pid}" data-n="" aria-live="polite">Par ${par}</div>`
-    : `<div class="stv${scratch ? ' out' : ''}" data-pid="${pid}" data-n="${base}" aria-live="polite"><b>${base}<sup>${pts}</sup></b><small>${word}</small></div>`;
+    : `<button class="stv${scratch ? ' out' : ''}" data-act="clear" data-pid="${pid}" data-n="${base}" aria-label="${name}: ${base} strokes. Tap to clear and start again from par"><b>${base}<sup>${pts}</sup></b><small>${word}</small></button>`;
   return `<div class="pr${flash}">
     <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dots(shots, true)}${dpl ? dropChev : ''}</button></div>
     ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
@@ -2532,6 +2537,15 @@ function setScore(pid, v) {
   const d = ensureDraft(ctx);
   const val = v === 'P' ? 'P' : Number(v);
   if (d[pid] === val) delete d[pid]; else d[pid] = val;
+  savePrefs();
+  render();
+}
+
+// Tap the big number to wipe an entry and go back to "Par n".
+function clearScore(pid) {
+  const ctx = entryCtx();
+  if (D.round(ctx.rid).status === 'final') return;
+  delete ensureDraft(ctx)[pid];
   savePrefs();
   render();
 }
@@ -3568,6 +3582,7 @@ const ACT = {
   },
   enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },
   set: el => setScore(el.dataset.pid, el.dataset.v),
+  clear: el => clearScore(el.dataset.pid),
   'contest-open': () => { UI.contestSheet = true; render(); },
   'contest-close': () => { UI.contestSheet = false; render(); },
   'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },

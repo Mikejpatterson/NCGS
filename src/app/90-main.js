@@ -41,6 +41,7 @@ const ACT = {
   },
   enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },
   set: el => setScore(el.dataset.pid, el.dataset.v),
+  clear: el => clearScore(el.dataset.pid),
   'contest-open': () => { UI.contestSheet = true; render(); },
   'contest-close': () => { UI.contestSheet = false; render(); },
   'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },

@@ -105,7 +105,7 @@ function entryRow(pid, val, shots, par, rid) {
   const atOne = base !== null && base <= 1;
   const mid = base === null
     ? `<div class="stv none" data-pid="${pid}" data-n="" aria-live="polite">Par ${par}</div>`
-    : `<div class="stv${scratch ? ' out' : ''}" data-pid="${pid}" data-n="${base}" aria-live="polite"><b>${base}<sup>${pts}</sup></b><small>${word}</small></div>`;
+    : `<button class="stv${scratch ? ' out' : ''}" data-act="clear" data-pid="${pid}" data-n="${base}" aria-label="${name}: ${base} strokes. Tap to clear and start again from par"><b>${base}<sup>${pts}</sup></b><small>${word}</small></button>`;
   return `<div class="pr${flash}">
     <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dots(shots, true)}${dpl ? dropChev : ''}</button></div>
     ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
@@ -162,6 +162,15 @@ function setScore(pid, v) {
   const d = ensureDraft(ctx);
   const val = v === 'P' ? 'P' : Number(v);
   if (d[pid] === val) delete d[pid]; else d[pid] = val;
+  savePrefs();
+  render();
+}
+
+// Tap the big number to wipe an entry and go back to "Par n".
+function clearScore(pid) {
+  const ctx = entryCtx();
+  if (D.round(ctx.rid).status === 'final') return;
+  delete ensureDraft(ctx)[pid];
   savePrefs();
   render();
 }

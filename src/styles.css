@@ -524,3 +524,8 @@ body { min-height: 100vh; }
 .pill.b.soft { background: rgba(207, 42, 42, .13); color: var(--red); }
 .row .right { display: flex; align-items: center; gap: 6px; }
 .tee .sec { margin-top: 16px; } .tee .sec-label { min-height: 22px; margin-bottom: 6px; } .tee .row, .tee .drop { min-height: 44px; }
+
+/* The strokes cell is always the same height, so the row does not jump when a score goes in. Tapping a score clears it. */
+.stv { height: 70px; justify-content: center; }
+button.stv { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--pine); width: 100%; border-radius: 14px; -webkit-user-select: none; user-select: none; }
+button.stv:active { background: var(--press); }
