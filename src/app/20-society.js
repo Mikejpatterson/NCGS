@@ -78,6 +78,7 @@ VIEWS.home = () => {
     ${tile('players', ICON.users, 'Players', plural(D.active().length, 'golfer'))}
     ${tile('org', ICON.lock, 'Organiser', 'PIN needed')}
   </div>`;
+  html += `<p class="c" style="margin-top:24px;text-align:center"><button class="link" data-act="diag">Display test</button></p>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   return { html };
 };
@@ -349,3 +350,17 @@ VIEWS.who = p => {
       ${sec('', cardOf(list.map(m => `<button class="row" data-act="pick" data-id="${m.id}"><span class="${m.id === DB.prefs.me ? 'b' : ''}">${esc(m.name)}</span>${m.id === DB.prefs.me ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : chev}</button>`).join('')), false)}`
   };
 };
+
+/* ----- Temporary: try different ways of treating the top of the screen on the phone itself ----- */
+const DIAG = [
+  ['', 'Normal (as now)'],
+  ['d-nobar', 'No solid bar at the top'],
+  ['d-dark', 'Dark colour scheme (status bar only)'],
+  ['d-inner', 'Page scrolls inside the app, not the browser'],
+  ['d-nocover', 'Not under the status bar at all'],
+  ['d-white', 'White header instead of green']
+];
+VIEWS.diag = () => ({
+  html: `${navBack(D.society())}<header class="hero s"><div class="head"><h1 class="title">Display test</h1></div><p class="sub">Tap each one, then look at the very top of the screen. Tell me which looks clean.</p></header>
+    ${sec('', cardOf(DIAG.map(([k, t]) => `<button class="row" data-act="diag-set" data-k="${k}"><span>${t}</span><span class="sub">${document.documentElement.classList.contains(k || 'none') || (!k && !DIAG.some(([c]) => c && document.documentElement.classList.contains(c))) ? 'On' : ''}</span></button>`).join('')))}`
+});

@@ -539,9 +539,18 @@ body { min-height: 100vh; }
 .stv { height: 70px; justify-content: center; }
 button.stv { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--pine); width: 100%; border-radius: 14px; -webkit-user-select: none; user-select: none; }
 button.stv:active { background: var(--press); }
+
+/* Display test variants (temporary) */
+html.d-nobar body::before { display: none; }
+html.d-dark { color-scheme: dark; }
+html.d-inner, html.d-inner body { height: 100%; overflow: hidden; }
+html.d-inner #app { position: fixed; inset: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
+html.d-nocover .hero, html.d-nocover .hero.c { padding-top: 18px; }
+html.d-white .hero { background: #fff; color: var(--pine); }
+html.d-white .hero * { color: var(--pine) !important; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610120703"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610120707"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2100,6 +2109,7 @@ VIEWS.home = () => {
     ${tile('players', ICON.users, 'Players', plural(D.active().length, 'golfer'))}
     ${tile('org', ICON.lock, 'Organiser', 'PIN needed')}
   </div>`;
+  html += `<p class="c" style="margin-top:24px;text-align:center"><button class="link" data-act="diag">Display test</button></p>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   return { html };
 };
@@ -2371,6 +2381,20 @@ VIEWS.who = p => {
       ${sec('', cardOf(list.map(m => `<button class="row" data-act="pick" data-id="${m.id}"><span class="${m.id === DB.prefs.me ? 'b' : ''}">${esc(m.name)}</span>${m.id === DB.prefs.me ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : chev}</button>`).join('')), false)}`
   };
 };
+
+/* ----- Temporary: try different ways of treating the top of the screen on the phone itself ----- */
+const DIAG = [
+  ['', 'Normal (as now)'],
+  ['d-nobar', 'No solid bar at the top'],
+  ['d-dark', 'Dark colour scheme (status bar only)'],
+  ['d-inner', 'Page scrolls inside the app, not the browser'],
+  ['d-nocover', 'Not under the status bar at all'],
+  ['d-white', 'White header instead of green']
+];
+VIEWS.diag = () => ({
+  html: `${navBack(D.society())}<header class="hero s"><div class="head"><h1 class="title">Display test</h1></div><p class="sub">Tap each one, then look at the very top of the screen. Tell me which looks clean.</p></header>
+    ${sec('', cardOf(DIAG.map(([k, t]) => `<button class="row" data-act="diag-set" data-k="${k}"><span>${t}</span><span class="sub">${document.documentElement.classList.contains(k || 'none') || (!k && !DIAG.some(([c]) => c && document.documentElement.classList.contains(c))) ? 'On' : ''}</span></button>`).join('')))}`
+});
 
 /* ---- 30-play.js ---- */
 /* ================= PLAYING A ROUND ================= */
@@ -3583,6 +3607,15 @@ const ACT = {
   enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },
   set: el => setScore(el.dataset.pid, el.dataset.v),
   clear: el => clearScore(el.dataset.pid),
+  diag: () => go('diag', {}),
+  'diag-set': el => {
+    const root = document.documentElement;
+    DIAG.forEach(([c]) => { if (c) root.classList.remove(c); });
+    if (el.dataset.k) root.classList.add(el.dataset.k);
+    const vp = document.querySelector('meta[name=viewport]');
+    if (vp) vp.setAttribute('content', el.dataset.k === 'd-nocover' ? 'width=device-width,initial-scale=1' : 'width=device-width,initial-scale=1,viewport-fit=cover');
+    render();
+  },
   'contest-open': () => { UI.contestSheet = true; render(); },
   'contest-close': () => { UI.contestSheet = false; render(); },
   'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },
