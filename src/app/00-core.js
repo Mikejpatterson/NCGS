@@ -59,6 +59,13 @@ function dots(shots, small) {
   if (shots < 0) return `<span class="${cls} give" role="img" aria-label="gives back ${plural(-shots, 'shot')}">${'<i></i>'.repeat(-shots)}</span>`;
   return `<span class="${cls}" role="img" aria-label="no shots"></span>`;
 }
+// A buggy match result as two small pills in the buggy's colour: "Buggy 1" then "2 up" / "won 3 & 1". Level matches are one grey pill.
+const statusPills = st => {
+  if (!st.leader) return `<span class="pill n">${esc(st.text)}</span>`;
+  const i = st.leader === 'A' ? 0 : 1;
+  const m = /(won .+|\d+ up.*)$/.exec(st.text);
+  return `<span class="right">${pill(i)}<span class="pill ${i ? 'b' : 'a'} soft">${esc(m ? m[1] : st.text)}</span></span>`;
+};
 const status = st => `<span class="b ${sideCls(st.leader)}">${esc(st.text)}</span>`;
 const sec = (label, body, near) => `<section class="sec${near ? ' near' : ''}">${label ? `<div class="sec-label">${label}</div>` : ''}${body}</section>`;
 const label = t => `<span class="sub">${t}</span>`;

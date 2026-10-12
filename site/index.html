@@ -530,9 +530,13 @@ body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 
 .ct-l { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ct-r { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; white-space: nowrap; }
 body { min-height: 100vh; }
+.pill.a.soft { background: rgba(11, 95, 208, .13); color: var(--blue); }
+.pill.b.soft { background: rgba(207, 42, 42, .13); color: var(--red); }
+.row .right { display: flex; align-items: center; gap: 6px; }
+.tee .sec { margin-top: 16px; } .tee .sec-label { min-height: 22px; margin-bottom: 6px; } .tee .row, .tee .drop { min-height: 44px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610120642"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610120654"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1631,6 +1635,13 @@ function dots(shots, small) {
   if (shots < 0) return `<span class="${cls} give" role="img" aria-label="gives back ${plural(-shots, 'shot')}">${'<i></i>'.repeat(-shots)}</span>`;
   return `<span class="${cls}" role="img" aria-label="no shots"></span>`;
 }
+// A buggy match result as two small pills in the buggy's colour: "Buggy 1" then "2 up" / "won 3 & 1". Level matches are one grey pill.
+const statusPills = st => {
+  if (!st.leader) return `<span class="pill n">${esc(st.text)}</span>`;
+  const i = st.leader === 'A' ? 0 : 1;
+  const m = /(won .+|\d+ up.*)$/.exec(st.text);
+  return `<span class="right">${pill(i)}<span class="pill ${i ? 'b' : 'a'} soft">${esc(m ? m[1] : st.text)}</span></span>`;
+};
 const status = st => `<span class="b ${sideCls(st.leader)}">${esc(st.text)}</span>`;
 const sec = (label, body, near) => `<section class="sec${near ? ' near' : ''}">${label ? `<div class="sec-label">${label}</div>` : ''}${body}</section>`;
 const label = t => `<span class="sub">${t}</span>`;
@@ -2214,7 +2225,7 @@ function resultsBlock(r) {
     if (twoBuggies.length) {
       html += sec(label('Buggy Wars'), twoBuggies.map(gc => cardOf(
         `<div class="row"><span class="sub">${esc(gc.labels[0].long)} v ${esc(gc.labels[1].long)}</span></div>` +
-        ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${status(gc.matches[s].status)}</div>`).join('')
+        ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('')
       )).join('<div style="height:8px"></div>'));
       const lows = comp.pairs.filter(p => p.lowest);
       if (lows.length) html += sec(label('First round of drinks'), cardOf(lows.map(p => `<div class="row"><span>${esc(p.label)}</span><span class="right"><span class="pill w">Buying</span><span class="b num">${p.total}</span></span></div>`).join('')));
@@ -2400,13 +2411,14 @@ VIEWS.tee = () => {
   const clashRows = [...new Set(clash.map(c => c.hole))].map(hn => `<button class="row" data-act="conflict" data-n="${hn}"><span>Hole ${hn}</span><span class="right"><span class="pill w">Saved on two phones</span>${chev}</span></button>`).join('');
   return {
     tabs: 'hole',
-    html: `<header class="hero c"><div class="hrow2"><h1 class="big"><small>Hole</small>${n}</h1>${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></div>
+    html: `<div class="tee"><header class="hero c"><div class="hrow2"><h1 class="big"><small>Hole</small>${n}</h1>${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></div>
       <div class="pills2"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span>${h.yards ? `<span class="fact">${h.yards}<b>yds</b></span>` : ''}${contest ? `<span class="pill flag">${CONTEST[contest.type]}</span>` : ''}</div></header>
       ${clashRows ? sec('', cardOf(clashRows), true) : ''}
       ${teams}
-      ${buggies || checkRows ? sec('', cardOf(`${buggies ? `<button class="row" data-act="tab" data-tab="match"><span class="sub">${segName(seg)}</span>${status(mShow)}</button>` : ''}${checkRows}`)) : ''}
+      ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span class="sub">${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
+      ${checkRows ? sec('', cardOf(checkRows)) : ''}
       <button class="btn" data-act="enter"${checkRows ? ' style="margin-top:16px"' : ''}>${hasDraft ? 'Continue scores' : 'Enter scores'}</button>
-      ${saveWarning()}`
+      ${saveWarning()}</div>`
   };
 };
 function saveWarning() {
@@ -2885,7 +2897,7 @@ VIEWS.finish = () => {
   const submitted = D.card(rid, g.id);
   const buggies = gc.teams.length === 2;
   const players = gc.teams.map((t, i) => t.map(pid => dropRow(rid, { id: pid }, `<span style="display:flex;align-items:center;gap:8px">${buggies ? dot(i) : ''}${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${comp.players[pid].total}</span>${dropChev}</span>`, 'row')).join('')).join('');
-  const bw = buggies ? ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${status(gc.matches[s].status)}</div>`).join('') : '';
+  const bw = buggies ? ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('') : '';
   const missing = 18 - gc.holesDone;
   const checks = ['front', 'back'].map(sg => checkRow(sg, D.check(rid, g.id, sg))).join('');
   const pending = ['front', 'back'].find(sg => { const c = D.check(rid, g.id, sg); return !c || !c.resolved; });
@@ -2939,7 +2951,7 @@ function buggyView(rid) {
   const gc = comp.groups.find(g => g.id === gid);
   const L = gc.labels;
   const canEdit = mine && mine.id === gid && r.status === 'live';
-  const summary = ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${status(gc.matches[s].status)}</div>`).join('');
+  const summary = ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('');
   let rows = '';
   gc.order.forEach((n, idx) => {
     const hr = gc.holes[n];
@@ -2950,7 +2962,7 @@ function buggyView(rid) {
       a = `<span class="ppts ${hr.result === 'A' ? 'a' : hr.result === 'B' ? 'lose' : ''}">${pa}</span>`;
       b = `<span class="ppts ${hr.result === 'B' ? 'b' : hr.result === 'A' ? 'lose' : ''}">${pb}</span>`;
       const lead = hr.segLead;
-      m = lead === 0 ? '<span class="pill n">AS</span>' : `<span class="pill ${lead > 0 ? 'a' : 'b'}">${esc(lead > 0 ? L[0].short : L[1].short)} ${Math.abs(lead)} up</span>`;
+      m = lead === 0 ? '<span class="pill n">AS</span>' : `<span class="pill ${lead > 0 ? 'a' : 'b'} soft">${Math.abs(lead)} up</span>`;
     } else if (isNow) m = '<span class="b c-g">Now</span>';
     const tag = canEdit && hr.complete ? 'button' : 'div';
     const attrs = tag === 'button' ? ` data-act="edit-hole" data-n="${n}" aria-label="Change hole ${n}"` : '';
@@ -2958,7 +2970,7 @@ function buggyView(rid) {
     const nextN = gc.order[idx + 1];
     if (nextN !== undefined && (nextN <= 9) !== (n <= 9)) {
       const seg = n <= 9 ? 'front' : 'back';
-      rows += `<div class="row" style="background:var(--bg)"><span class="sub">${segName(seg)}</span>${status(gc.matches[seg].status)}</div>`;
+      rows += `<div class="row" style="background:var(--bg)"><span class="sub">${segName(seg)}</span>${statusPills(gc.matches[seg].status)}</div>`;
     }
   });
   return {

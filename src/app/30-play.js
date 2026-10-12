@@ -41,13 +41,14 @@ VIEWS.tee = () => {
   const clashRows = [...new Set(clash.map(c => c.hole))].map(hn => `<button class="row" data-act="conflict" data-n="${hn}"><span>Hole ${hn}</span><span class="right"><span class="pill w">Saved on two phones</span>${chev}</span></button>`).join('');
   return {
     tabs: 'hole',
-    html: `<header class="hero c"><div class="hrow2"><h1 class="big"><small>Hole</small>${n}</h1>${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></div>
+    html: `<div class="tee"><header class="hero c"><div class="hrow2"><h1 class="big"><small>Hole</small>${n}</h1>${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></div>
       <div class="pills2"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span>${h.yards ? `<span class="fact">${h.yards}<b>yds</b></span>` : ''}${contest ? `<span class="pill flag">${CONTEST[contest.type]}</span>` : ''}</div></header>
       ${clashRows ? sec('', cardOf(clashRows), true) : ''}
       ${teams}
-      ${buggies || checkRows ? sec('', cardOf(`${buggies ? `<button class="row" data-act="tab" data-tab="match"><span class="sub">${segName(seg)}</span>${status(mShow)}</button>` : ''}${checkRows}`)) : ''}
+      ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span class="sub">${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
+      ${checkRows ? sec('', cardOf(checkRows)) : ''}
       <button class="btn" data-act="enter"${checkRows ? ' style="margin-top:16px"' : ''}>${hasDraft ? 'Continue scores' : 'Enter scores'}</button>
-      ${saveWarning()}`
+      ${saveWarning()}</div>`
   };
 };
 function saveWarning() {
@@ -526,7 +527,7 @@ VIEWS.finish = () => {
   const submitted = D.card(rid, g.id);
   const buggies = gc.teams.length === 2;
   const players = gc.teams.map((t, i) => t.map(pid => dropRow(rid, { id: pid }, `<span style="display:flex;align-items:center;gap:8px">${buggies ? dot(i) : ''}${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${comp.players[pid].total}</span>${dropChev}</span>`, 'row')).join('')).join('');
-  const bw = buggies ? ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${status(gc.matches[s].status)}</div>`).join('') : '';
+  const bw = buggies ? ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('') : '';
   const missing = 18 - gc.holesDone;
   const checks = ['front', 'back'].map(sg => checkRow(sg, D.check(rid, g.id, sg))).join('');
   const pending = ['front', 'back'].find(sg => { const c = D.check(rid, g.id, sg); return !c || !c.resolved; });
@@ -580,7 +581,7 @@ function buggyView(rid) {
   const gc = comp.groups.find(g => g.id === gid);
   const L = gc.labels;
   const canEdit = mine && mine.id === gid && r.status === 'live';
-  const summary = ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${status(gc.matches[s].status)}</div>`).join('');
+  const summary = ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('');
   let rows = '';
   gc.order.forEach((n, idx) => {
     const hr = gc.holes[n];
@@ -591,7 +592,7 @@ function buggyView(rid) {
       a = `<span class="ppts ${hr.result === 'A' ? 'a' : hr.result === 'B' ? 'lose' : ''}">${pa}</span>`;
       b = `<span class="ppts ${hr.result === 'B' ? 'b' : hr.result === 'A' ? 'lose' : ''}">${pb}</span>`;
       const lead = hr.segLead;
-      m = lead === 0 ? '<span class="pill n">AS</span>' : `<span class="pill ${lead > 0 ? 'a' : 'b'}">${esc(lead > 0 ? L[0].short : L[1].short)} ${Math.abs(lead)} up</span>`;
+      m = lead === 0 ? '<span class="pill n">AS</span>' : `<span class="pill ${lead > 0 ? 'a' : 'b'} soft">${Math.abs(lead)} up</span>`;
     } else if (isNow) m = '<span class="b c-g">Now</span>';
     const tag = canEdit && hr.complete ? 'button' : 'div';
     const attrs = tag === 'button' ? ` data-act="edit-hole" data-n="${n}" aria-label="Change hole ${n}"` : '';
@@ -599,7 +600,7 @@ function buggyView(rid) {
     const nextN = gc.order[idx + 1];
     if (nextN !== undefined && (nextN <= 9) !== (n <= 9)) {
       const seg = n <= 9 ? 'front' : 'back';
-      rows += `<div class="row" style="background:var(--bg)"><span class="sub">${segName(seg)}</span>${status(gc.matches[seg].status)}</div>`;
+      rows += `<div class="row" style="background:var(--bg)"><span class="sub">${segName(seg)}</span>${statusPills(gc.matches[seg].status)}</div>`;
     }
   });
   return {
