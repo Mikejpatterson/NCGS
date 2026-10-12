@@ -208,7 +208,7 @@ function resultsBlock(r) {
     if (twoBuggies.length) {
       html += sec(label('Buggy Wars'), twoBuggies.map(gc => cardOf(
         `<div class="row"><span class="sub">${esc(gc.labels[0].long)} v ${esc(gc.labels[1].long)}</span></div>` +
-        ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('')
+        ['front', 'back', 'overall'].map(s => `<div class="row"><span>${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('')
       )).join('<div style="height:8px"></div>'));
       const lows = comp.pairs.filter(p => p.lowest);
       if (lows.length) html += sec(label('First round of drinks'), cardOf(lows.map(p => `<div class="row"><span>${esc(p.label)}</span><span class="right"><span class="pill w">Buying</span><span class="b num">${p.total}</span></span></div>`).join('')));

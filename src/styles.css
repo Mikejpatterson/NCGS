@@ -527,7 +527,7 @@ body { min-height: 100vh; }
 .pill.a.soft { background: rgba(11, 95, 208, .13); color: var(--blue); }
 .pill.b.soft { background: rgba(207, 42, 42, .13); color: var(--red); }
 .row .right { display: flex; align-items: center; gap: 6px; }
-.tee .sec { margin-top: 16px; } .tee .sec-label { min-height: 22px; margin-bottom: 6px; } .tee .row, .tee .drop { min-height: 44px; }
+.tee .sec { margin-top: 12px; } .tee .sec-label { min-height: 22px; margin-bottom: 4px; } .tee .row, .tee .drop { min-height: 42px; }
 
 /* The strokes cell is always the same height, so the row does not jump when a score goes in. Tapping a score clears it. */
 .stv { height: 70px; justify-content: center; }
@@ -645,3 +645,4 @@ body.hearing .askbar .arow .x, body.hearing .askbar .arow .stop, body.hearing .a
 .res { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; }
 .res-t { font-size: var(--t-lead); font-weight: 700; letter-spacing: -.01em; }
 .res-sub { margin-top: 6px; }
+.row .pill { font-size: var(--t-cap); }

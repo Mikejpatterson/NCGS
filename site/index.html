@@ -537,7 +537,7 @@ body { min-height: 100vh; }
 .pill.a.soft { background: rgba(11, 95, 208, .13); color: var(--blue); }
 .pill.b.soft { background: rgba(207, 42, 42, .13); color: var(--red); }
 .row .right { display: flex; align-items: center; gap: 6px; }
-.tee .sec { margin-top: 16px; } .tee .sec-label { min-height: 22px; margin-bottom: 6px; } .tee .row, .tee .drop { min-height: 44px; }
+.tee .sec { margin-top: 12px; } .tee .sec-label { min-height: 22px; margin-bottom: 4px; } .tee .row, .tee .drop { min-height: 42px; }
 
 /* The strokes cell is always the same height, so the row does not jump when a score goes in. Tapping a score clears it. */
 .stv { height: 70px; justify-content: center; }
@@ -655,9 +655,10 @@ body.hearing .askbar .arow .x, body.hearing .askbar .arow .stop, body.hearing .a
 .res { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 10px; }
 .res-t { font-size: var(--t-lead); font-weight: 700; letter-spacing: -.01em; }
 .res-sub { margin-top: 6px; }
+.row .pill { font-size: var(--t-cap); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121456"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121506"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2412,7 +2413,7 @@ function resultsBlock(r) {
     if (twoBuggies.length) {
       html += sec(label('Buggy Wars'), twoBuggies.map(gc => cardOf(
         `<div class="row"><span class="sub">${esc(gc.labels[0].long)} v ${esc(gc.labels[1].long)}</span></div>` +
-        ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('')
+        ['front', 'back', 'overall'].map(s => `<div class="row"><span>${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('')
       )).join('<div style="height:8px"></div>'));
       const lows = comp.pairs.filter(p => p.lowest);
       if (lows.length) html += sec(label('First round of drinks'), cardOf(lows.map(p => `<div class="row"><span>${esc(p.label)}</span><span class="right"><span class="pill w">Buying</span><span class="b num">${p.total}</span></span></div>`).join('')));
@@ -2602,8 +2603,8 @@ VIEWS.tee = () => {
       <div class="pills2"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span>${h.yards ? `<span class="fact">${h.yards}<b>yds</b></span>` : ''}${contest ? `<span class="pill flag">${CONTEST[contest.type]}</span>` : ''}</div></header>
       ${clashRows ? sec('', cardOf(clashRows), true) : ''}
       ${teams}
-      ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span class="sub">${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
-      ${checkRows ? sec('', cardOf(checkRows)) : ''}
+      ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span>${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
+      ${checkRows ? sec(label('Scorecard'), cardOf(checkRows)) : ''}
       <button class="btn" data-act="enter"${checkRows ? ' style="margin-top:16px"' : ''}>${hasDraft ? 'Continue scores' : 'Enter scores'}</button>
       ${saveWarning()}</div>${holesSheet(rid, gc, null)}`
   };
@@ -3104,7 +3105,7 @@ VIEWS.finish = () => {
   const submitted = D.card(rid, g.id);
   const buggies = gc.teams.length === 2;
   const players = gc.teams.map((t, i) => t.map(pid => dropRow(rid, { id: pid }, `<span style="display:flex;align-items:center;gap:8px">${buggies ? dot(i) : ''}${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${comp.players[pid].total}</span>${dropChev}</span>`, 'row')).join('')).join('');
-  const bw = buggies ? ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('') : '';
+  const bw = buggies ? ['front', 'back', 'overall'].map(s => `<div class="row"><span>${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('') : '';
   const missing = 18 - gc.holesDone;
   const checks = ['front', 'back'].map(sg => checkRow(sg, D.check(rid, g.id, sg))).join('');
   const pending = ['front', 'back'].find(sg => { const c = D.check(rid, g.id, sg); return !c || !c.resolved; });
@@ -3158,7 +3159,7 @@ function buggyView(rid) {
   const gc = comp.groups.find(g => g.id === gid);
   const L = gc.labels;
   const canEdit = mine && mine.id === gid && r.status === 'live';
-  const summary = ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('');
+  const summary = ['front', 'back', 'overall'].map(s => `<div class="row"><span>${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('');
   let rows = '';
   gc.order.forEach((n, idx) => {
     const hr = gc.holes[n];

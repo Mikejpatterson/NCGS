@@ -45,8 +45,8 @@ VIEWS.tee = () => {
       <div class="pills2"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span>${h.yards ? `<span class="fact">${h.yards}<b>yds</b></span>` : ''}${contest ? `<span class="pill flag">${CONTEST[contest.type]}</span>` : ''}</div></header>
       ${clashRows ? sec('', cardOf(clashRows), true) : ''}
       ${teams}
-      ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span class="sub">${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
-      ${checkRows ? sec('', cardOf(checkRows)) : ''}
+      ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span>${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
+      ${checkRows ? sec(label('Scorecard'), cardOf(checkRows)) : ''}
       <button class="btn" data-act="enter"${checkRows ? ' style="margin-top:16px"' : ''}>${hasDraft ? 'Continue scores' : 'Enter scores'}</button>
       ${saveWarning()}</div>${holesSheet(rid, gc, null)}`
   };
@@ -547,7 +547,7 @@ VIEWS.finish = () => {
   const submitted = D.card(rid, g.id);
   const buggies = gc.teams.length === 2;
   const players = gc.teams.map((t, i) => t.map(pid => dropRow(rid, { id: pid }, `<span style="display:flex;align-items:center;gap:8px">${buggies ? dot(i) : ''}${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${comp.players[pid].total}</span>${dropChev}</span>`, 'row')).join('')).join('');
-  const bw = buggies ? ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('') : '';
+  const bw = buggies ? ['front', 'back', 'overall'].map(s => `<div class="row"><span>${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('') : '';
   const missing = 18 - gc.holesDone;
   const checks = ['front', 'back'].map(sg => checkRow(sg, D.check(rid, g.id, sg))).join('');
   const pending = ['front', 'back'].find(sg => { const c = D.check(rid, g.id, sg); return !c || !c.resolved; });
@@ -601,7 +601,7 @@ function buggyView(rid) {
   const gc = comp.groups.find(g => g.id === gid);
   const L = gc.labels;
   const canEdit = mine && mine.id === gid && r.status === 'live';
-  const summary = ['front', 'back', 'overall'].map(s => `<div class="row"><span class="sub">${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('');
+  const summary = ['front', 'back', 'overall'].map(s => `<div class="row"><span>${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('');
   let rows = '';
   gc.order.forEach((n, idx) => {
     const hr = gc.holes[n];
