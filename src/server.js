@@ -67,6 +67,7 @@ var NCGS = (function () {
     var data = initial && initial.tables ? JSON.parse(JSON.stringify(initial)) : { tables: {}, ver: 0, pin: DEFAULT_PIN, photos: {} };
     TABLES.forEach(function (t) { data.tables[t] = data.tables[t] || []; });
     data.photos = data.photos || {};
+    var cacheMap = {};
     function save() { if (onChange) onChange(data); }
     return {
       kind: 'memory',
@@ -95,8 +96,8 @@ var NCGS = (function () {
       putPhoto: function (dataUrl) { var id = 'ph' + (Object.keys(data.photos).length + 1) + '-' + Date.now(); data.photos[id] = dataUrl; save(); return id; },
       getPhoto: function (id) { return data.photos[id] || null; },
       lock: function (fn) { return fn(); },
-      cacheGet: function () { return null; },
-      cachePut: function () {},
+      cacheGet: function (k) { return Object.prototype.hasOwnProperty.call(cacheMap, k) ? cacheMap[k] : null; },
+      cachePut: function (k, v) { cacheMap[k] = v; },
       fetchJson: null,
       backup: function () { return { name: 'in-memory copy', url: '' }; },
       dump: function () { return data; }
@@ -230,7 +231,32 @@ var NCGS = (function () {
     // The new version is only published (commit) after its rows are written, so a poll never skips them.
     function bump() { return store.getVer() + 1; }
     function commit(v) { store.setVer(v); return v; }
-    function pinOk(pin) { return pin !== undefined && pin !== null && String(pin) === String(store.getPin()); }
+    /* The organiser PIN. Ten wrong guesses in ten minutes lock the PIN for everyone until the window passes;
+       scoring from a phone never needs the PIN, so a round carries on. */
+    var LOCK_AFTER = 10;
+    function wrongCount() { return Number(store.cacheGet('pinfail') || 0); }
+    function locked() { return wrongCount() >= LOCK_AFTER; }
+    function pinOk(pin) {
+      if (pin === undefined || pin === null) return false;
+      if (locked()) return false;
+      if (String(pin) === String(store.getPin())) { if (wrongCount()) store.cachePut('pinfail', '0', 600); return true; }
+      store.cachePut('pinfail', String(wrongCount() + 1), 600);
+      return false;
+    }
+    var MAX_CELL = 40000, MAX_ROWS = 400;
+    /* Refuses rows that would not fit a sheet cell, are missing their key, or come in huge batches. */
+    function checkRows(t, rows) {
+      if (!Array.isArray(rows)) throw err('bad', 'Rows expected');
+      if (rows.length > MAX_ROWS) throw err('bad', 'Too many rows in one go');
+      rows.forEach(function (r) {
+        if (!r || typeof r !== 'object' || Array.isArray(r)) throw err('bad', 'Unreadable row');
+        SCHEMA[t].key.forEach(function (k) { if (r[k] === undefined || r[k] === null || r[k] === '') throw err('bad', 'A row is missing its ' + k); });
+        Object.keys(SCHEMA[t].cols).forEach(function (c) {
+          var v = r[c];
+          if (v !== undefined && v !== null && toCell(SCHEMA[t].cols[c], v).length > MAX_CELL) throw err('bad', 'That is too long to store');
+        });
+      });
+    }
     function stamp(t, rows, v) { return rows.map(function (r) { var c = clean(t, r); c.ver = v; return c; }); }
     function logRow(v, by, action, detail) {
       return { id: 'L' + v + '-' + Math.random().toString(36).slice(2, 7), at: now(), by: by || '', action: action, detail: detail || '' };
@@ -258,7 +284,7 @@ var NCGS = (function () {
       return { ver: cur, build: BUILD, tables: tables };
     };
 
-    ops.checkPin = function (req) { return { ok: pinOk(req.pin) }; };
+    ops.checkPin = function (req) { var ok = pinOk(req.pin); return ok ? { ok: true } : { ok: false, locked: locked() }; };
 
     ops.setPin = function (req) {
       if (!pinOk(req.pin)) throw err('pin', 'That PIN did not match.');
@@ -279,10 +305,21 @@ var NCGS = (function () {
         var round = find('rounds', function (r) { return r.id === req.round; });
         if (!round) throw err('missing', 'That round no longer exists.');
         var org = pinOk(req.pin);
+        var hole = Number(req.hole);
+        if (req.hole === null || req.hole === '' || typeof req.hole === 'boolean' || !isFinite(hole) || Math.floor(hole) !== hole || hole < 1 || hole > 18) throw err('bad', 'That is not a hole on the course.');
+        var grp = (round.groups || []).filter(function (g) { return g.id === req.grp; })[0];
+        if (!grp) throw err('bad', 'That group is not in this round.');
+        var inGroup = {};
+        grp.teams.forEach(function (t) { t.forEach(function (pid) { inGroup[pid] = 1; }); });
+        var sc = req.scores && typeof req.scores === 'object' ? req.scores : {};
+        Object.keys(sc).forEach(function (pid) {
+          if (!inGroup[pid]) throw err('bad', 'That player is not in this group.');
+          var w = sc[pid] && sc[pid].v;
+          if (w !== null && w !== 'P' && !(typeof w === 'number' && isFinite(w) && Math.floor(w) === w && w >= 1 && w <= 25)) throw err('bad', 'That is not a score.');
+        });
         if (round.status === 'final') throw err('final', 'This round is final.');
         var starting = round.status === 'upcoming' && round.groups && round.groups.length;
         if (round.status !== 'live' && !starting) throw err('notlive', 'This round has not started.');
-        var hole = Number(req.hole);
         var existing = {};
         store.read('scores').forEach(function (s) { if (s.round === req.round && s.hole === hole) existing[s.player] = s.strokes; });
         var conflicts = [];
@@ -294,7 +331,7 @@ var NCGS = (function () {
           var base = req.scores[pid].base;
           var cur = existing[pid] === undefined ? null : existing[pid];
           if (cur === want) return;
-          if (base !== undefined && cur !== (base === undefined ? null : base) && !req.force) {
+          if (base !== undefined && cur !== (base === undefined ? null : base) && !(req.force && org)) {
             conflicts.push({ player: pid, server: cur, mine: want });
             return;
           }
@@ -307,6 +344,7 @@ var NCGS = (function () {
         if (req.claim !== undefined) {
           var curClaim = find('claims', function (c) { return c.round === req.round && c.hole === hole && c.grp === req.grp; });
           var wantClaim = req.claim || null;
+          if (wantClaim && !inGroup[wantClaim]) throw err('bad', 'That player is not in this group.');
           if ((curClaim ? curClaim.player : null) !== wantClaim) {
             if (wantClaim) claimRows.push({ round: req.round, hole: hole, grp: req.grp, player: wantClaim, at: now() });
             else if (curClaim) claimRemove.push(keyOf('claims', curClaim));
@@ -347,10 +385,20 @@ var NCGS = (function () {
     ops.put = function (req) {
       var t = req.table;
       if (!SCHEMA[t] || t === 'deleted') throw err('bad', 'Unknown table');
-      if (!PLAYER_TABLES[t] && !pinOk(req.pin)) throw err('pin', 'Organiser PIN needed.');
+      var org = pinOk(req.pin);
+      if (!PLAYER_TABLES[t] && !org) throw err('pin', 'Organiser PIN needed.');
+      var rows = req.rows === undefined ? [] : req.rows;
+      checkRows(t, rows);
+      if (t === 'log' && !org) {
+        // a phone may add to the log but never edit it, and never sign as the organiser
+        var have = {};
+        store.read('log').forEach(function (r) { have[r.id] = 1; });
+        rows = rows.filter(function (r) { return !have[r.id]; }).map(function (r) { return Object.assign({}, r, { by: String(r.by) === 'Organiser' ? 'Player' : r.by }); });
+        if (!rows.length) return { ok: true, ver: store.getVer() };
+      }
       return store.lock(function () {
         var v = bump();
-        store.upsert(t, stamp(t, req.rows || [], v));
+        store.upsert(t, stamp(t, rows, v));
         if (req.log) store.upsert('log', stamp('log', [logRow(v, req.log.by || 'Organiser', req.log.action, req.log.detail)], v));
         commit(v);
         return { ok: true, ver: v };

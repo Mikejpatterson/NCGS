@@ -155,7 +155,8 @@ test('the version is published only after the rows are written', () => {
 test('the sheet grows when a table passes its row limit', () => {
   const ss = fakeSpreadsheet();
   const s = N.createServer(N.sheetStore(ss, fakeProps(), fakeCache(), fakeLock, () => null));
-  s.api({ op: 'seed', data: { rounds: [ROUND] } });
+  const big = Object.assign({}, ROUND, { groups: [{ id: 'g1', n: 1, teams: [Array.from({ length: 60 }, (_, p) => 'p' + p)] }] });
+  s.api({ op: 'seed', data: { rounds: [big] } });
   for (let h = 1; h <= 18; h++) {
     const scores = {};
     for (let p = 0; p < 60; p++) scores['p' + p] = { v: 4, base: null };

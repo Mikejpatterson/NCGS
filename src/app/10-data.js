@@ -94,6 +94,8 @@ function applyLocal(tables, req) {
 function view() {
   if (DB._view) return DB._view;
   const t = clone(DB.server.tables);
+  // Changes the server has accepted but this phone has not yet read back stay visible, so a saved score never blinks out.
+  (DB.sent || []).forEach(item => applyLocal(t, item.req));
   DB.outbox.forEach(item => applyLocal(t, item.req));
   DB._view = t;
   DB._memo = {};
@@ -131,9 +133,11 @@ function sync() {
   if (syncing) return syncing;
   const full = !DB.server.ver;
   const req = full ? { op: 'load' } : { op: 'since', v: DB.server.ver };
+  const mark = DB.sentSeq || 0; // anything sent before this read started will be in its answer
   syncing = call(req).then(resp => {
     syncing = null;
     if (resp.error) { DB.online = true; return; }
+    DB.sent = (DB.sent || []).filter(i => i.seq > mark);
     DB.online = true;
     DB.lastSync = Date.now();
     DB.serverBuild = resp.build || 'old';
@@ -173,6 +177,7 @@ async function flush() {
       DB.outbox.shift();
       saveOutbox();
       sent += 1;
+      if (!resp.error) { DB.sentSeq = (DB.sentSeq || 0) + 1; (DB.sent = DB.sent || []).push({ req: item.req, seq: DB.sentSeq }); }
       if (resp.error) {
         if (resp.error !== 'pin') reject(item, resp);
         toast(resp.error === 'pin' ? 'Organiser PIN needed for that' : resp.error === 'final' ? 'That round is final, so that score was not saved' : resp.message || 'That change was not saved');

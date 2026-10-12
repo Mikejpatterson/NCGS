@@ -16,7 +16,7 @@
   /** Nearest whole number, .5 rounded away from zero. */
   function roundHandicap(x) {
     const e = 1e-9;
-    return x >= 0 ? Math.floor(x + 0.5 + e) : -Math.floor(-x + 0.5 + e);
+    return (x >= 0 ? Math.floor(x + 0.5 + e) : -Math.floor(-x + 0.5 + e)) + 0;
   }
 
   /** Every step of the playing-handicap sum, so players can check it.
@@ -393,12 +393,15 @@
   function addMinutes(hhmm, mins) {
     const m = /^(\d{1,2}):(\d{2})$/.exec(String(hhmm || ''));
     if (!m) return '';
-    const t = Number(m[1]) * 60 + Number(m[2]) + mins;
-    return `${String(Math.floor(t / 60) % 24).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
+    if (Number(m[1]) > 23 || Number(m[2]) > 59) return '';
+    const step = Number.isFinite(mins) ? Math.round(mins) : 0;
+    const t = (((Number(m[1]) * 60 + Number(m[2]) + step) % 1440) + 1440) % 1440;
+    return `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
   }
 
   function teeTimesFrom(first, interval, count) {
-    return Array.from({ length: count }, (_, i) => addMinutes(first, i * (interval || 8)));
+    const step = Number(interval) > 0 ? Number(interval) : 8;
+    return Array.from({ length: count }, (_, i) => addMinutes(first, i * step));
   }
 
   function makeGroups(orderedIds, teeTimes, history) {

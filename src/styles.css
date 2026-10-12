@@ -365,7 +365,7 @@ button.btn:has(> svg) { flex-direction: row; }
 
 /* Front page */
 .hero.home { padding-bottom: 20px; }
-.who-chip { margin-left: auto; align-self: flex-start; height: 34px; padding: 0 14px; border-radius: 17px; background: rgba(255,255,255,.16); color: #fff; font-size: var(--t-sub); font-weight: 600; white-space: nowrap; }
+.who-chip { margin-left: auto; align-self: flex-start; height: 44px; padding: 0 16px; border-radius: 22px; background: rgba(255,255,255,.16); color: #fff; font-size: var(--t-sub); font-weight: 600; white-space: nowrap; }
 .brand .two { flex: 1; min-width: 0; }
 .now { margin-top: 20px; }
 .now-main { display: flex; flex-direction: column; gap: 4px; width: 100%; text-align: left; }

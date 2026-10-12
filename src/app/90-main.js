@@ -295,7 +295,7 @@ const FORMS = {
     const v = val('pin');
     call({ op: 'checkPin', pin: v }).then(res => {
       if (res.ok) { ORGPIN.pin = v; ORGPIN.weak = v === '1234'; UI.orgUnlocked = true; UI.pinError = false; replaceTop('home'); }
-      else { UI.pinError = 'That PIN did not match.'; render(); const el = document.getElementById('pin'); if (el) el.focus(); }
+      else { UI.pinError = res.locked ? 'Too many wrong PINs. Wait ten minutes and try again.' : 'That PIN did not match.'; render(); const el = document.getElementById('pin'); if (el) el.focus(); }
     }).catch(() => { UI.pinError = 'The organiser needs signal to unlock.'; render(); });
   },
   details: () => {
@@ -416,6 +416,7 @@ const FORMS = {
 const app = document.getElementById('app');
 const tabs = document.getElementById('tabs');
 
+let renderGuard = 0;
 function render() {
   if (!DB.loaded && !view().members.length) {
     app.innerHTML = `<div class="loading"><span class="badge">NCGS</span><p class="sub">${DB.online ? 'Loading' : 'No signal. The app will load when there is.'}</p></div>`;
@@ -427,9 +428,19 @@ function render() {
   try {
     out = UI.org ? (UI.orgUnlocked || e.v === 'lock' ? (ORG[e.v] || ORG.home)(e.p || {}) : ORG.lock()) : (VIEWS[e.v] || VIEWS.home)(e.p || {});
   } catch (err) {
-    console.error(err);
-    UI.stack = [{ v: 'home', p: {} }];
-    UI.org = false;
+    // A screen that cannot be drawn (its round was deleted, the player was moved) steps back one level instead of breaking the app.
+    console.warn(err);
+    DB.renderFaults = (DB.renderFaults || 0) + 1;
+    (DB.faultLog = DB.faultLog || []).push((UI.org ? 'org:' : '') + e.v + ' ' + JSON.stringify(e.p || {}).slice(0, 40) + ' ' + String(err && err.message).slice(0, 80));
+    const st = stackOf();
+    if (st.length > 1) st.pop(); else { UI.stack = [{ v: 'home', p: {} }]; UI.org = false; }
+    UI.confirm = null; UI.holeSheet = false;
+    if ((renderGuard || 0) < 4) {
+      renderGuard = (renderGuard || 0) + 1;
+      try { toast('That screen is not available any more'); render(); } finally { renderGuard -= 1; }
+      return;
+    }
+    UI.stack = [{ v: 'home', p: {} }]; UI.org = false;
     out = VIEWS.home({});
   }
   let overlay = '';
@@ -620,4 +631,4 @@ if (window.claude && typeof window.claude.use === 'function') {
   sync().then(() => flush());
 })();
 if ('serviceWorker' in navigator && BOOT.mode === 'live' && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
-window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN };
+window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, fmtDate, daysFromToday, todayIso };

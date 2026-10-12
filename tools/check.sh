@@ -3,12 +3,14 @@
 # Run from the project folder:  sh tools/check.sh
 set -e
 cd "$(dirname "$0")/.."
-node --test test/engine.test.js test/server.test.js
+node --test test/engine.test.js test/server.test.js test/fuzz.server.test.js test/fuzz.engine.test.js
 if [ ! -f data/seed.json ]; then echo "No data/seed.json here, so the screen tests are skipped."; exit 0; fi
 node build.js > /dev/null
 python3 -m http.server 8765 -d dist > /dev/null 2>&1 &
 SERVER=$!
-trap 'kill $SERVER 2>/dev/null' EXIT
+node tools/devserver.js > /dev/null 2>&1 &
+DEV=$!
+trap 'kill $SERVER $DEV 2>/dev/null' EXIT
 sleep 1
 FAIL=0
 for t in test/*.run.js; do
