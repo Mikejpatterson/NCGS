@@ -100,6 +100,8 @@ function view() {
   return t;
 }
 function changed() { DB._view = null; DB._memo = {}; }
+/* Live only: the server the app is talking to is not the one this app was built with. */
+const serverStale = () => BOOT.mode === 'live' && !!BOOT.server && !!DB.lastSync && DB.serverBuild !== undefined && DB.serverBuild !== BOOT.server;
 const isGuest = m => !!m && String(m.id).startsWith('guest-');
 function memo(key, fn) { view(); if (!(key in DB._memo)) DB._memo[key] = fn(); return DB._memo[key]; }
 
@@ -134,6 +136,7 @@ function sync() {
     if (resp.error) { DB.online = true; return; }
     DB.online = true;
     DB.lastSync = Date.now();
+    DB.serverBuild = resp.build || 'old';
     const was = DB.loaded;
     DB.loaded = true;
     if (merge(resp, full) || !was) render();
@@ -236,7 +239,9 @@ const D = {
 /* ----- Rounds ----- */
 const isDemo = r => r && r.source === 'demo';
 const courseOf = r => (r ? D.course(r.course) : null);
+/* A finished round keeps the card it was played on, so editing a course later cannot change an old result. */
 function teeOf(r) {
+  if (r && r.results && r.results.snap && r.results.snap.tee) return Object.assign({}, r.results.snap.tee);
   const c = courseOf(r);
   if (!c || !c.tees || !r.tee || !c.tees[r.tee]) return null;
   const t = Object.assign({}, c.tees[r.tee]);
@@ -244,6 +249,7 @@ function teeOf(r) {
   return t;
 }
 function holesOf(r) {
+  if (r && r.results && r.results.snap && r.results.snap.holes && r.results.snap.holes.length === 18) return r.results.snap.holes.map(h => Object.assign({}, h, { yards: h.m ? E.metresToYards(h.m) : null }));
   const c = courseOf(r);
   return c && c.holes && c.holes.length === 18 ? c.holes.map(h => Object.assign({}, h, { yards: h.m ? E.metresToYards(h.m) : null })) : null;
 }

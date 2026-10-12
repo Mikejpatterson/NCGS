@@ -20,7 +20,8 @@ const appFiles = fs.readdirSync(path.join(__dirname, 'src/app')).filter(f => f.e
 const appJs = `(function () {\n'use strict';\n${appFiles.map(f => `/* ---- ${f} ---- */\n${read('src/app/' + f)}`).join('\n')}\n})();`;
 const css = read('src/styles.css');
 const engine = read('src/engine.js');
-const server = read('src/server.js');
+const serverBuild = require('crypto').createHash('sha1').update(read('src/server.js')).digest('hex').slice(0, 8);
+const server = read('src/server.js').replace(/__BUILD__/g, serverBuild);
 
 const body = boot => `<main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
@@ -33,16 +34,16 @@ window.TRIP_CARD_FIXTURES = ${safe(JSON.stringify(fixtures))};</script>` : ''}
 <script>${safe(appJs)}</script>`;
 
 // Preview (in-browser data)
-const previewBody = `<title>NCGS</title>\n<style>\n${css}\n</style>\n${body({ mode: 'local' })}\n`;
+const previewBody = `<title>NCGS</title>\n<style>\n${css}\n</style>\n${body({ mode: 'local', version, server: serverBuild })}\n`;
 out('golf-trip.html', previewBody);
 const head = extra => `<!doctype html><html lang="en-IE"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0B3D2E">
 ${extra || ''}<style>:root{color-scheme:light}[hidden]{display:none!important}</style>`;
-out('preview.html', `${head()}<title>NCGS</title><style>${css}</style></head><body>${body({ mode: 'local' })}</body></html>`);
+out('preview.html', `${head()}<title>NCGS</title><style>${css}</style></head><body>${body({ mode: 'local', version, server: serverBuild })}</body></html>`);
 
 // Live site
-const live = { mode: 'live', api: deploy.api || '', version };
+const live = { mode: 'live', api: deploy.api || '', version, server: serverBuild };
 out('site/index.html', `${head(`<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">

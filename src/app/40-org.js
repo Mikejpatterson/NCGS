@@ -48,6 +48,7 @@ ORG.home = () => {
   const item = (v, icon, color, lbl) => `<button class="row" data-act="org-go" data-v="${v}"><span style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:${color}">${icon}</span>${lbl}</span>${chev}</button>`;
   let html = orgTop();
   if (ORGPIN.weak) html += `<button class="banner warn" data-act="org-go" data-v="settings"><b>Change the organiser PIN.</b> It is still the starting one, and anyone who knows it can change scores. Tap to open Settings.</button>`;
+  if (serverStale()) html += `<button class="banner warn" data-act="org-go" data-v="settings"><b>The server is out of date.</b> Upload the newest server.js to Drive so it matches this app. Tap for details.</button>`;
   if (D.testing()) html += `<button class="banner note" data-act="org-go" data-v="settings"><b>Testing mode is on.</b> Any round can be deleted. Turn it off in Settings before real rounds.</button>`;
   html += nextChecklist(active.find(r => r.status === 'upcoming' && !isDemo(r)));
   html += sec(label('Rounds'), cardOf(active.map(roundSummary).join('') + `<button class="row" data-act="org-new-round"><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}New round</span></button>`), true);
@@ -352,6 +353,7 @@ ORG.settings = () => ({
     ${formErr()}
     <button class="btn" type="submit">Save</button>
   </form>
+  ${sec(label('About'), cardOf(`<div class="row"><span>App</span><span class="sub num">${esc(String(BOOT.version || 'preview'))}</span></div><div class="row"><span>Server</span><span class="${serverStale() ? 'c-b b' : 'sub'} num">${BOOT.mode !== 'live' ? 'In this preview' : !DB.lastSync ? 'Not checked yet' : DB.serverBuild === 'old' ? 'Old version' : serverStale() ? 'Out of date' : 'Up to date'}</span></div>`))}
   ${sec(label('Testing'), cardOf(`<button class="row tall" data-act="testing-toggle" role="switch" aria-checked="${D.testing()}"><span class="two"><span>Testing mode</span><span class="sub">${D.testing() ? 'On: any round can be deleted, even one with scores. Turn this off before real rounds.' : 'Off: only rounds that have not started can be deleted.'}</span></span><span class="switch${D.testing() ? ' on' : ''}" aria-hidden="true"><i></i></span></button>`))}
   <form data-form="newpin" autocomplete="off" class="sec">
     ${field('s-pin', 'New organiser PIN', '', 'type="password" inputmode="numeric" maxlength="8"')}

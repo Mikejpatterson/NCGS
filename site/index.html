@@ -704,7 +704,7 @@ textarea.export + .btn, #restorejson + .btn { margin-top: 8px; }
 .seg.pills button, .seg.pills.four button { white-space: normal; line-height: 1.15; padding-block: 6px; overflow-wrap: anywhere; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121745"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121754","server":"009394d0"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1408,6 +1408,8 @@ var NCGS = (function () {
   var TABLES = Object.keys(SCHEMA);
   var PLAYER_TABLES = { checks: 1, cards: 1, log: 1 };
   var DEFAULT_PIN = '1234';
+  // Stamped by build.js with a fingerprint of this file, so the app can tell whether the live server is the latest.
+  var BUILD = '009394d0';
 
   function keyOf(table, row) {
     return SCHEMA[table].key.map(function (k) { return String(row[k]); }).join('|');
@@ -1619,20 +1621,20 @@ var NCGS = (function () {
     ops.load = function () {
       var tables = {};
       TABLES.forEach(function (t) { tables[t] = store.read(t); });
-      return { ver: store.getVer(), tables: tables };
+      return { ver: store.getVer(), build: BUILD, tables: tables };
     };
 
     ops.since = function (req) {
       var v = Number(req.v || 0);
       var cached = store.cacheGet('VER');
       var cur = cached !== null && cached !== undefined ? Number(cached) : store.getVer();
-      if (v >= cur) return { ver: cur, same: true };
+      if (v >= cur) return { ver: cur, same: true, build: BUILD };
       var tables = {};
       TABLES.forEach(function (t) {
         var rows = store.read(t).filter(function (r) { return (r.ver || 0) > v; });
         if (rows.length) tables[t] = rows;
       });
-      return { ver: cur, tables: tables };
+      return { ver: cur, build: BUILD, tables: tables };
     };
 
     ops.checkPin = function (req) { return { ok: pinOk(req.pin) }; };
@@ -1925,7 +1927,7 @@ var NCGS = (function () {
           if (e && e.postData && e.postData.contents) req = JSON.parse(e.postData.contents);
           else if (e && e.parameter && e.parameter.q) req = JSON.parse(e.parameter.q);
         } catch (x) { return json({ error: 'bad', message: 'Unreadable request' }); }
-        if (!req.op) return json({ ok: true, app: 'NCGS', ver: Number(props.getProperty('VER') || 0) });
+        if (!req.op) return json({ ok: true, app: 'NCGS', build: BUILD, ver: Number(props.getProperty('VER') || 0) });
         return json(server().api(req));
       },
       backup: function () { return sheetStore(spreadsheet(), props, CacheService.getScriptCache(), LockService, folder).backup(); },
@@ -2142,6 +2144,8 @@ function view() {
   return t;
 }
 function changed() { DB._view = null; DB._memo = {}; }
+/* Live only: the server the app is talking to is not the one this app was built with. */
+const serverStale = () => BOOT.mode === 'live' && !!BOOT.server && !!DB.lastSync && DB.serverBuild !== undefined && DB.serverBuild !== BOOT.server;
 const isGuest = m => !!m && String(m.id).startsWith('guest-');
 function memo(key, fn) { view(); if (!(key in DB._memo)) DB._memo[key] = fn(); return DB._memo[key]; }
 
@@ -2176,6 +2180,7 @@ function sync() {
     if (resp.error) { DB.online = true; return; }
     DB.online = true;
     DB.lastSync = Date.now();
+    DB.serverBuild = resp.build || 'old';
     const was = DB.loaded;
     DB.loaded = true;
     if (merge(resp, full) || !was) render();
@@ -2278,7 +2283,9 @@ const D = {
 /* ----- Rounds ----- */
 const isDemo = r => r && r.source === 'demo';
 const courseOf = r => (r ? D.course(r.course) : null);
+/* A finished round keeps the card it was played on, so editing a course later cannot change an old result. */
 function teeOf(r) {
+  if (r && r.results && r.results.snap && r.results.snap.tee) return Object.assign({}, r.results.snap.tee);
   const c = courseOf(r);
   if (!c || !c.tees || !r.tee || !c.tees[r.tee]) return null;
   const t = Object.assign({}, c.tees[r.tee]);
@@ -2286,6 +2293,7 @@ function teeOf(r) {
   return t;
 }
 function holesOf(r) {
+  if (r && r.results && r.results.snap && r.results.snap.holes && r.results.snap.holes.length === 18) return r.results.snap.holes.map(h => Object.assign({}, h, { yards: h.m ? E.metresToYards(h.m) : null }));
   const c = courseOf(r);
   return c && c.holes && c.holes.length === 18 ? c.holes.map(h => Object.assign({}, h, { yards: h.m ? E.metresToYards(h.m) : null })) : null;
 }
@@ -3974,6 +3982,7 @@ ORG.home = () => {
   const item = (v, icon, color, lbl) => `<button class="row" data-act="org-go" data-v="${v}"><span style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:${color}">${icon}</span>${lbl}</span>${chev}</button>`;
   let html = orgTop();
   if (ORGPIN.weak) html += `<button class="banner warn" data-act="org-go" data-v="settings"><b>Change the organiser PIN.</b> It is still the starting one, and anyone who knows it can change scores. Tap to open Settings.</button>`;
+  if (serverStale()) html += `<button class="banner warn" data-act="org-go" data-v="settings"><b>The server is out of date.</b> Upload the newest server.js to Drive so it matches this app. Tap for details.</button>`;
   if (D.testing()) html += `<button class="banner note" data-act="org-go" data-v="settings"><b>Testing mode is on.</b> Any round can be deleted. Turn it off in Settings before real rounds.</button>`;
   html += nextChecklist(active.find(r => r.status === 'upcoming' && !isDemo(r)));
   html += sec(label('Rounds'), cardOf(active.map(roundSummary).join('') + `<button class="row" data-act="org-new-round"><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}New round</span></button>`), true);
@@ -4278,6 +4287,7 @@ ORG.settings = () => ({
     ${formErr()}
     <button class="btn" type="submit">Save</button>
   </form>
+  ${sec(label('About'), cardOf(`<div class="row"><span>App</span><span class="sub num">${esc(String(BOOT.version || 'preview'))}</span></div><div class="row"><span>Server</span><span class="${serverStale() ? 'c-b b' : 'sub'} num">${BOOT.mode !== 'live' ? 'In this preview' : !DB.lastSync ? 'Not checked yet' : DB.serverBuild === 'old' ? 'Old version' : serverStale() ? 'Out of date' : 'Up to date'}</span></div>`))}
   ${sec(label('Testing'), cardOf(`<button class="row tall" data-act="testing-toggle" role="switch" aria-checked="${D.testing()}"><span class="two"><span>Testing mode</span><span class="sub">${D.testing() ? 'On: any round can be deleted, even one with scores. Turn this off before real rounds.' : 'Off: only rounds that have not started can be deleted.'}</span></span><span class="switch${D.testing() ? ' on' : ''}" aria-hidden="true"><i></i></span></button>`))}
   <form data-form="newpin" autocomplete="off" class="sec">
     ${field('s-pin', 'New organiser PIN', '', 'type="password" inputmode="numeric" maxlength="8"')}
@@ -4579,7 +4589,8 @@ const ACT = {
     const reasons = finaliseBlockers(r);
     if (reasons.length) { toast(`Not yet: ${reasons.join(', ')}`); return; }
     const comp = computeR(r.id);
-    put('rounds', [Object.assign({}, r, { status: 'final', ph: Object.fromEntries(Object.values(comp.players).map(p => [p.id, p.ph])), allowance: allowanceOf(r) })], { action: 'Round finalised', detail: `${roundName(r)}: results and handicaps fixed` });
+    const snapHoles = (holesOf(r) || []).map(h => { const o = Object.assign({}, h); delete o.yards; return o; });
+    put('rounds', [Object.assign({}, r, { status: 'final', ph: Object.fromEntries(Object.values(comp.players).map(p => [p.id, p.ph])), allowance: allowanceOf(r), results: snapHoles.length === 18 && teeOf(r) ? { snap: { holes: snapHoles, tee: teeOf(r) } } : r.results || null })], { action: 'Round finalised', detail: `${roundName(r)}: results, handicaps and the course card fixed` });
     tick();
     toast(`${roundName(r)} is final`);
   },

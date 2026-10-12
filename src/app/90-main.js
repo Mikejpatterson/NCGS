@@ -230,7 +230,8 @@ const ACT = {
     const reasons = finaliseBlockers(r);
     if (reasons.length) { toast(`Not yet: ${reasons.join(', ')}`); return; }
     const comp = computeR(r.id);
-    put('rounds', [Object.assign({}, r, { status: 'final', ph: Object.fromEntries(Object.values(comp.players).map(p => [p.id, p.ph])), allowance: allowanceOf(r) })], { action: 'Round finalised', detail: `${roundName(r)}: results and handicaps fixed` });
+    const snapHoles = (holesOf(r) || []).map(h => { const o = Object.assign({}, h); delete o.yards; return o; });
+    put('rounds', [Object.assign({}, r, { status: 'final', ph: Object.fromEntries(Object.values(comp.players).map(p => [p.id, p.ph])), allowance: allowanceOf(r), results: snapHoles.length === 18 && teeOf(r) ? { snap: { holes: snapHoles, tee: teeOf(r) } } : r.results || null })], { action: 'Round finalised', detail: `${roundName(r)}: results, handicaps and the course card fixed` });
     tick();
     toast(`${roundName(r)} is final`);
   },

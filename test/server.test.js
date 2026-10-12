@@ -327,3 +327,24 @@ test('backupNow needs the PIN and is logged', () => {
   assert.equal(r.ok, true); assert.equal(r.name, 'NCGS backup test'); assert.equal(made, 1);
   assert.ok(s.api({ op: 'load' }).tables.log.some(l => l.action === 'Backup made'));
 });
+
+test('the server reports its build on every kind of answer', () => {
+  for (const [kind, s] of servers().list) {
+    s.api({ op: 'seed', data: { rounds: [ROUND] } });
+    const a = s.api({ op: 'load' });
+    assert.equal(typeof a.build, 'string', kind);
+    assert.equal(s.api({ op: 'since', v: 0 }).build, a.build, kind);
+    assert.equal(s.api({ op: 'since', v: a.ver }).build, a.build, kind);
+  }
+});
+
+test('a finished round can carry its course card in results without disturbing anything else', () => {
+  for (const [kind, s] of servers().list) {
+    s.api({ op: 'seed', data: { rounds: [ROUND] } });
+    const snap = { holes: [{ n: 1, par: 4, si: 7 }], tee: { name: 'Yellow', slope: 120, rating: 70.1, par: 71 } };
+    s.api({ op: 'put', table: 'rounds', pin: '1234', rows: [Object.assign({}, ROUND, { status: 'final', results: { snap } })] });
+    const r = s.api({ op: 'load' }).tables.rounds.find(x => x.id === 'r9');
+    assert.deepEqual(r.results.snap, snap, kind);
+    assert.equal(r.status, 'final', kind);
+  }
+});

@@ -29,6 +29,8 @@ var NCGS = (function () {
   var TABLES = Object.keys(SCHEMA);
   var PLAYER_TABLES = { checks: 1, cards: 1, log: 1 };
   var DEFAULT_PIN = '1234';
+  // Stamped by build.js with a fingerprint of this file, so the app can tell whether the live server is the latest.
+  var BUILD = '__BUILD__';
 
   function keyOf(table, row) {
     return SCHEMA[table].key.map(function (k) { return String(row[k]); }).join('|');
@@ -240,20 +242,20 @@ var NCGS = (function () {
     ops.load = function () {
       var tables = {};
       TABLES.forEach(function (t) { tables[t] = store.read(t); });
-      return { ver: store.getVer(), tables: tables };
+      return { ver: store.getVer(), build: BUILD, tables: tables };
     };
 
     ops.since = function (req) {
       var v = Number(req.v || 0);
       var cached = store.cacheGet('VER');
       var cur = cached !== null && cached !== undefined ? Number(cached) : store.getVer();
-      if (v >= cur) return { ver: cur, same: true };
+      if (v >= cur) return { ver: cur, same: true, build: BUILD };
       var tables = {};
       TABLES.forEach(function (t) {
         var rows = store.read(t).filter(function (r) { return (r.ver || 0) > v; });
         if (rows.length) tables[t] = rows;
       });
-      return { ver: cur, tables: tables };
+      return { ver: cur, build: BUILD, tables: tables };
     };
 
     ops.checkPin = function (req) { return { ok: pinOk(req.pin) }; };
@@ -546,7 +548,7 @@ var NCGS = (function () {
           if (e && e.postData && e.postData.contents) req = JSON.parse(e.postData.contents);
           else if (e && e.parameter && e.parameter.q) req = JSON.parse(e.parameter.q);
         } catch (x) { return json({ error: 'bad', message: 'Unreadable request' }); }
-        if (!req.op) return json({ ok: true, app: 'NCGS', ver: Number(props.getProperty('VER') || 0) });
+        if (!req.op) return json({ ok: true, app: 'NCGS', build: BUILD, ver: Number(props.getProperty('VER') || 0) });
         return json(server().api(req));
       },
       backup: function () { return sheetStore(spreadsheet(), props, CacheService.getScriptCache(), LockService, folder).backup(); },
