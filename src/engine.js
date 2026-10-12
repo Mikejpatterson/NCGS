@@ -607,13 +607,17 @@
     const swings = nines.filter(x => x.seg === 'back' && x.other !== null).map(x => ({ id: x.id, name: x.name, swing: x.pts - x.other, front: x.other, back: x.pts }));
     const up = swings.length ? Math.max(...swings.map(x => x.swing)) : 0;
     const comeback = up >= 5 ? swings.filter(x => x.swing === up) : [];
+    const down = swings.length ? Math.min(...swings.map(x => x.swing)) : 0;
+    const fade = down <= -5 ? swings.filter(x => x.swing === down) : [];
+    const level = swings.length > 1 ? Math.min(...swings.map(x => Math.abs(x.swing))) : null;
+    const steady = level !== null && level <= 1 ? swings.filter(x => Math.abs(x.swing) === level) : [];
 
     const worst = [];
     ps.forEach(p => entered(p).forEach(n => { const g = p.holes[n].gross; if (g !== 'P') worst.push({ id: p.id, name: p.name, n, over: g - par[n], gross: g }); }));
     const wo = worst.length ? Math.max(...worst.map(x => x.over)) : 0;
     const blowup = wo >= 3 ? worst.filter(x => x.over === wo) : [];
 
-    return { hole, hardest, easiest, birdies, scratches, streak, bestNine, comeback, blowup };
+    return { hole, hardest, easiest, birdies, scratches, streak, bestNine, comeback, fade, steady, blowup };
   }
 
   /**

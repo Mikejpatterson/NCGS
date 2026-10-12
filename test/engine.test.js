@@ -289,6 +289,8 @@ test('roundStats: fun facts from hole by hole scores', () => {
   assert.deepEqual(s.scratches.map(x => x.name), ['Bob']);
   assert.deepEqual(s.blowup.map(x => x.name + x.n), ['Ann9']);
   assert.deepEqual(s.comeback.map(x => x.name), ['Bob']);
+  assert.deepEqual(s.fade, []);
+  assert.deepEqual(s.steady, []);
   assert.equal(s.bestNine.length, 1);
   assert.ok(s.hardest.length && s.easiest.length);
 });
@@ -310,4 +312,20 @@ test('playerSummary: averages, marks and scoring by par', () => {
   assert.equal(s.wins, 1); assert.equal(s.kbs, 1); assert.equal(s.scored, 1);
   assert.equal(s.birdies, 1); assert.equal(s.pars, 1); assert.equal(s.doubles, 1); assert.equal(s.scratches, 1); assert.equal(s.bogeys, 1);
   assert.equal(s.byPar[3], 2); assert.equal(s.byPar[5], 0); assert.equal(s.byPar[4], 4 / 3);
+});
+
+test('roundStats: the opposite of a comeback, and a steady pair of nines', () => {
+  const holes = Array.from({ length: 18 }, (_, i) => ({ n: i + 1, par: 4, si: i + 1 }));
+  const card = f => { const c = {}; for (let n = 1; n <= 18; n++) c[n] = f(n); return c; };
+  const comp = E.computeRound({
+    groups: [{ id: 'g1', n: 1, teeTime: '', startHole: 1, teams: [['a', 'b']] }],
+    holes, tee: { slope: 113, rating: 72, par: 72 }, allowance: 1,
+    players: { a: { name: 'Ann', index: 0 }, b: { name: 'Bob', index: 0 } },
+    scores: { a: card(n => (n <= 9 ? 3 : 7)), b: card(() => 4) }
+  });
+  const s = E.roundStats(comp, holes);
+  assert.deepEqual(s.fade.map(x => x.name), ['Ann']);
+  assert.equal(s.fade[0].front, 27); assert.equal(s.fade[0].back, 0);
+  assert.deepEqual(s.steady.map(x => x.name), ['Bob']);
+  assert.deepEqual(s.comeback, []);
 });
