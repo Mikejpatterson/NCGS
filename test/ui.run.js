@@ -130,10 +130,13 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   t = await text();
   check('Buggy Wars board with front/back/overall', /Front nine/.test(t) && /Overall/.test(t));
   check('Buggy Wars shows only my own group, no group pills', (await page.$$('[data-act="mgroup"]')).length === 0 && (await page.$$('.mrow')).length > 0);
+  check('Buggy Wars opens at the top, not scrolled to the current hole', await page.evaluate(() => window.scrollY) === 0);
   await shot('08-match', true);
   await tap('[data-act="respill"][data-p="ct"]');
   t = await text();
   check('Contests pill: nearest the pin and longest drive', /Nearest the pin/.test(t) && /Longest drive/.test(t));
+  check('Contests rows are tidy: hole under the name, winner on one line', /Hole\s*\d+/.test(t) && (await page.$$eval('.ct-r .b', els => els.every(e => e.getBoundingClientRect().height < 28))));
+  await shot('08b-contests', true);
   await tap('[data-act="respill"][data-p="lb"]');
   t = await text();
   await shot('09-board', true);

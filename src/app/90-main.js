@@ -27,7 +27,7 @@ const ACT = {
   },
   leaderboard: el => { UI.playRid = el.dataset.rid; UI.board = el.dataset.rid; UI.res = 'lb'; go('board', { rid: el.dataset.rid }); },
   trip: el => go('trip', { rid: el.dataset.rid }),
-  respill: el => { UI.res = el.dataset.p; if (UI.res === 'bw') UI.scrollCur = true; render(); },
+  respill: el => { UI.res = el.dataset.p; UI.scrollTop = true; render(); },
   toggle: el => { UI.open[el.dataset.key] = !UI.open[el.dataset.key]; render(); },
   hcp: el => go('hcp', { pid: el.dataset.pid, rid: el.dataset.rid }),
   tab: el => {
@@ -36,7 +36,7 @@ const ACT = {
     const rid = playRid();
     while (UI.stack.length > 1 && !['tee', 'match', 'board', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();
     if (t === 'hole') { UI.edit = false; UI.after = null; replaceTop(playHomeView(rid), { rid }); }
-    else if (t === 'match') { UI.board = null; UI.res = 'bw'; UI.scrollCur = true; replaceTop('board', { rid }); }
+    else if (t === 'match') { UI.board = null; UI.res = 'bw'; UI.scrollTop = true; replaceTop('board', { rid }); }
     else { UI.board = null; UI.res = UI.res === 'bw' || UI.res === 'ct' ? UI.res : 'lb'; replaceTop('board', { rid }); }
   },
   enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },

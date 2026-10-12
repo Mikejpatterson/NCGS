@@ -635,8 +635,8 @@ VIEWS.board = () => {
   const comp = res.comp;
   if (pillSel === 'ct') {
     html += sec(label('Contests'), cardOf(res.contests.map(c => {
-      const right = c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : c.lead ? `<span class="right"><span class="pill n">To confirm</span>${esc(D.nameOf(c.lead.pid))}</span>` : '<span class="sub">–</span>';
-      return `<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${right}</div>`;
+      const right = c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : c.lead ? `<span class="b">${esc(D.nameOf(c.lead.pid))}</span><span class="pill n">To confirm</span>` : '<span class="sub">Not yet claimed</span>';
+      return `<div class="row crow"><span class="ct-l"><span>${CONTEST[c.type]}</span>${c.hole ? `<span class="sub">Hole ${c.hole}</span>` : ''}</span><span class="ct-r">${right}</span></div>`;
     }).join('')));
     return { tabs: 'board', html };
   }
