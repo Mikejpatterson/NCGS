@@ -1,5 +1,7 @@
 # Bug list from the full break-test (October 2026)
 
+Second pass (click-through of every control, about 1,400 taps over four modes) added bugs 11 and 12.
+
 Every bug has a regression test, so it cannot quietly come back.
 
 | # | Severity | Bug | Fix | Test |
@@ -14,6 +16,8 @@ Every bug has a regression test, so it cannot quietly come back.
 | 8 | Medium | `addMinutes` gave garbage for hours over 23, minutes over 59, negative steps and non-numbers; tee-time interval of 0 or blank. | Validated; falls back to 8 minutes. | `fuzz.engine.test.js` |
 | 9 | Low | A handicap could show as "-0". | Normalised. | `fuzz.engine.test.js` |
 | 10 | Low | "Who are you?" button was 34px high, too small for a thumb. | 44px. | `break.ui.run.js` (touch targets) |
+| 11 | Medium | After each hole the Back history gained another identical hole screen, so the phone's Back swipe from the finish screen seemed to do nothing for several swipes (a loop-back). | `replaceTop` removes an identical screen left directly underneath. | `finish.run.js` |
+| 12 | Medium | The finish screen had no direct way home; the Hole tab just reloaded it. | Added "Back to the front page". | `finish.run.js`, `crawl.run.js` |
 
 ## Still the organiser's to do
 - Change the PIN in Organiser, Settings (the app shows a red banner while it is 1234). The PIN is never put in this public repository.

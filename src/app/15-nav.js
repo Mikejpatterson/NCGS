@@ -10,7 +10,10 @@ const UI = {
 const cur = () => (UI.org ? UI.orgStack : UI.stack)[(UI.org ? UI.orgStack : UI.stack).length - 1];
 const stackOf = () => (UI.org ? UI.orgStack : UI.stack);
 function go(v, p) { stackOf().push({ v, p: p || {} }); UI.scrollTop = true; UI.formError = null; UI.confirm = null; UI.holeSheet = false; render(); }
-function replaceTop(v, p) { const s = stackOf(); s[s.length - 1] = { v, p: p || {} }; UI.scrollTop = true; UI.formError = null; UI.confirm = null; UI.holeSheet = false; render(); }
+function replaceTop(v, p) { const s = stackOf(); s[s.length - 1] = { v, p: p || {} };
+  /* never leave the same screen twice in a row underneath, or Back would seem to do nothing */
+  while (s.length > 1 && s[s.length - 2].v === v && JSON.stringify(s[s.length - 2].p) === JSON.stringify(p || {})) s.splice(s.length - 2, 1);
+  UI.scrollTop = true; UI.formError = null; UI.confirm = null; UI.holeSheet = false; render(); }
 function back() {
   const s = stackOf();
   if (s.length > 1) s.pop();

@@ -704,7 +704,7 @@ textarea.export + .btn, #restorejson + .btn { margin-top: 8px; }
 .seg.pills button, .seg.pills.four button { white-space: normal; line-height: 1.15; padding-block: 6px; overflow-wrap: anywhere; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121839","server":"dfa6e177"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121952","server":"dfa6e177"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2479,7 +2479,10 @@ const UI = {
 const cur = () => (UI.org ? UI.orgStack : UI.stack)[(UI.org ? UI.orgStack : UI.stack).length - 1];
 const stackOf = () => (UI.org ? UI.orgStack : UI.stack);
 function go(v, p) { stackOf().push({ v, p: p || {} }); UI.scrollTop = true; UI.formError = null; UI.confirm = null; UI.holeSheet = false; render(); }
-function replaceTop(v, p) { const s = stackOf(); s[s.length - 1] = { v, p: p || {} }; UI.scrollTop = true; UI.formError = null; UI.confirm = null; UI.holeSheet = false; render(); }
+function replaceTop(v, p) { const s = stackOf(); s[s.length - 1] = { v, p: p || {} };
+  /* never leave the same screen twice in a row underneath, or Back would seem to do nothing */
+  while (s.length > 1 && s[s.length - 2].v === v && JSON.stringify(s[s.length - 2].p) === JSON.stringify(p || {})) s.splice(s.length - 2, 1);
+  UI.scrollTop = true; UI.formError = null; UI.confirm = null; UI.holeSheet = false; render(); }
 function back() {
   const s = stackOf();
   if (s.length > 1) s.pop();
@@ -3482,7 +3485,8 @@ VIEWS.finish = () => {
       ${sec('', cardOf(players), true)}
       ${buggies ? sec(label('Buggy Wars'), cardOf(bw)) : ''}
       ${missing ? '' : sec(label('Card check'), cardOf(checks))}
-      ${action}${saveWarning()}`
+      ${action}${saveWarning()}
+      <div class="foot"><button class="link" data-act="home">Back to the front page</button></div>`
   };
 };
 
@@ -5046,6 +5050,6 @@ if (window.claude && typeof window.claude.use === 'function') {
   sync().then(() => flush());
 })();
 if ('serviceWorker' in navigator && BOOT.mode === 'live' && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
-window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, fmtDate, daysFromToday, todayIso };
+window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, fmtDate, daysFromToday, todayIso, send, holeOf, computeR, myGroup, liveRid };
 
 })();</script></body></html>

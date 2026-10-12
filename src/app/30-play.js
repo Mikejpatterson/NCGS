@@ -566,7 +566,8 @@ VIEWS.finish = () => {
       ${sec('', cardOf(players), true)}
       ${buggies ? sec(label('Buggy Wars'), cardOf(bw)) : ''}
       ${missing ? '' : sec(label('Card check'), cardOf(checks))}
-      ${action}${saveWarning()}`
+      ${action}${saveWarning()}
+      <div class="foot"><button class="link" data-act="home">Back to the front page</button></div>`
   };
 };
 
