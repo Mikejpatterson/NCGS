@@ -66,6 +66,11 @@ const statusPills = st => {
   const m = /(won .+|\d+ up.*)$/.exec(st.text);
   return `<span class="right">${pill(i)}<span class="pill ${i ? 'b' : 'a'} soft">${esc(m ? m[1] : st.text)}</span></span>`;
 };
+const statusShort = st => {
+  if (!st.leader) return st.text;
+  const m = /(won .+|\d+ up.*)$/.exec(st.text);
+  return `Buggy ${st.leader === 'A' ? 1 : 2} · ${m ? m[1] : st.text}`;
+};
 const status = st => `<span class="b ${sideCls(st.leader)}">${esc(st.text)}</span>`;
 const sec = (label, body, near) => `<section class="sec${near ? ' near' : ''}">${label ? `<div class="sec-label">${label}</div>` : ''}${body}</section>`;
 const label = t => `<span class="sub">${t}</span>`;

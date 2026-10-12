@@ -186,7 +186,7 @@ function saveHole() {
   if (missing.length) { UI.flash = true; render(); setTimeout(() => { UI.flash = false; }, 1300); return; }
   if (r.status === 'final') { toast('This round is final. Reopen it to change scores.'); return; }
   const before = {};
-  ['front', 'back', 'overall'].forEach(s => { before[s] = gc.matches[s].status.text; });
+  ['front', 'back', 'overall'].forEach(s => { before[s] = { text: gc.matches[s].status.text, leader: gc.matches[s].status.leader }; });
   const prev = {};
   const scores = {};
   pids.forEach(pid => {
@@ -248,22 +248,20 @@ VIEWS.after = () => {
   const L = gc.labels;
   const who = list => list.map(D.nameOf).join(' and ');
   const buggies = gc.teams.length === 2;
-  let title, cls = '', sub = '';
-  if (!buggies) { title = `Hole ${a.n} saved`; }
-  else if (hr.result === 'H') { title = `Hole ${a.n} halved`; sub = `Both buggies scored ${plural(hr.best[0], 'point')}`; }
+  let head, sub = '';
+  if (!buggies) head = `<span class="res-t">Hole ${a.n} saved</span>`;
+  else if (hr.result === 'H') { head = `<span class="pill n big">Halved</span>`; sub = `Both buggies scored ${plural(hr.best[0], 'point')}`; }
   else {
     const w = hr.result === 'A' ? 0 : 1;
-    title = `${L[w].long} win ${a.n}`;
-    cls = w ? 'c-b' : 'c-a';
+    head = `<span class="pill ${w ? 'b' : 'a'} big">Buggy ${w + 1}</span><span class="res-t">won the hole</span>`;
     sub = `${who(hr.counting[w])}'s ${plural(hr.best[w], 'point')} beat ${hr.best[1 - w]}`;
   }
   const rows = buggies ? [a.n <= 9 ? 'front' : 'back', 'overall'].map(s => {
     const m = gc.matches[s];
-    const now = m.status.text;
     const was = a.before[s];
-    const changedNow = was !== now && was !== 'Not started';
+    const changedNow = was.text !== m.status.text && was.text !== 'Not started';
     return `<div class="row tall chg"><span><div>${segName(s)}</div><div class="cap">${m.remaining ? `${m.remaining} to play` : 'Finished'}</div></span>
-      <span class="right">${changedNow ? `<s>${esc(was)}</s>` : ''}<span class="b ${sideCls(m.status.leader)} ${was !== now ? 'new' : ''}">${esc(now)}</span></span></div>`;
+      <span class="stat">${statusPills(m.status)}${changedNow ? `<span class="cap was">Was ${esc(statusShort(was))}</span>` : ''}</span></div>`;
   }).join('') : gc.teams.flat().map(pid => `<div class="row"><span>${esc(D.nameOf(pid))}</span><span class="b num">${comp.players[pid].total}</span></div>`).join('');
   let next;
   const nine = a.n <= 9 ? 'front' : 'back';
@@ -275,9 +273,9 @@ VIEWS.after = () => {
   } else next = `<button class="btn" data-act="to-finish">See the card</button>`;
   return {
     tabs: 'hole',
-    html: `<div class="nav"><span class="sub c-g" style="display:inline-flex;align-items:center;gap:4px">${sized(ICON.check, 18)} Saved</span><button class="link" data-act="undo">Undo</button></div>
-      <h1 class="result ${cls}">${esc(title)}</h1>
-      ${sub ? `<p class="sub head-sub">${esc(sub)}</p>` : ''}
+    html: `<header class="hero c"><div class="hrow2"><h1 class="big"><small>Hole</small>${a.n}</h1><span class="saved">${sized(ICON.check, 20)} Saved</span><button class="link" data-act="undo">Undo</button></div></header>
+      <div class="res">${head}</div>
+      ${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}
       ${sec('', cardOf(rows))}
       ${next}${saveWarning()}`
   };
