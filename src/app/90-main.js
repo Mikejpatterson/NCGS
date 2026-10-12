@@ -44,6 +44,8 @@ const ACT = {
   set: el => setScore(el.dataset.pid, el.dataset.v),
   clear: el => clearScore(el.dataset.pid),
   'ask-mic': () => askListen(),
+  'ask-stop': () => askStop(),
+  'ask-cancel': () => askCancel(),
   'ask-idea': el => askQuestion(el.dataset.q),
   'ask-clear': () => { UI.chat = []; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'contest-open': () => { UI.contestSheet = true; render(); },
@@ -412,7 +414,9 @@ document.addEventListener('submit', e => {
   const fn = FORMS[f.dataset.form];
   if (fn) fn();
 });
-document.addEventListener('input', e => { if (e.target && e.target.id === 'askin') UI.askDraft = e.target.value; });
+document.addEventListener('input', e => { if (e.target && e.target.id === 'askin') { UI.askDraft = e.target.value; growAsk(e.target); } });
+// In the question box, Return sends; Shift+Return is a new line.
+document.addEventListener('keydown', e => { if (e.target && e.target.id === 'askin' && e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); askQuestion(e.target.value); } });
 // While typing a question the tab bar steps aside and the ask bar rides above the keyboard.
 function placeAskBar() {
   const vv = window.visualViewport;
@@ -425,7 +429,7 @@ document.addEventListener('focusout', e => {
   setTimeout(() => { if (document.activeElement && document.activeElement.id === 'askin') return; document.body.classList.remove('typing'); document.documentElement.style.setProperty('--kb', '0px'); }, 150);
 });
 // With a mouse, clicking Send or the microphone must not take focus from the box. (Never on touch: stopping touchstart would swallow the tap on a phone.)
-document.addEventListener('mousedown', e => { if (e.target.closest && e.target.closest('.askbar .send, .askbar .mic')) e.preventDefault(); });
+document.addEventListener('mousedown', e => { if (e.target.closest && e.target.closest('.askbar .send, .askbar .mic, .askbar .stop, .askbar .x')) e.preventDefault(); });
 if (window.visualViewport) { window.visualViewport.addEventListener('resize', placeAskBar); window.visualViewport.addEventListener('scroll', placeAskBar); }
 document.addEventListener('change', e => {
   const t = e.target;

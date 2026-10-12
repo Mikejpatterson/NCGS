@@ -558,8 +558,8 @@ button.stv:active { background: var(--press); }
 .bub.wait { display: inline-flex; gap: 5px; padding: 16px 18px; } .bub.wait i { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); animation: askdot 1.2s infinite ease-in-out; } .bub.wait i:nth-child(2) { animation-delay: .15s; } .bub.wait i:nth-child(3) { animation-delay: .3s; }
 @keyframes askdot { 0%, 80%, 100% { opacity: .3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
 .ask-note { text-align: center; margin: 12px 8px 0; }
-.askbar { position: fixed; left: 0; right: 0; bottom: var(--tabh, 64px); z-index: 9; display: flex; gap: 8px; padding: 10px 16px; background: #fff; border-top: .5px solid var(--line); }
-.askbar input { flex: 1; min-width: 0; height: 48px; border-radius: 24px; border: 0; background: var(--fill); padding: 0 18px; font: inherit; font-size: 1rem; color: var(--text); outline: none; }
+.askbar { position: fixed; left: 0; right: 0; bottom: var(--tabh, 64px); z-index: 9; display: block; padding: 10px 16px; background: #fff; border-top: .5px solid var(--line); }
+.askbar textarea { flex: 1; min-width: 0; min-height: 48px; max-height: 120px; resize: none; border-radius: 24px; border: 0; background: var(--fill); padding: 13px 18px; font: inherit; font-size: 1rem; line-height: 1.25; color: var(--text); outline: none; display: block; }
 .askbar .send { width: 48px; height: 48px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; }
 .askbar .send svg { width: 24px; height: 24px; }
 body.typing .tabs { display: none; }
@@ -576,9 +576,26 @@ body.typing .askbar { bottom: var(--kb, 0px); padding-bottom: 10px; }
 body.hearing .askbar .mic { background: var(--red); color: #fff; animation: hear 1.1s infinite ease-in-out; }
 @keyframes hear { 0%, 100% { box-shadow: 0 0 0 0 rgba(207, 42, 42, .45); } 50% { box-shadow: 0 0 0 10px rgba(207, 42, 42, 0); } }
 @media (prefers-reduced-motion: reduce) { body.hearing .askbar .mic { animation: none; } }
+
+.askbar .typed { display: flex; gap: 8px; align-items: flex-end; }
+.askbar .live { display: none; }
+body.hearing .askbar .typed { display: none; }
+body.hearing .askbar .live { display: block; }
+.askbar .lt { min-height: 24px; max-height: 96px; overflow-y: auto; padding: 2px 4px 10px; font-size: 1.05rem; line-height: 1.3; color: var(--text); }
+.askbar .lrow2 { display: flex; align-items: center; gap: 12px; }
+.askbar .x { width: 48px; height: 48px; border-radius: 50%; background: var(--fill); color: var(--text); display: grid; place-items: center; flex: none; }
+.askbar .x svg { width: 22px; height: 22px; }
+.askbar .stop { width: 48px; height: 48px; border-radius: 50%; background: var(--red); display: grid; place-items: center; flex: none; }
+.askbar .stop i { width: 16px; height: 16px; border-radius: 4px; background: #fff; display: block; }
+.eq { flex: 1; height: 48px; display: flex; align-items: center; justify-content: space-between; gap: 3px; }
+.eq i { flex: 1; max-width: 5px; height: 36px; border-radius: 3px; background: var(--green); transform: scaleY(.12); transition: transform 70ms linear; }
+.eq.fake i { animation: eqpulse 1s ease-in-out infinite; animation-delay: var(--d); }
+@keyframes eqpulse { 0%, 100% { transform: scaleY(.15); } 50% { transform: scaleY(.8); } }
+@media (prefers-reduced-motion: reduce) { .eq.fake i { animation: none; transform: scaleY(.4); } }
+body.hearing .askbar .mic { animation: none; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121221"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121226"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1682,6 +1699,7 @@ const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const ICON = {
   back: svg('<path d="M15 5l-7 7 7 7"/>'),
   chev: svg('<path d="M9 5l7 7-7 7"/>'),
+  x: svg('<path d="M6 6l12 12"/><path d="M18 6L6 18"/>'),
   mic: svg('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/>'),
   send: svg('<path d="M12 19V5"/><path d="M5.5 11.5L12 5l6.5 6.5"/>'),
   check: svg('<path d="M5 12.5l4.5 4.5L19 7"/>'),
@@ -3322,34 +3340,92 @@ function askThread() {
     + `<p class="cap ask-note">Answers come from the Rules of Golf and our society rules. For anything close, the organiser has the final say.</p>`;
 }
 
-let listening = null;
+/* ----- Speaking a question: live words, a level meter, Stop, X to cancel, then Send ----- */
+const EQ_BARS = 30;
+const eqHtml = () => Array.from({ length: EQ_BARS }, (_, i) => `<i style="--d:${(i * 0.07).toFixed(2)}s"></i>`).join('');
+let listening = null, meter = null;
+
+function stopMeter() {
+  if (!meter) return;
+  cancelAnimationFrame(meter.raf);
+  try { meter.stream.getTracks().forEach(t => t.stop()); } catch (e) { /* already stopped */ }
+  try { meter.ctx.close(); } catch (e) { /* already closed */ }
+  meter = null;
+  document.querySelectorAll('.eq i').forEach(i => { i.style.transform = ''; });
+}
+// The meter is only for show. If the phone will not share the microphone with speech recognition, the bars just pulse.
+function startMeter() {
+  const eq = document.querySelector('.eq');
+  if (eq) eq.classList.add('fake');
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    if (!listening) { stream.getTracks().forEach(t => t.stop()); return; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    const ctx = new AC();
+    const an = ctx.createAnalyser(); an.fftSize = 128; an.smoothingTimeConstant = 0.7;
+    ctx.createMediaStreamSource(stream).connect(an);
+    const data = new Uint8Array(an.frequencyBinCount);
+    meter = { stream, ctx, raf: 0 };
+    const tick = () => {
+      an.getByteFrequencyData(data);
+      const bars = document.querySelectorAll('.eq i');
+      bars.forEach((el, i) => { const v = data[Math.min(data.length - 1, 1 + Math.floor(i * 0.9))] / 255; el.style.transform = `scaleY(${(0.12 + v * 0.95).toFixed(2)})`; });
+      meter.raf = requestAnimationFrame(tick);
+    };
+    const live = document.querySelector('.eq'); if (live) live.classList.remove('fake');
+    tick();
+  }).catch(() => { /* keep the pulsing bars */ });
+}
+
+function showLive(on) {
+  document.body.classList.toggle('hearing', on);
+  const lt = document.getElementById('asklive');
+  if (lt) lt.textContent = UI.askLive || (on ? 'Listening…' : '');
+}
+
 function askListen() {
-  if (listening) { try { listening.stop(); } catch (e) { /* already stopped */ } return; }
+  if (listening) return;
   if (!SPEECH) return askKeyboard('Tap the microphone on your keyboard to speak.');
   const r = new SPEECH();
   r.lang = 'en-IE'; r.interimResults = true; r.maxAlternatives = 1; r.continuous = false;
-  let said = '', failed = false;
-  const mic = () => document.querySelector('.askbar .mic');
-  r.onstart = () => { listening = r; document.body.classList.add('hearing'); const input = document.getElementById('askin'); if (input) input.placeholder = 'Listening…'; };
+  UI.askLive = '';
+  let failed = false, cancelled = false;
+  r.onstart = () => { listening = r; r.cancel = () => { cancelled = true; try { r.abort(); } catch (e) { /* not running */ } }; showLive(true); startMeter(); };
   r.onresult = ev => {
-    said = Array.from(ev.results).map(x => x[0].transcript).join(' ').trim();
-    const input = document.getElementById('askin'); if (input) { input.value = said; UI.askDraft = said; }
+    UI.askLive = Array.from(ev.results).map(x => x[0].transcript).join(' ').trim();
+    const lt = document.getElementById('asklive'); if (lt) lt.textContent = UI.askLive || 'Listening…';
   };
-  r.onerror = ev => { failed = true; if (ev.error !== 'no-speech' && ev.error !== 'aborted') { askKeyboard("Dictation isn't available here. Tap the microphone on your keyboard instead."); } };
+  r.onerror = ev => {
+    failed = true;
+    if (ev.error !== 'no-speech' && ev.error !== 'aborted') askKeyboard("Dictation isn't available here. Tap the microphone on your keyboard instead.");
+  };
   r.onend = () => {
-    listening = null; document.body.classList.remove('hearing');
-    const input = document.getElementById('askin'); if (input) input.placeholder = 'What happened?';
-    if (said && !failed) askQuestion(said);
+    listening = null; stopMeter();
+    const said = cancelled || failed ? '' : UI.askLive;
+    UI.askLive = '';
+    showLive(false);
+    if (said) {
+      UI.askDraft = (UI.askDraft ? UI.askDraft.trim() + ' ' : '') + said;
+      const input = document.getElementById('askin');
+      if (input) { input.value = UI.askDraft; growAsk(input); }
+    }
   };
-  try { r.start(); } catch (e) { askKeyboard('Tap the microphone on your keyboard to speak.'); }
+  try { r.start(); } catch (e) { listening = null; askKeyboard('Tap the microphone on your keyboard to speak.'); }
 }
+function askStop() { if (listening) { try { listening.stop(); } catch (e) { /* already stopped */ } } }
+function askCancel() { if (listening && listening.cancel) listening.cancel(); }
+function growAsk(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
 function askKeyboard(msg) { const i = document.getElementById('askin'); if (i) i.focus(); if (msg) toast(msg); }
 
 VIEWS.rules = () => ({
   tabs: 'rules',
   html: `<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">Ruling</h1>${UI.chat.length ? '<button class="link" data-act="ask-clear">New question</button>' : ''}</div></header>
     <div id="thread" class="thread">${askThread()}</div>
-    <form class="askbar" data-form="ask" autocomplete="off"><input id="askin" type="text" enterkeyhint="send" maxlength="600" placeholder="What happened?" aria-label="Your rules question" value="${esc(UI.askDraft)}"><button class="mic" type="button" data-act="ask-mic" aria-label="Speak your question">${ICON.mic}</button><button class="send" type="submit" aria-label="Ask">${ICON.send}</button></form>`
+    <form class="askbar" data-form="ask" autocomplete="off">
+      <div class="live"><div id="asklive" class="lt" aria-live="polite">${esc(UI.askLive || 'Listening…')}</div>
+        <div class="lrow2"><button class="x" type="button" data-act="ask-cancel" aria-label="Cancel">${ICON.x}</button><div class="eq" aria-hidden="true">${eqHtml()}</div><button class="stop" type="button" data-act="ask-stop" aria-label="Stop"><i></i></button></div></div>
+      <div class="typed"><textarea id="askin" rows="1" enterkeyhint="send" maxlength="600" placeholder="What happened?" aria-label="Your rules question">${esc(UI.askDraft)}</textarea><button class="mic" type="button" data-act="ask-mic" aria-label="Speak your question">${ICON.mic}</button><button class="send" type="submit" aria-label="Ask">${ICON.send}</button></div>
+    </form>`
 });
 
 function refreshThread() {
@@ -3368,7 +3444,7 @@ function askQuestion(q) {
   UI.chat.push({ role: 'user', text: q });
   UI.askDraft = '';
   const input = document.getElementById('askin');
-  if (input) input.value = '';
+  if (input) { input.value = ''; input.style.height = ''; }
   if (!navigator.onLine) {
     UI.chat.push({ role: 'ai', text: 'No signal right now. Try again when you have some.', error: true });
     refreshThread();
@@ -3791,6 +3867,8 @@ const ACT = {
   set: el => setScore(el.dataset.pid, el.dataset.v),
   clear: el => clearScore(el.dataset.pid),
   'ask-mic': () => askListen(),
+  'ask-stop': () => askStop(),
+  'ask-cancel': () => askCancel(),
   'ask-idea': el => askQuestion(el.dataset.q),
   'ask-clear': () => { UI.chat = []; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'contest-open': () => { UI.contestSheet = true; render(); },
@@ -4159,7 +4237,9 @@ document.addEventListener('submit', e => {
   const fn = FORMS[f.dataset.form];
   if (fn) fn();
 });
-document.addEventListener('input', e => { if (e.target && e.target.id === 'askin') UI.askDraft = e.target.value; });
+document.addEventListener('input', e => { if (e.target && e.target.id === 'askin') { UI.askDraft = e.target.value; growAsk(e.target); } });
+// In the question box, Return sends; Shift+Return is a new line.
+document.addEventListener('keydown', e => { if (e.target && e.target.id === 'askin' && e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); askQuestion(e.target.value); } });
 // While typing a question the tab bar steps aside and the ask bar rides above the keyboard.
 function placeAskBar() {
   const vv = window.visualViewport;
@@ -4172,7 +4252,7 @@ document.addEventListener('focusout', e => {
   setTimeout(() => { if (document.activeElement && document.activeElement.id === 'askin') return; document.body.classList.remove('typing'); document.documentElement.style.setProperty('--kb', '0px'); }, 150);
 });
 // With a mouse, clicking Send or the microphone must not take focus from the box. (Never on touch: stopping touchstart would swallow the tap on a phone.)
-document.addEventListener('mousedown', e => { if (e.target.closest && e.target.closest('.askbar .send, .askbar .mic')) e.preventDefault(); });
+document.addEventListener('mousedown', e => { if (e.target.closest && e.target.closest('.askbar .send, .askbar .mic, .askbar .stop, .askbar .x')) e.preventDefault(); });
 if (window.visualViewport) { window.visualViewport.addEventListener('resize', placeAskBar); window.visualViewport.addEventListener('scroll', placeAskBar); }
 document.addEventListener('change', e => {
   const t = e.target;
