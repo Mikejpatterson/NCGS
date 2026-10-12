@@ -224,7 +224,9 @@ const D = {
   log: () => view().log.slice().sort((a, b) => String(b.at).localeCompare(String(a.at))),
   society: () => D.setting('society', 'NCGS'),
   goyBest: () => Number(D.setting('goy_best', 3)) || 3,
-  allowance: () => { const a = Number(D.setting('allowance', 1)); return isFinite(a) && a > 0 ? a : 1; }
+  allowance: () => { const a = Number(D.setting('allowance', 1)); return isFinite(a) && a > 0 ? a : 1; },
+  // While testing, any round can be deleted. Switched off in Settings once real rounds are being played.
+  testing: () => String(D.setting('testing', '1')) !== '0'
 };
 
 /* ----- Rounds ----- */

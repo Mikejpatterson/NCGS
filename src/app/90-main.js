@@ -245,6 +245,11 @@ const ACT = {
     UI.confirm = null;
     back();
   },
+  'testing-toggle': () => {
+    const on = !D.testing();
+    put('settings', [{ key: 'testing', value: on ? '1' : '0' }], { action: 'Testing mode ' + (on ? 'on' : 'off'), detail: on ? 'Any round can be deleted' : 'Only rounds that have not started can be deleted' });
+    toast(on ? 'Testing mode on' : 'Testing mode off');
+  },
   'demo-fill': () => demoFill(),
   'reset-preview': () => {
     if (UI.confirm !== 'reset') { UI.confirm = 'reset'; render(); return; }

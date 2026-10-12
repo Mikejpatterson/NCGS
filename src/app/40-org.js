@@ -101,7 +101,11 @@ ORG.round = p => {
     const why = !canScore(r) ? (r.groups && r.groups.length ? 'Course details needed' : 'Draw the groups first') : liveRid() ? 'Another round is live' : '';
     html += `<button class="btn ${why ? 'quiet' : ''}" data-act="start-round" data-rid="${r.id}">Start round${why ? `<small style="color:var(--sub)">${esc(why)}</small>` : ''}</button>`;
   }
-  if (r.status === 'upcoming' || isDemo(r)) html += `<div style="text-align:center;margin-top:8px"><button class="link c-b" data-act="delete-round" data-rid="${r.id}">${UI.confirm === 'del-' + r.id ? 'Tap again to delete' : 'Delete round'}</button></div>`;
+  if (r.status === 'upcoming' || isDemo(r) || D.testing()) {
+    const sc = Object.values(D.scores(r.id)).reduce((n, byHole) => n + Object.keys(byHole).length, 0);
+    const warn = sc ? ` and its ${plural(sc, 'score')}` : '';
+    html += `<div style="text-align:center;margin-top:8px"><button class="link c-b" data-act="delete-round" data-rid="${r.id}">${UI.confirm === 'del-' + r.id ? `Tap again to delete the round${warn}` : 'Delete round'}</button></div>`;
+  }
   return { html };
 };
 
@@ -284,6 +288,7 @@ ORG.settings = () => ({
     ${formErr()}
     <button class="btn" type="submit">Save</button>
   </form>
+  ${sec(label('Testing'), cardOf(`<button class="row tall" data-act="testing-toggle" role="switch" aria-checked="${D.testing()}"><span class="two"><span>Testing mode</span><span class="sub">${D.testing() ? 'On: any round can be deleted, even one with scores. Turn this off before real rounds.' : 'Off: only rounds that have not started can be deleted.'}</span></span><span class="switch${D.testing() ? ' on' : ''}" aria-hidden="true"><i></i></span></button>`))}
   <form data-form="newpin" autocomplete="off" class="sec">
     ${field('s-pin', 'New organiser PIN', '', 'type="password" inputmode="numeric" maxlength="8"')}
     <button class="btn quiet" type="submit">Change PIN</button>

@@ -665,9 +665,16 @@ button.hsub svg { width: 14px; height: 14px; opacity: .8; }
 .hero .seg.year { margin-top: 12px; background: rgba(255, 255, 255, .14); }
 .hero .seg.year button { color: #fff; }
 .hero .seg.year button.on { background: #fff; color: var(--pine); }
+
+/* Switch */
+.switch { width: 52px; height: 32px; border-radius: 16px; background: #C9D3CE; position: relative; flex: none; transition: background-color .2s; }
+.switch i { position: absolute; top: 3px; left: 3px; width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.3); transition: transform .2s; }
+.switch.on { background: var(--green); }
+.switch.on i { transform: translateX(20px); }
+@media (prefers-reduced-motion: reduce) { .switch, .switch i { transition: none; } }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121624"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121638"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2071,7 +2078,9 @@ const D = {
   log: () => view().log.slice().sort((a, b) => String(b.at).localeCompare(String(a.at))),
   society: () => D.setting('society', 'NCGS'),
   goyBest: () => Number(D.setting('goy_best', 3)) || 3,
-  allowance: () => { const a = Number(D.setting('allowance', 1)); return isFinite(a) && a > 0 ? a : 1; }
+  allowance: () => { const a = Number(D.setting('allowance', 1)); return isFinite(a) && a > 0 ? a : 1; },
+  // While testing, any round can be deleted. Switched off in Settings once real rounds are being played.
+  testing: () => String(D.setting('testing', '1')) !== '0'
 };
 
 /* ----- Rounds ----- */
@@ -3724,7 +3733,11 @@ ORG.round = p => {
     const why = !canScore(r) ? (r.groups && r.groups.length ? 'Course details needed' : 'Draw the groups first') : liveRid() ? 'Another round is live' : '';
     html += `<button class="btn ${why ? 'quiet' : ''}" data-act="start-round" data-rid="${r.id}">Start round${why ? `<small style="color:var(--sub)">${esc(why)}</small>` : ''}</button>`;
   }
-  if (r.status === 'upcoming' || isDemo(r)) html += `<div style="text-align:center;margin-top:8px"><button class="link c-b" data-act="delete-round" data-rid="${r.id}">${UI.confirm === 'del-' + r.id ? 'Tap again to delete' : 'Delete round'}</button></div>`;
+  if (r.status === 'upcoming' || isDemo(r) || D.testing()) {
+    const sc = Object.values(D.scores(r.id)).reduce((n, byHole) => n + Object.keys(byHole).length, 0);
+    const warn = sc ? ` and its ${plural(sc, 'score')}` : '';
+    html += `<div style="text-align:center;margin-top:8px"><button class="link c-b" data-act="delete-round" data-rid="${r.id}">${UI.confirm === 'del-' + r.id ? `Tap again to delete the round${warn}` : 'Delete round'}</button></div>`;
+  }
   return { html };
 };
 
@@ -3907,6 +3920,7 @@ ORG.settings = () => ({
     ${formErr()}
     <button class="btn" type="submit">Save</button>
   </form>
+  ${sec(label('Testing'), cardOf(`<button class="row tall" data-act="testing-toggle" role="switch" aria-checked="${D.testing()}"><span class="two"><span>Testing mode</span><span class="sub">${D.testing() ? 'On: any round can be deleted, even one with scores. Turn this off before real rounds.' : 'Off: only rounds that have not started can be deleted.'}</span></span><span class="switch${D.testing() ? ' on' : ''}" aria-hidden="true"><i></i></span></button>`))}
   <form data-form="newpin" autocomplete="off" class="sec">
     ${field('s-pin', 'New organiser PIN', '', 'type="password" inputmode="numeric" maxlength="8"')}
     <button class="btn quiet" type="submit">Change PIN</button>
@@ -4219,6 +4233,11 @@ const ACT = {
     removeRows('rounds', [{ id: r.id }], { action: 'Round deleted', detail: `${roundName(r)}${r.date ? ' ' + r.date : ''}` });
     UI.confirm = null;
     back();
+  },
+  'testing-toggle': () => {
+    const on = !D.testing();
+    put('settings', [{ key: 'testing', value: on ? '1' : '0' }], { action: 'Testing mode ' + (on ? 'on' : 'off'), detail: on ? 'Any round can be deleted' : 'Only rounds that have not started can be deleted' });
+    toast(on ? 'Testing mode on' : 'Testing mode off');
   },
   'demo-fill': () => demoFill(),
   'reset-preview': () => {
