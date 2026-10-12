@@ -44,7 +44,7 @@ function askThread() {
 }
 
 /* ----- Speaking a question: words fill the box as you speak, a waveform shows your voice, Stop / X / Send ----- */
-const EQ_BARS = 36;
+const EQ_BARS = 48;
 const eqHtml = () => Array.from({ length: EQ_BARS }, () => '<i></i>').join('');
 let listening = null, meter = null;
 
@@ -59,19 +59,20 @@ function stopMeter() {
 }
 function drawMeter() {
   const bars = document.querySelectorAll('.eq i');
-  bars.forEach((el, i) => { const v = meter.levels[i]; el.style.height = v == null ? '' : Math.max(4, Math.round(v * 34)) + 'px'; });
+  bars.forEach((el, i) => { const v = meter.levels[i]; el.style.height = v == null ? '' : Math.max(3, Math.round(v * 30)) + 'px'; });
 }
 function startMeter() {
   stopMeter();
-  meter = { levels: [], timer: 0, an: null, buf: null, stream: null, ctx: null, lastWords: 0 };
+  meter = { levels: [], smooth: 0, timer: 0, an: null, buf: null, stream: null, ctx: null, lastWords: 0 };
   const m = meter;
   m.timer = setInterval(() => {
     let v;
     if (m.an) { m.an.getByteTimeDomainData(m.buf); let sum = 0; for (let k = 0; k < m.buf.length; k++) { const d = (m.buf[k] - 128) / 128; sum += d * d; } v = Math.min(1, Math.sqrt(sum / m.buf.length) * 5); }
     else v = Date.now() - UI.askWordsAt < 700 ? 0.25 + Math.random() * 0.6 : 0.03;   // no microphone access for the meter: move while words arrive
-    m.levels.push(v); if (m.levels.length > EQ_BARS) m.levels.shift();
+    m.smooth += (v - m.smooth) * (v > m.smooth ? 0.7 : 0.35);   // quick to rise, easy to fall
+    m.levels.push(m.smooth); if (m.levels.length > EQ_BARS) m.levels.shift();
     drawMeter();
-  }, 70);
+  }, 55);
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
   navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
     if (meter !== m) { stream.getTracks().forEach(t => t.stop()); return; }
@@ -90,6 +91,8 @@ function showLive(on) {
 // The box grows with the words; the thread keeps clear of it.
 function sizeAsk() {
   const bar = document.querySelector('.askbar');
+  const box = document.getElementById('askin');
+  if (bar && box) bar.classList.toggle('empty', !box.value.trim());
   document.documentElement.style.setProperty('--askh', (bar ? bar.offsetHeight : 76) + 'px');
 }
 
@@ -169,7 +172,7 @@ function askQuestion(q) {
   UI.chat.push({ role: 'user', text: q });
   UI.askDraft = '';
   const input = document.getElementById('askin');
-  if (input) { input.value = ''; input.style.height = ''; }
+  if (input) { input.value = ''; input.style.height = ''; sizeAsk(); }
   if (!navigator.onLine) {
     UI.chat.push({ role: 'ai', text: 'No signal right now. Try again when you have some.', error: true });
     refreshThread();
@@ -181,7 +184,7 @@ function askQuestion(q) {
   call({ op: 'ask', question: q, history }).then(res => {
     UI.chatBusy = false;
     if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer, sources: res.sources || [] });
-    else UI.chat.push({ role: 'ai', text: (res && res.message) || 'The rules checker could not answer just now.', error: true });
+    else UI.chat.push({ role: 'ai', text: (res && res.error === 'bad' && /Unknown request/.test(res.message || '')) ? 'The rules checker is not switched on yet. The organiser needs to finish setting it up.' : ((res && res.message) || 'The rules checker could not answer just now.'), error: true });
     refreshThread();
   }).catch(() => {
     UI.chatBusy = false;

@@ -591,9 +591,35 @@ body.hearing:not(.typing) .askbar { padding-bottom: calc(10px + env(safe-area-in
 .srcs { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,.1); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .srcl { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted, #5b6b64); }
 .src { font-size: .9rem; font-weight: 600; color: var(--pine); text-decoration: underline; text-underline-offset: 2px; min-height: 32px; display: inline-flex; align-items: center; }
+
+/* Ruling: lighter and smoother, closer to a chat app than a form */
+.ask-intro .b { font-size: 1.5rem; }
+.ask-intro .sub { font-size: .98rem; }
+.idea { min-height: 44px; padding: 10px 16px; border-radius: 16px; font-size: 1rem; font-weight: 500; box-shadow: 0 0 0 .5px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04); transition: background-color .15s, transform .15s; }
+.idea:active { transform: scale(.985); }
+.bub { font-size: 1.02rem; line-height: 1.42; padding: 11px 16px; border-radius: 20px; }
+.msg { animation: msgin .22s ease-out both; }
+@keyframes msgin { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.verdict { font-size: 1.18rem; }
+.askbar { padding: 6px 12px 8px; }
+.askbar .card { border-radius: 26px; border: .5px solid rgba(0,0,0,.12); box-shadow: 0 2px 10px rgba(0,0,0,.06); padding: 4px 6px 6px; }
+.askbar textarea { font-size: 1.06rem; line-height: 1.35; min-height: 28px; padding: 9px 12px 4px; }
+.askbar .arow { gap: 6px; }
+.askbar .arow button { width: 38px; height: 38px; transition: background-color .18s, transform .12s, opacity .18s; }
+.askbar .arow button:active { transform: scale(.9); }
+.askbar .send svg, .askbar .mic svg { width: 20px; height: 20px; }
+.askbar .x svg { width: 18px; height: 18px; }
+.askbar .stop i { width: 13px; height: 13px; border-radius: 3px; }
+.askbar .send { transition: background-color .2s, opacity .2s, transform .12s; }
+.askbar.empty .send { background: #c9d3ce; }
+.eq { height: 38px; padding: 0 6px; }
+.eq i { width: 3px; border-radius: 1.5px; transition: height 90ms ease-out; }
+body.hearing .askbar .arow .x, body.hearing .askbar .arow .stop, body.hearing .askbar .arow .eq { animation: lfade .2s ease-out both; }
+@keyframes lfade { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .msg, body.hearing .askbar .arow .x, body.hearing .askbar .arow .stop, body.hearing .askbar .arow .eq { animation: none; } }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121243"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121248"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3345,7 +3371,7 @@ function askThread() {
 }
 
 /* ----- Speaking a question: words fill the box as you speak, a waveform shows your voice, Stop / X / Send ----- */
-const EQ_BARS = 36;
+const EQ_BARS = 48;
 const eqHtml = () => Array.from({ length: EQ_BARS }, () => '<i></i>').join('');
 let listening = null, meter = null;
 
@@ -3360,19 +3386,20 @@ function stopMeter() {
 }
 function drawMeter() {
   const bars = document.querySelectorAll('.eq i');
-  bars.forEach((el, i) => { const v = meter.levels[i]; el.style.height = v == null ? '' : Math.max(4, Math.round(v * 34)) + 'px'; });
+  bars.forEach((el, i) => { const v = meter.levels[i]; el.style.height = v == null ? '' : Math.max(3, Math.round(v * 30)) + 'px'; });
 }
 function startMeter() {
   stopMeter();
-  meter = { levels: [], timer: 0, an: null, buf: null, stream: null, ctx: null, lastWords: 0 };
+  meter = { levels: [], smooth: 0, timer: 0, an: null, buf: null, stream: null, ctx: null, lastWords: 0 };
   const m = meter;
   m.timer = setInterval(() => {
     let v;
     if (m.an) { m.an.getByteTimeDomainData(m.buf); let sum = 0; for (let k = 0; k < m.buf.length; k++) { const d = (m.buf[k] - 128) / 128; sum += d * d; } v = Math.min(1, Math.sqrt(sum / m.buf.length) * 5); }
     else v = Date.now() - UI.askWordsAt < 700 ? 0.25 + Math.random() * 0.6 : 0.03;   // no microphone access for the meter: move while words arrive
-    m.levels.push(v); if (m.levels.length > EQ_BARS) m.levels.shift();
+    m.smooth += (v - m.smooth) * (v > m.smooth ? 0.7 : 0.35);   // quick to rise, easy to fall
+    m.levels.push(m.smooth); if (m.levels.length > EQ_BARS) m.levels.shift();
     drawMeter();
-  }, 70);
+  }, 55);
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
   navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
     if (meter !== m) { stream.getTracks().forEach(t => t.stop()); return; }
@@ -3391,6 +3418,8 @@ function showLive(on) {
 // The box grows with the words; the thread keeps clear of it.
 function sizeAsk() {
   const bar = document.querySelector('.askbar');
+  const box = document.getElementById('askin');
+  if (bar && box) bar.classList.toggle('empty', !box.value.trim());
   document.documentElement.style.setProperty('--askh', (bar ? bar.offsetHeight : 76) + 'px');
 }
 
@@ -3470,7 +3499,7 @@ function askQuestion(q) {
   UI.chat.push({ role: 'user', text: q });
   UI.askDraft = '';
   const input = document.getElementById('askin');
-  if (input) { input.value = ''; input.style.height = ''; }
+  if (input) { input.value = ''; input.style.height = ''; sizeAsk(); }
   if (!navigator.onLine) {
     UI.chat.push({ role: 'ai', text: 'No signal right now. Try again when you have some.', error: true });
     refreshThread();
@@ -3482,7 +3511,7 @@ function askQuestion(q) {
   call({ op: 'ask', question: q, history }).then(res => {
     UI.chatBusy = false;
     if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer, sources: res.sources || [] });
-    else UI.chat.push({ role: 'ai', text: (res && res.message) || 'The rules checker could not answer just now.', error: true });
+    else UI.chat.push({ role: 'ai', text: (res && res.error === 'bad' && /Unknown request/.test(res.message || '')) ? 'The rules checker is not switched on yet. The organiser needs to finish setting it up.' : ((res && res.message) || 'The rules checker could not answer just now.'), error: true });
     refreshThread();
   }).catch(() => {
     UI.chatBusy = false;
