@@ -663,3 +663,5 @@ button.hsub svg { width: 14px; height: 14px; opacity: .8; }
 .switch.on i { transform: translateX(20px); }
 @media (prefers-reduced-motion: reduce) { .switch, .switch i { transition: none; } }
 .field.short { width: 84px; flex: none; min-height: 44px; }
+.stat { padding-block: 12px; } .stat .cap { text-transform: uppercase; letter-spacing: .04em; } .stat .b { font-size: var(--t-lead); }
+.seg.pills button { white-space: nowrap; padding-inline: 6px; font-size: .9rem; }

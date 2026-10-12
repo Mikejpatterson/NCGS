@@ -563,8 +563,61 @@
     return 'double';
   }
 
+
+  /**
+   * Fun facts from the hole-by-hole scores of one round. Pure: takes the computed round and the course holes.
+   * Only holes that have been entered count; anything with nothing to say is left out.
+   */
+  function roundStats(comp, holes) {
+    const par = {}; holes.forEach(h => { par[h.n] = h.par; });
+    const ps = Object.values(comp.players);
+    const entered = p => ALL.filter(n => p.holes[n].gross !== null);
+    const by = (key, dir) => rows => rows.slice().sort((a, b) => dir * (b[key] - a[key]) || a.name.localeCompare(b.name));
+    const top = (rows, key) => rows.length && rows[0][key] > 0 ? rows.filter(r => r[key] === rows[0][key]) : [];
+
+    const hole = {};
+    ALL.forEach(n => {
+      const cards = ps.filter(p => p.holes[n].points !== null);
+      if (cards.length >= 2) hole[n] = { n, par: par[n], cards: cards.length, avgPts: cards.reduce((s, p) => s + p.holes[n].points, 0) / cards.length };
+    });
+    const hl = Object.values(hole);
+    const lo = hl.length ? Math.min(...hl.map(h => h.avgPts)) : null, hi = hl.length ? Math.max(...hl.map(h => h.avgPts)) : null;
+    const hardest = lo !== null && hi > lo ? hl.filter(h => h.avgPts === lo) : [];
+    const easiest = lo !== null && hi > lo ? hl.filter(h => h.avgPts === hi) : [];
+
+    const counts = (marks) => by('count', 1)(ps.map(p => ({ id: p.id, name: p.name, count: entered(p).filter(n => marks.includes(scoreMark(p.holes[n].gross, par[n]))).length })));
+    const birdies = top(counts(['birdie', 'eagle']), 'count');
+    const scratches = top(by('count', 1)(ps.map(p => ({ id: p.id, name: p.name, count: p.pickups.length }))), 'count');
+
+    let streak = null;
+    ps.forEach(p => {
+      const order = (comp.groups.find(g => g.id === p.groupId) || { order: ALL }).order;
+      let run = 0, from = null;
+      order.forEach(n => {
+        const pts = p.holes[n].points;
+        if (pts !== null && pts >= 2) { if (!run) from = n; run++; if (run >= 3 && (!streak || run > streak.len)) streak = { id: p.id, name: p.name, len: run, from, to: n }; }
+        else run = 0;
+      });
+    });
+
+    const nine = (p, a, b) => { let t = 0, d = 0; for (let n = a; n <= b; n++) { if (p.holes[n].points !== null) { t += p.holes[n].points; d++; } } return d === 9 ? t : null; };
+    const nines = [];
+    ps.forEach(p => { const f = nine(p, 1, 9), b = nine(p, 10, 18); if (f !== null) nines.push({ id: p.id, name: p.name, seg: 'front', pts: f, other: b }); if (b !== null) nines.push({ id: p.id, name: p.name, seg: 'back', pts: b, other: f }); });
+    const bestNine = nines.length ? nines.filter(x => x.pts === Math.max(...nines.map(y => y.pts))) : [];
+    const swings = nines.filter(x => x.seg === 'back' && x.other !== null).map(x => ({ id: x.id, name: x.name, swing: x.pts - x.other, front: x.other, back: x.pts }));
+    const up = swings.length ? Math.max(...swings.map(x => x.swing)) : 0;
+    const comeback = up >= 5 ? swings.filter(x => x.swing === up) : [];
+
+    const worst = [];
+    ps.forEach(p => entered(p).forEach(n => { const g = p.holes[n].gross; if (g !== 'P') worst.push({ id: p.id, name: p.name, n, over: g - par[n], gross: g }); }));
+    const wo = worst.length ? Math.max(...worst.map(x => x.over)) : 0;
+    const blowup = wo >= 3 ? worst.filter(x => x.over === wo) : [];
+
+    return { hole, hardest, easiest, birdies, scratches, streak, bestNine, comeback, blowup };
+  }
+
   return {
-    SEGMENTS, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
+    SEGMENTS, roundStats, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,

@@ -271,3 +271,24 @@ test('a pick-up is shown as the strokes that net 0 points, and still scores 0', 
     assert.equal(E.stablefordPoints('P', par, shots), 0);
   });
 });
+
+test('roundStats: fun facts from hole by hole scores', () => {
+  const holes = Array.from({ length: 18 }, (_, i) => ({ n: i + 1, par: 4, si: i + 1 }));
+  const tee = { slope: 113, rating: 72, par: 72 };
+  const card = (f) => { const c = {}; for (let n = 1; n <= 18; n++) c[n] = f(n); return c; };
+  const comp = E.computeRound({
+    groups: [{ id: 'g1', n: 1, teeTime: '', startHole: 1, teams: [['a', 'b']] }],
+    holes, tee, allowance: 1, players: { a: { name: 'Ann', index: 0 }, b: { name: 'Bob', index: 0 } },
+    scores: { a: card(n => (n >= 3 && n <= 6 ? 3 : n === 9 ? 8 : 4)), b: card(n => (n === 2 ? 'P' : n <= 9 ? 6 : 4)) }
+  });
+  const s = E.roundStats(comp, holes);
+  assert.deepEqual(s.birdies.map(x => x.name), ['Ann']);
+  assert.equal(s.birdies[0].count, 4);
+  assert.equal(s.streak.name, 'Ann');
+  assert.ok(s.streak.len === 9 && s.streak.from === 10);
+  assert.deepEqual(s.scratches.map(x => x.name), ['Bob']);
+  assert.deepEqual(s.blowup.map(x => x.name + x.n), ['Ann9']);
+  assert.deepEqual(s.comeback.map(x => x.name), ['Bob']);
+  assert.equal(s.bestNine.length, 1);
+  assert.ok(s.hardest.length && s.easiest.length);
+});

@@ -634,20 +634,49 @@ function buggyView(rid) {
 
 /* ----- Leaderboard ----- */
 function tripRounds(r) { return r && r.trip ? D.rounds().filter(x => x.trip === r.trip && x.season === r.season && !isDemo(x) === !isDemo(r)).sort((a, b) => (a.trip_day || 0) - (b.trip_day || 0)) : [r]; }
+
+/* ----- Fun facts from the hole-by-hole scores ----- */
+function statsOf(rid) {
+  return memo('stats:' + rid, () => {
+    const r = D.round(rid), res = resultsOf(rid), holes = r && holesOf(r);
+    if (!res || !res.comp || !holes) return null;
+    const s = E.roundStats(res.comp, holes);
+    const any = s.birdies.length || s.scratches.length || s.streak || s.hardest.length || s.bestNine.length || s.comeback.length || s.blowup.length;
+    return any ? s : null;
+  });
+}
+function statsView(s) {
+  const names = a => a.length > 3 ? `${a.length} players tied` : a.map(x => esc(x.name)).join(' and ');
+  const holesTxt = a => a.map(h => h.n).join(', ');
+  const card = (title, who, note) => `<div class="row tall stat"><span class="two"><span class="cap">${title}</span><span class="b">${who}</span>${note ? `<span class="sub">${note}</span>` : ''}</span></div>`;
+  const rows = [];
+  if (s.birdies.length) rows.push(card('Most birdies', names(s.birdies), `${s.birdies[0].count} ${s.birdies[0].count === 1 ? 'birdie' : 'birdies'} or better`));
+  if (s.streak) rows.push(card('Hot streak', esc(s.streak.name), `${s.streak.len} holes in a row at par or better, ${s.streak.from} to ${s.streak.to}`));
+  if (s.bestNine.length) { const b = s.bestNine[0]; rows.push(card('Best nine', names(s.bestNine), `${b.pts} points on the ${b.seg} nine`)); }
+  if (s.comeback.length) { const c = s.comeback[0]; rows.push(card('Comeback', names(s.comeback), `${c.front} points on the front, ${c.back} on the back`)); }
+  if (s.hardest.length) rows.push(card('Toughest hole', `Hole ${holesTxt(s.hardest)}`, 'Fewest points across the field'));
+  if (s.easiest.length) rows.push(card('Friendliest hole', `Hole ${holesTxt(s.easiest)}`, 'Most points across the field'));
+  if (s.blowup.length) { const w = s.blowup[0]; rows.push(card('Big number', names(s.blowup), `${w.gross} on hole ${w.n}`)); }
+  if (s.scratches.length) rows.push(card('Most scratches', names(s.scratches), `${s.scratches[0].count} ${s.scratches[0].count === 1 ? 'hole' : 'holes'} picked up`));
+  return sec(label('The round in numbers'), cardOf(rows.join('')), true);
+}
+
 VIEWS.board = () => {
   const sel = UI.board && D.round(UI.board) ? UI.board : playRid();
   const r = D.round(sel);
   const res0 = r.status === 'upcoming' ? null : resultsOf(sel);
   const hasBuggy = !!(res0 && res0.comp && res0.comp.groups.some(g => g.teams.length === 2));
   const hasContests = !!(res0 && res0.contests.length);
-  const avail = ['lb', hasBuggy && 'bw', hasContests && 'ct'].filter(Boolean);
+  const stats = res0 && res0.comp && res0.source === 'app' ? statsOf(sel) : null;
+  const avail = ['lb', hasBuggy && 'bw', hasContests && 'ct', stats && 'st'].filter(Boolean);
   const pillSel = avail.includes(UI.res) ? UI.res : 'lb';
   let html = `<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">Results</h1></div></header>`;
   if (avail.length > 1) {
-    const names = { lb: 'Leaderboard', bw: 'Buggy Wars', ct: 'Contests' };
+    const names = { lb: 'Leaderboard', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
     html += `<div class="seg pills" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
   }
   if (pillSel === 'bw') return { tabs: 'board', html: html + buggyView(sel).html };
+  if (pillSel === 'st') return { tabs: 'board', html: html + statsView(stats) };
   if (r.status === 'upcoming') {
     html += sec(label(esc(roundWhen(r) || roundName(r))), r.groups ? cardOf(r.groups.map(g => `<div class="grow"><span class="b num">${esc(g.teeTime || '')}</span><span class="teams">${g.teams.map((t, i) => `<span>${dot(i)}${esc(t.map(D.nameOf).join(' & '))}</span>`).join('')}</span><span></span></div>`).join('')) : cardOf('<div class="row sub">Groups to be drawn</div>'), true);
     return { tabs: 'board', html };
