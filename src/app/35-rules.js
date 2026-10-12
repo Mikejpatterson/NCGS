@@ -134,7 +134,22 @@ function askListen() {
 }
 function askStop() { if (listening) { try { listening.stop(); } catch (e) { /* already stopped */ } } }
 function askCancel() { if (listening && listening.cancel) listening.cancel(); }
-function growAsk(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 168) + 'px'; sizeAsk(); }
+// The box grows with a hidden twin of itself, so its height can be animated (a textarea cannot animate from "auto").
+let askMirror = null;
+function growAsk(el) {
+  const card = el.closest('.card');
+  if (!card) return;
+  if (!askMirror || askMirror.parentNode !== card) { askMirror = document.createElement('div'); askMirror.className = 'mirror'; askMirror.setAttribute('aria-hidden', 'true'); card.appendChild(askMirror); }
+  askMirror.textContent = el.value + '\u200b';
+  const full = askMirror.offsetHeight, MAX = 168, need = Math.min(full, MAX);
+  if (el.dataset.h !== String(need)) { el.style.height = need + 'px'; el.dataset.h = String(need); }
+  el.classList.toggle('over', full > MAX);
+  if (full > MAX) el.scrollTop = full - MAX;   // glide to the newest words (the box has smooth scrolling)
+  sizeAsk();
+  // keep the page clear of the box while it is growing
+  const t0 = performance.now();
+  (function follow() { sizeAsk(); if (performance.now() - t0 < 260) requestAnimationFrame(follow); })();
+}
 function askKeyboard(msg) { const i = document.getElementById('askin'); if (i) i.focus(); if (msg) toast(msg); }
 
 VIEWS.rules = () => ({

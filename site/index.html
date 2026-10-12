@@ -617,9 +617,16 @@ body.hearing:not(.typing) .askbar { padding-bottom: calc(10px + env(safe-area-in
 body.hearing .askbar .arow .x, body.hearing .askbar .arow .stop, body.hearing .askbar .arow .eq { animation: lfade .2s ease-out both; }
 @keyframes lfade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .msg, body.hearing .askbar .arow .x, body.hearing .askbar .arow .stop, body.hearing .askbar .arow .eq { animation: none; } }
+
+/* Ruling: the pill grows and the words glide */
+.askbar .card { position: relative; }
+.askbar textarea { transition: height .2s cubic-bezier(.2, .8, .2, 1); scroll-behavior: smooth; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+.askbar textarea.over { -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26px); mask-image: linear-gradient(to bottom, transparent 0, #000 26px); }
+.askbar .mirror { position: absolute; left: 6px; right: 6px; top: 0; visibility: hidden; pointer-events: none; white-space: pre-wrap; overflow-wrap: break-word; word-break: normal; box-sizing: border-box; font: inherit; font-size: 1.06rem; line-height: 1.35; padding: 9px 12px 4px; min-height: 28px; }
+@media (prefers-reduced-motion: reduce) { .askbar textarea { transition: none; scroll-behavior: auto; } }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121248"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121252"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3461,7 +3468,22 @@ function askListen() {
 }
 function askStop() { if (listening) { try { listening.stop(); } catch (e) { /* already stopped */ } } }
 function askCancel() { if (listening && listening.cancel) listening.cancel(); }
-function growAsk(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 168) + 'px'; sizeAsk(); }
+// The box grows with a hidden twin of itself, so its height can be animated (a textarea cannot animate from "auto").
+let askMirror = null;
+function growAsk(el) {
+  const card = el.closest('.card');
+  if (!card) return;
+  if (!askMirror || askMirror.parentNode !== card) { askMirror = document.createElement('div'); askMirror.className = 'mirror'; askMirror.setAttribute('aria-hidden', 'true'); card.appendChild(askMirror); }
+  askMirror.textContent = el.value + '\u200b';
+  const full = askMirror.offsetHeight, MAX = 168, need = Math.min(full, MAX);
+  if (el.dataset.h !== String(need)) { el.style.height = need + 'px'; el.dataset.h = String(need); }
+  el.classList.toggle('over', full > MAX);
+  if (full > MAX) el.scrollTop = full - MAX;   // glide to the newest words (the box has smooth scrolling)
+  sizeAsk();
+  // keep the page clear of the box while it is growing
+  const t0 = performance.now();
+  (function follow() { sizeAsk(); if (performance.now() - t0 < 260) requestAnimationFrame(follow); })();
+}
 function askKeyboard(msg) { const i = document.getElementById('askin'); if (i) i.focus(); if (msg) toast(msg); }
 
 VIEWS.rules = () => ({
