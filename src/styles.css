@@ -612,5 +612,5 @@ body.hearing .askbar .arow .x, body.hearing .askbar .arow .stop, body.hearing .a
 .askbar .card { position: relative; }
 .askbar textarea { transition: height .2s cubic-bezier(.2, .8, .2, 1); scroll-behavior: smooth; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 .askbar textarea.over { -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26px); mask-image: linear-gradient(to bottom, transparent 0, #000 26px); }
-.askbar .mirror { position: absolute; left: 6px; right: 6px; top: 0; visibility: hidden; pointer-events: none; white-space: pre-wrap; overflow-wrap: break-word; word-break: normal; box-sizing: border-box; font: inherit; font-size: 1.06rem; line-height: 1.35; padding: 9px 12px 4px; min-height: 28px; }
+.askbar .mirror { position: absolute; left: 6px; right: 6px; top: 0; width: auto; height: 0; min-height: 0; max-height: none; visibility: hidden; pointer-events: none; overflow: hidden; border: 0; resize: none; transition: none; background: none; }
 @media (prefers-reduced-motion: reduce) { .askbar textarea { transition: none; scroll-behavior: auto; } }

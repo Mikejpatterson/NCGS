@@ -97,30 +97,39 @@ function sizeAsk() {
 }
 
 function askListen() {
-  if (listening) return;
+  // A tap on the microphone while the app thinks it is already listening means a previous go got stuck: reset it.
+  if (listening) { const old = listening; listening = null; old.cancel = null; try { old.abort(); } catch (e) { /* already stopped */ } stopMeter(); showLive(false); }
   if (!SPEECH) return askKeyboard('Tap the microphone on your keyboard to speak.');
   const box = document.getElementById('askin');
   const base = (box ? box.value : UI.askDraft).trim();
-  const r = new SPEECH();
+  let r;
+  try { r = new SPEECH(); } catch (e) { return askKeyboard("Dictation isn't available here. Tap the microphone on your keyboard instead."); }
   r.lang = 'en-IE'; r.interimResults = true; r.maxAlternatives = 1; r.continuous = true;
   UI.askWordsAt = 0;
-  let cancelled = false;
-  r.onstart = () => {
-    listening = r;
-    r.cancel = () => { cancelled = true; try { r.abort(); } catch (e) { /* not running */ } };
-    showLive(true); startMeter();
-  };
+  let cancelled = false, began = false, dog = 0;
+  const giveUp = msg => { clearTimeout(dog); cancelled = true; if (listening === r) listening = null; try { r.abort(); } catch (e) { /* not running */ } stopMeter(); showLive(false); askKeyboard(msg); };
+  listening = r;
+  r.cancel = () => { cancelled = true; try { r.abort(); } catch (e) { /* not running */ } };
+  showLive(true);   // answer the tap straight away, even while the phone is still getting the microphone ready
+  dog = setTimeout(() => { if (!began) giveUp("The microphone didn't start. Tap it again, or use the microphone on your keyboard."); }, 3500);
+  r.onstart = () => { began = true; clearTimeout(dog); startMeter(); };
   r.onresult = ev => {
+    began = true; clearTimeout(dog);
     UI.askWordsAt = Date.now();
     const said = Array.from(ev.results).map(x => x[0].transcript).join(' ').replace(/\s+/g, ' ').trim();
     UI.askDraft = (base ? base + ' ' : '') + said;
     const input = document.getElementById('askin');
-    if (input) { input.value = UI.askDraft; growAsk(input); input.scrollTop = input.scrollHeight; }
+    if (input) { input.value = UI.askDraft; growAsk(input); }
   };
   r.onerror = ev => {
-    if (ev.error !== 'no-speech' && ev.error !== 'aborted') askKeyboard("Dictation isn't available here. Tap the microphone on your keyboard instead.");
+    clearTimeout(dog);
+    if (ev.error === 'aborted') return;
+    if (ev.error === 'no-speech') { toast("Didn't catch anything. Tap the microphone and try again."); return; }
+    if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') { askKeyboard('Microphone or speech access is off for this app. Turn it on in Settings, or use the microphone on your keyboard.'); return; }
+    askKeyboard("Dictation isn't working here (" + ev.error + "). Tap the microphone on your keyboard instead.");
   };
   r.onend = () => {
+    clearTimeout(dog);
     if (listening === r) listening = null;
     stopMeter();
     showLive(false);
@@ -130,18 +139,18 @@ function askListen() {
       if (input) { input.value = base; growAsk(input); }
     }
   };
-  try { r.start(); } catch (e) { listening = null; askKeyboard('Tap the microphone on your keyboard to speak.'); }
+  try { r.start(); } catch (e) { giveUp('Tap the microphone on your keyboard to speak.'); }
 }
 function askStop() { if (listening) { try { listening.stop(); } catch (e) { /* already stopped */ } } }
 function askCancel() { if (listening && listening.cancel) listening.cancel(); }
-// The box grows with a hidden twin of itself, so its height can be animated (a textarea cannot animate from "auto").
+// The box grows with a hidden twin of itself (a real textarea, so the words wrap exactly the same way), so its height can be animated (a textarea cannot animate from "auto").
 let askMirror = null;
 function growAsk(el) {
   const card = el.closest('.card');
   if (!card) return;
-  if (!askMirror || askMirror.parentNode !== card) { askMirror = document.createElement('div'); askMirror.className = 'mirror'; askMirror.setAttribute('aria-hidden', 'true'); card.appendChild(askMirror); }
-  askMirror.textContent = el.value + '\u200b';
-  const full = askMirror.offsetHeight, MAX = 168, need = Math.min(full, MAX);
+  if (!askMirror || askMirror.parentNode !== card) { askMirror = document.createElement('textarea'); askMirror.className = 'mirror'; askMirror.setAttribute('aria-hidden', 'true'); askMirror.tabIndex = -1; askMirror.readOnly = true; askMirror.rows = 1; card.appendChild(askMirror); }
+  askMirror.value = el.value;
+  const full = askMirror.scrollHeight, MAX = 168, need = Math.min(full, MAX);
   if (el.dataset.h !== String(need)) { el.style.height = need + 'px'; el.dataset.h = String(need); }
   el.classList.toggle('over', full > MAX);
   if (full > MAX) el.scrollTop = full - MAX;   // glide to the newest words (the box has smooth scrolling)

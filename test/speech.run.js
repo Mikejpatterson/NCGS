@@ -47,6 +47,22 @@ const { chromium } = require('playwright');
   await pg.screenshot({ path: '/tmp/claude-0/shots/speech-long.png' });
   await pg.tap('.askbar .x'); await pg.waitForTimeout(500);
   check('and shrinks back when cancelled', (await pg.$eval('#askin', e => e.getBoundingClientRect().height)) < big.h - 40);
+  // A phone that never starts the recogniser, or one that fails on start, must still answer the tap and then say so
+  const bad = await ctx.newPage(); const berrs = [];
+  bad.on('pageerror', e => berrs.push(e.message));
+  await bad.addInitScript(() => {
+    const Hang = class { start() { window.__starts = (window.__starts || 0) + 1; } stop() {} abort() { setTimeout(() => this.onend && this.onend(), 5); } };
+    window.webkitSpeechRecognition = Hang; window.SpeechRecognition = Hang;
+  });
+  await bad.goto('http://localhost:8765/preview.html'); await bad.waitForTimeout(600);
+  await bad.evaluate(() => { window.__ncgs.UI.stack = [{ v: 'rules', p: {} }]; window.__ncgs.render(); });
+  await bad.tap('.askbar .mic'); await bad.waitForTimeout(150);
+  check('the tap is answered at once, even if the phone is slow to start listening', await bad.evaluate(() => document.body.classList.contains('hearing')));
+  await bad.waitForTimeout(3700);
+  check('and if it never starts, the panel closes and says so', !(await bad.evaluate(() => document.body.classList.contains('hearing'))) && /didn't start/.test(await bad.evaluate(() => document.body.innerText)));
+  await bad.tap('.askbar .mic'); await bad.waitForTimeout(150);
+  check('the microphone can be tried again straight after', (await bad.evaluate(() => window.__starts)) === 2 && await bad.evaluate(() => document.body.classList.contains('hearing')));
+  check('no script errors there either', berrs.length === 0);
   check('no script errors', errs.length === 0);
   if (errs.length) console.log(errs);
   await b.close();
