@@ -690,3 +690,5 @@ button.banner { display: block; width: 100%; text-align: left; margin: 12px 0 0;
 textarea.export + .btn, #restorejson + .btn { margin-top: 8px; }
 .chk { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line, #C7C7CC); display: inline-flex; align-items: center; justify-content: center; flex: none; color: #fff; }
 .chk.on { background: var(--green); border-color: var(--green); }
+.seg.pills.four { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.seg.pills button, .seg.pills.four button { white-space: normal; line-height: 1.15; padding-block: 6px; overflow-wrap: anywhere; }
