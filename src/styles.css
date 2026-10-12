@@ -672,3 +672,16 @@ button.hsub svg { width: 14px; height: 14px; opacity: .8; }
 .chart .avg { stroke: var(--pine); stroke-width: 1.5; stroke-dasharray: 4 3; }
 .chart text { font: 600 10px -apple-system, system-ui, sans-serif; fill: var(--sub); }
 .chart text.v { fill: var(--ink, #111); font-size: 11px; }
+/* Four result pills sit in two rows of two so none runs off the edge */
+.seg.pills.four { grid-auto-flow: row; grid-template-columns: 1fr 1fr; gap: 2px; }
+.seg.pills.four button { font-size: var(--t-body); padding-inline: 8px; }
+/* Stats tiles */
+.stiles { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stile { --tone: var(--green); --soft: var(--green-soft); background: var(--card); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 3px; min-width: 0; box-shadow: var(--lift); }
+.stile.tf { --tone: #8A6A00; --soft: #FFF1B8; }
+.stile.tb { --tone: #0A60C9; --soft: #E3EEFB; }
+.stile.tr { --tone: #B3261E; --soft: #FBE7E5; }
+.stile .sic { width: 44px; height: 44px; border-radius: 14px; background: var(--soft); color: var(--tone); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 6px; }
+.stile .cap { color: var(--tone); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
+.stile .who { font-size: var(--t-lead); font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
+.stile .nt { font-size: var(--t-sub); color: var(--sub); line-height: 1.3; }

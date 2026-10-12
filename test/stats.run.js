@@ -13,7 +13,7 @@ const { chromium } = require('playwright');
   check('a Stats pill appears on Results', !!(await pg.$('.seg.pills button[data-p="st"]')));
   await pg.click('.seg.pills button[data-p="st"]'); await pg.waitForTimeout(200);
   const t = await pg.textContent('#app');
-  check('it shows the round in numbers with several facts', /The round in numbers/.test(t) && (await pg.$$('.stat')).length >= 3);
+  check('it shows the round in numbers with several facts', /The round in numbers/.test(t) && (await pg.$$('.stile')).length >= 3);
   check('no script errors', errs.length === 0);
   if (errs.length) console.log(errs);
   await pg.screenshot({ path: '/tmp/stats.png' });

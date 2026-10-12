@@ -645,20 +645,30 @@ function statsOf(rid) {
     return any ? s : null;
   });
 }
+const STAT_ICON = {
+  birdie: svg('<path d="M8 21V4"/><path d="M8 4l9 3.500L8 11"/><circle cx="14" cy="19" r="1.800"/>'),
+  streak: svg('<path d="M12 3c1 3.500 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 .3 1.500 1 2 2 2-1-3 0-5 1-8z"/>'),
+  nine: svg('<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4"/><path d="M16 6h3a3 3 0 0 1-3 4"/><path d="M12 13v4"/><path d="M8.500 20h7"/>'),
+  comeback: svg('<path d="M4 17l6-6 4 4 6-7"/><path d="M15 8h5v5"/>'),
+  tough: svg('<path d="M3 19l6-11 4 6 2-3 6 8z"/>'),
+  easy: svg('<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.600 5.600L7 7M17 17l1.400 1.400M5.600 18.400L7 17M17 7l1.400-1.400"/>'),
+  big: svg('<path d="M12 3l2 5 5-2-2 5 5 2-5 2 2 5-5-2-2 5-2-5-5 2 2-5-5-2 5-2-2-5 5 2z"/>'),
+  scratch: svg('<circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/>')
+};
 function statsView(s) {
   const names = a => a.length > 3 ? `${a.length} players tied` : a.map(x => esc(x.name)).join(' and ');
   const holesTxt = a => a.map(h => h.n).join(', ');
-  const card = (title, who, note) => `<div class="row tall stat"><span class="two"><span class="cap">${title}</span><span class="b">${who}</span>${note ? `<span class="sub">${note}</span>` : ''}</span></div>`;
-  const rows = [];
-  if (s.birdies.length) rows.push(card('Most birdies', names(s.birdies), `${s.birdies[0].count} ${s.birdies[0].count === 1 ? 'birdie' : 'birdies'} or better`));
-  if (s.streak) rows.push(card('Hot streak', esc(s.streak.name), `${s.streak.len} holes in a row at par or better, ${s.streak.from} to ${s.streak.to}`));
-  if (s.bestNine.length) { const b = s.bestNine[0]; rows.push(card('Best nine', names(s.bestNine), `${b.pts} points on the ${b.seg} nine`)); }
-  if (s.comeback.length) { const c = s.comeback[0]; rows.push(card('Comeback', names(s.comeback), `${c.front} points on the front, ${c.back} on the back`)); }
-  if (s.hardest.length) rows.push(card('Toughest hole', `Hole ${holesTxt(s.hardest)}`, 'Fewest points across the field'));
-  if (s.easiest.length) rows.push(card('Friendliest hole', `Hole ${holesTxt(s.easiest)}`, 'Most points across the field'));
-  if (s.blowup.length) { const w = s.blowup[0]; rows.push(card('Big number', names(s.blowup), `${w.gross} on hole ${w.n}`)); }
-  if (s.scratches.length) rows.push(card('Most scratches', names(s.scratches), `${s.scratches[0].count} ${s.scratches[0].count === 1 ? 'hole' : 'holes'} picked up`));
-  return sec(label('The round in numbers'), cardOf(rows.join('')), true);
+  const tile = (tone, icon, title, who, note, wide) => `<div class="stile ${tone}${wide ? ' wide' : ''}"><span class="sic">${sized(STAT_ICON[icon], 26)}</span><span class="cap">${title}</span><span class="who">${who}</span>${note ? `<span class="nt">${note}</span>` : ''}</div>`;
+  const t = [];
+  if (s.birdies.length) t.push(tile('tg', 'birdie', 'Most birdies', names(s.birdies), `${s.birdies[0].count} ${s.birdies[0].count === 1 ? 'birdie' : 'birdies'} or better`));
+  if (s.streak) t.push(tile('tf', 'streak', 'Hot streak', esc(s.streak.name), `${s.streak.len} holes in a row at par or better, ${s.streak.from} to ${s.streak.to}`));
+  if (s.bestNine.length) { const b = s.bestNine[0]; t.push(tile('tb', 'nine', 'Best nine', names(s.bestNine), `${b.pts} points on the ${b.seg} nine`)); }
+  if (s.comeback.length) { const c = s.comeback[0]; t.push(tile('tg', 'comeback', 'Comeback', names(s.comeback), `${c.front} on the front, ${c.back} on the back`)); }
+  if (s.hardest.length) t.push(tile('tr', 'tough', 'Toughest hole', `Hole ${holesTxt(s.hardest)}`, 'Fewest points in the field'));
+  if (s.easiest.length) t.push(tile('tf', 'easy', 'Friendliest hole', `Hole ${holesTxt(s.easiest)}`, 'Most points in the field'));
+  if (s.blowup.length) { const w = s.blowup[0]; t.push(tile('tr', 'big', 'Big number', names(s.blowup), `${w.gross} on hole ${w.n}`)); }
+  if (s.scratches.length) t.push(tile('tb', 'scratch', 'Most scratches', names(s.scratches), `${s.scratches[0].count} ${s.scratches[0].count === 1 ? 'hole' : 'holes'} picked up`));
+  return sec(label('The round in numbers'), `<div class="stiles">${t.join('')}</div>`, true);
 }
 
 VIEWS.board = () => {
@@ -673,7 +683,7 @@ VIEWS.board = () => {
   let html = `<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">Results</h1></div></header>`;
   if (avail.length > 1) {
     const names = { lb: 'Leaderboard', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
-    html += `<div class="seg pills" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
+    html += `<div class="seg pills${avail.length > 3 ? ' four' : ''}" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
   }
   if (pillSel === 'bw') return { tabs: 'board', html: html + buggyView(sel).html };
   if (pillSel === 'st') return { tabs: 'board', html: html + statsView(stats) };
