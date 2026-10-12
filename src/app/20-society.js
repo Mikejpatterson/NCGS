@@ -354,13 +354,12 @@ VIEWS.who = p => {
 /* ----- Temporary: try different ways of treating the top of the screen on the phone itself ----- */
 const DIAG = [
   ['', 'Normal (as now)'],
-  ['d-nobar', 'No solid bar at the top'],
-  ['d-dark', 'Dark colour scheme (status bar only)'],
-  ['d-inner', 'Page scrolls inside the app, not the browser'],
-  ['d-nocover', 'Not under the status bar at all'],
-  ['d-white', 'White header instead of green']
+  ['d-html', 'Green behind the page (html)'],
+  ['d-body', 'Green behind the page (body)'],
+  ['d-both', 'Green behind the page (both)'],
+  ['d-nobar2', 'Green (html) and no thin bar']
 ];
 VIEWS.diag = () => ({
-  html: `${navBack(D.society())}<header class="hero s"><div class="head"><h1 class="title">Display test</h1></div><p class="sub">Tap each one, then look at the very top of the screen. Tell me which looks clean.</p></header>
+  html: `${navBack(D.society())}<header class="hero s"><div class="head"><h1 class="title">Display test</h1></div><p class="sub">Tap each one and look at the strip behind the clock. Tell me which is green.</p></header>
     ${sec('', cardOf(DIAG.map(([k, t]) => `<button class="row" data-act="diag-set" data-k="${k}"><span>${t}</span><span class="sub">${document.documentElement.classList.contains(k || 'none') || (!k && !DIAG.some(([c]) => c && document.documentElement.classList.contains(c))) ? 'On' : ''}</span></button>`).join('')))}`
 });
