@@ -646,3 +646,12 @@ body.hearing .askbar .arow .x, body.hearing .askbar .arow .stop, body.hearing .a
 .res-t { font-size: var(--t-lead); font-weight: 700; letter-spacing: -.01em; }
 .res-sub { margin-top: 6px; }
 .row .pill { font-size: var(--t-cap); }
+
+/* Front page: your standing under the name, a quiet Organiser link, year picker in the header band */
+button.hsub { display: inline-flex; align-items: center; gap: 2px; min-height: 28px; padding: 0; color: #BFD6C8; font-size: var(--t-sub); text-align: left; }
+button.hsub svg { width: 14px; height: 14px; opacity: .8; }
+.foot { margin: 24px 0 8px; text-align: center; }
+.foot .link { color: var(--sub); font-size: var(--t-sub); justify-content: center; }
+.hero .seg.year { margin-top: 12px; background: rgba(255, 255, 255, .14); }
+.hero .seg.year button { color: #fff; }
+.hero .seg.year button.on { background: #fff; color: var(--pine); }

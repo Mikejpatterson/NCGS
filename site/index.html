@@ -656,9 +656,18 @@ body.hearing .askbar .arow .x, body.hearing .askbar .arow .stop, body.hearing .a
 .res-t { font-size: var(--t-lead); font-weight: 700; letter-spacing: -.01em; }
 .res-sub { margin-top: 6px; }
 .row .pill { font-size: var(--t-cap); }
+
+/* Front page: your standing under the name, a quiet Organiser link, year picker in the header band */
+button.hsub { display: inline-flex; align-items: center; gap: 2px; min-height: 28px; padding: 0; color: #BFD6C8; font-size: var(--t-sub); text-align: left; }
+button.hsub svg { width: 14px; height: 14px; opacity: .8; }
+.foot { margin: 24px 0 8px; text-align: center; }
+.foot .link { color: var(--sub); font-size: var(--t-sub); justify-content: center; }
+.hero .seg.year { margin-top: 12px; background: rgba(255, 255, 255, .14); }
+.hero .seg.year button { color: #fff; }
+.hero .seg.year button.on { background: #fff; color: var(--pine); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121506"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121624"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2152,6 +2161,15 @@ function pointsOf(rid) {
 /* The season on show: the latest one with a finished round (a round booked for next year does not move it on). */
 const seasonOf = () => { const s = D.rounds().filter(r => r.season && !isDemo(r) && r.status !== 'upcoming').map(r => r.season); return s.length ? Math.max(...s) : new Date().getFullYear(); };
 const seasonRounds = season => D.rounds().filter(r => r.season === season && !isDemo(r));
+/* Every season that has results, newest first; and the one being looked at (the current season unless a year was picked). */
+const seasonsList = () => [...new Set(D.rounds().filter(r => r.season && !isDemo(r) && (r.status === 'final' || r.status === 'live')).map(r => r.season))].sort((a, b) => b - a);
+const yearOn = () => (UI.year && seasonsList().includes(UI.year) ? UI.year : seasonOf());
+// A row of years, only once there is more than one season to choose between.
+const yearPicker = () => {
+  const ys = seasonsList();
+  if (ys.length < 2) return '';
+  return `<div class="seg year" role="group" aria-label="Year">${ys.map(y => `<button class="${y === yearOn() ? 'on' : ''}" data-act="year" data-y="${y}" aria-pressed="${y === yearOn()}">${y}</button>`).join('')}</div>`;
+};
 function goy(season) {
   return memo('goy:' + season, () => {
     const done = seasonRounds(season).filter(r => r.status === 'final');
@@ -2169,7 +2187,7 @@ const UI = {
   stack: [{ v: 'home', p: {} }],
   org: false, orgUnlocked: false, orgStack: [{ v: 'home', p: {} }],
   toast: null, flash: false, contestSheet: false, fix: null, after: null, open: {}, scrollCur: false, scrollTop: false,
-  playRid: null, hole: null, holeSheet: false, edit: false, matchGroup: null, board: null, res: 'lb', chat: [], chatBusy: false, askDraft: '',
+  playRid: null, hole: null, holeSheet: false, year: null, edit: false, matchGroup: null, board: null, res: 'lb', chat: [], chatBusy: false, askDraft: '',
   draft: null, sel: null, testSheet: null, photoFull: null, confirm: null, pinError: false, formError: null,
   wx: {}, shareImg: null, checkSeg: null, photos: {}
 };
@@ -2266,7 +2284,9 @@ VIEWS.home = () => {
   const feature = live[0] || next[0] || null;
   const more = [...live.slice(1), ...next.slice(live[0] ? 0 : 1)];
   const me = DB.prefs.me ? D.member(DB.prefs.me) : null;
-  let html = `<header class="hero home"><div class="brand"><span class="badge">${FLAG_SVG}</span><span class="two"><span class="wordmark">${esc(D.society())}</span><span class="hsub">${season} season</span></span>
+  const myRow = me ? goy(season).find(x => x.id === me.id) : null;
+  const standLine = myRow ? `<button class="hsub me-line" data-act="player" data-pid="${me.id}">${posWord(myRow.posLabel)} in Golfer of the Year${sized(ICON.chev, 14)}</button>` : '';
+  let html = `<header class="hero home"><div class="brand"><span class="badge">${FLAG_SVG}</span><span class="two"><span class="wordmark">${esc(D.society())}</span>${standLine}</span>
     <button class="who-chip" data-act="who">${me ? esc(me.name) : 'Who are you?'}</button></div>
     ${feature ? nowCard(feature) : '<div class="now"><div class="now-main"><span class="now-name">No round booked</span><span class="now-line">The organiser adds the next one.</span></div></div>'}</header>`;
   const table = goy(season);
@@ -2278,20 +2298,20 @@ VIEWS.home = () => {
   const tripTile = tripList.length > 1 ? `<button class="lnk" data-act="trip" data-rid="${tripFor.id}"><span class="lnk-ic">${sized(ICON.trophy, 24)}</span><span class="lnk-t">Trip standings</span><span class="lnk-s">${esc(tripFor.trip)}</span></button>` : '';
   html += `<div class="links">
     ${tripTile}
-    ${tile('rounds', ICON.history, 'Past rounds', pastAll.length ? `${pastAll.length} played` : 'None played yet')}
-    ${tile('goy', ICON.trophy, 'Standings', lead ? `${esc(lead.name)} leads on ${lead.total}` : 'Golfer of the Year')}
+    ${tile('rounds', ICON.history, 'Past rounds', played.length ? `${played.length} played` : 'None played yet')}
+    ${tile('goy', ICON.trophy, 'Golfer of the Year', lead ? `${esc(lead.name)} leads on ${lead.total}` : 'Best ' + D.goyBest() + ' scores count')}
     ${tile('players', ICON.users, 'Players', plural(D.active().length, 'golfer'))}
-    ${tile('org', ICON.lock, 'Organiser', 'PIN needed')}
   </div>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
+  html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
   return { html };
 };
 
 VIEWS.rounds = () => {
-  const season = seasonOf();
-  const past = D.rounds().filter(r => r.status === 'final').reverse();
+  const yr = yearOn();
+  const past = D.rounds().filter(r => r.status === 'final' && !isDemo(r) && (r.season || seasonOf()) === yr).reverse();
   return {
-    html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Past rounds</h1></div><p class="sub">${season} season · tap a round for the scorecards</p></header>
+    html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Past rounds</h1></div><p class="sub">Tap a round for the scorecards</p>${yearPicker()}</header>
       ${past.length ? sec('', cardOf(past.map(r => roundRow(r, winnerText(r))).join('')), false) : sec('', '<div class="prose">No rounds played yet.</div>', false)}`
   };
 };
@@ -2311,11 +2331,11 @@ function goyRow(x) {
 }
 
 VIEWS.goy = () => {
-  const season = seasonOf();
+  const season = yearOn();
   const table = goy(season);
   return {
     html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Golfer of the Year</h1></div>
-      <p class="sub">${season} · best ${D.goyBest()} scores count</p></header>
+      <p class="sub">${season} · best ${D.goyBest()} scores count</p>${yearPicker()}</header>
       ${sec('', cardOf(table.map(goyRow).join('')), false)}`
   };
 };
@@ -2403,7 +2423,7 @@ function resultsBlock(r) {
   let html = sec(label('Stableford'), cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
     return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
-  }).join('')) + (res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : res.source === 'sheet' ? '<p class="cap note">From the 2026 sheet</p>' : ''));
+  }).join('')) + (res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : res.source === 'sheet' ? '<p class="cap note">From the society sheet</p>' : ''));
   if (res.kb.length) {
     html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join('')));
   }
@@ -2482,18 +2502,21 @@ VIEWS.player = p => {
   html += `<div class="tiles"><div class="tile flag"><span class="cap">GOY</span><span class="bignum">${row ? posWord(row.posLabel) : '–'}</span></div>
     <div class="tile"><span class="cap">Best ${D.goyBest()}</span><span class="bignum">${row ? row.total : '–'}</span></div>
     <div class="tile"><span class="cap">To beat</span><span class="bignum">${row && row.toBeat ? row.toBeat : '–'}</span></div></div></header>`;
-  const rounds = seasonRounds(season).filter(r => r.status === 'final' || r.status === 'live').reverse();
-  const rows = rounds.map(r => {
+  const rowsFor = yr => seasonRounds(yr).filter(r => r.status === 'final' || r.status === 'live').reverse().map(r => {
     const res = resultsOf(r.id);
     const me = res ? res.rows.find(x => x.id === m.id) : null;
     if (!me) return '';
     const live = r.status === 'live';
     const sub = [roundWhenShort(r), live ? 'In progress' : posWord(me.posLabel)].filter(Boolean).join(' · ');
     const act = hasCards(r) ? `data-act="card" data-rid="${r.id}" data-pid="${m.id}"` : `data-act="round" data-rid="${r.id}"`;
-    const tag = counting.includes(r.id) ? '<span class="pill g">Counts</span>' : '';
+    const tag = yr === season && counting.includes(r.id) ? '<span class="pill g">Counts</span>' : '';
     return `<button class="row tall" ${act}><span class="two"><span>${esc(roundName(r))}</span><span class="sub">${esc(sub)}</span></span><span class="right">${tag}<span class="b num">${me.total}</span>${chev}</span></button>`;
   }).filter(Boolean);
-  html += sec(label(`${season} rounds`), cardOf(rows.length ? rows.join('') : '<div class="row"><span class="sub">No rounds yet</span></div>'));
+  const years = [season, ...seasonsList().filter(y => y !== season)];
+  years.forEach(yr => {
+    const rows = rowsFor(yr);
+    if (yr === season || rows.length) html += sec(label(`${yr} rounds`), cardOf(rows.length ? rows.join('') : '<div class="row"><span class="sub">No rounds yet</span></div>'));
+  });
   return { html };
 };
 
@@ -4010,6 +4033,7 @@ const ACT = {
     if (ctx.mode === 'player' && !ctx.edit && d && Object.keys(d).some(k => k[0] !== '_')) toast('Scores kept. Pick up where you left off.');
     UI.contestSheet = false; UI.edit = false; back();
   },
+  year: el => { UI.year = Number(el.dataset.y); UI.scrollTop = false; render(); },
   holes: () => { UI.holeSheet = true; render(); },
   'holes-close': () => { UI.holeSheet = false; render(); },
   'holes-scrim': (el, e) => { if (e.target !== el) return; UI.holeSheet = false; render(); },
@@ -4518,6 +4542,6 @@ if (window.claude && typeof window.claude.use === 'function') {
   sync().then(() => flush());
 })();
 if ('serviceWorker' in navigator && BOOT.mode === 'live' && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
-window.__ncgs = { DB, UI, D, view, sync, flush, render };
+window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN };
 
 })();</script></body></html>

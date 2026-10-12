@@ -58,6 +58,7 @@ const ACT = {
     if (ctx.mode === 'player' && !ctx.edit && d && Object.keys(d).some(k => k[0] !== '_')) toast('Scores kept. Pick up where you left off.');
     UI.contestSheet = false; UI.edit = false; back();
   },
+  year: el => { UI.year = Number(el.dataset.y); UI.scrollTop = false; render(); },
   holes: () => { UI.holeSheet = true; render(); },
   'holes-close': () => { UI.holeSheet = false; render(); },
   'holes-scrim': (el, e) => { if (e.target !== el) return; UI.holeSheet = false; render(); },
@@ -566,4 +567,4 @@ if (window.claude && typeof window.claude.use === 'function') {
   sync().then(() => flush());
 })();
 if ('serviceWorker' in navigator && BOOT.mode === 'live' && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
-window.__ncgs = { DB, UI, D, view, sync, flush, render };
+window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN };

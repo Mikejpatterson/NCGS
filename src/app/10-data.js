@@ -314,6 +314,15 @@ function pointsOf(rid) {
 /* The season on show: the latest one with a finished round (a round booked for next year does not move it on). */
 const seasonOf = () => { const s = D.rounds().filter(r => r.season && !isDemo(r) && r.status !== 'upcoming').map(r => r.season); return s.length ? Math.max(...s) : new Date().getFullYear(); };
 const seasonRounds = season => D.rounds().filter(r => r.season === season && !isDemo(r));
+/* Every season that has results, newest first; and the one being looked at (the current season unless a year was picked). */
+const seasonsList = () => [...new Set(D.rounds().filter(r => r.season && !isDemo(r) && (r.status === 'final' || r.status === 'live')).map(r => r.season))].sort((a, b) => b - a);
+const yearOn = () => (UI.year && seasonsList().includes(UI.year) ? UI.year : seasonOf());
+// A row of years, only once there is more than one season to choose between.
+const yearPicker = () => {
+  const ys = seasonsList();
+  if (ys.length < 2) return '';
+  return `<div class="seg year" role="group" aria-label="Year">${ys.map(y => `<button class="${y === yearOn() ? 'on' : ''}" data-act="year" data-y="${y}" aria-pressed="${y === yearOn()}">${y}</button>`).join('')}</div>`;
+};
 function goy(season) {
   return memo('goy:' + season, () => {
     const done = seasonRounds(season).filter(r => r.status === 'final');

@@ -29,7 +29,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await page.waitForSelector('.brand');
   await shot('01-home', true);
   let t = await text();
-  check('home: next round first, then Past rounds, Standings, Players, Organiser tiles', /2026 season/.test(t) && /Past rounds\s*8 played/.test(t) && /Standings\s*Sean leads on 115/.test(t) && /Players\s*12 golfers/.test(t) && /Organiser/.test(t));
+  check('home: next round first, then Past rounds, Golfer of the Year, Players tiles, a quiet Organiser link, and no year in the header', !/2026 season/.test(t) && /Past rounds\s*8 played/.test(t) && /Golfer of the Year\s*Sean leads on 115/.test(t) && /Players\s*12 golfers/.test(t) && !!(await page.$('.foot [data-act="org"]')) && !(await page.$('.links [data-act="org"]')));
   check('home: the list of past rounds is not on the front page', !/Kieran, Sean 32/.test(t));
   await tap('[data-act="trip"]');
   t = await text();
@@ -57,7 +57,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   // An Irish round: points only, ties shown as ties
   await tap('[data-act="round"][data-rid="2026-westport"]');
   t = await text();
-  check('Irish round: level scores share a position', /T1Kieran32T1Sean32/.test(t) && /From the 2026 sheet/.test(t));
+  check('Irish round: level scores share a position', /T1Kieran32T1Sean32/.test(t) && /From the society sheet/.test(t));
   await tap('[data-act="back"]');
   await tap('[data-act="back"]');
 
