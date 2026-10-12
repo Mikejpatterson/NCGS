@@ -292,3 +292,22 @@ test('roundStats: fun facts from hole by hole scores', () => {
   assert.equal(s.bestNine.length, 1);
   assert.ok(s.hardest.length && s.easiest.length);
 });
+
+test('kbLowest: the bottom row of the KB table, with ties', () => {
+  assert.deepEqual(E.kbLowest([]), []);
+  assert.deepEqual(E.kbLowest([{ name: 'A' }]), []);
+  assert.deepEqual(E.kbLowest([{ name: 'A' }, { name: 'B' }, { name: 'C' }]).map(r => r.name), ['C']);
+  assert.deepEqual(E.kbLowest([{ name: 'A', pos: 1 }, { name: 'B', pos: 2 }, { name: 'C', pos: 2 }]).map(r => r.name), ['B', 'C']);
+});
+
+test('playerSummary: averages, marks and scoring by par', () => {
+  const h = (par, gross, points) => ({ par, gross, points });
+  const s = E.playerSummary([
+    { total: 30, pos: 1, kb: false, holes: [h(4, 3, 3), h(3, 3, 2), h(5, 7, 0), h(4, 'P', 0), h(4, 5, 1)] },
+    { total: 20, pos: 4, kb: true, holes: null }
+  ]);
+  assert.equal(s.rounds, 2); assert.equal(s.average, 25); assert.equal(s.best, 30); assert.equal(s.worst, 20);
+  assert.equal(s.wins, 1); assert.equal(s.kbs, 1); assert.equal(s.scored, 1);
+  assert.equal(s.birdies, 1); assert.equal(s.pars, 1); assert.equal(s.doubles, 1); assert.equal(s.scratches, 1); assert.equal(s.bogeys, 1);
+  assert.equal(s.byPar[3], 2); assert.equal(s.byPar[5], 0); assert.equal(s.byPar[4], 4 / 3);
+});

@@ -7,6 +7,7 @@ const ACT = {
   player: el => go('player', { pid: el.dataset.pid }),
   card: el => go('card', { rid: el.dataset.rid, pid: el.dataset.pid }),
   goy: () => go('goy'),
+  stats: () => go('stats'),
   players: () => go('players'),
   rounds: () => go('rounds'),
   who: () => go('who', { then: null }),

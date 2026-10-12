@@ -616,8 +616,47 @@
     return { hole, hardest, easiest, birdies, scratches, streak, bestNine, comeback, blowup };
   }
 
+  /**
+   * One golfer's numbers across rounds. entries: [{ total, pos, kb, holes }], where holes is
+   * [{ par, gross, points }] for rounds scored hole by hole and null for imported totals.
+   */
+  function playerSummary(entries) {
+    const totals = entries.map(e => e.total);
+    const out = {
+      rounds: entries.length,
+      average: totals.length ? totals.reduce((a, b) => a + b, 0) / totals.length : null,
+      best: totals.length ? Math.max(...totals) : null,
+      worst: totals.length ? Math.min(...totals) : null,
+      wins: entries.filter(e => e.pos === 1).length,
+      kbs: entries.filter(e => e.kb).length,
+      scored: 0, eagles: 0, birdies: 0, pars: 0, bogeys: 0, doubles: 0, scratches: 0,
+      byPar: { 3: null, 4: null, 5: null }
+    };
+    const acc = { 3: [0, 0], 4: [0, 0], 5: [0, 0] };
+    entries.forEach(e => {
+      if (!e.holes) return;
+      out.scored += 1;
+      e.holes.forEach(h => {
+        if (h.gross === null || h.gross === undefined) return;
+        const m = scoreMark(h.gross, h.par);
+        if (m === 'eagle') out.eagles++; else if (m === 'birdie') out.birdies++; else if (m === 'par') out.pars++;
+        else if (m === 'bogey') out.bogeys++; else if (m === 'double') out.doubles++; else if (m === 'pu') out.scratches++;
+        if (acc[h.par] && h.points !== null) { acc[h.par][0] += h.points; acc[h.par][1] += 1; }
+      });
+    });
+    [3, 4, 5].forEach(k => { if (acc[k][1]) out.byPar[k] = acc[k][0] / acc[k][1]; });
+    return out;
+  }
+
+  /** The KBs of a round: the last-placed row of the KB table, plus anyone level with it. */
+  function kbLowest(rows) {
+    if (!rows || rows.length < 2) return [];
+    const last = rows[rows.length - 1];
+    return last.pos !== undefined ? rows.filter(r => r.pos === last.pos) : [last];
+  }
+
   return {
-    SEGMENTS, roundStats, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
+    SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,

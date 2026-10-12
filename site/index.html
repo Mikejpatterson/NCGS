@@ -187,8 +187,6 @@ button.row:active, button.mrow:active, button.lrow:active { background: var(--fi
 .rcard .top .title { margin-top: 4px; }
 .rcard .blk { padding: 12px 16px; border-top: .5px solid var(--line); }
 .rcard .ln { display: flex; justify-content: space-between; gap: 8px; min-height: 26px; align-items: center; font-variant-numeric: tabular-nums; }
-.rcard .blk.drinks { background: var(--amber-soft); }
-.rcard .blk.drinks .cap { color: var(--amber); }
 
 /* Organiser */
 .field { width: 100%; min-height: 52px; border-radius: 12px; border: 1px solid #D1D1D6; background: #fff; font: inherit; font-size: var(--t-body); padding: 0 16px; }
@@ -675,9 +673,18 @@ button.hsub svg { width: 14px; height: 14px; opacity: .8; }
 .field.short { width: 84px; flex: none; min-height: 44px; }
 .stat { padding-block: 12px; } .stat .cap { text-transform: uppercase; letter-spacing: .04em; } .stat .b { font-size: var(--t-lead); }
 .seg.pills button { white-space: nowrap; padding-inline: 6px; font-size: .9rem; }
+.lrow.low { background: var(--flag-soft, #FFF3B8); font-weight: 700; box-shadow: inset 4px 0 0 var(--flag); }
+.chartcard { padding: 12px 12px 4px; }
+.chart { width: 100%; height: auto; display: block; }
+.chart .cbar { fill: var(--green); }
+.chart .cbar.top { fill: var(--flag); }
+.chart .g { stroke: var(--line); stroke-width: .5; }
+.chart .avg { stroke: var(--pine); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.chart text { font: 600 10px -apple-system, system-ui, sans-serif; fill: var(--sub); }
+.chart text.v { fill: var(--ink, #111); font-size: 11px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121652"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121702"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1297,8 +1304,47 @@ button.hsub svg { width: 14px; height: 14px; opacity: .8; }
     return { hole, hardest, easiest, birdies, scratches, streak, bestNine, comeback, blowup };
   }
 
+  /**
+   * One golfer's numbers across rounds. entries: [{ total, pos, kb, holes }], where holes is
+   * [{ par, gross, points }] for rounds scored hole by hole and null for imported totals.
+   */
+  function playerSummary(entries) {
+    const totals = entries.map(e => e.total);
+    const out = {
+      rounds: entries.length,
+      average: totals.length ? totals.reduce((a, b) => a + b, 0) / totals.length : null,
+      best: totals.length ? Math.max(...totals) : null,
+      worst: totals.length ? Math.min(...totals) : null,
+      wins: entries.filter(e => e.pos === 1).length,
+      kbs: entries.filter(e => e.kb).length,
+      scored: 0, eagles: 0, birdies: 0, pars: 0, bogeys: 0, doubles: 0, scratches: 0,
+      byPar: { 3: null, 4: null, 5: null }
+    };
+    const acc = { 3: [0, 0], 4: [0, 0], 5: [0, 0] };
+    entries.forEach(e => {
+      if (!e.holes) return;
+      out.scored += 1;
+      e.holes.forEach(h => {
+        if (h.gross === null || h.gross === undefined) return;
+        const m = scoreMark(h.gross, h.par);
+        if (m === 'eagle') out.eagles++; else if (m === 'birdie') out.birdies++; else if (m === 'par') out.pars++;
+        else if (m === 'bogey') out.bogeys++; else if (m === 'double') out.doubles++; else if (m === 'pu') out.scratches++;
+        if (acc[h.par] && h.points !== null) { acc[h.par][0] += h.points; acc[h.par][1] += 1; }
+      });
+    });
+    [3, 4, 5].forEach(k => { if (acc[k][1]) out.byPar[k] = acc[k][0] / acc[k][1]; });
+    return out;
+  }
+
+  /** The KBs of a round: the last-placed row of the KB table, plus anyone level with it. */
+  function kbLowest(rows) {
+    if (!rows || rows.length < 2) return [];
+    const last = rows[rows.length - 1];
+    return last.pos !== undefined ? rows.filter(r => r.pos === last.pos) : [last];
+  }
+
   return {
-    SEGMENTS, roundStats, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
+    SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,
@@ -2223,6 +2269,26 @@ function pointsOf(rid) {
   const res = resultsOf(rid);
   return res ? Object.fromEntries(res.rows.map(x => [x.id, x.total])) : {};
 }
+
+/* The KBs of a round: the pair at the bottom of the KB table. */
+function kbLowOf(rid) { const res = resultsOf(rid); return res ? E.kbLowest(res.kb) : []; }
+/* One golfer's finished rounds, oldest first, ready for E.playerSummary. */
+function playerEntries(pid, season) {
+  return memo('pe:' + pid + ':' + (season || 'all'), () => D.rounds().filter(r => r.status === 'final' && !isDemo(r) && (!season || r.season === season))
+    .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')) || (a.seq || 0) - (b.seq || 0)).map(r => {
+      const res = resultsOf(r.id);
+      const row = res && res.rows.find(x => x.id === pid);
+      if (!row) return null;
+      const holes = holesOf(r);
+      const pl = res.comp && res.comp.players[pid];
+      return {
+        rid: r.id, name: roundName(r), date: r.date, total: row.total, pos: row.pos, posLabel: row.posLabel,
+        kb: kbLowOf(r.id).some(k => k.pair && k.pair.includes(pid)),
+        holes: pl && holes ? holes.map(h => ({ par: h.par, gross: pl.holes[h.n].gross, points: pl.holes[h.n].points })) : null
+      };
+    }).filter(Boolean));
+}
+const playerStats = (pid, season) => E.playerSummary(playerEntries(pid, season));
 /* The season on show: the latest one with a finished round (a round booked for next year does not move it on). */
 const seasonOf = () => { const s = D.rounds().filter(r => r.season && !isDemo(r) && r.status !== 'upcoming').map(r => r.season); return s.length ? Math.max(...s) : new Date().getFullYear(); };
 const seasonRounds = season => D.rounds().filter(r => r.season === season && !isDemo(r));
@@ -2365,6 +2431,7 @@ VIEWS.home = () => {
     ${tripTile}
     ${tile('rounds', ICON.history, 'Past rounds', played.length ? `${played.length} played` : 'None played yet')}
     ${tile('goy', ICON.trophy, 'Golfer of the Year', lead ? `${esc(lead.name)} leads on ${lead.total}` : 'Best ' + D.goyBest() + ' scores count')}
+    ${tile('stats', ICON.history, 'Stats', 'KBs, birdies, averages')}
     ${tile('players', ICON.users, 'Players', plural(D.active().length, 'golfer'))}
   </div>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
@@ -2490,7 +2557,7 @@ function resultsBlock(r) {
     return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')) + (res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : res.source === 'sheet' ? '<p class="cap note">From the society sheet</p>' : ''));
   if (res.kb.length) {
-    html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join('')));
+    { const low = E.kbLowest(res.kb); html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''))); }
   }
   if (app && res.comp) {
     const comp = res.comp;
@@ -2500,8 +2567,6 @@ function resultsBlock(r) {
         `<div class="row"><span class="sub">${esc(gc.labels[0].long)} v ${esc(gc.labels[1].long)}</span></div>` +
         ['front', 'back', 'overall'].map(s => `<div class="row"><span>${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('')
       )).join('<div style="height:8px"></div>'));
-      const lows = comp.pairs.filter(p => p.lowest);
-      if (lows.length) html += sec(label('First round of drinks'), cardOf(lows.map(p => `<div class="row"><span>${esc(p.label)}</span><span class="right"><span class="pill w">Buying</span><span class="b num">${p.total}</span></span></div>`).join('')));
     }
   }
   const contests = res.contests.filter(c => c.winner !== undefined);
@@ -2555,6 +2620,56 @@ VIEWS.round = p => {
 };
 
 /* ----- A player ----- */
+
+/* ----- Stats: one golfer, and the whole society ----- */
+const fmt1 = v => v === null || v === undefined ? '–' : (Math.round(v * 10) / 10).toLocaleString('en-IE', { minimumFractionDigits: Number.isInteger(Math.round(v * 10) / 10) ? 0 : 1 });
+function scoreChart(entries, avg) {
+  const W = 340, H = 150, padL = 26, padB = 22, padT = 10, n = entries.length;
+  const max = Math.max(36, ...entries.map(e => e.total)), step = n > 1 ? (W - padL) / n : W - padL, bw = Math.min(34, step * 0.62);
+  const y = v => padT + (H - padT - padB) * (1 - v / max);
+  const bars = entries.map((e, i) => {
+    const x = padL + step * i + (step - bw) / 2;
+    return `<rect class="cbar${e.total === Math.max(...entries.map(z => z.total)) ? ' top' : ''}" x="${x.toFixed(1)}" y="${y(e.total).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H - padB - y(e.total)).toFixed(1)}" rx="4"/><text class="v" x="${(x + bw / 2).toFixed(1)}" y="${(y(e.total) - 4).toFixed(1)}" text-anchor="middle">${e.total}</text><text class="l" x="${(x + bw / 2).toFixed(1)}" y="${H - 6}" text-anchor="middle">${esc(shortRound(e))}</text>`;
+  }).join('');
+  const grid = [0, 18, 36].filter(v => v <= max).map(v => `<line class="g" x1="${padL}" x2="${W}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/><text class="a" x="${padL - 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end">${v}</text>`).join('');
+  const aveLine = avg === null ? '' : `<line class="avg" x1="${padL}" x2="${W}" y1="${y(avg).toFixed(1)}" y2="${y(avg).toFixed(1)}"/>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Stableford points in each round, average ${fmt1(avg)}">${grid}${bars}${aveLine}</svg>`;
+}
+const shortRound = e => { const w = String(e.name || '').replace(/\b(GC|Golf Club|Golf Links|Golf)\b/g, '').trim().split(/\s+/)[0] || ''; return w.length > 6 ? w.slice(0, 5) + '.' : w; };
+function statRow(label, value, sub) { return `<div class="row"><span>${label}${sub ? `<span class="sub"> ${sub}</span>` : ''}</span><span class="b num">${value}</span></div>`; }
+function playerStatsBlock(pid) {
+  const entries = playerEntries(pid);
+  if (!entries.length) return '';
+  const st = E.playerSummary(entries);
+  let html = sec(label('Scores'), `<div class="card chartcard">${scoreChart(entries, st.average)}<p class="cap note">Stableford points in each round. The dashed line is the average, ${fmt1(st.average)}.</p></div>`);
+  const rows = [statRow('Rounds played', st.rounds), statRow('Average', fmt1(st.average)), statRow('Best round', st.best), statRow('Lowest round', st.worst), statRow('Wins', st.wins), statRow('KBs', st.kbs)];
+  html += sec(label('Numbers'), cardOf(rows.join('')));
+  if (st.scored) {
+    const holeRows = [statRow('Eagles', st.eagles), statRow('Birdies', st.birdies), statRow('Pars', st.pars), statRow('Bogeys', st.bogeys), statRow('Double bogey or worse', st.doubles), statRow('Holes picked up', st.scratches)];
+    const par = [3, 4, 5].filter(k => st.byPar[k] !== null).map(k => statRow(`Par ${k}s`, fmt1(st.byPar[k]), 'avg points'));
+    html += sec(label(`Hole by hole · ${plural(st.scored, 'round')}`), cardOf(holeRows.concat(par).join('')));
+  }
+  return html;
+}
+VIEWS.stats = () => {
+  const yr = yearOn();
+  const members = D.active();
+  const all = members.map(m => ({ id: m.id, name: m.name, st: E.playerSummary(playerEntries(m.id, yr)) })).filter(x => x.st.rounds);
+  const board = (title, key, unit, min) => {
+    const rows = all.filter(x => x.st[key] > (min || 0)).sort((a, b) => b.st[key] - a.st[key] || a.name.localeCompare(b.name));
+    if (!rows.length) return '';
+    return sec(label(title), cardOf(rows.map(x => `<button class="lrow" data-act="player" data-pid="${x.id}"><span></span><span>${esc(x.name)}</span><span class="b r">${x.st[key]}${unit || ''}</span></button>`).join('')));
+  };
+  const avg = all.filter(x => x.st.rounds >= 1).sort((a, b) => b.st.average - a.st.average || a.name.localeCompare(b.name));
+  let html = `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Stats</h1></div><p class="sub">Tap a name for their own numbers</p>${yearPicker()}</header>`;
+  if (!all.length) return { html: html + sec('', '<div class="prose">Stats appear once a round has been played.</div>') };
+  html += board('KBs', 'kbs');
+  html += board('Round wins', 'wins');
+  html += board('Birdies', 'birdies');
+  html += sec(label('Average points'), cardOf(avg.map(x => `<button class="lrow" data-act="player" data-pid="${x.id}"><span></span><span>${esc(x.name)}</span><span class="b r">${fmt1(x.st.average)}</span></button>`).join('')));
+  return { html };
+};
+
 VIEWS.player = p => {
   const m = D.member(p.pid);
   if (!m) return { html: `${navBack('Back')}<div class="head"><h1 class="title">Not found</h1></div>` };
@@ -2577,6 +2692,7 @@ VIEWS.player = p => {
     const tag = yr === season && counting.includes(r.id) ? '<span class="pill g">Counts</span>' : '';
     return `<button class="row tall" ${act}><span class="two"><span>${esc(roundName(r))}</span><span class="sub">${esc(sub)}</span></span><span class="right">${tag}<span class="b num">${me.total}</span>${chev}</span></button>`;
   }).filter(Boolean);
+  html += playerStatsBlock(m.id);
   const years = [season, ...seasonsList().filter(y => y !== season)];
   years.forEach(yr => {
     const rows = rowsFor(yr);
@@ -3342,15 +3458,7 @@ VIEWS.board = () => {
     const inner = `<span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
     return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')), true);
-  if (res.kb.length) html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join('')));
-  if (comp && comp.groups.some(g => g.teams.length === 2)) {
-    const final = r.status === 'final';
-    const lowCount = comp.pairs.filter(p => p.lowest).length;
-    html += sec(label('First round of drinks'), cardOf(comp.pairs.map(p => {
-      const tag = p.lowest ? `<span class="pill w">${lowCount > 1 ? 'Level' : final ? 'Buying' : 'Buying so far'}</span>` : '';
-      return `<div class="row"><span>${esc(p.label)}</span><span class="right">${tag}<span class="b num">${p.total}</span></span></div>`;
-    }).join('')));
-  }
+  if (res.kb.length) { const low = E.kbLowest(res.kb); html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''))); }
   html += `<button class="btn quiet" data-act="results" data-rid="${sel}">Share results</button>`;
   html += `<div class="foot"><button class="link" data-act="home">${esc(D.society())}</button><button class="link" data-act="org">Organiser</button></div>`;
   return { tabs: 'board', html };
@@ -3391,7 +3499,7 @@ VIEWS.results = p => {
   const final = r.status === 'final';
   const names = leaders.map(x => x.name).join(' and ');
   const headline = final ? (leaders.length > 1 ? `${names} tie on ${top.total}` : `${top.name} wins with ${top.total}`) : (leaders.length > 1 ? `${names} lead on ${top.total}` : `${top.name} leads on ${top.total}`);
-  let moneyRows = '', drinks = '';
+  let moneyRows = '';
   if (res.comp) {
     const money = {};
     res.comp.groups.filter(g => g.teams.length === 2).forEach(gc => ['front', 'back', 'overall'].forEach(s => {
@@ -3399,18 +3507,15 @@ VIEWS.results = p => {
       if (w) { const k = gc.labels[w === 'A' ? 0 : 1].long; money[k] = (money[k] || 0) + 5; }
     }));
     moneyRows = Object.keys(money).sort((a, b) => money[b] - money[a]).map(k => `<div class="ln"><span>${esc(k)}</span><span class="b">€${money[k]}</span></div>`).join('');
-    const lows = res.comp.pairs.filter(pp => pp.lowest);
-    if (lows.length && res.comp.groups.some(g => g.teams.length === 2)) drinks = `<div class="blk drinks"><div class="cap">First round${final ? '' : ' so far'}</div><div class="ln"><span class="b">${esc(lows.map(pp => pp.label).join(' and '))}</span><span>${lows[0].total}</span></div></div>`;
   }
   const minThru = res.comp ? Math.min(...res.comp.groups.map(g => g.holesDone)) : 18;
   const contests = res.contests.map(c => `<div class="ln"><span class="sub">${CONTEST[c.type]}${c.hole ? ' ' + c.hole : ''}</span><span>${c.winner ? esc(D.nameOf(c.winner)) : c.lead ? `${esc(D.nameOf(c.lead.pid))} <span class="sub">to confirm</span>` : '–'}</span></div>`).join('');
-  const kb = res.kb.length ? `<div class="blk"><div class="cap">KBs</div>${res.kb.filter(k => k.posLabel === '1' || k.posLabel === 'T1').map(k => `<div class="ln"><span>${esc(k.name)}</span><span class="b">${k.total}</span></div>`).join('')}</div>` : '';
+  const kb = E.kbLowest(res.kb).length ? `<div class="blk"><div class="cap">KBs</div>${E.kbLowest(res.kb).map(k => `<div class="ln"><span>${esc(k.name)}</span><span class="b">${k.total}</span></div>`).join('')}</div>` : '';
   const card = `<div class="rcard" id="rcard">
     <div class="top"><div class="cap">${esc(D.society())} · ${esc(roundName(r))}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''} · ${final ? 'Final' : `Thru ${minThru}`}</div><div class="title">${esc(headline)}</div></div>
     <div class="blk">${lb.filter(x => x.pos <= 5).map(x => `<div class="ln"><span><span class="sub" style="display:inline-block;width:32px">${x.posLabel}</span>${esc(x.name)}</span><span class="b">${x.total}</span></div>`).join('')}</div>
     ${kb}
     ${moneyRows ? `<div class="blk"><div class="cap">Buggy Wars</div>${moneyRows}</div>` : ''}
-    ${drinks}
     ${contests ? `<div class="blk">${contests}</div>` : ''}
     ${isDemo(r) ? '<div class="blk cap">Demo scores</div>' : ''}
   </div>`;
@@ -4084,6 +4189,7 @@ const ACT = {
   player: el => go('player', { pid: el.dataset.pid }),
   card: el => go('card', { rid: el.dataset.rid, pid: el.dataset.pid }),
   goy: () => go('goy'),
+  stats: () => go('stats'),
   players: () => go('players'),
   rounds: () => go('rounds'),
   who: () => go('who', { then: null }),

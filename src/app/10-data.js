@@ -313,6 +313,26 @@ function pointsOf(rid) {
   const res = resultsOf(rid);
   return res ? Object.fromEntries(res.rows.map(x => [x.id, x.total])) : {};
 }
+
+/* The KBs of a round: the pair at the bottom of the KB table. */
+function kbLowOf(rid) { const res = resultsOf(rid); return res ? E.kbLowest(res.kb) : []; }
+/* One golfer's finished rounds, oldest first, ready for E.playerSummary. */
+function playerEntries(pid, season) {
+  return memo('pe:' + pid + ':' + (season || 'all'), () => D.rounds().filter(r => r.status === 'final' && !isDemo(r) && (!season || r.season === season))
+    .sort((a, b) => String(a.date || '').localeCompare(String(b.date || '')) || (a.seq || 0) - (b.seq || 0)).map(r => {
+      const res = resultsOf(r.id);
+      const row = res && res.rows.find(x => x.id === pid);
+      if (!row) return null;
+      const holes = holesOf(r);
+      const pl = res.comp && res.comp.players[pid];
+      return {
+        rid: r.id, name: roundName(r), date: r.date, total: row.total, pos: row.pos, posLabel: row.posLabel,
+        kb: kbLowOf(r.id).some(k => k.pair && k.pair.includes(pid)),
+        holes: pl && holes ? holes.map(h => ({ par: h.par, gross: pl.holes[h.n].gross, points: pl.holes[h.n].points })) : null
+      };
+    }).filter(Boolean));
+}
+const playerStats = (pid, season) => E.playerSummary(playerEntries(pid, season));
 /* The season on show: the latest one with a finished round (a round booked for next year does not move it on). */
 const seasonOf = () => { const s = D.rounds().filter(r => r.season && !isDemo(r) && r.status !== 'upcoming').map(r => r.season); return s.length ? Math.max(...s) : new Date().getFullYear(); };
 const seasonRounds = season => D.rounds().filter(r => r.season === season && !isDemo(r));

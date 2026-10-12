@@ -696,15 +696,7 @@ VIEWS.board = () => {
     const inner = `<span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
     return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')), true);
-  if (res.kb.length) html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join('')));
-  if (comp && comp.groups.some(g => g.teams.length === 2)) {
-    const final = r.status === 'final';
-    const lowCount = comp.pairs.filter(p => p.lowest).length;
-    html += sec(label('First round of drinks'), cardOf(comp.pairs.map(p => {
-      const tag = p.lowest ? `<span class="pill w">${lowCount > 1 ? 'Level' : final ? 'Buying' : 'Buying so far'}</span>` : '';
-      return `<div class="row"><span>${esc(p.label)}</span><span class="right">${tag}<span class="b num">${p.total}</span></span></div>`;
-    }).join('')));
-  }
+  if (res.kb.length) { const low = E.kbLowest(res.kb); html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''))); }
   html += `<button class="btn quiet" data-act="results" data-rid="${sel}">Share results</button>`;
   html += `<div class="foot"><button class="link" data-act="home">${esc(D.society())}</button><button class="link" data-act="org">Organiser</button></div>`;
   return { tabs: 'board', html };
@@ -745,7 +737,7 @@ VIEWS.results = p => {
   const final = r.status === 'final';
   const names = leaders.map(x => x.name).join(' and ');
   const headline = final ? (leaders.length > 1 ? `${names} tie on ${top.total}` : `${top.name} wins with ${top.total}`) : (leaders.length > 1 ? `${names} lead on ${top.total}` : `${top.name} leads on ${top.total}`);
-  let moneyRows = '', drinks = '';
+  let moneyRows = '';
   if (res.comp) {
     const money = {};
     res.comp.groups.filter(g => g.teams.length === 2).forEach(gc => ['front', 'back', 'overall'].forEach(s => {
@@ -753,18 +745,15 @@ VIEWS.results = p => {
       if (w) { const k = gc.labels[w === 'A' ? 0 : 1].long; money[k] = (money[k] || 0) + 5; }
     }));
     moneyRows = Object.keys(money).sort((a, b) => money[b] - money[a]).map(k => `<div class="ln"><span>${esc(k)}</span><span class="b">€${money[k]}</span></div>`).join('');
-    const lows = res.comp.pairs.filter(pp => pp.lowest);
-    if (lows.length && res.comp.groups.some(g => g.teams.length === 2)) drinks = `<div class="blk drinks"><div class="cap">First round${final ? '' : ' so far'}</div><div class="ln"><span class="b">${esc(lows.map(pp => pp.label).join(' and '))}</span><span>${lows[0].total}</span></div></div>`;
   }
   const minThru = res.comp ? Math.min(...res.comp.groups.map(g => g.holesDone)) : 18;
   const contests = res.contests.map(c => `<div class="ln"><span class="sub">${CONTEST[c.type]}${c.hole ? ' ' + c.hole : ''}</span><span>${c.winner ? esc(D.nameOf(c.winner)) : c.lead ? `${esc(D.nameOf(c.lead.pid))} <span class="sub">to confirm</span>` : '–'}</span></div>`).join('');
-  const kb = res.kb.length ? `<div class="blk"><div class="cap">KBs</div>${res.kb.filter(k => k.posLabel === '1' || k.posLabel === 'T1').map(k => `<div class="ln"><span>${esc(k.name)}</span><span class="b">${k.total}</span></div>`).join('')}</div>` : '';
+  const kb = E.kbLowest(res.kb).length ? `<div class="blk"><div class="cap">KBs</div>${E.kbLowest(res.kb).map(k => `<div class="ln"><span>${esc(k.name)}</span><span class="b">${k.total}</span></div>`).join('')}</div>` : '';
   const card = `<div class="rcard" id="rcard">
     <div class="top"><div class="cap">${esc(D.society())} · ${esc(roundName(r))}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''} · ${final ? 'Final' : `Thru ${minThru}`}</div><div class="title">${esc(headline)}</div></div>
     <div class="blk">${lb.filter(x => x.pos <= 5).map(x => `<div class="ln"><span><span class="sub" style="display:inline-block;width:32px">${x.posLabel}</span>${esc(x.name)}</span><span class="b">${x.total}</span></div>`).join('')}</div>
     ${kb}
     ${moneyRows ? `<div class="blk"><div class="cap">Buggy Wars</div>${moneyRows}</div>` : ''}
-    ${drinks}
     ${contests ? `<div class="blk">${contests}</div>` : ''}
     ${isDemo(r) ? '<div class="blk cap">Demo scores</div>' : ''}
   </div>`;

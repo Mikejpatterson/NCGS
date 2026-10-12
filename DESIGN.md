@@ -121,11 +121,11 @@ The group still keeps a paper card. The app checks the two against each other at
   - Round and Trip switcher.
   - Status pill: "Thru 14" or "Final".
   - Stableford points, with ties shown as T3.
-  - "First round of drinks": buggy totals, with the lowest marked "Buying so far" or "Buying".
+  - KBs: the table is highlighted on its bottom row, the lowest score. No drinks wording anywhere.
   - Contests.
   - "Share results".
   - The organiser link.
-- **Results card:** headline, top five, Buggy Wars money, drinks pair, contests, and the "Demo scores" label.
+- **Results card:** headline, top five, KBs, Buggy Wars money, contests, and the "Demo scores" label.
 - **Card after 18:** points per player, Buggy Wars results, then "Submit card".
 
 ## Organiser

@@ -77,6 +77,7 @@ VIEWS.home = () => {
     ${tripTile}
     ${tile('rounds', ICON.history, 'Past rounds', played.length ? `${played.length} played` : 'None played yet')}
     ${tile('goy', ICON.trophy, 'Golfer of the Year', lead ? `${esc(lead.name)} leads on ${lead.total}` : 'Best ' + D.goyBest() + ' scores count')}
+    ${tile('stats', ICON.history, 'Stats', 'KBs, birdies, averages')}
     ${tile('players', ICON.users, 'Players', plural(D.active().length, 'golfer'))}
   </div>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
@@ -202,7 +203,7 @@ function resultsBlock(r) {
     return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')) + (res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : res.source === 'sheet' ? '<p class="cap note">From the society sheet</p>' : ''));
   if (res.kb.length) {
-    html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join('')));
+    { const low = E.kbLowest(res.kb); html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''))); }
   }
   if (app && res.comp) {
     const comp = res.comp;
@@ -212,8 +213,6 @@ function resultsBlock(r) {
         `<div class="row"><span class="sub">${esc(gc.labels[0].long)} v ${esc(gc.labels[1].long)}</span></div>` +
         ['front', 'back', 'overall'].map(s => `<div class="row"><span>${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('')
       )).join('<div style="height:8px"></div>'));
-      const lows = comp.pairs.filter(p => p.lowest);
-      if (lows.length) html += sec(label('First round of drinks'), cardOf(lows.map(p => `<div class="row"><span>${esc(p.label)}</span><span class="right"><span class="pill w">Buying</span><span class="b num">${p.total}</span></span></div>`).join('')));
     }
   }
   const contests = res.contests.filter(c => c.winner !== undefined);
@@ -267,6 +266,56 @@ VIEWS.round = p => {
 };
 
 /* ----- A player ----- */
+
+/* ----- Stats: one golfer, and the whole society ----- */
+const fmt1 = v => v === null || v === undefined ? '–' : (Math.round(v * 10) / 10).toLocaleString('en-IE', { minimumFractionDigits: Number.isInteger(Math.round(v * 10) / 10) ? 0 : 1 });
+function scoreChart(entries, avg) {
+  const W = 340, H = 150, padL = 26, padB = 22, padT = 10, n = entries.length;
+  const max = Math.max(36, ...entries.map(e => e.total)), step = n > 1 ? (W - padL) / n : W - padL, bw = Math.min(34, step * 0.62);
+  const y = v => padT + (H - padT - padB) * (1 - v / max);
+  const bars = entries.map((e, i) => {
+    const x = padL + step * i + (step - bw) / 2;
+    return `<rect class="cbar${e.total === Math.max(...entries.map(z => z.total)) ? ' top' : ''}" x="${x.toFixed(1)}" y="${y(e.total).toFixed(1)}" width="${bw.toFixed(1)}" height="${(H - padB - y(e.total)).toFixed(1)}" rx="4"/><text class="v" x="${(x + bw / 2).toFixed(1)}" y="${(y(e.total) - 4).toFixed(1)}" text-anchor="middle">${e.total}</text><text class="l" x="${(x + bw / 2).toFixed(1)}" y="${H - 6}" text-anchor="middle">${esc(shortRound(e))}</text>`;
+  }).join('');
+  const grid = [0, 18, 36].filter(v => v <= max).map(v => `<line class="g" x1="${padL}" x2="${W}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/><text class="a" x="${padL - 6}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end">${v}</text>`).join('');
+  const aveLine = avg === null ? '' : `<line class="avg" x1="${padL}" x2="${W}" y1="${y(avg).toFixed(1)}" y2="${y(avg).toFixed(1)}"/>`;
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Stableford points in each round, average ${fmt1(avg)}">${grid}${bars}${aveLine}</svg>`;
+}
+const shortRound = e => { const w = String(e.name || '').replace(/\b(GC|Golf Club|Golf Links|Golf)\b/g, '').trim().split(/\s+/)[0] || ''; return w.length > 6 ? w.slice(0, 5) + '.' : w; };
+function statRow(label, value, sub) { return `<div class="row"><span>${label}${sub ? `<span class="sub"> ${sub}</span>` : ''}</span><span class="b num">${value}</span></div>`; }
+function playerStatsBlock(pid) {
+  const entries = playerEntries(pid);
+  if (!entries.length) return '';
+  const st = E.playerSummary(entries);
+  let html = sec(label('Scores'), `<div class="card chartcard">${scoreChart(entries, st.average)}<p class="cap note">Stableford points in each round. The dashed line is the average, ${fmt1(st.average)}.</p></div>`);
+  const rows = [statRow('Rounds played', st.rounds), statRow('Average', fmt1(st.average)), statRow('Best round', st.best), statRow('Lowest round', st.worst), statRow('Wins', st.wins), statRow('KBs', st.kbs)];
+  html += sec(label('Numbers'), cardOf(rows.join('')));
+  if (st.scored) {
+    const holeRows = [statRow('Eagles', st.eagles), statRow('Birdies', st.birdies), statRow('Pars', st.pars), statRow('Bogeys', st.bogeys), statRow('Double bogey or worse', st.doubles), statRow('Holes picked up', st.scratches)];
+    const par = [3, 4, 5].filter(k => st.byPar[k] !== null).map(k => statRow(`Par ${k}s`, fmt1(st.byPar[k]), 'avg points'));
+    html += sec(label(`Hole by hole · ${plural(st.scored, 'round')}`), cardOf(holeRows.concat(par).join('')));
+  }
+  return html;
+}
+VIEWS.stats = () => {
+  const yr = yearOn();
+  const members = D.active();
+  const all = members.map(m => ({ id: m.id, name: m.name, st: E.playerSummary(playerEntries(m.id, yr)) })).filter(x => x.st.rounds);
+  const board = (title, key, unit, min) => {
+    const rows = all.filter(x => x.st[key] > (min || 0)).sort((a, b) => b.st[key] - a.st[key] || a.name.localeCompare(b.name));
+    if (!rows.length) return '';
+    return sec(label(title), cardOf(rows.map(x => `<button class="lrow" data-act="player" data-pid="${x.id}"><span></span><span>${esc(x.name)}</span><span class="b r">${x.st[key]}${unit || ''}</span></button>`).join('')));
+  };
+  const avg = all.filter(x => x.st.rounds >= 1).sort((a, b) => b.st.average - a.st.average || a.name.localeCompare(b.name));
+  let html = `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Stats</h1></div><p class="sub">Tap a name for their own numbers</p>${yearPicker()}</header>`;
+  if (!all.length) return { html: html + sec('', '<div class="prose">Stats appear once a round has been played.</div>') };
+  html += board('KBs', 'kbs');
+  html += board('Round wins', 'wins');
+  html += board('Birdies', 'birdies');
+  html += sec(label('Average points'), cardOf(avg.map(x => `<button class="lrow" data-act="player" data-pid="${x.id}"><span></span><span>${esc(x.name)}</span><span class="b r">${fmt1(x.st.average)}</span></button>`).join('')));
+  return { html };
+};
+
 VIEWS.player = p => {
   const m = D.member(p.pid);
   if (!m) return { html: `${navBack('Back')}<div class="head"><h1 class="title">Not found</h1></div>` };
@@ -289,6 +338,7 @@ VIEWS.player = p => {
     const tag = yr === season && counting.includes(r.id) ? '<span class="pill g">Counts</span>' : '';
     return `<button class="row tall" ${act}><span class="two"><span>${esc(roundName(r))}</span><span class="sub">${esc(sub)}</span></span><span class="right">${tag}<span class="b num">${me.total}</span>${chev}</span></button>`;
   }).filter(Boolean);
+  html += playerStatsBlock(m.id);
   const years = [season, ...seasonsList().filter(y => y !== season)];
   years.forEach(yr => {
     const rows = rowsFor(yr);

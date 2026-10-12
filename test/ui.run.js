@@ -148,7 +148,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   t = await text();
   check('one Results tab bar, no separate Buggy tab', (await page.$$('.tab')).length === 3 && !(await page.$('.tab[data-tab="match"]')) && /Results/.test(t));
   check('Results has Leaderboard, Buggy Wars, Contests and Stats pills, Leaderboard first', JSON.stringify(await page.$$eval('.pills button', b => b.map(x => x.textContent.trim()))) === JSON.stringify(['Leaderboard', 'Buggy Wars', 'Contests', 'Stats']) && await page.$eval('.pills button.on', e => e.textContent.trim()) === 'Leaderboard');
-  check('leaderboard: Stableford, KBs, drinks (contests are on their own pill)', /Stableford|Demo round/.test(t) && /KBs/.test(t) && /First round of drinks/.test(t) && !/Nearest the pin/.test(t));
+  check('leaderboard: Stableford and KBs, no drinks (contests are on their own pill)', /Stableford|Demo round/.test(t) && /KBs/.test(t) && !/drinks|Buying/i.test(t) && !/Nearest the pin/.test(t));
   await tap('[data-act="respill"][data-p="bw"]');
   t = await text();
   check('Buggy Wars board with front/back/overall', /Front nine/.test(t) && /Overall/.test(t));
