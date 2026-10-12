@@ -41,16 +41,28 @@ VIEWS.tee = () => {
   const clashRows = [...new Set(clash.map(c => c.hole))].map(hn => `<button class="row" data-act="conflict" data-n="${hn}"><span>Hole ${hn}</span><span class="right"><span class="pill w">Saved on two phones</span>${chev}</span></button>`).join('');
   return {
     tabs: 'hole',
-    html: `<div class="tee"><header class="hero c"><div class="hrow2"><h1 class="big"><small>Hole</small>${n}</h1>${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></div>
+    html: `<div class="tee"><header class="hero c"><div class="hrow2"><button class="back-icon" data-act="home" aria-label="Home">${ICON.back}</button><h1 class="big"><button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${n}"><small>Hole</small>${n}<span class="hdown">${ICON.down}</span></button></h1>${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></div>
       <div class="pills2"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span>${h.yards ? `<span class="fact">${h.yards}<b>yds</b></span>` : ''}${contest ? `<span class="pill flag">${CONTEST[contest.type]}</span>` : ''}</div></header>
       ${clashRows ? sec('', cardOf(clashRows), true) : ''}
       ${teams}
       ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span class="sub">${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
       ${checkRows ? sec('', cardOf(checkRows)) : ''}
       <button class="btn" data-act="enter"${checkRows ? ' style="margin-top:16px"' : ''}>${hasDraft ? 'Continue scores' : 'Enter scores'}</button>
-      ${saveWarning()}</div>`
+      ${saveWarning()}</div>${holesSheet(rid, gc, null)}`
   };
 };
+// "Go to hole": every hole at once. Scored holes are filled, the next one to play is ringed, the one on screen is outlined.
+function holesSheet(rid, gc, here) {
+  if (!UI.holeSheet) return '';
+  const seg = (name, list) => `<div class="hs-lab">${name}</div><div class="hs-grid">${list.map(n => {
+    const hr = gc.holes[n], next = n === gc.nextHole;
+    return `<button class="hs${hr.complete ? ' done' : ''}${next ? ' nxt' : ''}${n === here ? ' here' : ''}" data-act="goto-hole" data-n="${n}" aria-label="Hole ${n}${hr.complete ? ', scored. Tap to change it' : next ? ', next to play' : ''}">${n}</button>`;
+  }).join('')}</div>`;
+  return `<div class="scrim" data-act="holes-scrim"><div class="sheet hs-sheet" role="dialog" aria-label="Go to a hole">
+    <div class="nav"><span class="b">Go to hole</span><button class="link" data-act="holes-close">Done</button></div>
+    ${seg('Front nine', E.SEGMENTS.front)}${seg('Back nine', E.SEGMENTS.back)}
+    <div class="cap hs-key"><span class="hs-ki"><i class="hs-k done"></i>Scored</span><span class="hs-ki"><i class="hs-k nxt"></i>Next to play</span><span class="hs-tip">Tap a scored hole to change it.</span></div></div></div>`;
+}
 function saveWarning() {
   if (!DB.saveOk) return '<p class="err" style="text-align:center">This phone is not saving. Keep this screen open.</p>';
   if (DB.outbox.length && !DB.online) return `<p class="cap" style="text-align:center;margin-top:12px">No signal · ${plural(DB.outbox.filter(i => i.req.op === 'saveHole').length || DB.outbox.length, 'save')} waiting on this phone</p>`;
@@ -129,7 +141,7 @@ VIEWS.entry = () => {
   const buggies = gc.teams.length === 2;
   let html = '<div class="entry">';
   if (ctx.mode === 'org') html += `<p class="cap">Correcting group ${gc.n}</p>`;
-  html += `<header class="hero c"><div class="hrow2"><button class="back-icon" data-act="entry-back" aria-label="Back">${ICON.back}</button><h1 class="big"><small>Hole</small>${ctx.n}</h1><span class="facts"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span></span></div></header>`;
+  html += `<header class="hero c"><div class="hrow2"><button class="back-icon" data-act="entry-back" aria-label="Back">${ICON.back}</button><h1 class="big">${ctx.mode === 'org' ? `<small>Hole</small>${ctx.n}` : `<button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${ctx.n}"><small>Hole</small>${ctx.n}<span class="hdown">${ICON.down}</span></button>`}</h1><span class="facts"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span></span></div></header>`;
   if (final) html += `<div class="banner" style="margin-top:12px">This round is final.</div>${ctx.mode === 'org' ? '<button class="btn quiet" data-act="reopen">Reopen round</button>' : ''}`;
   const clash = DB.conflicts.filter(c => c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n);
   if (clash.length) html += `<div class="banner" style="margin-top:12px">Another phone saved ${clash.map(c => `${esc(D.nameOf(c.player))} ${fmtGross(c.server)}`).join(', ')}</div>`;
@@ -153,6 +165,7 @@ VIEWS.entry = () => {
         `<button class="row" data-act="claim" data-pid=""><span>${lead ? 'Nobody closer' : 'Nobody'}</span>${!d._claim ? tickMark : ''}</button>`)}
     </div></div>`;
   }
+  if (ctx.mode === 'player') html += holesSheet(ctx.rid, gc, ctx.n);
   return { html };
 };
 

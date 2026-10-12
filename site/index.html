@@ -624,9 +624,28 @@ body.hearing .askbar .arow .x, body.hearing .askbar .arow .stop, body.hearing .a
 .askbar textarea.over { -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 26px); mask-image: linear-gradient(to bottom, transparent 0, #000 26px); }
 .askbar .mirror { position: absolute; left: 6px; right: 6px; top: 0; width: auto; height: 0; min-height: 0; max-height: none; visibility: hidden; pointer-events: none; overflow: hidden; border: 0; resize: none; transition: none; background: none; }
 @media (prefers-reduced-motion: reduce) { .askbar textarea { transition: none; scroll-behavior: auto; } }
+
+/* Go to hole */
+.holebtn { display: inline-flex; align-items: baseline; gap: 8px; min-height: 44px; padding: 0 6px; margin: 0 -6px; background: none; border: 0; color: inherit; font: inherit; letter-spacing: inherit; border-radius: 12px; -webkit-tap-highlight-color: transparent; }
+.holebtn:active { background: rgba(255, 255, 255, .12); }
+.holebtn .hdown { align-self: center; display: inline-flex; color: var(--flag); }
+.holebtn .hdown svg { width: 20px; height: 20px; }
+.hs-sheet { padding-top: 12px; }
+.hs-lab { margin: 14px 2px 8px; font-size: var(--t-cap); font-weight: 700; color: var(--sub); text-transform: uppercase; letter-spacing: .04em; }
+.hs-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.hs { display: grid; place-items: center; text-align: center; padding: 0; min-height: 52px; border-radius: 14px; background: #fff; color: var(--pine); font-size: 1.25rem; font-weight: 700; font-variant-numeric: tabular-nums; box-shadow: 0 0 0 .5px rgba(0,0,0,.08); transition: transform .12s, background-color .15s; }
+.hs:active { transform: scale(.94); }
+.hs.done { background: var(--green); color: #fff; box-shadow: none; }
+.hs.nxt { box-shadow: inset 0 0 0 3px var(--flag); }
+.hs.here { outline: 3px solid var(--pine); outline-offset: 2px; }
+.hs-key { margin: 14px 2px 4px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; }
+.hs-ki { display: inline-flex; align-items: center; gap: 8px; }
+.hs-tip { flex-basis: 100%; }
+.hs-k { width: 14px; height: 14px; border-radius: 5px; background: #fff; box-shadow: 0 0 0 .5px rgba(0,0,0,.2); display: inline-block; }
+.hs-k.done { background: var(--green); box-shadow: none; } .hs-k.nxt { box-shadow: inset 0 0 0 3px var(--flag); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121300"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121438"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1731,6 +1750,7 @@ const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const ICON = {
   back: svg('<path d="M15 5l-7 7 7 7"/>'),
   chev: svg('<path d="M9 5l7 7-7 7"/>'),
+  down: svg('<path d="M6 9l6 6 6-6"/>'),
   x: svg('<path d="M6 6l12 12"/><path d="M18 6L6 18"/>'),
   mic: svg('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/>'),
   send: svg('<path d="M12 19V5"/><path d="M5.5 11.5L12 5l6.5 6.5"/>'),
@@ -2136,19 +2156,19 @@ const UI = {
   stack: [{ v: 'home', p: {} }],
   org: false, orgUnlocked: false, orgStack: [{ v: 'home', p: {} }],
   toast: null, flash: false, contestSheet: false, fix: null, after: null, open: {}, scrollCur: false, scrollTop: false,
-  playRid: null, hole: null, edit: false, matchGroup: null, board: null, res: 'lb', chat: [], chatBusy: false, askDraft: '',
+  playRid: null, hole: null, holeSheet: false, edit: false, matchGroup: null, board: null, res: 'lb', chat: [], chatBusy: false, askDraft: '',
   draft: null, sel: null, testSheet: null, photoFull: null, confirm: null, pinError: false, formError: null,
   wx: {}, shareImg: null, checkSeg: null, photos: {}
 };
 const cur = () => (UI.org ? UI.orgStack : UI.stack)[(UI.org ? UI.orgStack : UI.stack).length - 1];
 const stackOf = () => (UI.org ? UI.orgStack : UI.stack);
-function go(v, p) { stackOf().push({ v, p: p || {} }); UI.scrollTop = true; UI.formError = null; UI.confirm = null; render(); }
-function replaceTop(v, p) { const s = stackOf(); s[s.length - 1] = { v, p: p || {} }; UI.scrollTop = true; UI.formError = null; UI.confirm = null; render(); }
+function go(v, p) { stackOf().push({ v, p: p || {} }); UI.scrollTop = true; UI.formError = null; UI.confirm = null; UI.holeSheet = false; render(); }
+function replaceTop(v, p) { const s = stackOf(); s[s.length - 1] = { v, p: p || {} }; UI.scrollTop = true; UI.formError = null; UI.confirm = null; UI.holeSheet = false; render(); }
 function back() {
   const s = stackOf();
   if (s.length > 1) s.pop();
   else if (UI.org) { UI.org = false; } else s[0] = { v: 'home', p: {} };
-  UI.scrollTop = true; UI.formError = null; UI.confirm = null; UI.contestSheet = false;
+  UI.scrollTop = true; UI.formError = null; UI.confirm = null; UI.contestSheet = false; UI.holeSheet = false;
   render();
 }
 function backTo(pred) {
@@ -2566,16 +2586,28 @@ VIEWS.tee = () => {
   const clashRows = [...new Set(clash.map(c => c.hole))].map(hn => `<button class="row" data-act="conflict" data-n="${hn}"><span>Hole ${hn}</span><span class="right"><span class="pill w">Saved on two phones</span>${chev}</span></button>`).join('');
   return {
     tabs: 'hole',
-    html: `<div class="tee"><header class="hero c"><div class="hrow2"><h1 class="big"><small>Hole</small>${n}</h1>${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></div>
+    html: `<div class="tee"><header class="hero c"><div class="hrow2"><button class="back-icon" data-act="home" aria-label="Home">${ICON.back}</button><h1 class="big"><button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${n}"><small>Hole</small>${n}<span class="hdown">${ICON.down}</span></button></h1>${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></div>
       <div class="pills2"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span>${h.yards ? `<span class="fact">${h.yards}<b>yds</b></span>` : ''}${contest ? `<span class="pill flag">${CONTEST[contest.type]}</span>` : ''}</div></header>
       ${clashRows ? sec('', cardOf(clashRows), true) : ''}
       ${teams}
       ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span class="sub">${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
       ${checkRows ? sec('', cardOf(checkRows)) : ''}
       <button class="btn" data-act="enter"${checkRows ? ' style="margin-top:16px"' : ''}>${hasDraft ? 'Continue scores' : 'Enter scores'}</button>
-      ${saveWarning()}</div>`
+      ${saveWarning()}</div>${holesSheet(rid, gc, null)}`
   };
 };
+// "Go to hole": every hole at once. Scored holes are filled, the next one to play is ringed, the one on screen is outlined.
+function holesSheet(rid, gc, here) {
+  if (!UI.holeSheet) return '';
+  const seg = (name, list) => `<div class="hs-lab">${name}</div><div class="hs-grid">${list.map(n => {
+    const hr = gc.holes[n], next = n === gc.nextHole;
+    return `<button class="hs${hr.complete ? ' done' : ''}${next ? ' nxt' : ''}${n === here ? ' here' : ''}" data-act="goto-hole" data-n="${n}" aria-label="Hole ${n}${hr.complete ? ', scored. Tap to change it' : next ? ', next to play' : ''}">${n}</button>`;
+  }).join('')}</div>`;
+  return `<div class="scrim" data-act="holes-scrim"><div class="sheet hs-sheet" role="dialog" aria-label="Go to a hole">
+    <div class="nav"><span class="b">Go to hole</span><button class="link" data-act="holes-close">Done</button></div>
+    ${seg('Front nine', E.SEGMENTS.front)}${seg('Back nine', E.SEGMENTS.back)}
+    <div class="cap hs-key"><span class="hs-ki"><i class="hs-k done"></i>Scored</span><span class="hs-ki"><i class="hs-k nxt"></i>Next to play</span><span class="hs-tip">Tap a scored hole to change it.</span></div></div></div>`;
+}
 function saveWarning() {
   if (!DB.saveOk) return '<p class="err" style="text-align:center">This phone is not saving. Keep this screen open.</p>';
   if (DB.outbox.length && !DB.online) return `<p class="cap" style="text-align:center;margin-top:12px">No signal · ${plural(DB.outbox.filter(i => i.req.op === 'saveHole').length || DB.outbox.length, 'save')} waiting on this phone</p>`;
@@ -2654,7 +2686,7 @@ VIEWS.entry = () => {
   const buggies = gc.teams.length === 2;
   let html = '<div class="entry">';
   if (ctx.mode === 'org') html += `<p class="cap">Correcting group ${gc.n}</p>`;
-  html += `<header class="hero c"><div class="hrow2"><button class="back-icon" data-act="entry-back" aria-label="Back">${ICON.back}</button><h1 class="big"><small>Hole</small>${ctx.n}</h1><span class="facts"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span></span></div></header>`;
+  html += `<header class="hero c"><div class="hrow2"><button class="back-icon" data-act="entry-back" aria-label="Back">${ICON.back}</button><h1 class="big">${ctx.mode === 'org' ? `<small>Hole</small>${ctx.n}` : `<button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${ctx.n}"><small>Hole</small>${ctx.n}<span class="hdown">${ICON.down}</span></button>`}</h1><span class="facts"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span></span></div></header>`;
   if (final) html += `<div class="banner" style="margin-top:12px">This round is final.</div>${ctx.mode === 'org' ? '<button class="btn quiet" data-act="reopen">Reopen round</button>' : ''}`;
   const clash = DB.conflicts.filter(c => c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n);
   if (clash.length) html += `<div class="banner" style="margin-top:12px">Another phone saved ${clash.map(c => `${esc(D.nameOf(c.player))} ${fmtGross(c.server)}`).join(', ')}</div>`;
@@ -2678,6 +2710,7 @@ VIEWS.entry = () => {
         `<button class="row" data-act="claim" data-pid=""><span>${lead ? 'Nobody closer' : 'Nobody'}</span>${!d._claim ? tickMark : ''}</button>`)}
     </div></div>`;
   }
+  if (ctx.mode === 'player') html += holesSheet(ctx.rid, gc, ctx.n);
   return { html };
 };
 
@@ -3962,7 +3995,23 @@ const ACT = {
   'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },
   claim: el => { const ctx = entryCtx(); ensureDraft(ctx)._claim = el.dataset.pid || null; UI.contestSheet = false; savePrefs(); render(); },
   save: () => saveHole(),
-  'entry-back': () => { UI.contestSheet = false; UI.edit = false; back(); },
+  'entry-back': () => {
+    const ctx = entryCtx(), d = (draftsFor(ctx) || {})[ctx.n];
+    if (ctx.mode === 'player' && !ctx.edit && d && Object.keys(d).some(k => k[0] !== '_')) toast('Scores kept. Pick up where you left off.');
+    UI.contestSheet = false; UI.edit = false; back();
+  },
+  holes: () => { UI.holeSheet = true; render(); },
+  'holes-close': () => { UI.holeSheet = false; render(); },
+  'holes-scrim': (el, e) => { if (e.target !== el) return; UI.holeSheet = false; render(); },
+  'goto-hole': el => {
+    const rid = playRid(), g = myGroup(rid), comp = computeR(rid);
+    UI.holeSheet = false;
+    if (!g || !comp) { render(); return; }
+    const gc = comp.groups.find(x => x.id === g.id), n = Number(el.dataset.n);
+    if (cur().v === 'tee' && n === gc.nextHole) { render(); return; }
+    UI.hole = n; UI.edit = !!gc.holes[n].complete; UI.after = null; UI.contestSheet = false;
+    if (cur().v === 'entry') replaceTop('entry', { rid }); else go('entry', { rid });
+  },
   undo: () => undoSave(),
   next: () => { UI.after = null; replaceTop('tee', { rid: playRid() }); },
   'to-finish': () => { UI.after = null; replaceTop('finish', { rid: playRid() }); },
@@ -4299,7 +4348,33 @@ function render() {
   if (UI.scrollCur) { UI.scrollCur = false; const c = document.getElementById('cur'); if (c) c.scrollIntoView({ block: 'center' }); else window.scrollTo(0, 0); }
   else if (UI.scrollTop) { UI.scrollTop = false; window.scrollTo(0, 0); }
   renderToast();
+  syncHistory();
 }
+
+/* The phone's own Back (swipe from the left edge on iPhone, the back button on Android) steps back one screen, like the Back buttons do.
+   The browser history is kept the same depth as the screens we have open. */
+let histDepth = 0, histBusy = false;
+const navDepth = () => (UI.stack.length - 1) + (UI.org ? UI.orgStack.length : 0);
+function syncHistory() {
+  try {
+    const d = navDepth();
+    if (d > histDepth) { while (histDepth < d) { histDepth++; history.pushState({ d: histDepth }, ''); } }
+    else if (d < histDepth) { const n = histDepth - d; histDepth = d; histBusy = true; setTimeout(() => { histBusy = false; }, 500); history.go(-n); }
+  } catch (e) { /* history not available: the Back buttons still work */ }
+}
+window.addEventListener('popstate', e => {
+  if (histBusy) { histBusy = false; return; }
+  const d = e.state && typeof e.state.d === 'number' ? e.state.d : 0;
+  histDepth = d;
+  while (navDepth() > d) {
+    if (UI.org) { if (UI.orgStack.length > 1) UI.orgStack.pop(); else UI.org = false; }
+    else if (UI.stack.length > 1) UI.stack.pop();
+    else break;
+  }
+  UI.contestSheet = false; UI.holeSheet = false; UI.confirm = null; UI.formError = null; UI.scrollTop = true;
+  render();
+});
+try { history.replaceState({ d: 0 }, ''); } catch (e) { /* ignore */ }
 function renderToast() {
   let el = document.getElementById('toast');
   if (!UI.toast) { if (el) el.remove(); return; }

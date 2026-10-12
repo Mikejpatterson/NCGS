@@ -53,7 +53,23 @@ const ACT = {
   'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },
   claim: el => { const ctx = entryCtx(); ensureDraft(ctx)._claim = el.dataset.pid || null; UI.contestSheet = false; savePrefs(); render(); },
   save: () => saveHole(),
-  'entry-back': () => { UI.contestSheet = false; UI.edit = false; back(); },
+  'entry-back': () => {
+    const ctx = entryCtx(), d = (draftsFor(ctx) || {})[ctx.n];
+    if (ctx.mode === 'player' && !ctx.edit && d && Object.keys(d).some(k => k[0] !== '_')) toast('Scores kept. Pick up where you left off.');
+    UI.contestSheet = false; UI.edit = false; back();
+  },
+  holes: () => { UI.holeSheet = true; render(); },
+  'holes-close': () => { UI.holeSheet = false; render(); },
+  'holes-scrim': (el, e) => { if (e.target !== el) return; UI.holeSheet = false; render(); },
+  'goto-hole': el => {
+    const rid = playRid(), g = myGroup(rid), comp = computeR(rid);
+    UI.holeSheet = false;
+    if (!g || !comp) { render(); return; }
+    const gc = comp.groups.find(x => x.id === g.id), n = Number(el.dataset.n);
+    if (cur().v === 'tee' && n === gc.nextHole) { render(); return; }
+    UI.hole = n; UI.edit = !!gc.holes[n].complete; UI.after = null; UI.contestSheet = false;
+    if (cur().v === 'entry') replaceTop('entry', { rid }); else go('entry', { rid });
+  },
   undo: () => undoSave(),
   next: () => { UI.after = null; replaceTop('tee', { rid: playRid() }); },
   'to-finish': () => { UI.after = null; replaceTop('finish', { rid: playRid() }); },
@@ -390,7 +406,33 @@ function render() {
   if (UI.scrollCur) { UI.scrollCur = false; const c = document.getElementById('cur'); if (c) c.scrollIntoView({ block: 'center' }); else window.scrollTo(0, 0); }
   else if (UI.scrollTop) { UI.scrollTop = false; window.scrollTo(0, 0); }
   renderToast();
+  syncHistory();
 }
+
+/* The phone's own Back (swipe from the left edge on iPhone, the back button on Android) steps back one screen, like the Back buttons do.
+   The browser history is kept the same depth as the screens we have open. */
+let histDepth = 0, histBusy = false;
+const navDepth = () => (UI.stack.length - 1) + (UI.org ? UI.orgStack.length : 0);
+function syncHistory() {
+  try {
+    const d = navDepth();
+    if (d > histDepth) { while (histDepth < d) { histDepth++; history.pushState({ d: histDepth }, ''); } }
+    else if (d < histDepth) { const n = histDepth - d; histDepth = d; histBusy = true; setTimeout(() => { histBusy = false; }, 500); history.go(-n); }
+  } catch (e) { /* history not available: the Back buttons still work */ }
+}
+window.addEventListener('popstate', e => {
+  if (histBusy) { histBusy = false; return; }
+  const d = e.state && typeof e.state.d === 'number' ? e.state.d : 0;
+  histDepth = d;
+  while (navDepth() > d) {
+    if (UI.org) { if (UI.orgStack.length > 1) UI.orgStack.pop(); else UI.org = false; }
+    else if (UI.stack.length > 1) UI.stack.pop();
+    else break;
+  }
+  UI.contestSheet = false; UI.holeSheet = false; UI.confirm = null; UI.formError = null; UI.scrollTop = true;
+  render();
+});
+try { history.replaceState({ d: 0 }, ''); } catch (e) { /* ignore */ }
 function renderToast() {
   let el = document.getElementById('toast');
   if (!UI.toast) { if (el) el.remove(); return; }
