@@ -31,6 +31,10 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   let t = await text();
   check('home: next round first, then Past rounds, Standings, Players, Organiser tiles', /2026 season/.test(t) && /Past rounds\s*8 played/.test(t) && /Standings\s*Sean leads on 115/.test(t) && /Players\s*12 golfers/.test(t) && /Organiser/.test(t));
   check('home: the list of past rounds is not on the front page', !/Kieran, Sean 32/.test(t));
+  await tap('[data-act="trip"]');
+  t = await text();
+  check('home: Trip standings tile opens the whole-trip table with a link to each day', /Marbella/.test(t) && /All 3 rounds count/.test(t) && (await page.$$('[data-act="leaderboard"]')).length === 3);
+  await tap('[data-act="back"]');
   await tap('[data-act="rounds"]');
   t = await text();
   check('past rounds screen lists all eight; Westport shows the tie', (await page.$$('[data-act="round"]')).length >= 8 && /Kieran, Sean 32/.test(t));
@@ -117,13 +121,21 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   check('reload opens straight on the next hole', /Hole\s*16/.test(await text()));
 
   // Buggy Wars and leaderboard
-  await tap('.tab[data-tab="match"]');
-  t = await text();
-  check('Buggy Wars board with front/back/overall', /Front nine/.test(t) && /Overall/.test(t));
-  await shot('08-match', true);
   await tap('.tab[data-tab="board"]');
   t = await text();
-  check('leaderboard: Stableford, KBs, drinks, contests', /Stableford|Demo round/.test(t) && /KBs/.test(t) && /First round of drinks/.test(t) && /Contests/.test(t));
+  check('one Results tab bar, no separate Buggy tab', (await page.$$('.tab')).length === 2 && !(await page.$('.tab[data-tab="match"]')) && /Results/.test(t));
+  check('Results has Leaderboard, Buggy Wars and Contests pills, Leaderboard first', JSON.stringify(await page.$$eval('.pills button', b => b.map(x => x.textContent.trim()))) === JSON.stringify(['Leaderboard', 'Buggy Wars', 'Contests']) && await page.$eval('.pills button.on', e => e.textContent.trim()) === 'Leaderboard');
+  check('leaderboard: Stableford, KBs, drinks (contests are on their own pill)', /Stableford|Demo round/.test(t) && /KBs/.test(t) && /First round of drinks/.test(t) && !/Nearest the pin/.test(t));
+  await tap('[data-act="respill"][data-p="bw"]');
+  t = await text();
+  check('Buggy Wars board with front/back/overall', /Front nine/.test(t) && /Overall/.test(t));
+  check('Buggy Wars shows only my own group, no group pills', (await page.$$('[data-act="mgroup"]')).length === 0 && (await page.$$('.mrow')).length > 0);
+  await shot('08-match', true);
+  await tap('[data-act="respill"][data-p="ct"]');
+  t = await text();
+  check('Contests pill: nearest the pin and longest drive', /Nearest the pin/.test(t) && /Longest drive/.test(t));
+  await tap('[data-act="respill"][data-p="lb"]');
+  t = await text();
   await shot('09-board', true);
   // a player's card from the leaderboard
   await tap('[data-act="toggle"][data-key$="-mike-p"]');

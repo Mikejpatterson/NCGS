@@ -27,7 +27,7 @@ const sized = (icon, n) => icon.replace('<svg', `<svg width="${n}" height="${n}"
 const TABICON = {
   hole: svg('<path d="M6 21V4"/><path d="M6 4h12l-2.5 4L18 12H6"/>'),
   match: svg('<path d="M4 8h14"/><path d="M15 5l3 3-3 3"/><path d="M20 16H6"/><path d="M9 13l-3 3 3 3"/>'),
-  board: svg('<path d="M10 6h10M10 12h10M10 18h10"/><path d="M4.5 6h1.5M4.5 12h1.5M4.5 18h1.5"/>')
+  board: svg('<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3"/><path d="M17 6h3v1a3 3 0 0 1-3 3"/>')
 };
 const CONTEST = { ntp: 'Nearest the pin', ld: 'Longest drive' };
 

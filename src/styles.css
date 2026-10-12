@@ -513,3 +513,4 @@ body::before { content: none; }
 .stv.out b { color: var(--faint); }
 .stepper .pu.on { background: var(--green); color: #fff; }
 .stepper .st:disabled { opacity: .35; }
+.seg.pills { margin: 12px 0 4px; } .seg.pills button { min-height: 40px; font-weight: 600; }

@@ -568,15 +568,15 @@ VIEWS.hcp = p => {
 };
 
 /* ----- Buggy Wars board ----- */
-VIEWS.match = () => {
-  const rid = playRid();
+function buggyView(rid) {
   const r = D.round(rid);
   const comp = computeR(rid);
-  if (!comp) return { tabs: 'match', html: `<div class="head"><h1 class="title">Buggy Wars</h1></div>${sec('', cardOf('<div class="row sub">Groups to be drawn</div>'))}` };
+  if (!comp) return { html: `${sec('', cardOf('<div class="row sub">Groups to be drawn</div>'))}` };
   const groups = comp.groups.filter(g => g.teams.length === 2);
-  if (!groups.length) return { tabs: 'match', html: `<div class="head"><h1 class="title">Buggy Wars</h1></div>${sec('', cardOf('<div class="row sub">No buggy matches today</div>'))}` };
+  if (!groups.length) return { html: `${sec('', cardOf('<div class="row sub">No buggy matches today</div>'))}` };
   const mine = myGroup(rid);
-  const gid = UI.matchGroup && groups.find(g => g.id === UI.matchGroup) ? UI.matchGroup : (mine && groups.find(g => g.id === mine.id) ? mine.id : groups[0].id);
+  const inMatch = !!(mine && groups.find(g => g.id === mine.id));
+  const gid = inMatch ? mine.id : (UI.matchGroup && groups.find(g => g.id === UI.matchGroup) ? UI.matchGroup : groups[0].id);
   const gc = comp.groups.find(g => g.id === gid);
   const L = gc.labels;
   const canEdit = mine && mine.id === gid && r.status === 'live';
@@ -603,34 +603,44 @@ VIEWS.match = () => {
     }
   });
   return {
-    tabs: 'match',
-    html: `<div class="head"><h1 class="title">Buggy Wars</h1></div>
-      ${groups.length > 1 ? `<div class="seg" style="margin-top:8px">${groups.map(g => `<button class="${g.id === gid ? 'on' : ''}" data-act="mgroup" data-gid="${g.id}" aria-pressed="${g.id === gid}">Group ${g.n}</button>`).join('')}</div>` : ''}
+    html: `      ${!inMatch && groups.length > 1 ? `<div class="seg" style="margin-top:8px">${groups.map(g => `<button class="${g.id === gid ? 'on' : ''}" data-act="mgroup" data-gid="${g.id}" aria-pressed="${g.id === gid}">Group ${g.n}</button>`).join('')}</div>` : ''}
       ${sec(`${pill(0)}<span class="sub" style="flex:1">${esc(L[0].long)}</span>`, '', true)}
       <div class="sec-label" style="margin-top:-4px">${pill(1)}<span class="sub" style="flex:1">${esc(L[1].long)}</span></div>
       ${cardOf(summary)}
       ${sec('', cardOf(`<div class="mrow cols"><span class="cap">Hole</span><span class="p">${pill(0)}</span><span class="p">${pill(1)}</span><span></span></div>${rows}`), true)}`
   };
-};
+}
 
 /* ----- Leaderboard ----- */
 function tripRounds(r) { return r && r.trip ? D.rounds().filter(x => x.trip === r.trip && x.season === r.season && !isDemo(x) === !isDemo(r)).sort((a, b) => (a.trip_day || 0) - (b.trip_day || 0)) : [r]; }
 VIEWS.board = () => {
-  const base = D.round(playRid());
-  const list = tripRounds(base);
-  const sel = UI.board && (UI.board === 'trip' || list.find(x => x.id === UI.board)) ? UI.board : base.id;
-  let html = `<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">Leaderboard</h1></div></header>`;
-  if (list.length > 1) {
-    html += `<div class="seg" style="margin-top:8px">${list.map(x => `<button class="${sel === x.id ? 'on' : ''}" data-act="board" data-id="${x.id}" aria-pressed="${sel === x.id}">Day ${x.trip_day || x.seq}</button>`).join('')}<button class="${sel === 'trip' ? 'on' : ''}" data-act="board" data-id="trip" aria-pressed="${sel === 'trip'}">${esc(base.trip)}</button></div>`;
-  }
-  if (sel === 'trip') return { tabs: 'board', html: html + tripTable(list) };
+  const sel = UI.board && D.round(UI.board) ? UI.board : playRid();
   const r = D.round(sel);
+  const res0 = r.status === 'upcoming' ? null : resultsOf(sel);
+  const hasBuggy = !!(res0 && res0.comp && res0.comp.groups.some(g => g.teams.length === 2));
+  const hasContests = !!(res0 && res0.contests.length);
+  const avail = ['lb', hasBuggy && 'bw', hasContests && 'ct'].filter(Boolean);
+  const pillSel = avail.includes(UI.res) ? UI.res : 'lb';
+  let html = `<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">Results</h1></div></header>`;
+  if (avail.length > 1) {
+    const names = { lb: 'Leaderboard', bw: 'Buggy Wars', ct: 'Contests' };
+    html += `<div class="seg pills" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
+  }
+  if (pillSel === 'bw') return { tabs: 'board', html: html + buggyView(sel).html };
   if (r.status === 'upcoming') {
     html += sec(label(esc(roundWhen(r) || roundName(r))), r.groups ? cardOf(r.groups.map(g => `<div class="grow"><span class="b num">${esc(g.teeTime || '')}</span><span class="teams">${g.teams.map((t, i) => `<span>${dot(i)}${esc(t.map(D.nameOf).join(' & '))}</span>`).join('')}</span><span></span></div>`).join('')) : cardOf('<div class="row sub">Groups to be drawn</div>'), true);
     return { tabs: 'board', html };
   }
-  const res = resultsOf(sel);
+  const res = res0;
   const comp = res.comp;
+  if (pillSel === 'ct') {
+    html += sec(label('Contests'), cardOf(res.contests.map(c => {
+      const right = c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : c.lead ? `<span class="right"><span class="pill n">To confirm</span>${esc(D.nameOf(c.lead.pid))}</span>` : '<span class="sub">–</span>';
+      return `<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${right}</div>`;
+    }).join('')));
+    return { tabs: 'board', html };
+  }
+
   const pillTxt = r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r);
   html += sec(`${label(esc(roundName(r)))}${pillTxt}`, cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
@@ -645,15 +655,18 @@ VIEWS.board = () => {
       return `<div class="row"><span>${esc(p.label)}</span><span class="right">${tag}<span class="b num">${p.total}</span></span></div>`;
     }).join('')));
   }
-  if (res.contests.length) {
-    html += sec(label('Contests'), cardOf(res.contests.map(c => {
-      const right = c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : c.lead ? `<span class="right"><span class="pill n">To confirm</span>${esc(D.nameOf(c.lead.pid))}</span>` : '<span class="sub">–</span>';
-      return `<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${right}</div>`;
-    }).join('')));
-  }
   html += `<button class="btn quiet" data-act="results" data-rid="${sel}">Share results</button>`;
   html += `<div class="foot"><button class="link" data-act="home">${esc(D.society())}</button><button class="link" data-act="org">Organiser</button></div>`;
   return { tabs: 'board', html };
+};
+
+VIEWS.trip = p => {
+  const list = tripRounds(D.round(p.rid));
+  const r0 = D.round(p.rid);
+  let html = `${navBack('Back')}<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">${esc(r0.trip || 'Trip standings')}</h1></div></header>`;
+  html += tripTable(list);
+  html += sec(label('Each day'), cardOf(list.map(x => `<button class="row" data-act="leaderboard" data-rid="${x.id}"><span>Day ${x.trip_day || x.seq}</span><span class="right">${x.status === 'upcoming' ? '<span class="sub">Not played</span>' : ''}${chev}</span></button>`).join('')));
+  return { html };
 };
 
 function tripTable(list) {

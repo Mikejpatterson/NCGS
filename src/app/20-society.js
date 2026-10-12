@@ -68,7 +68,11 @@ VIEWS.home = () => {
   const lead = table[0];
   const pastAll = D.rounds().filter(r => r.status === 'final').reverse();
   const tile = (act, icon, t, s2) => `<button class="lnk" data-act="${act}"><span class="lnk-ic">${sized(icon, 24)}</span><span class="lnk-t">${t}</span><span class="lnk-s">${s2}</span></button>`;
+  const tripFor = feature && feature.trip ? feature : (D.rounds().filter(r => r.trip).slice(-1)[0] || null);
+  const tripList = tripFor ? tripRounds(tripFor) : [];
+  const tripTile = tripList.length > 1 ? `<button class="lnk" data-act="trip" data-rid="${tripFor.id}"><span class="lnk-ic">${sized(ICON.trophy, 24)}</span><span class="lnk-t">Trip standings</span><span class="lnk-s">${esc(tripFor.trip)}</span></button>` : '';
   html += `<div class="links">
+    ${tripTile}
     ${tile('rounds', ICON.history, 'Past rounds', pastAll.length ? `${pastAll.length} played` : 'None played yet')}
     ${tile('goy', ICON.trophy, 'Standings', lead ? `${esc(lead.name)} leads on ${lead.total}` : 'Golfer of the Year')}
     ${tile('players', ICON.users, 'Players', plural(D.active().length, 'golfer'))}

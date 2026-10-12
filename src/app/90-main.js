@@ -25,7 +25,9 @@ const ACT = {
     UI.playRid = rid;
     go(playHomeView(rid), { rid });
   },
-  leaderboard: el => { UI.playRid = el.dataset.rid; UI.board = el.dataset.rid; go('board', { rid: el.dataset.rid }); },
+  leaderboard: el => { UI.playRid = el.dataset.rid; UI.board = el.dataset.rid; UI.res = 'lb'; go('board', { rid: el.dataset.rid }); },
+  trip: el => go('trip', { rid: el.dataset.rid }),
+  respill: el => { UI.res = el.dataset.p; if (UI.res === 'bw') UI.scrollCur = true; render(); },
   toggle: el => { UI.open[el.dataset.key] = !UI.open[el.dataset.key]; render(); },
   hcp: el => go('hcp', { pid: el.dataset.pid, rid: el.dataset.rid }),
   tab: el => {
@@ -34,8 +36,8 @@ const ACT = {
     const rid = playRid();
     while (UI.stack.length > 1 && !['tee', 'match', 'board', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();
     if (t === 'hole') { UI.edit = false; UI.after = null; replaceTop(playHomeView(rid), { rid }); }
-    else if (t === 'match') { replaceTop('match', { rid }); UI.scrollCur = true; render(); }
-    else replaceTop('board', { rid });
+    else if (t === 'match') { UI.board = null; UI.res = 'bw'; UI.scrollCur = true; replaceTop('board', { rid }); }
+    else { UI.board = null; UI.res = UI.res === 'bw' || UI.res === 'ct' ? UI.res : 'lb'; replaceTop('board', { rid }); }
   },
   enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },
   set: el => setScore(el.dataset.pid, el.dataset.v),
@@ -78,7 +80,6 @@ const ACT = {
   'fix-cancel': () => { UI.fix = null; render(); },
   'fix-scrim': (el, e) => { if (e.target !== el) return; UI.fix = null; render(); },
   'edit-hole': el => { UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: playRid() }); },
-  board: el => { UI.board = el.dataset.id; render(); },
   results: el => go('results', { rid: el.dataset.rid }),
   'share-card': el => shareCard(el.dataset.rid),
   'share-close': () => { UI.shareImg = null; render(); },
@@ -387,7 +388,7 @@ function renderToast() {
   el.textContent = UI.toast;
 }
 
-tabs.innerHTML = [['hole', 'Hole'], ['match', 'Buggy Wars'], ['board', 'Leaderboard']]
+tabs.innerHTML = [['hole', 'Hole'], ['board', 'Results']]
   .map(([k, l]) => `<button class="tab" data-act="tab" data-tab="${k}">${TABICON[k]}<span>${l}</span></button>`).join('');
 
 document.addEventListener('click', e => {

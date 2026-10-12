@@ -523,9 +523,10 @@ body::before { content: none; }
 .stv.out b { color: var(--faint); }
 .stepper .pu.on { background: var(--green); color: #fff; }
 .stepper .st:disabled { opacity: .35; }
+.seg.pills { margin: 12px 0 4px; } .seg.pills button { min-height: 40px; font-weight: 600; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610112143"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610120627"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1592,7 +1593,7 @@ const sized = (icon, n) => icon.replace('<svg', `<svg width="${n}" height="${n}"
 const TABICON = {
   hole: svg('<path d="M6 21V4"/><path d="M6 4h12l-2.5 4L18 12H6"/>'),
   match: svg('<path d="M4 8h14"/><path d="M15 5l3 3-3 3"/><path d="M20 16H6"/><path d="M9 13l-3 3 3 3"/>'),
-  board: svg('<path d="M10 6h10M10 12h10M10 18h10"/><path d="M4.5 6h1.5M4.5 12h1.5M4.5 18h1.5"/>')
+  board: svg('<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3"/><path d="M17 6h3v1a3 3 0 0 1-3 3"/>')
 };
 const CONTEST = { ntp: 'Nearest the pin', ld: 'Longest drive' };
 
@@ -1963,7 +1964,7 @@ const UI = {
   stack: [{ v: 'home', p: {} }],
   org: false, orgUnlocked: false, orgStack: [{ v: 'home', p: {} }],
   toast: null, flash: false, contestSheet: false, fix: null, after: null, open: {}, scrollCur: false, scrollTop: false,
-  playRid: null, hole: null, edit: false, matchGroup: null, board: null,
+  playRid: null, hole: null, edit: false, matchGroup: null, board: null, res: 'lb',
   draft: null, sel: null, testSheet: null, photoFull: null, confirm: null, pinError: false, formError: null,
   wx: {}, shareImg: null, checkSeg: null, photos: {}
 };
@@ -2067,7 +2068,11 @@ VIEWS.home = () => {
   const lead = table[0];
   const pastAll = D.rounds().filter(r => r.status === 'final').reverse();
   const tile = (act, icon, t, s2) => `<button class="lnk" data-act="${act}"><span class="lnk-ic">${sized(icon, 24)}</span><span class="lnk-t">${t}</span><span class="lnk-s">${s2}</span></button>`;
+  const tripFor = feature && feature.trip ? feature : (D.rounds().filter(r => r.trip).slice(-1)[0] || null);
+  const tripList = tripFor ? tripRounds(tripFor) : [];
+  const tripTile = tripList.length > 1 ? `<button class="lnk" data-act="trip" data-rid="${tripFor.id}"><span class="lnk-ic">${sized(ICON.trophy, 24)}</span><span class="lnk-t">Trip standings</span><span class="lnk-s">${esc(tripFor.trip)}</span></button>` : '';
   html += `<div class="links">
+    ${tripTile}
     ${tile('rounds', ICON.history, 'Past rounds', pastAll.length ? `${pastAll.length} played` : 'None played yet')}
     ${tile('goy', ICON.trophy, 'Standings', lead ? `${esc(lead.name)} leads on ${lead.total}` : 'Golfer of the Year')}
     ${tile('players', ICON.users, 'Players', plural(D.active().length, 'golfer'))}
@@ -2916,15 +2921,15 @@ VIEWS.hcp = p => {
 };
 
 /* ----- Buggy Wars board ----- */
-VIEWS.match = () => {
-  const rid = playRid();
+function buggyView(rid) {
   const r = D.round(rid);
   const comp = computeR(rid);
-  if (!comp) return { tabs: 'match', html: `<div class="head"><h1 class="title">Buggy Wars</h1></div>${sec('', cardOf('<div class="row sub">Groups to be drawn</div>'))}` };
+  if (!comp) return { html: `${sec('', cardOf('<div class="row sub">Groups to be drawn</div>'))}` };
   const groups = comp.groups.filter(g => g.teams.length === 2);
-  if (!groups.length) return { tabs: 'match', html: `<div class="head"><h1 class="title">Buggy Wars</h1></div>${sec('', cardOf('<div class="row sub">No buggy matches today</div>'))}` };
+  if (!groups.length) return { html: `${sec('', cardOf('<div class="row sub">No buggy matches today</div>'))}` };
   const mine = myGroup(rid);
-  const gid = UI.matchGroup && groups.find(g => g.id === UI.matchGroup) ? UI.matchGroup : (mine && groups.find(g => g.id === mine.id) ? mine.id : groups[0].id);
+  const inMatch = !!(mine && groups.find(g => g.id === mine.id));
+  const gid = inMatch ? mine.id : (UI.matchGroup && groups.find(g => g.id === UI.matchGroup) ? UI.matchGroup : groups[0].id);
   const gc = comp.groups.find(g => g.id === gid);
   const L = gc.labels;
   const canEdit = mine && mine.id === gid && r.status === 'live';
@@ -2951,34 +2956,44 @@ VIEWS.match = () => {
     }
   });
   return {
-    tabs: 'match',
-    html: `<div class="head"><h1 class="title">Buggy Wars</h1></div>
-      ${groups.length > 1 ? `<div class="seg" style="margin-top:8px">${groups.map(g => `<button class="${g.id === gid ? 'on' : ''}" data-act="mgroup" data-gid="${g.id}" aria-pressed="${g.id === gid}">Group ${g.n}</button>`).join('')}</div>` : ''}
+    html: `      ${!inMatch && groups.length > 1 ? `<div class="seg" style="margin-top:8px">${groups.map(g => `<button class="${g.id === gid ? 'on' : ''}" data-act="mgroup" data-gid="${g.id}" aria-pressed="${g.id === gid}">Group ${g.n}</button>`).join('')}</div>` : ''}
       ${sec(`${pill(0)}<span class="sub" style="flex:1">${esc(L[0].long)}</span>`, '', true)}
       <div class="sec-label" style="margin-top:-4px">${pill(1)}<span class="sub" style="flex:1">${esc(L[1].long)}</span></div>
       ${cardOf(summary)}
       ${sec('', cardOf(`<div class="mrow cols"><span class="cap">Hole</span><span class="p">${pill(0)}</span><span class="p">${pill(1)}</span><span></span></div>${rows}`), true)}`
   };
-};
+}
 
 /* ----- Leaderboard ----- */
 function tripRounds(r) { return r && r.trip ? D.rounds().filter(x => x.trip === r.trip && x.season === r.season && !isDemo(x) === !isDemo(r)).sort((a, b) => (a.trip_day || 0) - (b.trip_day || 0)) : [r]; }
 VIEWS.board = () => {
-  const base = D.round(playRid());
-  const list = tripRounds(base);
-  const sel = UI.board && (UI.board === 'trip' || list.find(x => x.id === UI.board)) ? UI.board : base.id;
-  let html = `<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">Leaderboard</h1></div></header>`;
-  if (list.length > 1) {
-    html += `<div class="seg" style="margin-top:8px">${list.map(x => `<button class="${sel === x.id ? 'on' : ''}" data-act="board" data-id="${x.id}" aria-pressed="${sel === x.id}">Day ${x.trip_day || x.seq}</button>`).join('')}<button class="${sel === 'trip' ? 'on' : ''}" data-act="board" data-id="trip" aria-pressed="${sel === 'trip'}">${esc(base.trip)}</button></div>`;
-  }
-  if (sel === 'trip') return { tabs: 'board', html: html + tripTable(list) };
+  const sel = UI.board && D.round(UI.board) ? UI.board : playRid();
   const r = D.round(sel);
+  const res0 = r.status === 'upcoming' ? null : resultsOf(sel);
+  const hasBuggy = !!(res0 && res0.comp && res0.comp.groups.some(g => g.teams.length === 2));
+  const hasContests = !!(res0 && res0.contests.length);
+  const avail = ['lb', hasBuggy && 'bw', hasContests && 'ct'].filter(Boolean);
+  const pillSel = avail.includes(UI.res) ? UI.res : 'lb';
+  let html = `<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">Results</h1></div></header>`;
+  if (avail.length > 1) {
+    const names = { lb: 'Leaderboard', bw: 'Buggy Wars', ct: 'Contests' };
+    html += `<div class="seg pills" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
+  }
+  if (pillSel === 'bw') return { tabs: 'board', html: html + buggyView(sel).html };
   if (r.status === 'upcoming') {
     html += sec(label(esc(roundWhen(r) || roundName(r))), r.groups ? cardOf(r.groups.map(g => `<div class="grow"><span class="b num">${esc(g.teeTime || '')}</span><span class="teams">${g.teams.map((t, i) => `<span>${dot(i)}${esc(t.map(D.nameOf).join(' & '))}</span>`).join('')}</span><span></span></div>`).join('')) : cardOf('<div class="row sub">Groups to be drawn</div>'), true);
     return { tabs: 'board', html };
   }
-  const res = resultsOf(sel);
+  const res = res0;
   const comp = res.comp;
+  if (pillSel === 'ct') {
+    html += sec(label('Contests'), cardOf(res.contests.map(c => {
+      const right = c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : c.lead ? `<span class="right"><span class="pill n">To confirm</span>${esc(D.nameOf(c.lead.pid))}</span>` : '<span class="sub">–</span>';
+      return `<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${right}</div>`;
+    }).join('')));
+    return { tabs: 'board', html };
+  }
+
   const pillTxt = r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r);
   html += sec(`${label(esc(roundName(r)))}${pillTxt}`, cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
@@ -2993,15 +3008,18 @@ VIEWS.board = () => {
       return `<div class="row"><span>${esc(p.label)}</span><span class="right">${tag}<span class="b num">${p.total}</span></span></div>`;
     }).join('')));
   }
-  if (res.contests.length) {
-    html += sec(label('Contests'), cardOf(res.contests.map(c => {
-      const right = c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : c.lead ? `<span class="right"><span class="pill n">To confirm</span>${esc(D.nameOf(c.lead.pid))}</span>` : '<span class="sub">–</span>';
-      return `<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${right}</div>`;
-    }).join('')));
-  }
   html += `<button class="btn quiet" data-act="results" data-rid="${sel}">Share results</button>`;
   html += `<div class="foot"><button class="link" data-act="home">${esc(D.society())}</button><button class="link" data-act="org">Organiser</button></div>`;
   return { tabs: 'board', html };
+};
+
+VIEWS.trip = p => {
+  const list = tripRounds(D.round(p.rid));
+  const r0 = D.round(p.rid);
+  let html = `${navBack('Back')}<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">${esc(r0.trip || 'Trip standings')}</h1></div></header>`;
+  html += tripTable(list);
+  html += sec(label('Each day'), cardOf(list.map(x => `<button class="row" data-act="leaderboard" data-rid="${x.id}"><span>Day ${x.trip_day || x.seq}</span><span class="right">${x.status === 'upcoming' ? '<span class="sub">Not played</span>' : ''}${chev}</span></button>`).join('')));
+  return { html };
 };
 
 function tripTable(list) {
@@ -3516,7 +3534,9 @@ const ACT = {
     UI.playRid = rid;
     go(playHomeView(rid), { rid });
   },
-  leaderboard: el => { UI.playRid = el.dataset.rid; UI.board = el.dataset.rid; go('board', { rid: el.dataset.rid }); },
+  leaderboard: el => { UI.playRid = el.dataset.rid; UI.board = el.dataset.rid; UI.res = 'lb'; go('board', { rid: el.dataset.rid }); },
+  trip: el => go('trip', { rid: el.dataset.rid }),
+  respill: el => { UI.res = el.dataset.p; if (UI.res === 'bw') UI.scrollCur = true; render(); },
   toggle: el => { UI.open[el.dataset.key] = !UI.open[el.dataset.key]; render(); },
   hcp: el => go('hcp', { pid: el.dataset.pid, rid: el.dataset.rid }),
   tab: el => {
@@ -3525,8 +3545,8 @@ const ACT = {
     const rid = playRid();
     while (UI.stack.length > 1 && !['tee', 'match', 'board', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();
     if (t === 'hole') { UI.edit = false; UI.after = null; replaceTop(playHomeView(rid), { rid }); }
-    else if (t === 'match') { replaceTop('match', { rid }); UI.scrollCur = true; render(); }
-    else replaceTop('board', { rid });
+    else if (t === 'match') { UI.board = null; UI.res = 'bw'; UI.scrollCur = true; replaceTop('board', { rid }); }
+    else { UI.board = null; UI.res = UI.res === 'bw' || UI.res === 'ct' ? UI.res : 'lb'; replaceTop('board', { rid }); }
   },
   enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },
   set: el => setScore(el.dataset.pid, el.dataset.v),
@@ -3569,7 +3589,6 @@ const ACT = {
   'fix-cancel': () => { UI.fix = null; render(); },
   'fix-scrim': (el, e) => { if (e.target !== el) return; UI.fix = null; render(); },
   'edit-hole': el => { UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: playRid() }); },
-  board: el => { UI.board = el.dataset.id; render(); },
   results: el => go('results', { rid: el.dataset.rid }),
   'share-card': el => shareCard(el.dataset.rid),
   'share-close': () => { UI.shareImg = null; render(); },
@@ -3878,7 +3897,7 @@ function renderToast() {
   el.textContent = UI.toast;
 }
 
-tabs.innerHTML = [['hole', 'Hole'], ['match', 'Buggy Wars'], ['board', 'Leaderboard']]
+tabs.innerHTML = [['hole', 'Hole'], ['board', 'Results']]
   .map(([k, l]) => `<button class="tab" data-act="tab" data-tab="${k}">${TABICON[k]}<span>${l}</span></button>`).join('');
 
 document.addEventListener('click', e => {
