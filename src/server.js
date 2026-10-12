@@ -198,19 +198,11 @@ var NCGS = (function () {
 
   /* ---------- Rules checker ---------- */
   var ASK_SYSTEM = [
-    'You are the rules checker inside the NCGS golf society app. The golfers are men in their 50s and 60s playing a casual society day, usually in Ireland or Spain, standing on a course with a phone.',
-    'Answer questions about (1) the Rules of Golf as published by the R&A and USGA and (2) the NCGS society rules listed below. Nothing else: if asked about something unrelated, say you only cover golf rules and the society rules.',
-    'How to answer: give the answer in the first sentence. Then the relief or procedure in plain steps, then the penalty (for example "one penalty stroke"). Name the rule number, for example "Rule 17.1". Keep it under 150 words, short sentences, no tables, no headings. If a Local Rule or the Committee could change the answer, say so in a few words. If you are not sure, say so plainly rather than guessing. Never invent a rule.',
-    'Stableford: the society plays individual Stableford, which the Rules of Golf treat as a form of stroke play (Rule 21.1). A player may pick up when they cannot score any points, and a pick-up scores 0 points. When a player is unsure how to proceed, Rule 20.1c(3) lets them play a second ball (say so before playing it) and take both scores to the organiser, who acts as the Committee.',
-    'NCGS society rules (these come from the app, and if a question is about a society rule not listed here, say it is not covered and the organiser decides):',
-    '- Stableford points on each hole are max(0, par + shots received - gross strokes + 2). Handicaps use the World Handicap System: course handicap from the WHS index, slope and course rating, kept unrounded, with a 100 percent allowance unless the organiser says otherwise.',
-    '- Ties on the day are decided by countback: the back nine, then the last six, then the last three, then the 18th hole and backwards one hole at a time. Nothing else is used.',
-    '- Golfer of the Year: the best 3 scores of the season count. Ties compare the counting scores from best to worst, then the 4th best score, and so on.',
-    '- KBs is a pair competition. Partners are in different groups, and a pair\'s score is the two partners\' Stableford totals added together.',
-    '- Buggy Wars: each group of four is split into two buggies of two. On every hole each buggy counts its better Stableford score. The buggy with more points wins the hole, and level is a halved hole. There are three matches played at the same time: the front nine, the back nine and the overall 18, each worth 5 euro to the winners, and results are given in golf style such as "Buggy 1 won 3 and 1".',
-    '- First round of drinks: the pair with the lowest combined Stableford total (the same pairs as KBs) buys the first round.',
-    '- Contests: nearest the pin on the par 3s and longest drive on the chosen hole. The winner is claimed by the group on the app and confirmed by the organiser.',
-    '- The organiser makes the final call on anything the rules do not settle.'
+    'You are a golf rules referee. You answer questions about the Rules of Golf as published by the R&A and the USGA, and nothing else. If asked about anything that is not a golf rule, say you only cover the Rules of Golf.',
+    'The people asking are experienced club golfers standing on a course, speaking into a phone. Their question comes from voice dictation, so it may be rambling, loosely worded or slightly garbled. Work out the exact situation and answer that, not a generic version of it. If one fact would change the answer (for example whether the ball was in play, on the green, or in a bunker), give the answer for the most likely case and say in one short line what would change it.',
+    'Before you answer, use the web search tool to read the current official Rules of Golf on randa.org or usga.org, so that you are not relying on memory. Check the exact rule, its wording and any penalty. Check whether the stroke play or match play version matters. Society days are stroke play or Stableford, which the Rules treat as stroke play (Rule 21.1), unless the person says it was match play.',
+    'How to answer: start with the ruling in one plain sentence that can be read out to the group. Then explain why, quoting or closely paraphrasing the rule, so a doubter can see the reasoning. Then say exactly what the player does next, and the penalty if any (for example "no penalty" or "one penalty stroke" or "two penalty strokes"). Name the rule number each time, for example Rule 11.1 or Rule 9.6. Use short sentences, no headings, no tables. Aim for 120 to 200 words. Mention a Local Rule or Committee decision only if it could change the answer.',
+    'Never guess. If the rules do not clearly cover it, or you could not find the rule, say so plainly. Never invent a rule number. Treat the search result for the current edition as the authority over anything you remember.'
   ].join('\n');
 
   /* ---------- The service ---------- */
@@ -399,7 +391,7 @@ var NCGS = (function () {
     };
 
 
-    /* Rules checker: a question for Claude about the Rules of Golf and the society rules.
+    /* Rules checker: a question for Claude about the Rules of Golf, checked live against the official R&A / USGA rules.
        The key lives in the script properties (ANTHROPIC_KEY), never in the app. A daily cap stops a runaway bill. */
     ops.ask = function (req) {
       var q = String(req.question || '').trim();
@@ -421,10 +413,19 @@ var NCGS = (function () {
       messages.push({ role: 'user', content: q });
       store.cachePut(ck, String(used + 1), 21600);
       var r = store.postJson('https://api.anthropic.com/v1/messages', { 'x-api-key': key, 'anthropic-version': '2023-06-01' },
-        { model: store.getSecret('ASK_MODEL') || 'claude-sonnet-5-5', max_tokens: 700, system: ASK_SYSTEM, messages: messages });
-      var text = r && r.json && r.json.content && r.json.content[0] && r.json.content[0].text;
+        { model: store.getSecret('ASK_MODEL') || 'claude-sonnet-5-5', max_tokens: 1500, system: ASK_SYSTEM, messages: messages,
+          tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 4, allowed_domains: ['randa.org', 'usga.org'] }] });
+      var blocks = (r && r.json && r.json.content) || [], text = '', sources = [], seen = {};
+      blocks.forEach(function (b) {
+        if (!b || b.type !== 'text' || !b.text) return;
+        text += b.text;
+        (b.citations || []).forEach(function (c) {
+          if (c && c.url && !seen[c.url] && /^https:\/\/([a-z0-9-]+\.)*(randa|usga)\.org(\/|$)/i.test(c.url)) { seen[c.url] = 1; sources.push({ url: c.url, title: String(c.title || c.url).slice(0, 120) }); }
+        });
+      });
+      text = text.trim();
       if (!r || r.status !== 200 || !text) throw err('upstream', 'The rules checker could not answer just now. Try again in a minute.');
-      return { answer: String(text) };
+      return { answer: text, sources: sources.slice(0, 4) };
     };
 
     /* Fill an empty store with the society's starting data. */

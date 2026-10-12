@@ -241,7 +241,7 @@ test('rules checker: off until a key is set, and never reaches the network witho
   assert.equal(calls.length + b.calls.length, 0);
 });
 
-test('rules checker: sends the question with the key kept server-side and the society rules in the prompt', () => {
+test('rules checker: sends the question with the key kept server-side, searches only the official rules sites, and is golf rules only', () => {
   const { s, calls } = askServer({ secrets: { ANTHROPIC_KEY: 'sk-test' }, reply: ok });
   const r = s.api({ op: 'ask', question: '  Ball in the water?  ', history: [
     { role: 'assistant', text: 'orphan first' }, { role: 'user', text: 'Hi' }, { role: 'assistant', text: 'Hello' }, { role: 'user', text: 'dangling' }
@@ -249,8 +249,11 @@ test('rules checker: sends the question with the key kept server-side and the so
   assert.equal(r.answer, 'Take a drop. One penalty stroke (Rule 17.1).');
   assert.equal(calls.length, 1);
   assert.equal(calls[0].headers['x-api-key'], 'sk-test');
-  assert.match(calls[0].body.system, /Buggy Wars/);
-  assert.match(calls[0].body.system, /back nine, then the last six/);
+  assert.doesNotMatch(calls[0].body.system, /Buggy Wars|NCGS|countback/i);
+  assert.match(calls[0].body.system, /Rules of Golf/);
+  const tool = calls[0].body.tools[0];
+  assert.equal(tool.type, 'web_search_20250305');
+  assert.deepEqual(tool.allowed_domains, ['randa.org', 'usga.org']);
   const m = calls[0].body.messages;
   assert.equal(m[0].role, 'user');
   assert.equal(m[m.length - 1].content, 'Ball in the water?');
@@ -268,4 +271,20 @@ test('rules checker: refuses empty or very long questions, stops at the daily ca
   assert.equal(a.calls.length, 2);
   const f = askServer({ secrets: { ANTHROPIC_KEY: 'k' }, reply: () => ({ status: 529, json: { error: {} } }) });
   assert.equal(f.s.api({ op: 'ask', question: 'Is this ok?' }).error, 'upstream');
+});
+
+test('rules checker: joins the answer text and returns only official rule sources', () => {
+  const reply = () => ({ status: 200, json: { content: [
+    { type: 'server_tool_use', name: 'web_search' },
+    { type: 'web_search_tool_result', content: [] },
+    { type: 'text', text: 'Replay the ball. ', citations: [
+      { type: 'web_search_result_location', url: 'https://www.randa.org/en/rog/the-rules-of-golf/rule-11', title: 'Rule 11' },
+      { type: 'web_search_result_location', url: 'https://evil.example/randa.org', title: 'Fake' }] },
+    { type: 'text', text: 'No penalty (Rule 11.1).', citations: [
+      { type: 'web_search_result_location', url: 'https://www.randa.org/en/rog/the-rules-of-golf/rule-11', title: 'Rule 11' }] }
+  ] } });
+  const { s } = askServer({ secrets: { ANTHROPIC_KEY: 'k' }, reply });
+  const r = s.api({ op: 'ask', question: 'My ball hit another ball on the green' });
+  assert.equal(r.answer, 'Replay the ball. No penalty (Rule 11.1).');
+  assert.deepEqual(r.sources, [{ url: 'https://www.randa.org/en/rog/the-rules-of-golf/rule-11', title: 'Rule 11' }]);
 });

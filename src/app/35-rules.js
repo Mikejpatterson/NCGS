@@ -1,12 +1,11 @@
-/* ----- Rules checker: ask about the Rules of Golf and the society rules ----- */
+/* ----- Rules checker: ask about the Rules of Golf, checked live against the official rules ----- */
 const SPEECH = window.SpeechRecognition || window.webkitSpeechRecognition;
 const ASK_IDEAS = [
-  'My ball is in the water. What do I do?',
-  'Ball out of bounds or lost: what now?',
-  'Can I move something in a bunker?',
+  'My ball hit another ball on the green. What now?',
+  'Ball moved after I addressed it',
+  'Ball in a bunker footprint or plugged lie',
   'Unplayable lie: what are my options?',
-  'How does Buggy Wars work?',
-  'Who buys the first round?'
+  'Ball hit my buggy or a person'
 ];
 
 // Plain text from the answer: paragraphs, "- " bullets and **bold**, nothing else.
@@ -26,16 +25,22 @@ function askRuling(t) {
   return `<div class="verdict">${inline(verdict.replace(/^\*\*|\*\*$/g, ''))}</div>${rest.trim() ? `<div class="rest">${askText(rest)}</div>` : ''}${rules.length ? `<div class="rules">${rules.map(r => `<span class="rulechip">${esc(r)}</span>`).join('')}</div>` : ''}`;
 }
 
+function askSources(list) {
+  const ok = (list || []).filter(x => x && /^https:\/\//.test(x.url));
+  if (!ok.length) return '';
+  return `<div class="srcs"><span class="srcl">Source</span>${ok.map(x => `<a class="src" href="${esc(x.url)}" target="_blank" rel="noopener">${esc(String(x.title).replace(/\s*\|.*$/, ''))}</a>`).join('')}</div>`;
+}
+
 function askThread() {
   if (!UI.chat.length && !UI.chatBusy) {
-    return `<div class="ask-intro"><p class="b">Say what happened.</p><p class="sub">${SPEECH ? 'Tap the microphone and speak, or type.' : 'Tap the box, then the microphone on your keyboard to speak.'} You get a ruling you can read out, with the rule number.</p></div>
+    return `<div class="ask-intro"><p class="b">Say what happened.</p><p class="sub">${SPEECH ? 'Tap the microphone and speak, or type.' : 'Tap the box, then the microphone on your keyboard to speak.'} You get a ruling you can read out, checked against the official rules.</p></div>
       <div class="ask-ideas">${ASK_IDEAS.map(q => `<button class="idea" data-act="ask-idea" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
   }
   return UI.chat.map(m => m.role === 'user'
     ? `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>`
-    : `<div class="msg ai"><div class="bub${m.error ? ' err' : ''}">${m.error ? esc(m.text) : askRuling(m.text)}</div></div>`).join('')
+    : `<div class="msg ai"><div class="bub${m.error ? ' err' : ''}">${m.error ? esc(m.text) : askRuling(m.text) + askSources(m.sources)}</div></div>`).join('')
     + (UI.chatBusy ? '<div class="msg ai"><div class="bub wait" aria-label="Checking the rules"><i></i><i></i><i></i></div></div>' : '')
-    + `<p class="cap ask-note">Answers come from the Rules of Golf and our society rules. For anything close, the organiser has the final say.</p>`;
+    + `<p class="cap ask-note">Checked against the official Rules of Golf (R&amp;A and USGA). For anything close, play a second ball and ask the organiser.</p>`;
 }
 
 /* ----- Speaking a question: live words, a level meter, Stop, X to cancel, then Send ----- */
@@ -153,7 +158,7 @@ function askQuestion(q) {
   const history = UI.chat.slice(0, -1).filter(m => !m.error).map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', text: m.text }));
   call({ op: 'ask', question: q, history }).then(res => {
     UI.chatBusy = false;
-    if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer });
+    if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer, sources: res.sources || [] });
     else UI.chat.push({ role: 'ai', text: (res && res.message) || 'The rules checker could not answer just now.', error: true });
     refreshThread();
   }).catch(() => {

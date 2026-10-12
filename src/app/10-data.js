@@ -36,7 +36,7 @@ function saveCache() { LS.set(KEY.cache, DB.server); }
 function localServer() {
   let data = LS.get(KEY.local, null);
   const store = NCGS.memoryStore(data, d => LS.set(KEY.local, d));
-  if (window.NCGS_TEST_ASK) { store.getSecret = k => (k === 'ANTHROPIC_KEY' ? 'test' : null); store.postJson = (u, h, b) => ({ status: 200, json: { content: [{ text: window.NCGS_TEST_ASK(b) }] } }); }
+  if (window.NCGS_TEST_ASK) { store.getSecret = k => (k === 'ANTHROPIC_KEY' ? 'test' : null); store.postJson = (u, h, b) => ({ status: 200, json: { content: [{ type: 'text', text: window.NCGS_TEST_ASK(b) }] } }); }
   const srv = NCGS.createServer(store);
   if (!data) {
     srv.api({ op: 'seed', data: window.NCGS_SEED, note: 'NCGS 2026 season from Marbella_2026_Final_Workbook.xlsx' });

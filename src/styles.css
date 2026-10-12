@@ -583,3 +583,8 @@ body.hearing .askbar .live { display: block; }
 @keyframes eqpulse { 0%, 100% { transform: scaleY(.15); } 50% { transform: scaleY(.8); } }
 @media (prefers-reduced-motion: reduce) { .eq.fake i { animation: none; transform: scaleY(.4); } }
 body.hearing .askbar .mic { animation: none; }
+
+/* Rules checker: where the answer came from */
+.srcs { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,.1); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.srcl { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted, #5b6b64); }
+.src { font-size: .9rem; font-weight: 600; color: var(--pine); text-decoration: underline; text-underline-offset: 2px; min-height: 32px; display: inline-flex; align-items: center; }
