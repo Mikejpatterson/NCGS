@@ -29,6 +29,8 @@ ORG.home = () => {
   const past = D.rounds().filter(r => r.status === 'final').reverse();
   const item = (v, icon, color, lbl) => `<button class="row" data-act="org-go" data-v="${v}"><span style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:${color}">${icon}</span>${lbl}</span>${chev}</button>`;
   let html = orgTop();
+  if (ORGPIN.weak) html += `<button class="banner warn" data-act="org-go" data-v="settings"><b>Change the organiser PIN.</b> It is still the starting one, and anyone who knows it can change scores. Tap to open Settings.</button>`;
+  if (D.testing()) html += `<button class="banner note" data-act="org-go" data-v="settings"><b>Testing mode is on.</b> Any round can be deleted. Turn it off in Settings before real rounds.</button>`;
   html += sec(label('Rounds'), cardOf(active.map(roundSummary).join('') + `<button class="row" data-act="org-new-round"><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}New round</span></button>`), true);
   html += sec(label('Manage'), cardOf(`${item('members', ICON.users, '#0A60C9', 'Members and handicaps')}${item('courses', ICON.course, '#1E7A3D', 'Courses')}${item('settings', ICON.gear, '#8E8E93', 'Settings')}${item('log', ICON.history, '#8E8E93', 'Change log')}${item('export', ICON.download, '#8E8E93', 'Export')}`));
   if (past.length) {
@@ -322,7 +324,9 @@ function exportCsv() {
   return lines.join('\n');
 }
 ORG.export = () => ({
-  html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Export</h1></div></header>
+  html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Backup and export</h1></div></header>
+  ${sec(label('Backup'), cardOf(`<button class="row tall" data-act="backup-now"><span class="two"><span>Back up now</span><span class="sub">${BOOT.mode === 'live' ? 'Saves a copy of the whole sheet in Drive' : 'Preview: nothing is saved to Drive'}</span></span>${chev}</button>`), true)}
+  ${sec(label('Restore'), `<p class="cap note">Paste an export below to put back anything that has gone missing. Anything that is there now is left alone, so no newer score can be lost.</p><textarea class="export" id="restorejson" placeholder="Paste the export here" aria-label="Export to restore from"></textarea><button class="btn quiet" data-act="restore">${UI.confirm === 'restore' ? 'Tap again to restore' : 'Restore missing data'}</button>`)}
   ${sec(label('Everything (JSON)'), `<textarea class="export" id="exjson" readonly aria-label="All data as JSON">${esc(JSON.stringify(exportData(), null, 1))}</textarea>
     <button class="btn quiet" data-act="copy" data-target="exjson">Copy</button>`, true)}
   ${sec(label('Hole-by-hole scores (CSV)'), `<textarea class="export" id="excsv" readonly aria-label="Scores as CSV">${esc(exportCsv())}</textarea>

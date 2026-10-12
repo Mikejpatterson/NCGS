@@ -96,6 +96,7 @@ var NCGS = (function () {
       cacheGet: function () { return null; },
       cachePut: function () {},
       fetchJson: null,
+      backup: function () { return { name: 'in-memory copy', url: '' }; },
       dump: function () { return data; }
     };
   }
@@ -185,6 +186,19 @@ var NCGS = (function () {
       cacheGet: function (k) { return cache.get(k); },
       cachePut: function (k, v, s) { try { cache.put(k, v, s || 600); } catch (e) { /* too big to cache */ } },
       fetchJson: function (url) { return JSON.parse(UrlFetchApp.fetch(url, { muteHttpExceptions: true }).getContentText()); },
+      backup: function () {
+        var fid = props.getProperty('BACKUPS'), dir = null;
+        if (fid) { try { dir = DriveApp.getFolderById(fid); } catch (e) { dir = null; } }
+        if (!dir) { dir = DriveApp.createFolder('NCGS backups'); props.setProperty('BACKUPS', dir.getId()); }
+        var name = 'NCGS backup ' + Utilities.formatDate(new Date(), 'Europe/Dublin', 'yyyy-MM-dd HH:mm');
+        var copy = DriveApp.getFileById(ss.getId()).makeCopy(name, dir);
+        // keep the newest 14 copies
+        var files = [], it = dir.getFiles();
+        while (it.hasNext()) files.push(it.next());
+        files.sort(function (a, b) { return b.getDateCreated() - a.getDateCreated(); });
+        files.slice(14).forEach(function (f) { f.setTrashed(true); });
+        return { name: name, url: copy.getUrl() };
+      },
       getSecret: function (k) { return props.getProperty(k); },
       postJson: function (url, headers, body) {
         var r = UrlFetchApp.fetch(url, { method: 'post', contentType: 'application/json', headers: headers, payload: JSON.stringify(body), muteHttpExceptions: true });
@@ -373,6 +387,48 @@ var NCGS = (function () {
     };
     ops.photoGet = function (req) { return { dataUrl: store.getPhoto(String(req.id)) }; };
 
+    /* A copy of the whole sheet in Drive, on demand (a daily one can be switched on too). */
+    ops.backupNow = function (req) {
+      if (!pinOk(req.pin)) throw err('pin', 'Organiser PIN needed.');
+      if (!store.backup) throw err('bad', 'Backups are not available here.');
+      var b = store.backup();
+      return store.lock(function () {
+        var v = bump();
+        store.upsert('log', stamp('log', [logRow(v, 'Organiser', 'Backup made', b.name)], v));
+        commit(v);
+        return { ok: true, ver: v, name: b.name, url: b.url };
+      });
+    };
+
+    /* Put back what has gone missing, from an Export. A row that exists now is never overwritten, so a
+       score entered since the backup can never be lost to an old copy. */
+    ops.restore = function (req) {
+      if (!pinOk(req.pin)) throw err('pin', 'Organiser PIN needed.');
+      var tables = req.data && req.data.tables;
+      if (!tables || typeof tables !== 'object') throw err('bad', 'That is not an export from this app.');
+      var plan = {}, total = 0;
+      TABLES.forEach(function (t) {
+        if (t === 'deleted' || t === 'log' || !Array.isArray(tables[t])) return;
+        var have = {};
+        store.read(t).forEach(function (r) { have[keyOf(t, r)] = 1; });
+        var rows = [];
+        tables[t].forEach(function (r) {
+          if (!r || typeof r !== 'object') return;
+          if (SCHEMA[t].key.some(function (k) { return r[k] === undefined || r[k] === null || r[k] === ''; })) return;
+          if (!have[keyOf(t, r)]) { have[keyOf(t, r)] = 1; rows.push(r); }
+        });
+        if (rows.length) { plan[t] = rows; total += rows.length; }
+      });
+      if (!total) return { ok: true, restored: 0, tables: {} };
+      return store.lock(function () {
+        var v = bump(), counts = {};
+        Object.keys(plan).forEach(function (t) { store.upsert(t, stamp(t, plan[t], v)); counts[t] = plan[t].length; });
+        store.upsert('log', stamp('log', [logRow(v, 'Organiser', 'Restored from a backup', Object.keys(counts).map(function (t) { return counts[t] + ' ' + t; }).join(', '))], v));
+        commit(v);
+        return { ok: true, ver: v, restored: total, tables: counts };
+      });
+    };
+
     /* Forecast for a course on a day, from Open-Meteo (free, no key). Cached for an hour. */
     ops.weather = function (req) {
       if (!store.fetchJson) return { days: null };
@@ -492,6 +548,12 @@ var NCGS = (function () {
         } catch (x) { return json({ error: 'bad', message: 'Unreadable request' }); }
         if (!req.op) return json({ ok: true, app: 'NCGS', ver: Number(props.getProperty('VER') || 0) });
         return json(server().api(req));
+      },
+      backup: function () { return sheetStore(spreadsheet(), props, CacheService.getScriptCache(), LockService, folder).backup(); },
+      installBackup: function () {
+        var has = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'backup'; });
+        if (!has) ScriptApp.newTrigger('backup').timeBased().everyDays(1).atHour(3).create();
+        return { daily: true };
       },
       setup: function () {
         var ss = spreadsheet();

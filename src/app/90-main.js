@@ -256,6 +256,20 @@ const ACT = {
     if (UI.confirm !== 'reset') { UI.confirm = 'reset'; render(); return; }
     Object.values(KEY).forEach(k => LS.del(k));
     location.reload();
+  },
+  'backup-now': () => {
+    call({ op: 'backupNow', pin: ORGPIN.pin }).then(res => toast(res.ok ? 'Backup saved' : (res.message || 'Backup failed'))).catch(() => toast('Needs signal to back up'));
+  },
+  restore: () => {
+    let data;
+    try { data = JSON.parse(val('restorejson')); } catch (e) { toast('That does not look like an export'); return; }
+    if (!data || !data.tables) { toast('That does not look like an export'); return; }
+    if (UI.confirm !== 'restore') { UI.confirm = 'restore'; UI.restoreText = val('restorejson'); render(); const el = document.getElementById('restorejson'); if (el) el.value = UI.restoreText; return; }
+    UI.confirm = null;
+    call({ op: 'restore', pin: ORGPIN.pin, data }).then(res => {
+      if (res.ok) { toast(res.restored ? `Put back ${res.restored} ${res.restored === 1 ? 'item' : 'items'}` : 'Nothing was missing'); sync(); } else toast(res.message || 'Not restored');
+      render();
+    }).catch(() => toast('Needs signal to restore'));
   }
 };
 
@@ -264,7 +278,7 @@ const FORMS = {
   pin: () => {
     const v = val('pin');
     call({ op: 'checkPin', pin: v }).then(res => {
-      if (res.ok) { ORGPIN.pin = v; UI.orgUnlocked = true; UI.pinError = false; replaceTop('home'); }
+      if (res.ok) { ORGPIN.pin = v; ORGPIN.weak = v === '1234'; UI.orgUnlocked = true; UI.pinError = false; replaceTop('home'); }
       else { UI.pinError = 'That PIN did not match.'; render(); const el = document.getElementById('pin'); if (el) el.focus(); }
     }).catch(() => { UI.pinError = 'The organiser needs signal to unlock.'; render(); });
   },
@@ -361,7 +375,7 @@ const FORMS = {
     const np = val('s-pin');
     if (!/^\d{4,8}$/.test(np)) { toast('Use 4 to 8 digits'); return; }
     call({ op: 'setPin', pin: ORGPIN.pin, newPin: np }).then(res => {
-      if (res.ok) { ORGPIN.pin = np; toast('PIN changed'); sync(); } else toast(res.message || 'PIN not changed');
+      if (res.ok) { ORGPIN.pin = np; ORGPIN.weak = false; toast('PIN changed'); sync(); } else toast(res.message || 'PIN not changed');
     }).catch(() => toast('Needs signal to change the PIN'));
   }
 };

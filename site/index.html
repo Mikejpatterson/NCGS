@@ -695,9 +695,12 @@ button.hsub svg { width: 14px; height: 14px; opacity: .8; }
 .stile .cap { color: var(--tone); font-weight: 700; text-transform: uppercase; letter-spacing: .05em; }
 .stile .who { font-size: var(--t-lead); font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; }
 .stile .nt { font-size: var(--t-sub); color: var(--sub); line-height: 1.3; }
+button.banner { display: block; width: 100%; text-align: left; margin: 12px 0 0; font: inherit; font-size: var(--t-sub); line-height: 1.35; min-height: 52px; }
+.banner.warn { background: #FBE7E5; color: #B3261E; }
+textarea.export + .btn, #restorejson + .btn { margin-top: 8px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121720"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121739"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1468,6 +1471,7 @@ var NCGS = (function () {
       cacheGet: function () { return null; },
       cachePut: function () {},
       fetchJson: null,
+      backup: function () { return { name: 'in-memory copy', url: '' }; },
       dump: function () { return data; }
     };
   }
@@ -1557,6 +1561,19 @@ var NCGS = (function () {
       cacheGet: function (k) { return cache.get(k); },
       cachePut: function (k, v, s) { try { cache.put(k, v, s || 600); } catch (e) { /* too big to cache */ } },
       fetchJson: function (url) { return JSON.parse(UrlFetchApp.fetch(url, { muteHttpExceptions: true }).getContentText()); },
+      backup: function () {
+        var fid = props.getProperty('BACKUPS'), dir = null;
+        if (fid) { try { dir = DriveApp.getFolderById(fid); } catch (e) { dir = null; } }
+        if (!dir) { dir = DriveApp.createFolder('NCGS backups'); props.setProperty('BACKUPS', dir.getId()); }
+        var name = 'NCGS backup ' + Utilities.formatDate(new Date(), 'Europe/Dublin', 'yyyy-MM-dd HH:mm');
+        var copy = DriveApp.getFileById(ss.getId()).makeCopy(name, dir);
+        // keep the newest 14 copies
+        var files = [], it = dir.getFiles();
+        while (it.hasNext()) files.push(it.next());
+        files.sort(function (a, b) { return b.getDateCreated() - a.getDateCreated(); });
+        files.slice(14).forEach(function (f) { f.setTrashed(true); });
+        return { name: name, url: copy.getUrl() };
+      },
       getSecret: function (k) { return props.getProperty(k); },
       postJson: function (url, headers, body) {
         var r = UrlFetchApp.fetch(url, { method: 'post', contentType: 'application/json', headers: headers, payload: JSON.stringify(body), muteHttpExceptions: true });
@@ -1745,6 +1762,48 @@ var NCGS = (function () {
     };
     ops.photoGet = function (req) { return { dataUrl: store.getPhoto(String(req.id)) }; };
 
+    /* A copy of the whole sheet in Drive, on demand (a daily one can be switched on too). */
+    ops.backupNow = function (req) {
+      if (!pinOk(req.pin)) throw err('pin', 'Organiser PIN needed.');
+      if (!store.backup) throw err('bad', 'Backups are not available here.');
+      var b = store.backup();
+      return store.lock(function () {
+        var v = bump();
+        store.upsert('log', stamp('log', [logRow(v, 'Organiser', 'Backup made', b.name)], v));
+        commit(v);
+        return { ok: true, ver: v, name: b.name, url: b.url };
+      });
+    };
+
+    /* Put back what has gone missing, from an Export. A row that exists now is never overwritten, so a
+       score entered since the backup can never be lost to an old copy. */
+    ops.restore = function (req) {
+      if (!pinOk(req.pin)) throw err('pin', 'Organiser PIN needed.');
+      var tables = req.data && req.data.tables;
+      if (!tables || typeof tables !== 'object') throw err('bad', 'That is not an export from this app.');
+      var plan = {}, total = 0;
+      TABLES.forEach(function (t) {
+        if (t === 'deleted' || t === 'log' || !Array.isArray(tables[t])) return;
+        var have = {};
+        store.read(t).forEach(function (r) { have[keyOf(t, r)] = 1; });
+        var rows = [];
+        tables[t].forEach(function (r) {
+          if (!r || typeof r !== 'object') return;
+          if (SCHEMA[t].key.some(function (k) { return r[k] === undefined || r[k] === null || r[k] === ''; })) return;
+          if (!have[keyOf(t, r)]) { have[keyOf(t, r)] = 1; rows.push(r); }
+        });
+        if (rows.length) { plan[t] = rows; total += rows.length; }
+      });
+      if (!total) return { ok: true, restored: 0, tables: {} };
+      return store.lock(function () {
+        var v = bump(), counts = {};
+        Object.keys(plan).forEach(function (t) { store.upsert(t, stamp(t, plan[t], v)); counts[t] = plan[t].length; });
+        store.upsert('log', stamp('log', [logRow(v, 'Organiser', 'Restored from a backup', Object.keys(counts).map(function (t) { return counts[t] + ' ' + t; }).join(', '))], v));
+        commit(v);
+        return { ok: true, ver: v, restored: total, tables: counts };
+      });
+    };
+
     /* Forecast for a course on a day, from Open-Meteo (free, no key). Cached for an hour. */
     ops.weather = function (req) {
       if (!store.fetchJson) return { days: null };
@@ -1864,6 +1923,12 @@ var NCGS = (function () {
         } catch (x) { return json({ error: 'bad', message: 'Unreadable request' }); }
         if (!req.op) return json({ ok: true, app: 'NCGS', ver: Number(props.getProperty('VER') || 0) });
         return json(server().api(req));
+      },
+      backup: function () { return sheetStore(spreadsheet(), props, CacheService.getScriptCache(), LockService, folder).backup(); },
+      installBackup: function () {
+        var has = ScriptApp.getProjectTriggers().some(function (t) { return t.getHandlerFunction() === 'backup'; });
+        if (!has) ScriptApp.newTrigger('backup').timeBased().everyDays(1).atHour(3).create();
+        return { daily: true };
       },
       setup: function () {
         var ss = spreadsheet();
@@ -3882,6 +3947,8 @@ ORG.home = () => {
   const past = D.rounds().filter(r => r.status === 'final').reverse();
   const item = (v, icon, color, lbl) => `<button class="row" data-act="org-go" data-v="${v}"><span style="display:flex;align-items:center;gap:12px"><span class="ic" style="background:${color}">${icon}</span>${lbl}</span>${chev}</button>`;
   let html = orgTop();
+  if (ORGPIN.weak) html += `<button class="banner warn" data-act="org-go" data-v="settings"><b>Change the organiser PIN.</b> It is still the starting one, and anyone who knows it can change scores. Tap to open Settings.</button>`;
+  if (D.testing()) html += `<button class="banner note" data-act="org-go" data-v="settings"><b>Testing mode is on.</b> Any round can be deleted. Turn it off in Settings before real rounds.</button>`;
   html += sec(label('Rounds'), cardOf(active.map(roundSummary).join('') + `<button class="row" data-act="org-new-round"><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}New round</span></button>`), true);
   html += sec(label('Manage'), cardOf(`${item('members', ICON.users, '#0A60C9', 'Members and handicaps')}${item('courses', ICON.course, '#1E7A3D', 'Courses')}${item('settings', ICON.gear, '#8E8E93', 'Settings')}${item('log', ICON.history, '#8E8E93', 'Change log')}${item('export', ICON.download, '#8E8E93', 'Export')}`));
   if (past.length) {
@@ -4175,7 +4242,9 @@ function exportCsv() {
   return lines.join('\n');
 }
 ORG.export = () => ({
-  html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Export</h1></div></header>
+  html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Backup and export</h1></div></header>
+  ${sec(label('Backup'), cardOf(`<button class="row tall" data-act="backup-now"><span class="two"><span>Back up now</span><span class="sub">${BOOT.mode === 'live' ? 'Saves a copy of the whole sheet in Drive' : 'Preview: nothing is saved to Drive'}</span></span>${chev}</button>`), true)}
+  ${sec(label('Restore'), `<p class="cap note">Paste an export below to put back anything that has gone missing. Anything that is there now is left alone, so no newer score can be lost.</p><textarea class="export" id="restorejson" placeholder="Paste the export here" aria-label="Export to restore from"></textarea><button class="btn quiet" data-act="restore">${UI.confirm === 'restore' ? 'Tap again to restore' : 'Restore missing data'}</button>`)}
   ${sec(label('Everything (JSON)'), `<textarea class="export" id="exjson" readonly aria-label="All data as JSON">${esc(JSON.stringify(exportData(), null, 1))}</textarea>
     <button class="btn quiet" data-act="copy" data-target="exjson">Copy</button>`, true)}
   ${sec(label('Hole-by-hole scores (CSV)'), `<textarea class="export" id="excsv" readonly aria-label="Scores as CSV">${esc(exportCsv())}</textarea>
@@ -4469,6 +4538,20 @@ const ACT = {
     if (UI.confirm !== 'reset') { UI.confirm = 'reset'; render(); return; }
     Object.values(KEY).forEach(k => LS.del(k));
     location.reload();
+  },
+  'backup-now': () => {
+    call({ op: 'backupNow', pin: ORGPIN.pin }).then(res => toast(res.ok ? 'Backup saved' : (res.message || 'Backup failed'))).catch(() => toast('Needs signal to back up'));
+  },
+  restore: () => {
+    let data;
+    try { data = JSON.parse(val('restorejson')); } catch (e) { toast('That does not look like an export'); return; }
+    if (!data || !data.tables) { toast('That does not look like an export'); return; }
+    if (UI.confirm !== 'restore') { UI.confirm = 'restore'; UI.restoreText = val('restorejson'); render(); const el = document.getElementById('restorejson'); if (el) el.value = UI.restoreText; return; }
+    UI.confirm = null;
+    call({ op: 'restore', pin: ORGPIN.pin, data }).then(res => {
+      if (res.ok) { toast(res.restored ? `Put back ${res.restored} ${res.restored === 1 ? 'item' : 'items'}` : 'Nothing was missing'); sync(); } else toast(res.message || 'Not restored');
+      render();
+    }).catch(() => toast('Needs signal to restore'));
   }
 };
 
@@ -4477,7 +4560,7 @@ const FORMS = {
   pin: () => {
     const v = val('pin');
     call({ op: 'checkPin', pin: v }).then(res => {
-      if (res.ok) { ORGPIN.pin = v; UI.orgUnlocked = true; UI.pinError = false; replaceTop('home'); }
+      if (res.ok) { ORGPIN.pin = v; ORGPIN.weak = v === '1234'; UI.orgUnlocked = true; UI.pinError = false; replaceTop('home'); }
       else { UI.pinError = 'That PIN did not match.'; render(); const el = document.getElementById('pin'); if (el) el.focus(); }
     }).catch(() => { UI.pinError = 'The organiser needs signal to unlock.'; render(); });
   },
@@ -4574,7 +4657,7 @@ const FORMS = {
     const np = val('s-pin');
     if (!/^\d{4,8}$/.test(np)) { toast('Use 4 to 8 digits'); return; }
     call({ op: 'setPin', pin: ORGPIN.pin, newPin: np }).then(res => {
-      if (res.ok) { ORGPIN.pin = np; toast('PIN changed'); sync(); } else toast(res.message || 'PIN not changed');
+      if (res.ok) { ORGPIN.pin = np; ORGPIN.weak = false; toast('PIN changed'); sync(); } else toast(res.message || 'PIN not changed');
     }).catch(() => toast('Needs signal to change the PIN'));
   }
 };

@@ -288,3 +288,42 @@ test('rules checker: joins the answer text and returns only official rule source
   assert.equal(r.answer, 'Replay the ball. No penalty (Rule 11.1).');
   assert.deepEqual(r.sources, [{ url: 'https://www.randa.org/en/rog/the-rules-of-golf/rule-11', title: 'Rule 11' }]);
 });
+
+test('restore puts back what is missing and never overwrites a row that exists', () => {
+  for (const [kind, s] of servers().list) {
+    s.api({ op: 'seed', data: { members: [{ id: 'a', name: 'Al', index: 12.4, active: true }, { id: 'b', name: 'Bo', index: 20, active: true }], rounds: [ROUND] } });
+    s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 1, scores: { a: { v: 5, base: null } }, by: 'Al' });
+    const backup = { tables: s.api({ op: 'load' }).tables };
+    // later: Bo is deleted, and Al's hole 1 is corrected to 4 and hole 2 entered
+    s.api({ op: 'remove', table: 'members', rows: [{ id: 'b' }], pin: '1234' });
+    s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 1, scores: { a: { v: 4, base: 5 } }, by: 'Al' });
+    s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 2, scores: { a: { v: 6, base: null } }, by: 'Al' });
+    assert.equal(s.api({ op: 'restore', data: backup, pin: 'nope' }).error, 'pin', kind);
+    assert.equal(s.api({ op: 'restore', data: { nothing: 1 }, pin: '1234' }).error, 'bad', kind);
+    const r = s.api({ op: 'restore', data: backup, pin: '1234' });
+    assert.equal(r.ok, true, kind);
+    assert.deepEqual(r.tables, { members: 1 }, kind);
+    const t = s.api({ op: 'load' }).tables;
+    assert.deepEqual(t.members.map(m => m.id).sort(), ['a', 'b'], kind);
+    const sc = Object.fromEntries(t.scores.map(x => [x.hole, x.strokes]));
+    assert.deepEqual(sc, { 1: 4, 2: 6 }, kind); // the newer scores are untouched
+    // the restored member reaches phones that already deleted it
+    const d = s.api({ op: 'since', v: 0 });
+    assert.ok(d.tables.members.some(m => m.id === 'b'), kind);
+    assert.ok(t.log.some(l => l.action === 'Restored from a backup'), kind);
+    assert.equal(s.api({ op: 'restore', data: backup, pin: '1234' }).restored, 0, kind); // second time: nothing missing
+  }
+});
+
+test('backupNow needs the PIN and is logged', () => {
+  const ss = fakeSpreadsheet();
+  let made = 0;
+  const store = N.sheetStore(ss, fakeProps(), fakeCache(), fakeLock, () => null);
+  store.backup = () => { made++; return { name: 'NCGS backup test', url: 'u' }; };
+  const s = N.createServer(store);
+  assert.equal(s.api({ op: 'backupNow', pin: 'x' }).error, 'pin');
+  assert.equal(made, 0);
+  const r = s.api({ op: 'backupNow', pin: '1234' });
+  assert.equal(r.ok, true); assert.equal(r.name, 'NCGS backup test'); assert.equal(made, 1);
+  assert.ok(s.api({ op: 'load' }).tables.log.some(l => l.action === 'Backup made'));
+});
