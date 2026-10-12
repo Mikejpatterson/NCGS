@@ -163,8 +163,11 @@ ORG.playing = p => {
   html = html.replace('</header>', `<p class="sub head-sub">${plural(d.ids.length, 'player')} · first tee ${esc(r.first_tee || 'not set')}</p></header>`);
   if (d.repeats.length) html += `<div class="banner note">${d.repeats.map(x => `${esc(x.pair.map(D.nameOf).join(' & '))} shared a buggy before`).join('<br>')}</div>`;
   const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
+  const holeCount = (holesOf(r) || []).length || 18;
   d.groups.forEach((g, gi) => {
-    html += sec(`<span class="b">Group ${gi + 1}</span><span class="sub">${esc(times[gi] || '')}</span>`, cardOf(g.teams.map((t, i) => t.map(pid =>
+    const sh = g.startHole || 1;
+    const startRow = `<div class="row"><label for="sh-${gi}">Starts on hole</label><select id="sh-${gi}" class="field short" data-change="start-hole" data-gi="${gi}" aria-label="Group ${gi + 1} starts on hole">${Array.from({ length: holeCount }, (_, k) => `<option value="${k + 1}"${sh === k + 1 ? ' selected' : ''}>${k + 1}</option>`).join('')}</select></div>`;
+    html += sec(`<span class="b">Group ${gi + 1}</span><span class="sub">${esc(sh !== 1 ? 'Hole ' + sh + ' · ' : '')}${esc(times[gi] || '')}</span>`, cardOf(startRow + g.teams.map((t, i) => t.map(pid =>
       `<button class="row${sel === pid ? ' picked' : ''}" data-act="org-swap" data-pid="${pid}"><span style="display:flex;align-items:center;gap:8px">${g.teams.length > 1 ? dot(i) : ''}${esc(D.nameOf(pid))}</span>${g.teams.length > 1 ? `<span class="cap">Buggy ${i + 1}</span>` : ''}</button>`).join('')).join('')), true);
   });
   html += `<button class="btn" data-act="org-save-groups">Save groups</button>

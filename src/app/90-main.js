@@ -190,7 +190,7 @@ const ACT = {
     const r = D.round(cur().p.rid);
     const d = draftFor(r);
     const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
-    const groups = d.groups.map((g, i) => ({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: 1, teams: g.teams }));
+    const groups = d.groups.map((g, i) => ({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }));
     const ids = new Set(groups.flatMap(g => g.teams.flat()));
     const kb = r.kb && r.kb.every(pr => pr.every(pid => ids.has(pid))) ? r.kb : null;
     put('rounds', [Object.assign({}, r, { groups, kb })], { action: 'Groups saved', detail: `${roundName(r)}: ${groups.map(g => `${g.teeTime} ${g.teams.map(t => t.map(D.nameOf).join(' & ')).join(' v ')}`).join('; ')}` });
@@ -482,6 +482,7 @@ document.addEventListener('mousedown', e => { if (e.target.closest && e.target.c
 if (window.visualViewport) { window.visualViewport.addEventListener('resize', placeAskBar); window.visualViewport.addEventListener('scroll', placeAskBar); }
 document.addEventListener('change', e => {
   const t = e.target;
+  if (t.dataset && t.dataset.change === 'start-hole' && UI.draft && UI.draft.groups) { UI.draft.groups[Number(t.dataset.gi)].startHole = Number(t.value); render(); return; }
   if (t.dataset && t.dataset.change === 'details-course') { UI.formState = Object.assign({}, UI.formState, { course: t.value }); render(); return; }
   const el = t.closest && t.closest('input[data-photo]');
   if (!el || !el.files || !el.files[0]) return;

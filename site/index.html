@@ -672,9 +672,10 @@ button.hsub svg { width: 14px; height: 14px; opacity: .8; }
 .switch.on { background: var(--green); }
 .switch.on i { transform: translateX(20px); }
 @media (prefers-reduced-motion: reduce) { .switch, .switch i { transition: none; } }
+.field.short { width: 84px; flex: none; min-height: 44px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121638"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121646"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3795,8 +3796,11 @@ ORG.playing = p => {
   html = html.replace('</header>', `<p class="sub head-sub">${plural(d.ids.length, 'player')} · first tee ${esc(r.first_tee || 'not set')}</p></header>`);
   if (d.repeats.length) html += `<div class="banner note">${d.repeats.map(x => `${esc(x.pair.map(D.nameOf).join(' & '))} shared a buggy before`).join('<br>')}</div>`;
   const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
+  const holeCount = (holesOf(r) || []).length || 18;
   d.groups.forEach((g, gi) => {
-    html += sec(`<span class="b">Group ${gi + 1}</span><span class="sub">${esc(times[gi] || '')}</span>`, cardOf(g.teams.map((t, i) => t.map(pid =>
+    const sh = g.startHole || 1;
+    const startRow = `<div class="row"><label for="sh-${gi}">Starts on hole</label><select id="sh-${gi}" class="field short" data-change="start-hole" data-gi="${gi}" aria-label="Group ${gi + 1} starts on hole">${Array.from({ length: holeCount }, (_, k) => `<option value="${k + 1}"${sh === k + 1 ? ' selected' : ''}>${k + 1}</option>`).join('')}</select></div>`;
+    html += sec(`<span class="b">Group ${gi + 1}</span><span class="sub">${esc(sh !== 1 ? 'Hole ' + sh + ' · ' : '')}${esc(times[gi] || '')}</span>`, cardOf(startRow + g.teams.map((t, i) => t.map(pid =>
       `<button class="row${sel === pid ? ' picked' : ''}" data-act="org-swap" data-pid="${pid}"><span style="display:flex;align-items:center;gap:8px">${g.teams.length > 1 ? dot(i) : ''}${esc(D.nameOf(pid))}</span>${g.teams.length > 1 ? `<span class="cap">Buggy ${i + 1}</span>` : ''}</button>`).join('')).join('')), true);
   });
   html += `<button class="btn" data-act="org-save-groups">Save groups</button>
@@ -4179,7 +4183,7 @@ const ACT = {
     const r = D.round(cur().p.rid);
     const d = draftFor(r);
     const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
-    const groups = d.groups.map((g, i) => ({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: 1, teams: g.teams }));
+    const groups = d.groups.map((g, i) => ({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }));
     const ids = new Set(groups.flatMap(g => g.teams.flat()));
     const kb = r.kb && r.kb.every(pr => pr.every(pid => ids.has(pid))) ? r.kb : null;
     put('rounds', [Object.assign({}, r, { groups, kb })], { action: 'Groups saved', detail: `${roundName(r)}: ${groups.map(g => `${g.teeTime} ${g.teams.map(t => t.map(D.nameOf).join(' & ')).join(' v ')}`).join('; ')}` });
@@ -4471,6 +4475,7 @@ document.addEventListener('mousedown', e => { if (e.target.closest && e.target.c
 if (window.visualViewport) { window.visualViewport.addEventListener('resize', placeAskBar); window.visualViewport.addEventListener('scroll', placeAskBar); }
 document.addEventListener('change', e => {
   const t = e.target;
+  if (t.dataset && t.dataset.change === 'start-hole' && UI.draft && UI.draft.groups) { UI.draft.groups[Number(t.dataset.gi)].startHole = Number(t.value); render(); return; }
   if (t.dataset && t.dataset.change === 'details-course') { UI.formState = Object.assign({}, UI.formState, { course: t.value }); render(); return; }
   const el = t.closest && t.closest('input[data-photo]');
   if (!el || !el.files || !el.files[0]) return;
