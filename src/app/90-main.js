@@ -43,6 +43,7 @@ const ACT = {
   enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },
   set: el => setScore(el.dataset.pid, el.dataset.v),
   clear: el => clearScore(el.dataset.pid),
+  'ask-mic': () => askListen(),
   'ask-idea': el => askQuestion(el.dataset.q),
   'ask-clear': () => { UI.chat = []; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'contest-open': () => { UI.contestSheet = true; render(); },
@@ -394,7 +395,7 @@ function renderToast() {
   el.textContent = UI.toast;
 }
 
-tabs.innerHTML = [['hole', 'Hole'], ['board', 'Results'], ['rules', 'Rules']]
+tabs.innerHTML = [['hole', 'Hole'], ['rules', 'Ruling'], ['board', 'Results']]
   .map(([k, l]) => `<button class="tab" data-act="tab" data-tab="${k}">${TABICON[k]}<span>${l}</span></button>`).join('');
 
 document.addEventListener('click', e => {
@@ -424,7 +425,7 @@ document.addEventListener('focusout', e => {
   setTimeout(() => { if (document.activeElement && document.activeElement.id === 'askin') return; document.body.classList.remove('typing'); document.documentElement.style.setProperty('--kb', '0px'); }, 150);
 });
 // Tapping Send must not take focus from the box, or the keyboard drops and the bar jumps before the tap lands.
-['mousedown', 'touchstart'].forEach(ev => document.addEventListener(ev, e => { if (e.target.closest && e.target.closest('.askbar .send')) e.preventDefault(); }, { passive: false }));
+['mousedown', 'touchstart'].forEach(ev => document.addEventListener(ev, e => { if (e.target.closest && e.target.closest('.askbar .send, .askbar .mic')) e.preventDefault(); }, { passive: false }));
 if (window.visualViewport) { window.visualViewport.addEventListener('resize', placeAskBar); window.visualViewport.addEventListener('scroll', placeAskBar); }
 document.addEventListener('change', e => {
   const t = e.target;

@@ -10,6 +10,7 @@ const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const ICON = {
   back: svg('<path d="M15 5l-7 7 7 7"/>'),
   chev: svg('<path d="M9 5l7 7-7 7"/>'),
+  mic: svg('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/>'),
   send: svg('<path d="M12 19V5"/><path d="M5.5 11.5L12 5l6.5 6.5"/>'),
   check: svg('<path d="M5 12.5l4.5 4.5L19 7"/>'),
   lock: svg('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),

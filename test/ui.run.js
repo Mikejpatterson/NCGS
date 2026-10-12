@@ -149,7 +149,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   // Rules checker
   await tap('.tab[data-tab="rules"]');
   t = await text();
-  check('rules tab: heading, ideas to tap and an ask bar', /Rules/.test(t) && (await page.$$('.idea')).length >= 4 && !!(await page.$('#askin')) && await page.$eval('.tab.on, .tab[aria-current="page"]', e => e.dataset.tab) === 'rules');
+  check('rules tab: heading, ideas to tap and an ask bar', /Ruling/.test(t) && (await page.$$('.idea')).length >= 4 && !!(await page.$('#askin')) && await page.$eval('.tab.on, .tab[aria-current="page"]', e => e.dataset.tab) === 'rules');
   await page.fill('#askin', 'Ball in the water?');
   await tap('.send');
   await page.waitForSelector('.bub.err');
@@ -160,7 +160,8 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await page.press('#askin', 'Enter');
   await page.waitForSelector('.msg.ai .bub:not(.err):not(.wait)');
   t = await text();
-  check('rules: the answer shows with bullets and bold, my question stays', /One penalty stroke Rule 17\.1/.test(t) && !!(await page.$('.bub .ab')) && !!(await page.$('.bub b')) && /red area/.test(t));
+  check('rules: verdict first and big, steps under it, rule number as a chip, my question stays', (await page.$eval('.msg.ai:last-of-type .verdict', e => e.textContent)) === 'Take relief.' && !!(await page.$('.bub .ab')) && (await page.$eval('.rulechip', e => e.textContent)) === 'Rule 17.1' && /red area/.test(t));
+  check('rules: a microphone button sits beside the box', !!(await page.$('.askbar .mic')) && JSON.stringify(await page.$$eval('.tab', b => b.map(x => x.dataset.tab))) === JSON.stringify(['hole', 'rules', 'board']));
   check('rules: the input is still there and empty for the next question', (await page.$eval('#askin', e => e.value)) === '');
   await shot('08c-rules', true);
   await tap('[data-act="ask-clear"]');
