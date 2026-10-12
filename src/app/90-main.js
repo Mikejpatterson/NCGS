@@ -257,6 +257,21 @@ const ACT = {
     Object.values(KEY).forEach(k => LS.del(k));
     location.reload();
   },
+  'late-pick': el => { UI.late = { rid: el.dataset.rid, pid: el.dataset.pid }; UI.confirm = null; render(); },
+  'late-cancel': () => { UI.late = null; UI.confirm = null; render(); },
+  'late-replace': el => {
+    const r = D.round(el.dataset.rid), pid = el.dataset.pid, np = el.dataset.new;
+    if (scoresFor(r.id, pid)) { toast('That player already has scores'); return; }
+    put('rounds', [withPlayerChanged(r, pid, np)], { action: 'Player swapped', detail: `${roundName(r)}: ${D.nameOf(np)} in for ${D.nameOf(pid)}` });
+    UI.late = null; toast(`${D.nameOf(np)} is in`); back();
+  },
+  'late-drop': el => {
+    const r = D.round(el.dataset.rid), pid = el.dataset.pid;
+    if (scoresFor(r.id, pid)) { toast('That player already has scores'); return; }
+    if (UI.confirm !== 'drop-' + pid) { UI.confirm = 'drop-' + pid; render(); return; }
+    put('rounds', [withPlayerChanged(r, pid, null)], { action: 'Player dropped out', detail: `${roundName(r)}: ${D.nameOf(pid)}` });
+    UI.late = null; UI.confirm = null; toast(`${D.nameOf(pid)} is out`); back();
+  },
   'backup-now': () => {
     call({ op: 'backupNow', pin: ORGPIN.pin }).then(res => toast(res.ok ? 'Backup saved' : (res.message || 'Backup failed'))).catch(() => toast('Needs signal to back up'));
   },
@@ -369,6 +384,22 @@ const FORMS = {
     if (!(allow >= 50 && allow <= 100)) { UI.formError = 'Allowance: 50 to 100%.'; render(); return; }
     put('settings', [{ key: 'society', value: val('s-name') || 'NCGS' }, { key: 'goy_best', value: String(best) }, { key: 'allowance', value: String(allow / 100) }], { action: 'Settings changed', detail: `Best ${best} count · allowance ${allow}%` });
     toast('Saved');
+    back();
+  },
+  guest: () => {
+    const name = val('g-name');
+    const raw = val('g-index').replace(',', '.');
+    const plus = raw.startsWith('+');
+    const n = Number(raw.replace('+', ''));
+    if (!name) { UI.formError = 'Enter a name.'; render(); return; }
+    if (raw === '' || !isFinite(n)) { UI.formError = 'Enter their WHS index, like 18.4 or +1.2.'; render(); return; }
+    const index = Math.round((plus ? -n : n) * 10) / 10;
+    if (index < -10 || index > 54) { UI.formError = 'WHS indexes run from +10.0 to 54.0.'; render(); return; }
+    if (D.members().some(x => x.name.toLowerCase() === name.toLowerCase())) { UI.formError = 'Someone already has that name.'; render(); return; }
+    const id = 'guest-' + slug(name) + '-' + Date.now().toString(36);
+    put('members', [{ id, name, full: 'Guest', index, active: true }], { action: 'Guest added', detail: `${name} (${fmtIndex(index)})` });
+    if (UI.draft && !UI.draft.groups && !UI.draft.ids.includes(id)) UI.draft.ids.push(id);
+    toast(`${name} added`);
     back();
   },
   newpin: () => {

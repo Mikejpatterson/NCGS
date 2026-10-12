@@ -100,6 +100,7 @@ function view() {
   return t;
 }
 function changed() { DB._view = null; DB._memo = {}; }
+const isGuest = m => !!m && String(m.id).startsWith('guest-');
 function memo(key, fn) { view(); if (!(key in DB._memo)) DB._memo[key] = fn(); return DB._memo[key]; }
 
 function merge(resp, full) {
@@ -200,6 +201,9 @@ function removeRows(table, rows, log) { send({ op: 'remove', table, rows, pin: O
 const D = {
   members: () => memo('members', () => view().members.slice().sort((a, b) => a.name.localeCompare(b.name))),
   active: () => D.members().filter(m => m.active !== false),
+  // Guests play a round but are not members: no Golfer of the Year, no Players list.
+  regulars: () => D.active().filter(m => !isGuest(m)),
+  guests: () => D.active().filter(isGuest),
   member: id => view().members.find(m => m.id === id) || null,
   nameOf: id => (D.member(id) || { name: id || '' }).name,
   courses: () => view().courses.slice().sort((a, b) => a.name.localeCompare(b.name)),
@@ -348,7 +352,7 @@ const yearPicker = () => {
 function goy(season) {
   return memo('goy:' + season, () => {
     const done = seasonRounds(season).filter(r => r.status === 'final');
-    return E.goyStandings(view().members, done.map(r => ({ rid: r.id, scores: pointsOf(r.id) })), D.goyBest());
+    return E.goyStandings(view().members.filter(m => !isGuest(m)), done.map(r => ({ rid: r.id, scores: pointsOf(r.id) })), D.goyBest());
   });
 }
 

@@ -24,6 +24,24 @@ function roundSummary(r) {
   return `<button class="row tall" data-act="org-go" data-v="round" data-rid="${r.id}"><span class="two"><span>${esc(roundName(r))}</span><span class="sub">${esc(bits || roundWhenShort(r) || ' ')}</span></span><span class="right">${st}${chev}</span></button>`;
 }
 
+
+/* What still needs doing before the next round: each line opens the screen where it is done. */
+function nextChecklist(r) {
+  if (!r || r.status === 'final' || r.source === 'imported') return '';
+  const tee = teeOf(r), c = courseOf(r);
+  const items = [
+    { ok: !!(c && c.holes && tee), t: 'Course and tees', go: ['details', r.id], need: true },
+    { ok: !!(r.groups && r.groups.length), t: 'Players and groups', go: ['playing', r.id], need: true },
+    { ok: !!r.first_tee, t: 'First tee time', go: ['details', r.id], need: true },
+    { ok: !!(r.contests && r.contests.length), t: 'Contests', go: ['details', r.id], need: false },
+    { ok: !!(r.kb && r.kb.length), t: 'KBs', go: ['kb', r.id], need: false }
+  ];
+  const left = items.filter(i => i.need && !i.ok).length;
+  const head = `<span class="two"><span>${esc(roundName(r))}</span><span class="sub">${left ? `${plural(left, 'thing')} to do` : 'Ready to go'}</span></span>`;
+  return sec(label('Next up'), cardOf(`<div class="row tall">${head}<span class="pill ${left ? 'w' : 'g'}">${left ? 'To do' : 'Ready'}</span></div>` +
+    items.map(i => `<button class="row" data-act="org-go" data-v="${i.go[0]}" data-rid="${i.go[1]}"><span style="display:flex;align-items:center;gap:10px"><span class="chk${i.ok ? ' on' : ''}" aria-hidden="true">${i.ok ? sized(ICON.check, 16) : ''}</span>${i.t}${i.need ? '' : ' <span class="sub">optional</span>'}</span>${chev}</button>`).join('')), true);
+}
+
 ORG.home = () => {
   const active = D.rounds().filter(r => r.status !== 'final');
   const past = D.rounds().filter(r => r.status === 'final').reverse();
@@ -31,6 +49,7 @@ ORG.home = () => {
   let html = orgTop();
   if (ORGPIN.weak) html += `<button class="banner warn" data-act="org-go" data-v="settings"><b>Change the organiser PIN.</b> It is still the starting one, and anyone who knows it can change scores. Tap to open Settings.</button>`;
   if (D.testing()) html += `<button class="banner note" data-act="org-go" data-v="settings"><b>Testing mode is on.</b> Any round can be deleted. Turn it off in Settings before real rounds.</button>`;
+  html += nextChecklist(active.find(r => r.status === 'upcoming' && !isDemo(r)));
   html += sec(label('Rounds'), cardOf(active.map(roundSummary).join('') + `<button class="row" data-act="org-new-round"><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}New round</span></button>`), true);
   html += sec(label('Manage'), cardOf(`${item('members', ICON.users, '#0A60C9', 'Members and handicaps')}${item('courses', ICON.course, '#1E7A3D', 'Courses')}${item('settings', ICON.gear, '#8E8E93', 'Settings')}${item('log', ICON.history, '#8E8E93', 'Change log')}${item('export', ICON.download, '#8E8E93', 'Export')}`));
   if (past.length) {
@@ -72,6 +91,7 @@ ORG.round = p => {
   html += sec('', cardOf(`
     <button class="row tall" data-act="org-go" data-v="details" data-rid="${r.id}"><span class="two"><span>Details</span><span class="sub">${esc(details)}</span></span>${chev}</button>
     <button class="row tall" data-act="org-go" data-v="${locked ? 'groupsview' : 'playing'}" data-rid="${r.id}"><span class="two"><span>Groups and buggies</span><span class="sub">${r.groups && r.groups.length ? `${plural(nPlayers, 'player')} · ${plural(r.groups.length, 'group')}` : 'Not drawn'}</span></span>${chev}</button>
+    ${r.groups && r.groups.length && r.status !== 'final' ? `<button class="row tall" data-act="org-go" data-v="late" data-rid="${r.id}"><span class="two"><span>Change a player</span><span class="sub">Swap someone in, or let someone drop out</span></span>${chev}</button>` : ''}
     <button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`), true);
   if (c && (!c.holes || !tee)) html += `<div class="banner note">${esc(c.name)} needs ${!c.holes ? 'its par and stroke index for each hole' : 'tee details'} before scores can be entered. <button class="link inline" data-act="org-go" data-v="course" data-cid="${c.id}">Add them</button></div>`;
   const comp = computeR(r.id);
@@ -152,8 +172,8 @@ ORG.playing = p => {
   if (!d.groups) {
     html += sec(label(`Playing · ${d.ids.length}`), cardOf(D.active().map(m => {
       const on = d.ids.includes(m.id);
-      return `<button class="row" data-act="org-toggle-player" data-pid="${m.id}" aria-pressed="${on}"><span>${esc(m.name)}</span>${on ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : ''}</button>`;
-    }).join('')), true);
+      return `<button class="row" data-act="org-toggle-player" data-pid="${m.id}" aria-pressed="${on}"><span>${esc(m.name)}${isGuest(m) ? ' <span class="pill n">Guest</span>' : ''}</span>${on ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : ''}</button>`;
+    }).join('') + `<button class="row" data-act="org-go" data-v="guest" data-rid="${r.id}"><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}Add a guest</span></button>`), true);
     const priorFinal = r.trip ? D.rounds().filter(x => x.trip === r.trip && x.season === r.season && x.id !== r.id && x.status === 'final' && (x.trip_day || 0) < (r.trip_day || 99)) : [];
     if (d.ids.length >= 2) {
       html += `<button class="btn" data-act="org-draw" data-kind="random">Draw groups</button>`;
@@ -227,14 +247,53 @@ ORG.contest = p => {
   };
 };
 
+
+/* ----- A guest, for one round ----- */
+ORG.guest = p => ({
+  html: `<header class="hero s">${navBack('Players')}<div class="head"><h1 class="title">Add a guest</h1></div><p class="sub">Guests play the round but are not members: they do not count for Golfer of the Year.</p></header>
+  <form data-form="guest" autocomplete="off" class="sec near">
+    ${field('g-name', 'Name', '', 'placeholder="Name"')}
+    ${field('g-index', 'WHS index', '', 'inputmode="decimal" placeholder="e.g. 18.4"')}
+    ${formErr()}
+    <button class="btn" type="submit">Add guest</button>
+  </form>`
+});
+
+/* ----- A change of player after the groups are saved ----- */
+function scoresFor(rid, pid) { const sc = D.scores(rid)[pid]; return sc ? Object.keys(sc).length : 0; }
+ORG.late = p => {
+  const r = D.round(p.rid);
+  const sel = UI.late && UI.late.rid === r.id ? UI.late.pid : null;
+  let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Change a player</h1></div><p class="sub">${sel ? esc(D.nameOf(sel)) : 'Tap the player who is changing'}</p></header>`;
+  const inRound = new Set((r.groups || []).flatMap(g => g.teams.flat()));
+  if (!sel) {
+    html += (r.groups || []).map((g, gi) => sec(label(`Group ${gi + 1}`), cardOf(g.teams.flat().map(pid => `<button class="row" data-act="late-pick" data-rid="${r.id}" data-pid="${pid}"><span>${esc(D.nameOf(pid))}</span>${scoresFor(r.id, pid) ? `<span class="sub">${plural(scoresFor(r.id, pid), 'score')}</span>` : chev}</button>`).join('')), gi === 0)).join('');
+    return { html };
+  }
+  const n = scoresFor(r.id, sel);
+  if (n) return { html: html + sec('', cardOf(`<div class="row tall"><span class="sub">${esc(D.nameOf(sel))} already has ${plural(n, 'score')} in this round, so they cannot be swapped or removed. Correct their scores on the group screen instead.</span></div>`), true) + `<button class="btn quiet" data-act="late-cancel">Back</button>` };
+  const free = D.active().filter(m => !inRound.has(m.id));
+  html += sec(label('Swap in'), cardOf(free.length ? free.map(m => `<button class="row" data-act="late-replace" data-rid="${r.id}" data-pid="${sel}" data-new="${m.id}"><span>${esc(m.name)}${isGuest(m) ? ' <span class="pill n">Guest</span>' : ''}</span><span class="sub">${fmtIndex(m.index)}</span></button>`).join('') : '<div class="row"><span class="sub">Everyone is already playing</span></div>') + `<button class="row" data-act="org-go" data-v="guest" data-rid="${r.id}"><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}Add a guest</span></button>`, true);
+  html += sec('', cardOf(`<button class="row" data-act="late-drop" data-rid="${r.id}" data-pid="${sel}"><span class="c-b">${UI.confirm === 'drop-' + sel ? 'Tap again to take them out' : 'Takes no further part'}</span></button>`));
+  html += `<button class="btn quiet" data-act="late-cancel">Cancel</button>`;
+  return { html };
+};
+/* The round with one player swapped for another (or removed). KBs and handicap fixes follow the swap. */
+function withPlayerChanged(r, pid, newPid) {
+  const groups = r.groups.map(g => Object.assign({}, g, { teams: g.teams.map(t => t.map(x => x === pid ? newPid : x).filter(Boolean)).filter(t => t.length) })).filter(g => g.teams.length);
+  const kb = r.kb ? r.kb.map(pr => pr.map(x => x === pid ? newPid : x)).filter(pr => pr.length === 2 && pr.every(Boolean)) : r.kb;
+  const ph = r.ph ? Object.fromEntries(Object.entries(r.ph).filter(([k]) => k !== pid)) : r.ph;
+  return Object.assign({}, r, { groups, kb: kb && kb.length ? kb : null, ph: ph && Object.keys(ph).length ? ph : null });
+}
+
 /* ----- Members ----- */
 ORG.members = () => {
   const all = D.members();
   const row = m => `<button class="hrow" data-act="org-go" data-v="member" data-pid="${m.id}"><span class="nm">${esc(m.name)}</span><span></span><span class="r b num">${fmtIndex(m.index)}</span>${chev}</button>`;
-  const former = all.filter(m => m.active === false);
+  const former = all.filter(m => m.active === false && !isGuest(m));
   return {
     html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Members</h1></div></header>
-    ${sec('', cardOf(`<div class="hrow cols"><span></span><span></span><span class="r cap">Index</span><span></span></div>${all.filter(m => m.active !== false).map(row).join('')}<button class="row" data-act="org-go" data-v="member" data-pid=""><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}Add member</span></button>`), true)}
+    ${sec('', cardOf(`<div class="hrow cols"><span></span><span></span><span class="r cap">Index</span><span></span></div>${all.filter(m => m.active !== false && !isGuest(m)).map(row).join('')}<button class="row" data-act="org-go" data-v="member" data-pid=""><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}Add member</span></button>`), true)}
     ${former.length ? sec(label('Former members'), cardOf(former.map(row).join(''))) : ''}`
   };
 };

@@ -78,7 +78,7 @@ VIEWS.home = () => {
     ${tile('rounds', ICON.history, 'Past rounds', played.length ? `${played.length} played` : 'None played yet')}
     ${tile('goy', ICON.trophy, 'Golfer of the Year', lead ? `${esc(lead.name)} leads on ${lead.total}` : 'Best ' + D.goyBest() + ' scores count')}
     ${tile('stats', ICON.history, 'Stats', 'KBs, birdies, averages')}
-    ${tile('players', ICON.users, 'Players', plural(D.active().length, 'golfer'))}
+    ${tile('players', ICON.users, 'Players', plural(D.regulars().length, 'golfer'))}
   </div>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
@@ -100,7 +100,7 @@ VIEWS.players = () => {
   const pos = Object.fromEntries(table.map(x => [x.id, x.posLabel]));
   return {
     html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Players</h1></div><p class="sub">Tap a name for their cards</p></header>
-      ${sec('', cardOf(D.active().map(m => `<button class="row tall" data-act="player" data-pid="${m.id}"><span class="two"><span>${esc(m.name)}</span><span class="sub">${esc([m.full && m.full !== m.name ? m.full : '', 'Index ' + fmtIndex(m.index)].filter(Boolean).join(' · '))}</span></span><span class="right">${pos[m.id] ? `<span class="sub">${posWord(pos[m.id])}</span>` : ''}${chev}</span></button>`).join('')), false)}`
+      ${sec('', cardOf(D.regulars().map(m => `<button class="row tall" data-act="player" data-pid="${m.id}"><span class="two"><span>${esc(m.name)}</span><span class="sub">${esc([m.full && m.full !== m.name ? m.full : '', 'Index ' + fmtIndex(m.index)].filter(Boolean).join(' · '))}</span></span><span class="right">${pos[m.id] ? `<span class="sub">${posWord(pos[m.id])}</span>` : ''}${chev}</span></button>`).join('')), false)}`
   };
 };
 
@@ -299,7 +299,7 @@ function playerStatsBlock(pid) {
 }
 VIEWS.stats = () => {
   const yr = yearOn();
-  const members = D.active();
+  const members = D.regulars();
   const all = members.map(m => ({ id: m.id, name: m.name, st: E.playerSummary(playerEntries(m.id, yr)) })).filter(x => x.st.rounds);
   const board = (title, key, unit, min) => {
     const rows = all.filter(x => x.st[key] > (min || 0)).sort((a, b) => b.st[key] - a.st[key] || a.name.localeCompare(b.name));
@@ -398,7 +398,7 @@ VIEWS.card = p => {
 
 /* ----- Who are you ----- */
 VIEWS.who = p => {
-  const list = D.active();
+  const list = D.regulars();
   return {
     html: `<header class="hero s">${UI.stack.length > 1 ? navBack('Back') : '<div class="nav"></div>'}<div class="head"><h1 class="title">Who are you?</h1></div><p class="sub">So your scores and card are yours.</p></header>
       ${sec('', cardOf(list.map(m => `<button class="row" data-act="pick" data-id="${m.id}"><span class="${m.id === DB.prefs.me ? 'b' : ''}">${esc(m.name)}</span>${m.id === DB.prefs.me ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : chev}</button>`).join('')), false)}`
