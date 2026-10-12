@@ -424,8 +424,8 @@ document.addEventListener('focusout', e => {
   if (!e.target || e.target.id !== 'askin') return;
   setTimeout(() => { if (document.activeElement && document.activeElement.id === 'askin') return; document.body.classList.remove('typing'); document.documentElement.style.setProperty('--kb', '0px'); }, 150);
 });
-// Tapping Send must not take focus from the box, or the keyboard drops and the bar jumps before the tap lands.
-['mousedown', 'touchstart'].forEach(ev => document.addEventListener(ev, e => { if (e.target.closest && e.target.closest('.askbar .send, .askbar .mic')) e.preventDefault(); }, { passive: false }));
+// With a mouse, clicking Send or the microphone must not take focus from the box. (Never on touch: stopping touchstart would swallow the tap on a phone.)
+document.addEventListener('mousedown', e => { if (e.target.closest && e.target.closest('.askbar .send, .askbar .mic')) e.preventDefault(); });
 if (window.visualViewport) { window.visualViewport.addEventListener('resize', placeAskBar); window.visualViewport.addEventListener('scroll', placeAskBar); }
 document.addEventListener('change', e => {
   const t = e.target;

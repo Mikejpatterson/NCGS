@@ -41,7 +41,7 @@ function askThread() {
 let listening = null;
 function askListen() {
   if (listening) { try { listening.stop(); } catch (e) { /* already stopped */ } return; }
-  if (!SPEECH) return askKeyboard();
+  if (!SPEECH) return askKeyboard('Tap the microphone on your keyboard to speak.');
   const r = new SPEECH();
   r.lang = 'en-IE'; r.interimResults = true; r.maxAlternatives = 1; r.continuous = false;
   let said = '', failed = false;
@@ -51,15 +51,15 @@ function askListen() {
     said = Array.from(ev.results).map(x => x[0].transcript).join(' ').trim();
     const input = document.getElementById('askin'); if (input) { input.value = said; UI.askDraft = said; }
   };
-  r.onerror = ev => { failed = true; if (ev.error !== 'no-speech' && ev.error !== 'aborted') { toast("Dictation isn't available here. Tap the microphone on your keyboard instead."); askKeyboard(); } };
+  r.onerror = ev => { failed = true; if (ev.error !== 'no-speech' && ev.error !== 'aborted') { askKeyboard("Dictation isn't available here. Tap the microphone on your keyboard instead."); } };
   r.onend = () => {
     listening = null; document.body.classList.remove('hearing');
     const input = document.getElementById('askin'); if (input) input.placeholder = 'What happened?';
     if (said && !failed) askQuestion(said);
   };
-  try { r.start(); } catch (e) { askKeyboard(); }
+  try { r.start(); } catch (e) { askKeyboard('Tap the microphone on your keyboard to speak.'); }
 }
-function askKeyboard() { const i = document.getElementById('askin'); if (i) i.focus(); }
+function askKeyboard(msg) { const i = document.getElementById('askin'); if (i) i.focus(); if (msg) toast(msg); }
 
 VIEWS.rules = () => ({
   tabs: 'rules',
