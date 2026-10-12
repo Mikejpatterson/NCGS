@@ -219,3 +219,53 @@ test('changing one player\'s past score leaves the rest of the group alone, and 
     assert.deepEqual(at(), { a: 4, b: 7, c: 6 }, kind);
   }
 });
+
+/* ---- Rules checker ---- */
+function askServer(opts) {
+  const store = N.memoryStore();
+  const calls = [];
+  const secrets = Object.assign({}, opts.secrets);
+  const cache = {};
+  if (opts.secrets) store.getSecret = k => secrets[k];
+  if (opts.reply) store.postJson = (url, headers, body) => { calls.push({ url, headers, body }); return opts.reply(); };
+  store.cacheGet = k => cache[k]; store.cachePut = (k, v) => { cache[k] = v; };
+  return { s: N.createServer(store, { now: () => '2026-10-12T10:00:00.000Z' }), calls };
+}
+const ok = () => ({ status: 200, json: { content: [{ type: 'text', text: 'Take a drop. One penalty stroke (Rule 17.1).' }] } });
+
+test('rules checker: off until a key is set, and never reaches the network without one', () => {
+  const { s, calls } = askServer({ reply: ok });
+  assert.equal(s.api({ op: 'ask', question: 'Ball in the water?' }).error, 'nokey');
+  const b = askServer({ secrets: {}, reply: ok });
+  assert.equal(b.s.api({ op: 'ask', question: 'Ball in the water?' }).error, 'nokey');
+  assert.equal(calls.length + b.calls.length, 0);
+});
+
+test('rules checker: sends the question with the key kept server-side and the society rules in the prompt', () => {
+  const { s, calls } = askServer({ secrets: { ANTHROPIC_KEY: 'sk-test' }, reply: ok });
+  const r = s.api({ op: 'ask', question: '  Ball in the water?  ', history: [
+    { role: 'assistant', text: 'orphan first' }, { role: 'user', text: 'Hi' }, { role: 'assistant', text: 'Hello' }, { role: 'user', text: 'dangling' }
+  ] });
+  assert.equal(r.answer, 'Take a drop. One penalty stroke (Rule 17.1).');
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].headers['x-api-key'], 'sk-test');
+  assert.match(calls[0].body.system, /Buggy Wars/);
+  assert.match(calls[0].body.system, /back nine, then the last six/);
+  const m = calls[0].body.messages;
+  assert.equal(m[0].role, 'user');
+  assert.equal(m[m.length - 1].content, 'Ball in the water?');
+  assert.ok(m.every((x, i) => i === 0 || x.role !== m[i - 1].role), 'roles alternate');
+  assert.ok(!JSON.stringify(r).includes('sk-test'));
+});
+
+test('rules checker: refuses empty or very long questions, stops at the daily cap, and survives an API failure', () => {
+  const a = askServer({ secrets: { ANTHROPIC_KEY: 'k', ASK_DAILY_CAP: '2' }, reply: ok });
+  assert.equal(a.s.api({ op: 'ask', question: '   ' }).error, 'bad');
+  assert.equal(a.s.api({ op: 'ask', question: 'x'.repeat(601) }).error, 'bad');
+  assert.ok(a.s.api({ op: 'ask', question: 'one' }).answer);
+  assert.ok(a.s.api({ op: 'ask', question: 'two' }).answer);
+  assert.equal(a.s.api({ op: 'ask', question: 'three' }).error, 'limit');
+  assert.equal(a.calls.length, 2);
+  const f = askServer({ secrets: { ANTHROPIC_KEY: 'k' }, reply: () => ({ status: 529, json: { error: {} } }) });
+  assert.equal(f.s.api({ op: 'ask', question: 'Is this ok?' }).error, 'upstream');
+});

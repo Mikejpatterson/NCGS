@@ -184,9 +184,34 @@ var NCGS = (function () {
       },
       cacheGet: function (k) { return cache.get(k); },
       cachePut: function (k, v, s) { try { cache.put(k, v, s || 600); } catch (e) { /* too big to cache */ } },
-      fetchJson: function (url) { return JSON.parse(UrlFetchApp.fetch(url, { muteHttpExceptions: true }).getContentText()); }
+      fetchJson: function (url) { return JSON.parse(UrlFetchApp.fetch(url, { muteHttpExceptions: true }).getContentText()); },
+      getSecret: function (k) { return props.getProperty(k); },
+      postJson: function (url, headers, body) {
+        var r = UrlFetchApp.fetch(url, { method: 'post', contentType: 'application/json', headers: headers, payload: JSON.stringify(body), muteHttpExceptions: true });
+        var text = r.getContentText(), j = null;
+        try { j = JSON.parse(text); } catch (e) { /* not JSON */ }
+        return { status: r.getResponseCode(), json: j };
+      }
     };
   }
+
+
+  /* ---------- Rules checker ---------- */
+  var ASK_SYSTEM = [
+    'You are the rules checker inside the NCGS golf society app. The golfers are men in their 50s and 60s playing a casual society day, usually in Ireland or Spain, standing on a course with a phone.',
+    'Answer questions about (1) the Rules of Golf as published by the R&A and USGA and (2) the NCGS society rules listed below. Nothing else: if asked about something unrelated, say you only cover golf rules and the society rules.',
+    'How to answer: give the answer in the first sentence. Then the relief or procedure in plain steps, then the penalty (for example "one penalty stroke"). Name the rule number, for example "Rule 17.1". Keep it under 150 words, short sentences, no tables, no headings. If a Local Rule or the Committee could change the answer, say so in a few words. If you are not sure, say so plainly rather than guessing. Never invent a rule.',
+    'Stableford: the society plays individual Stableford, which the Rules of Golf treat as a form of stroke play (Rule 21.1). A player may pick up when they cannot score any points, and a pick-up scores 0 points. When a player is unsure how to proceed, Rule 20.1c(3) lets them play a second ball (say so before playing it) and take both scores to the organiser, who acts as the Committee.',
+    'NCGS society rules (these come from the app, and if a question is about a society rule not listed here, say it is not covered and the organiser decides):',
+    '- Stableford points on each hole are max(0, par + shots received - gross strokes + 2). Handicaps use the World Handicap System: course handicap from the WHS index, slope and course rating, kept unrounded, with a 100 percent allowance unless the organiser says otherwise.',
+    '- Ties on the day are decided by countback: the back nine, then the last six, then the last three, then the 18th hole and backwards one hole at a time. Nothing else is used.',
+    '- Golfer of the Year: the best 3 scores of the season count. Ties compare the counting scores from best to worst, then the 4th best score, and so on.',
+    '- KBs is a pair competition. Partners are in different groups, and a pair\'s score is the two partners\' Stableford totals added together.',
+    '- Buggy Wars: each group of four is split into two buggies of two. On every hole each buggy counts its better Stableford score. The buggy with more points wins the hole, and level is a halved hole. There are three matches played at the same time: the front nine, the back nine and the overall 18, each worth 5 euro to the winners, and results are given in golf style such as "Buggy 1 won 3 and 1".',
+    '- First round of drinks: the pair with the lowest combined Stableford total (the same pairs as KBs) buys the first round.',
+    '- Contests: nearest the pin on the par 3s and longest drive on the chosen hole. The winner is claimed by the group on the app and confirmed by the organiser.',
+    '- The organiser makes the final call on anything the rules do not settle.'
+  ].join('\n');
 
   /* ---------- The service ---------- */
   function createServer(store, opts) {
@@ -371,6 +396,35 @@ var NCGS = (function () {
       var out = { days: j && j.daily ? j.daily : null, hours: j && j.hourly ? j.hourly : null, at: now() };
       store.cachePut(ck, JSON.stringify(out), 3600);
       return out;
+    };
+
+
+    /* Rules checker: a question for Claude about the Rules of Golf and the society rules.
+       The key lives in the script properties (ANTHROPIC_KEY), never in the app. A daily cap stops a runaway bill. */
+    ops.ask = function (req) {
+      var q = String(req.question || '').trim();
+      if (!q) throw err('bad', 'Ask a question first');
+      if (q.length > 600) throw err('bad', 'That question is too long. Keep it to a couple of sentences.');
+      if (!store.postJson || !store.getSecret) throw err('nokey', 'The rules checker is not switched on yet');
+      var key = store.getSecret('ANTHROPIC_KEY');
+      if (!key) throw err('nokey', 'The rules checker is not switched on yet');
+      var day = now().slice(0, 10), ck = 'ask:' + day;
+      var used = Number(store.cacheGet(ck) || 0), cap = Number(store.getSecret('ASK_DAILY_CAP') || 200);
+      if (used >= cap) throw err('limit', 'The rules checker has had its fill for today. Try again tomorrow, or ask the organiser.');
+      var messages = [];
+      (Array.isArray(req.history) ? req.history.slice(-6) : []).forEach(function (m) {
+        if (m && (m.role === 'user' || m.role === 'assistant') && typeof m.text === 'string' && m.text) messages.push({ role: m.role, content: m.text.slice(0, 1500) });
+      });
+      while (messages.length && messages[0].role !== 'user') messages.shift();
+      messages = messages.filter(function (m, i) { return i === 0 || m.role !== messages[i - 1].role; });
+      if (messages.length && messages[messages.length - 1].role === 'user') messages.pop();
+      messages.push({ role: 'user', content: q });
+      store.cachePut(ck, String(used + 1), 21600);
+      var r = store.postJson('https://api.anthropic.com/v1/messages', { 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+        { model: store.getSecret('ASK_MODEL') || 'claude-sonnet-5-5', max_tokens: 700, system: ASK_SYSTEM, messages: messages });
+      var text = r && r.json && r.json.content && r.json.content[0] && r.json.content[0].text;
+      if (!r || r.status !== 200 || !text) throw err('upstream', 'The rules checker could not answer just now. Try again in a minute.');
+      return { answer: String(text) };
     };
 
     /* Fill an empty store with the society's starting data. */

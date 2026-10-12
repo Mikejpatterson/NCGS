@@ -21,7 +21,7 @@ const ACT = {
     if (!DB.prefs.me || !myGroup(rid)) { go('who', { then: rid }); return; }
     UI.edit = false;
     UI.after = null;
-    if (backTo(e => ['tee', 'match', 'board', 'finish'].includes(e.v))) { UI.playRid = rid; replaceTop(playHomeView(rid), { rid }); return; }
+    if (backTo(e => ['tee', 'match', 'board', 'rules', 'finish'].includes(e.v))) { UI.playRid = rid; replaceTop(playHomeView(rid), { rid }); return; }
     UI.playRid = rid;
     go(playHomeView(rid), { rid });
   },
@@ -34,14 +34,17 @@ const ACT = {
     UI.contestSheet = false;
     const t = el.dataset.tab;
     const rid = playRid();
-    while (UI.stack.length > 1 && !['tee', 'match', 'board', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();
+    while (UI.stack.length > 1 && !['tee', 'match', 'board', 'rules', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();
     if (t === 'hole') { UI.edit = false; UI.after = null; replaceTop(playHomeView(rid), { rid }); }
+    else if (t === 'rules') { replaceTop('rules', { rid }); }
     else if (t === 'match') { UI.board = null; UI.res = 'bw'; UI.scrollTop = true; replaceTop('board', { rid }); }
     else { UI.board = null; UI.res = UI.res === 'bw' || UI.res === 'ct' ? UI.res : 'lb'; replaceTop('board', { rid }); }
   },
   enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },
   set: el => setScore(el.dataset.pid, el.dataset.v),
   clear: el => clearScore(el.dataset.pid),
+  'ask-idea': el => askQuestion(el.dataset.q),
+  'ask-clear': () => { UI.chat = []; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'contest-open': () => { UI.contestSheet = true; render(); },
   'contest-close': () => { UI.contestSheet = false; render(); },
   'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },
@@ -231,6 +234,7 @@ const ACT = {
 };
 
 const FORMS = {
+  ask: () => { const i = document.getElementById('askin'); askQuestion(i ? i.value : UI.askDraft); },
   pin: () => {
     const v = val('pin');
     call({ op: 'checkPin', pin: v }).then(res => {
@@ -373,6 +377,7 @@ function render() {
   const showTabs = !UI.org && !!out.tabs;
   app.classList.toggle('no-tabs', !showTabs);
   tabs.hidden = !showTabs;
+  if (showTabs) document.documentElement.style.setProperty('--tabh', tabs.offsetHeight + 'px');
   tabs.querySelectorAll('.tab').forEach(b => {
     const on = b.dataset.tab === out.tabs;
     b.classList.toggle('on', on);
@@ -389,7 +394,7 @@ function renderToast() {
   el.textContent = UI.toast;
 }
 
-tabs.innerHTML = [['hole', 'Hole'], ['board', 'Results']]
+tabs.innerHTML = [['hole', 'Hole'], ['board', 'Results'], ['rules', 'Rules']]
   .map(([k, l]) => `<button class="tab" data-act="tab" data-tab="${k}">${TABICON[k]}<span>${l}</span></button>`).join('');
 
 document.addEventListener('click', e => {
@@ -406,6 +411,21 @@ document.addEventListener('submit', e => {
   const fn = FORMS[f.dataset.form];
   if (fn) fn();
 });
+document.addEventListener('input', e => { if (e.target && e.target.id === 'askin') UI.askDraft = e.target.value; });
+// While typing a question the tab bar steps aside and the ask bar rides above the keyboard.
+function placeAskBar() {
+  const vv = window.visualViewport;
+  const kb = vv ? Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) : 0;
+  document.documentElement.style.setProperty('--kb', kb + 'px');
+}
+document.addEventListener('focusin', e => { if (e.target && e.target.id === 'askin') { document.body.classList.add('typing'); placeAskBar(); setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 250); } });
+document.addEventListener('focusout', e => {
+  if (!e.target || e.target.id !== 'askin') return;
+  setTimeout(() => { if (document.activeElement && document.activeElement.id === 'askin') return; document.body.classList.remove('typing'); document.documentElement.style.setProperty('--kb', '0px'); }, 150);
+});
+// Tapping Send must not take focus from the box, or the keyboard drops and the bar jumps before the tap lands.
+['mousedown', 'touchstart'].forEach(ev => document.addEventListener(ev, e => { if (e.target.closest && e.target.closest('.askbar .send')) e.preventDefault(); }, { passive: false }));
+if (window.visualViewport) { window.visualViewport.addEventListener('resize', placeAskBar); window.visualViewport.addEventListener('scroll', placeAskBar); }
 document.addEventListener('change', e => {
   const t = e.target;
   if (t.dataset && t.dataset.change === 'details-course') { UI.formState = Object.assign({}, UI.formState, { course: t.value }); render(); return; }

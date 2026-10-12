@@ -130,7 +130,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   // Buggy Wars and leaderboard
   await tap('.tab[data-tab="board"]');
   t = await text();
-  check('one Results tab bar, no separate Buggy tab', (await page.$$('.tab')).length === 2 && !(await page.$('.tab[data-tab="match"]')) && /Results/.test(t));
+  check('one Results tab bar, no separate Buggy tab', (await page.$$('.tab')).length === 3 && !(await page.$('.tab[data-tab="match"]')) && /Results/.test(t));
   check('Results has Leaderboard, Buggy Wars and Contests pills, Leaderboard first', JSON.stringify(await page.$$eval('.pills button', b => b.map(x => x.textContent.trim()))) === JSON.stringify(['Leaderboard', 'Buggy Wars', 'Contests']) && await page.$eval('.pills button.on', e => e.textContent.trim()) === 'Leaderboard');
   check('leaderboard: Stableford, KBs, drinks (contests are on their own pill)', /Stableford|Demo round/.test(t) && /KBs/.test(t) && /First round of drinks/.test(t) && !/Nearest the pin/.test(t));
   await tap('[data-act="respill"][data-p="bw"]');
@@ -145,6 +145,27 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   check('Contests rows are tidy: hole under the name, winner on one line', /Hole\s*\d+/.test(t) && (await page.$$eval('.ct-r .b', els => els.every(e => e.getBoundingClientRect().height < 28))));
   await shot('08b-contests', true);
   await tap('[data-act="respill"][data-p="lb"]');
+  t = await text();
+  // Rules checker
+  await tap('.tab[data-tab="rules"]');
+  t = await text();
+  check('rules tab: heading, ideas to tap and an ask bar', /Rules/.test(t) && (await page.$$('.idea')).length >= 4 && !!(await page.$('#askin')) && await page.$eval('.tab.on, .tab[aria-current="page"]', e => e.dataset.tab) === 'rules');
+  await page.fill('#askin', 'Ball in the water?');
+  await tap('.send');
+  await page.waitForSelector('.bub.err');
+  t = await text();
+  check('rules: with no key switched on it says so plainly', /not switched on/.test(t) && /Ball in the water\?/.test(t));
+  await page.evaluate(() => { window.NCGS_TEST_ASK = body => 'Take relief.\n\n- Drop in the relief area\n- One penalty stroke **Rule 17.1**'; });
+  await page.fill('#askin', 'And if it is a red area?');
+  await page.press('#askin', 'Enter');
+  await page.waitForSelector('.msg.ai .bub:not(.err):not(.wait)');
+  t = await text();
+  check('rules: the answer shows with bullets and bold, my question stays', /One penalty stroke Rule 17\.1/.test(t) && !!(await page.$('.bub .ab')) && !!(await page.$('.bub b')) && /red area/.test(t));
+  check('rules: the input is still there and empty for the next question', (await page.$eval('#askin', e => e.value)) === '');
+  await shot('08c-rules', true);
+  await tap('[data-act="ask-clear"]');
+  check('rules: New question clears the chat', (await page.$$('.idea')).length >= 4);
+  await tap('.tab[data-tab="board"]');
   t = await text();
   await shot('09-board', true);
   // a player's card from the leaderboard

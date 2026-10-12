@@ -227,7 +227,7 @@ VIEWS.round = p => {
   const c = courseOf(r);
   const tee = teeOf(r);
   const holes = holesOf(r);
-  const inPlay = UI.stack.some(e => ['tee', 'match', 'board'].includes(e.v));
+  const inPlay = UI.stack.some(e => ['tee', 'match', 'board', 'rules'].includes(e.v));
   const prev = UI.stack[UI.stack.length - 2];
   let html = '<header class="hero s">' + navBack(prev && prev.v === 'tee' ? `Hole ${UI.hole || ''}`.trim() : prev && prev.v === 'player' ? D.nameOf(prev.p.pid) : prev && prev.v === 'card' ? 'Card' : D.society());
   html += `<div class="head"><h1 class="title">${esc(roundName(r))}</h1>${statusPill(r)}</div>`;

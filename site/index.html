@@ -541,9 +541,33 @@ button.stv { background: none; border: 0; padding: 0; margin: 0; font: inherit; 
 button.stv:active { background: var(--press); }
 /* The header starts in exactly the body green, so it joins the strip behind the clock with no visible seam. */
 .hero { background: linear-gradient(180deg, var(--pine), var(--pine-2)); }
+
+/* Rules checker */
+.thread { padding: 16px 0 calc(var(--tabh, 64px) + 76px); display: flex; flex-direction: column; gap: 10px; min-height: 40vh; }
+.ask-intro { margin: 8px 2px 4px; } .ask-intro .b { font-size: var(--t-title); font-weight: 700; line-height: 1.2; margin: 0 0 6px; } .ask-intro .sub { margin: 0; }
+.ask-ideas { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.idea { text-align: left; min-height: 48px; padding: 10px 16px; border-radius: 14px; background: #fff; box-shadow: var(--shadow, 0 1px 2px rgba(0,0,0,.06)); font-size: var(--t-body); color: var(--pine); font-weight: 600; }
+.idea:active { background: var(--press); }
+.msg { display: flex; } .msg.me { justify-content: flex-end; }
+.bub { max-width: 88%; padding: 12px 16px; border-radius: 20px; font-size: var(--t-body); line-height: 1.38; overflow-wrap: anywhere; }
+.msg.me .bub { background: var(--pine); color: #fff; border-bottom-right-radius: 6px; }
+.msg.ai .bub { background: #fff; border-bottom-left-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.bub .ap { margin: 0 0 8px; } .bub .ap:last-child { margin-bottom: 0; }
+.bub .ab { position: relative; padding-left: 16px; margin: 4px 0; } .bub .ab::before { content: ""; position: absolute; left: 3px; top: .62em; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.bub.err { color: var(--sub); }
+.bub.wait { display: inline-flex; gap: 5px; padding: 16px 18px; } .bub.wait i { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); animation: askdot 1.2s infinite ease-in-out; } .bub.wait i:nth-child(2) { animation-delay: .15s; } .bub.wait i:nth-child(3) { animation-delay: .3s; }
+@keyframes askdot { 0%, 80%, 100% { opacity: .3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+.ask-note { text-align: center; margin: 12px 8px 0; }
+.askbar { position: fixed; left: 0; right: 0; bottom: var(--tabh, 64px); z-index: 9; display: flex; gap: 8px; padding: 10px 16px; background: #fff; border-top: .5px solid var(--line); }
+.askbar input { flex: 1; min-width: 0; height: 48px; border-radius: 24px; border: 0; background: var(--fill); padding: 0 18px; font: inherit; font-size: 1rem; color: var(--text); outline: none; }
+.askbar .send { width: 48px; height: 48px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; }
+.askbar .send svg { width: 24px; height: 24px; }
+body.typing .tabs { display: none; }
+body.typing .askbar { bottom: var(--kb, 0px); padding-bottom: 10px; }
+@media (prefers-reduced-motion: reduce) { .bub.wait i { animation: none; } }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610120739"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121141"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1306,9 +1330,34 @@ var NCGS = (function () {
       },
       cacheGet: function (k) { return cache.get(k); },
       cachePut: function (k, v, s) { try { cache.put(k, v, s || 600); } catch (e) { /* too big to cache */ } },
-      fetchJson: function (url) { return JSON.parse(UrlFetchApp.fetch(url, { muteHttpExceptions: true }).getContentText()); }
+      fetchJson: function (url) { return JSON.parse(UrlFetchApp.fetch(url, { muteHttpExceptions: true }).getContentText()); },
+      getSecret: function (k) { return props.getProperty(k); },
+      postJson: function (url, headers, body) {
+        var r = UrlFetchApp.fetch(url, { method: 'post', contentType: 'application/json', headers: headers, payload: JSON.stringify(body), muteHttpExceptions: true });
+        var text = r.getContentText(), j = null;
+        try { j = JSON.parse(text); } catch (e) { /* not JSON */ }
+        return { status: r.getResponseCode(), json: j };
+      }
     };
   }
+
+
+  /* ---------- Rules checker ---------- */
+  var ASK_SYSTEM = [
+    'You are the rules checker inside the NCGS golf society app. The golfers are men in their 50s and 60s playing a casual society day, usually in Ireland or Spain, standing on a course with a phone.',
+    'Answer questions about (1) the Rules of Golf as published by the R&A and USGA and (2) the NCGS society rules listed below. Nothing else: if asked about something unrelated, say you only cover golf rules and the society rules.',
+    'How to answer: give the answer in the first sentence. Then the relief or procedure in plain steps, then the penalty (for example "one penalty stroke"). Name the rule number, for example "Rule 17.1". Keep it under 150 words, short sentences, no tables, no headings. If a Local Rule or the Committee could change the answer, say so in a few words. If you are not sure, say so plainly rather than guessing. Never invent a rule.',
+    'Stableford: the society plays individual Stableford, which the Rules of Golf treat as a form of stroke play (Rule 21.1). A player may pick up when they cannot score any points, and a pick-up scores 0 points. When a player is unsure how to proceed, Rule 20.1c(3) lets them play a second ball (say so before playing it) and take both scores to the organiser, who acts as the Committee.',
+    'NCGS society rules (these come from the app, and if a question is about a society rule not listed here, say it is not covered and the organiser decides):',
+    '- Stableford points on each hole are max(0, par + shots received - gross strokes + 2). Handicaps use the World Handicap System: course handicap from the WHS index, slope and course rating, kept unrounded, with a 100 percent allowance unless the organiser says otherwise.',
+    '- Ties on the day are decided by countback: the back nine, then the last six, then the last three, then the 18th hole and backwards one hole at a time. Nothing else is used.',
+    '- Golfer of the Year: the best 3 scores of the season count. Ties compare the counting scores from best to worst, then the 4th best score, and so on.',
+    '- KBs is a pair competition. Partners are in different groups, and a pair\'s score is the two partners\' Stableford totals added together.',
+    '- Buggy Wars: each group of four is split into two buggies of two. On every hole each buggy counts its better Stableford score. The buggy with more points wins the hole, and level is a halved hole. There are three matches played at the same time: the front nine, the back nine and the overall 18, each worth 5 euro to the winners, and results are given in golf style such as "Buggy 1 won 3 and 1".',
+    '- First round of drinks: the pair with the lowest combined Stableford total (the same pairs as KBs) buys the first round.',
+    '- Contests: nearest the pin on the par 3s and longest drive on the chosen hole. The winner is claimed by the group on the app and confirmed by the organiser.',
+    '- The organiser makes the final call on anything the rules do not settle.'
+  ].join('\n');
 
   /* ---------- The service ---------- */
   function createServer(store, opts) {
@@ -1495,6 +1544,35 @@ var NCGS = (function () {
       return out;
     };
 
+
+    /* Rules checker: a question for Claude about the Rules of Golf and the society rules.
+       The key lives in the script properties (ANTHROPIC_KEY), never in the app. A daily cap stops a runaway bill. */
+    ops.ask = function (req) {
+      var q = String(req.question || '').trim();
+      if (!q) throw err('bad', 'Ask a question first');
+      if (q.length > 600) throw err('bad', 'That question is too long. Keep it to a couple of sentences.');
+      if (!store.postJson || !store.getSecret) throw err('nokey', 'The rules checker is not switched on yet');
+      var key = store.getSecret('ANTHROPIC_KEY');
+      if (!key) throw err('nokey', 'The rules checker is not switched on yet');
+      var day = now().slice(0, 10), ck = 'ask:' + day;
+      var used = Number(store.cacheGet(ck) || 0), cap = Number(store.getSecret('ASK_DAILY_CAP') || 200);
+      if (used >= cap) throw err('limit', 'The rules checker has had its fill for today. Try again tomorrow, or ask the organiser.');
+      var messages = [];
+      (Array.isArray(req.history) ? req.history.slice(-6) : []).forEach(function (m) {
+        if (m && (m.role === 'user' || m.role === 'assistant') && typeof m.text === 'string' && m.text) messages.push({ role: m.role, content: m.text.slice(0, 1500) });
+      });
+      while (messages.length && messages[0].role !== 'user') messages.shift();
+      messages = messages.filter(function (m, i) { return i === 0 || m.role !== messages[i - 1].role; });
+      if (messages.length && messages[messages.length - 1].role === 'user') messages.pop();
+      messages.push({ role: 'user', content: q });
+      store.cachePut(ck, String(used + 1), 21600);
+      var r = store.postJson('https://api.anthropic.com/v1/messages', { 'x-api-key': key, 'anthropic-version': '2023-06-01' },
+        { model: store.getSecret('ASK_MODEL') || 'claude-sonnet-5-5', max_tokens: 700, system: ASK_SYSTEM, messages: messages });
+      var text = r && r.json && r.json.content && r.json.content[0] && r.json.content[0].text;
+      if (!r || r.status !== 200 || !text) throw err('upstream', 'The rules checker could not answer just now. Try again in a minute.');
+      return { answer: String(text) };
+    };
+
     /* Fill an empty store with the society's starting data. */
     ops.seed = function (req) {
       return store.lock(function () {
@@ -1593,6 +1671,7 @@ const svg = p => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 const ICON = {
   back: svg('<path d="M15 5l-7 7 7 7"/>'),
   chev: svg('<path d="M9 5l7 7-7 7"/>'),
+  send: svg('<path d="M12 19V5"/><path d="M5.5 11.5L12 5l6.5 6.5"/>'),
   check: svg('<path d="M5 12.5l4.5 4.5L19 7"/>'),
   lock: svg('<rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>'),
   users: svg('<circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3 2.8-4.6 5.5-4.6s4.9 1.6 5.5 4.6"/><path d="M16 5.2a3 3 0 0 1 0 5.6M18 14.6c1.4.6 2.3 2 2.6 4.4"/>'),
@@ -1610,6 +1689,7 @@ const sized = (icon, n) => icon.replace('<svg', `<svg width="${n}" height="${n}"
 const TABICON = {
   hole: svg('<path d="M6 21V4"/><path d="M6 4h12l-2.5 4L18 12H6"/>'),
   match: svg('<path d="M4 8h14"/><path d="M15 5l3 3-3 3"/><path d="M20 16H6"/><path d="M9 13l-3 3 3 3"/>'),
+  rules: svg('<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M11.2 8.2a1.8 1.8 0 1 1 2.4 1.7c-.6.3-.9.6-.9 1.3"/><path d="M12.7 13.6v.2"/>'),
   board: svg('<path d="M8 21h8"/><path d="M12 17v4"/><path d="M7 4h10v5a5 5 0 0 1-10 0z"/><path d="M7 6H4v1a3 3 0 0 0 3 3"/><path d="M17 6h3v1a3 3 0 0 1-3 3"/>')
 };
 const CONTEST = { ntp: 'Nearest the pin', ld: 'Longest drive' };
@@ -1699,6 +1779,7 @@ function saveCache() { LS.set(KEY.cache, DB.server); }
 function localServer() {
   let data = LS.get(KEY.local, null);
   const store = NCGS.memoryStore(data, d => LS.set(KEY.local, d));
+  if (window.NCGS_TEST_ASK) { store.getSecret = k => (k === 'ANTHROPIC_KEY' ? 'test' : null); store.postJson = (u, h, b) => ({ status: 200, json: { content: [{ text: window.NCGS_TEST_ASK(b) }] } }); }
   const srv = NCGS.createServer(store);
   if (!data) {
     srv.api({ op: 'seed', data: window.NCGS_SEED, note: 'NCGS 2026 season from Marbella_2026_Final_Workbook.xlsx' });
@@ -1993,7 +2074,7 @@ const UI = {
   stack: [{ v: 'home', p: {} }],
   org: false, orgUnlocked: false, orgStack: [{ v: 'home', p: {} }],
   toast: null, flash: false, contestSheet: false, fix: null, after: null, open: {}, scrollCur: false, scrollTop: false,
-  playRid: null, hole: null, edit: false, matchGroup: null, board: null, res: 'lb',
+  playRid: null, hole: null, edit: false, matchGroup: null, board: null, res: 'lb', chat: [], chatBusy: false, askDraft: '',
   draft: null, sel: null, testSheet: null, photoFull: null, confirm: null, pinError: false, formError: null,
   wx: {}, shareImg: null, checkSeg: null, photos: {}
 };
@@ -2013,10 +2094,10 @@ function backTo(pred) {
   for (let i = s.length - 1; i >= 0; i--) if (pred(s[i])) { s.length = i + 1; UI.scrollTop = true; render(); return true; }
   return false;
 }
-const PLAY_VIEWS = ['tee', 'match', 'board', 'entry', 'after', 'check', 'finish', 'hcp', 'results'];
+const PLAY_VIEWS = ['tee', 'match', 'board', 'rules', 'entry', 'after', 'check', 'finish', 'hcp', 'results'];
 function enterPlay(rid) {
   UI.playRid = rid;
-  if (backTo(e => ['tee', 'match', 'board'].includes(e.v))) return;
+  if (backTo(e => ['tee', 'match', 'board', 'rules'].includes(e.v))) return;
   go('tee', { rid });
 }
 function toast(msg) {
@@ -2256,7 +2337,7 @@ VIEWS.round = p => {
   const c = courseOf(r);
   const tee = teeOf(r);
   const holes = holesOf(r);
-  const inPlay = UI.stack.some(e => ['tee', 'match', 'board'].includes(e.v));
+  const inPlay = UI.stack.some(e => ['tee', 'match', 'board', 'rules'].includes(e.v));
   const prev = UI.stack[UI.stack.length - 2];
   let html = '<header class="hero s">' + navBack(prev && prev.v === 'tee' ? `Hole ${UI.hole || ''}`.trim() : prev && prev.v === 'player' ? D.nameOf(prev.p.pid) : prev && prev.v === 'card' ? 'Card' : D.society());
   html += `<div class="head"><h1 class="title">${esc(roundName(r))}</h1>${statusPill(r)}</div>`;
@@ -3188,6 +3269,79 @@ function fixSave() {
   toast(`${D.nameOf(f.pid)}, hole ${f.n}: ${f.v === 'P' ? 'picked up' : f.v}`);
 }
 
+/* ---- 35-rules.js ---- */
+/* ----- Rules checker: ask about the Rules of Golf and the society rules ----- */
+const ASK_IDEAS = [
+  'My ball is in the water. What do I do?',
+  'Ball out of bounds or lost: what now?',
+  'Can I move something in a bunker?',
+  'Unplayable lie: what are my options?',
+  'How does Buggy Wars work?',
+  'Who buys the first round?'
+];
+
+// Plain text from the answer: paragraphs, "- " bullets and **bold**, nothing else.
+function askText(t) {
+  const inline = s => esc(s).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+  return String(t).trim().split(/\n{2,}/).map(par => `<div class="ap">${par.split('\n').map(l => /^\s*[-•*]\s+/.test(l) ? `<div class="ab">${inline(l.replace(/^\s*[-•*]\s+/, ''))}</div>` : `<div>${inline(l)}</div>`).join('')}</div>`).join('');
+}
+
+function askThread() {
+  if (!UI.chat.length && !UI.chatBusy) {
+    return `<div class="ask-intro"><p class="b">Ask about the Rules of Golf or our own rules.</p><p class="sub">Describe what happened in a sentence or two. You'll get the answer, what to do and the penalty.</p></div>
+      <div class="ask-ideas">${ASK_IDEAS.map(q => `<button class="idea" data-act="ask-idea" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
+  }
+  return UI.chat.map(m => m.role === 'user'
+    ? `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>`
+    : `<div class="msg ai"><div class="bub${m.error ? ' err' : ''}">${m.error ? esc(m.text) : askText(m.text)}</div></div>`).join('')
+    + (UI.chatBusy ? '<div class="msg ai"><div class="bub wait" aria-label="Checking the rules"><i></i><i></i><i></i></div></div>' : '')
+    + `<p class="cap ask-note">Answers come from the Rules of Golf and our society rules. For anything close, the organiser has the final say.</p>`;
+}
+
+VIEWS.rules = () => ({
+  tabs: 'rules',
+  html: `<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">Rules</h1>${UI.chat.length ? '<button class="link" data-act="ask-clear">New question</button>' : ''}</div></header>
+    <div id="thread" class="thread">${askThread()}</div>
+    <form class="askbar" data-form="ask" autocomplete="off"><input id="askin" type="text" enterkeyhint="send" maxlength="600" placeholder="What happened?" aria-label="Your rules question" value="${esc(UI.askDraft)}"><button class="send" type="submit" aria-label="Ask">${ICON.send}</button></form>`
+});
+
+function refreshThread() {
+  const el = document.getElementById('thread');
+  if (!el) return;
+  el.innerHTML = askThread();
+  const bar = document.querySelector('.hero .hrow2');
+  if (bar && !bar.querySelector('[data-act="ask-clear"]') && UI.chat.length) bar.insertAdjacentHTML('beforeend', '<button class="link" data-act="ask-clear">New question</button>');
+  if (bar && !UI.chat.length) { const b = bar.querySelector('[data-act="ask-clear"]'); if (b) b.remove(); }
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
+function askQuestion(q) {
+  q = String(q || '').trim();
+  if (!q || UI.chatBusy) return;
+  UI.chat.push({ role: 'user', text: q });
+  UI.askDraft = '';
+  const input = document.getElementById('askin');
+  if (input) input.value = '';
+  if (!navigator.onLine) {
+    UI.chat.push({ role: 'ai', text: 'No signal right now. Try again when you have some.', error: true });
+    refreshThread();
+    return;
+  }
+  UI.chatBusy = true;
+  refreshThread();
+  const history = UI.chat.slice(0, -1).filter(m => !m.error).map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', text: m.text }));
+  call({ op: 'ask', question: q, history }).then(res => {
+    UI.chatBusy = false;
+    if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer });
+    else UI.chat.push({ role: 'ai', text: (res && res.message) || 'The rules checker could not answer just now.', error: true });
+    refreshThread();
+  }).catch(() => {
+    UI.chatBusy = false;
+    UI.chat.push({ role: 'ai', text: 'No signal right now. Try again when you have some.', error: true });
+    refreshThread();
+  });
+}
+
 /* ---- 40-org.js ---- */
 /* ================= ORGANISER ================= */
 const ORG = {};
@@ -3567,7 +3721,7 @@ const ACT = {
     if (!DB.prefs.me || !myGroup(rid)) { go('who', { then: rid }); return; }
     UI.edit = false;
     UI.after = null;
-    if (backTo(e => ['tee', 'match', 'board', 'finish'].includes(e.v))) { UI.playRid = rid; replaceTop(playHomeView(rid), { rid }); return; }
+    if (backTo(e => ['tee', 'match', 'board', 'rules', 'finish'].includes(e.v))) { UI.playRid = rid; replaceTop(playHomeView(rid), { rid }); return; }
     UI.playRid = rid;
     go(playHomeView(rid), { rid });
   },
@@ -3580,14 +3734,17 @@ const ACT = {
     UI.contestSheet = false;
     const t = el.dataset.tab;
     const rid = playRid();
-    while (UI.stack.length > 1 && !['tee', 'match', 'board', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();
+    while (UI.stack.length > 1 && !['tee', 'match', 'board', 'rules', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();
     if (t === 'hole') { UI.edit = false; UI.after = null; replaceTop(playHomeView(rid), { rid }); }
+    else if (t === 'rules') { replaceTop('rules', { rid }); }
     else if (t === 'match') { UI.board = null; UI.res = 'bw'; UI.scrollTop = true; replaceTop('board', { rid }); }
     else { UI.board = null; UI.res = UI.res === 'bw' || UI.res === 'ct' ? UI.res : 'lb'; replaceTop('board', { rid }); }
   },
   enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },
   set: el => setScore(el.dataset.pid, el.dataset.v),
   clear: el => clearScore(el.dataset.pid),
+  'ask-idea': el => askQuestion(el.dataset.q),
+  'ask-clear': () => { UI.chat = []; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'contest-open': () => { UI.contestSheet = true; render(); },
   'contest-close': () => { UI.contestSheet = false; render(); },
   'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },
@@ -3777,6 +3934,7 @@ const ACT = {
 };
 
 const FORMS = {
+  ask: () => { const i = document.getElementById('askin'); askQuestion(i ? i.value : UI.askDraft); },
   pin: () => {
     const v = val('pin');
     call({ op: 'checkPin', pin: v }).then(res => {
@@ -3919,6 +4077,7 @@ function render() {
   const showTabs = !UI.org && !!out.tabs;
   app.classList.toggle('no-tabs', !showTabs);
   tabs.hidden = !showTabs;
+  if (showTabs) document.documentElement.style.setProperty('--tabh', tabs.offsetHeight + 'px');
   tabs.querySelectorAll('.tab').forEach(b => {
     const on = b.dataset.tab === out.tabs;
     b.classList.toggle('on', on);
@@ -3935,7 +4094,7 @@ function renderToast() {
   el.textContent = UI.toast;
 }
 
-tabs.innerHTML = [['hole', 'Hole'], ['board', 'Results']]
+tabs.innerHTML = [['hole', 'Hole'], ['board', 'Results'], ['rules', 'Rules']]
   .map(([k, l]) => `<button class="tab" data-act="tab" data-tab="${k}">${TABICON[k]}<span>${l}</span></button>`).join('');
 
 document.addEventListener('click', e => {
@@ -3952,6 +4111,21 @@ document.addEventListener('submit', e => {
   const fn = FORMS[f.dataset.form];
   if (fn) fn();
 });
+document.addEventListener('input', e => { if (e.target && e.target.id === 'askin') UI.askDraft = e.target.value; });
+// While typing a question the tab bar steps aside and the ask bar rides above the keyboard.
+function placeAskBar() {
+  const vv = window.visualViewport;
+  const kb = vv ? Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) : 0;
+  document.documentElement.style.setProperty('--kb', kb + 'px');
+}
+document.addEventListener('focusin', e => { if (e.target && e.target.id === 'askin') { document.body.classList.add('typing'); placeAskBar(); setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 250); } });
+document.addEventListener('focusout', e => {
+  if (!e.target || e.target.id !== 'askin') return;
+  setTimeout(() => { if (document.activeElement && document.activeElement.id === 'askin') return; document.body.classList.remove('typing'); document.documentElement.style.setProperty('--kb', '0px'); }, 150);
+});
+// Tapping Send must not take focus from the box, or the keyboard drops and the bar jumps before the tap lands.
+['mousedown', 'touchstart'].forEach(ev => document.addEventListener(ev, e => { if (e.target.closest && e.target.closest('.askbar .send')) e.preventDefault(); }, { passive: false }));
+if (window.visualViewport) { window.visualViewport.addEventListener('resize', placeAskBar); window.visualViewport.addEventListener('scroll', placeAskBar); }
 document.addEventListener('change', e => {
   const t = e.target;
   if (t.dataset && t.dataset.change === 'details-course') { UI.formState = Object.assign({}, UI.formState, { course: t.value }); render(); return; }

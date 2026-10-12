@@ -3,7 +3,7 @@ const UI = {
   stack: [{ v: 'home', p: {} }],
   org: false, orgUnlocked: false, orgStack: [{ v: 'home', p: {} }],
   toast: null, flash: false, contestSheet: false, fix: null, after: null, open: {}, scrollCur: false, scrollTop: false,
-  playRid: null, hole: null, edit: false, matchGroup: null, board: null, res: 'lb',
+  playRid: null, hole: null, edit: false, matchGroup: null, board: null, res: 'lb', chat: [], chatBusy: false, askDraft: '',
   draft: null, sel: null, testSheet: null, photoFull: null, confirm: null, pinError: false, formError: null,
   wx: {}, shareImg: null, checkSeg: null, photos: {}
 };
@@ -23,10 +23,10 @@ function backTo(pred) {
   for (let i = s.length - 1; i >= 0; i--) if (pred(s[i])) { s.length = i + 1; UI.scrollTop = true; render(); return true; }
   return false;
 }
-const PLAY_VIEWS = ['tee', 'match', 'board', 'entry', 'after', 'check', 'finish', 'hcp', 'results'];
+const PLAY_VIEWS = ['tee', 'match', 'board', 'rules', 'entry', 'after', 'check', 'finish', 'hcp', 'results'];
 function enterPlay(rid) {
   UI.playRid = rid;
-  if (backTo(e => ['tee', 'match', 'board'].includes(e.v))) return;
+  if (backTo(e => ['tee', 'match', 'board', 'rules'].includes(e.v))) return;
   go('tee', { rid });
 }
 function toast(msg) {

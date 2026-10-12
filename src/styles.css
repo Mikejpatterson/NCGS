@@ -531,3 +531,27 @@ button.stv { background: none; border: 0; padding: 0; margin: 0; font: inherit; 
 button.stv:active { background: var(--press); }
 /* The header starts in exactly the body green, so it joins the strip behind the clock with no visible seam. */
 .hero { background: linear-gradient(180deg, var(--pine), var(--pine-2)); }
+
+/* Rules checker */
+.thread { padding: 16px 0 calc(var(--tabh, 64px) + 76px); display: flex; flex-direction: column; gap: 10px; min-height: 40vh; }
+.ask-intro { margin: 8px 2px 4px; } .ask-intro .b { font-size: var(--t-title); font-weight: 700; line-height: 1.2; margin: 0 0 6px; } .ask-intro .sub { margin: 0; }
+.ask-ideas { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.idea { text-align: left; min-height: 48px; padding: 10px 16px; border-radius: 14px; background: #fff; box-shadow: var(--shadow, 0 1px 2px rgba(0,0,0,.06)); font-size: var(--t-body); color: var(--pine); font-weight: 600; }
+.idea:active { background: var(--press); }
+.msg { display: flex; } .msg.me { justify-content: flex-end; }
+.bub { max-width: 88%; padding: 12px 16px; border-radius: 20px; font-size: var(--t-body); line-height: 1.38; overflow-wrap: anywhere; }
+.msg.me .bub { background: var(--pine); color: #fff; border-bottom-right-radius: 6px; }
+.msg.ai .bub { background: #fff; border-bottom-left-radius: 6px; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.bub .ap { margin: 0 0 8px; } .bub .ap:last-child { margin-bottom: 0; }
+.bub .ab { position: relative; padding-left: 16px; margin: 4px 0; } .bub .ab::before { content: ""; position: absolute; left: 3px; top: .62em; width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+.bub.err { color: var(--sub); }
+.bub.wait { display: inline-flex; gap: 5px; padding: 16px 18px; } .bub.wait i { width: 8px; height: 8px; border-radius: 50%; background: var(--faint); animation: askdot 1.2s infinite ease-in-out; } .bub.wait i:nth-child(2) { animation-delay: .15s; } .bub.wait i:nth-child(3) { animation-delay: .3s; }
+@keyframes askdot { 0%, 80%, 100% { opacity: .3; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
+.ask-note { text-align: center; margin: 12px 8px 0; }
+.askbar { position: fixed; left: 0; right: 0; bottom: var(--tabh, 64px); z-index: 9; display: flex; gap: 8px; padding: 10px 16px; background: #fff; border-top: .5px solid var(--line); }
+.askbar input { flex: 1; min-width: 0; height: 48px; border-radius: 24px; border: 0; background: var(--fill); padding: 0 18px; font: inherit; font-size: 1rem; color: var(--text); outline: none; }
+.askbar .send { width: 48px; height: 48px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; }
+.askbar .send svg { width: 24px; height: 24px; }
+body.typing .tabs { display: none; }
+body.typing .askbar { bottom: var(--kb, 0px); padding-bottom: 10px; }
+@media (prefers-reduced-motion: reduce) { .bub.wait i { animation: none; } }
