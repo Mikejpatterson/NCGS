@@ -1,6 +1,6 @@
 /* ================= ORGANISER ================= */
 const ORG = {};
-const orgTop = () => `<div class="nav"><span class="sub" style="display:inline-flex;align-items:center;gap:4px">${sized(ICON.lock, 16)} Organiser</span><button class="link" data-act="org-exit">Done</button></div>`;
+const orgTop = () => `<header class="hero s"><div class="nav"><span class="sub" style="display:inline-flex;align-items:center;gap:6px;margin:0">${sized(ICON.lock, 16)} PIN protected</span><button class="link" data-act="org-exit">Done</button></div><div class="head"><h1 class="title">Organiser</h1></div></header>`;
 const field = (id, lbl, value, attrs = '') => `<div class="fld"><label class="sub" for="${id}">${lbl}</label><input id="${id}" class="field" value="${esc(value === null || value === undefined ? '' : value)}" ${attrs}></div>`;
 const formErr = () => (UI.formError ? `<p class="err">${esc(UI.formError)}</p>` : '');
 const slug = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'x';
@@ -8,8 +8,8 @@ const val = id => { const el = document.getElementById(id); return el ? el.value
 const num = id => { const v = val(id).replace(',', '.'); return v === '' ? null : Number(v); };
 
 ORG.lock = () => ({
-  html: `<div class="nav"><button class="link" data-act="org-exit">${ICON.back}Back</button></div>
-    <div class="head"><h1 class="title">Organiser</h1></div>
+  html: `<header class="hero s"><div class="nav"><button class="link" data-act="org-exit">${ICON.back}Back</button></div>
+    <div class="head"><h1 class="title">Organiser</h1></div></header>
     <form data-form="pin" autocomplete="off" class="sec near">
       <input id="pin" class="field" type="password" inputmode="numeric" maxlength="8" placeholder="PIN" aria-label="Organiser PIN">
       ${UI.pinError ? `<p class="err">${esc(UI.pinError)}</p>` : ''}
@@ -59,8 +59,7 @@ ORG.round = p => {
   if (!r) return { html: `${navBack('Organiser')}<p class="sub">Round deleted</p>` };
   const c = courseOf(r);
   const tee = teeOf(r);
-  let html = `${navBack('Organiser')}<div class="head"><h1 class="title">${esc(roundName(r))}</h1>${statusPill(r)}</div>`;
-  if (roundWhen(r)) html += `<p class="sub">${esc(roundWhen(r))}</p>`;
+  let html = `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">${esc(roundName(r))}</h1>${statusPill(r)}</div>${roundWhen(r) ? `<p class="sub">${esc(roundWhen(r))}</p>` : ''}</header>`;
   if (r.source === 'imported') {
     html += sec('', cardOf(`<div class="row tall"><span class="sub">${esc(r.note || 'Imported results')}</span></div>`), true);
     return { html };
@@ -115,7 +114,7 @@ ORG.details = p => {
   const ntp = r && r.contests ? r.contests.filter(x => x.type === 'ntp').map(x => x.hole).join(', ') : '';
   const ld = r && r.contests ? r.contests.filter(x => x.type === 'ld').map(x => x.hole).join(', ') : '';
   return {
-    html: `${navBack(r ? roundName(r) : 'Organiser')}<div class="head"><h1 class="title">${r ? 'Details' : 'New round'}</h1></div>
+    html: `<header class="hero s">${navBack(r ? roundName(r) : 'Organiser')}<div class="head"><h1 class="title">${r ? 'Details' : 'New round'}</h1></div></header>
     <form data-form="details" autocomplete="off" class="sec near">
       <div class="fld"><label class="sub" for="f-course">Course</label><select id="f-course" class="field" data-change="details-course">${D.courses().map(x => `<option value="${x.id}"${x.id === st.course ? ' selected' : ''}>${esc(x.name)}${x.holes ? '' : ' (no card yet)'}</option>`).join('')}</select></div>
       <div class="fld"><label class="sub" for="f-tee">Tees</label><select id="f-tee" class="field">${tees.length ? tees.map(([k, t]) => `<option value="${k}"${r && r.tee === k ? ' selected' : ''}>${esc(t.name)} · ${t.slope} / ${t.rating}</option>`).join('') : '<option value="">Add tees to the course first</option>'}</select></div>
@@ -143,7 +142,7 @@ function priorTripGroups(r) {
 ORG.playing = p => {
   const r = D.round(p.rid);
   const d = draftFor(r);
-  let html = `${navBack(roundName(r))}<div class="head"><h1 class="title">Groups and buggies</h1></div>`;
+  let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups and buggies</h1></div></header>`;
   if (!d.groups) {
     html += sec(label(`Playing · ${d.ids.length}`), cardOf(D.active().map(m => {
       const on = d.ids.includes(m.id);
@@ -157,7 +156,7 @@ ORG.playing = p => {
     return { html };
   }
   const sel = d.sel;
-  html += `<p class="sub head-sub">${plural(d.ids.length, 'player')} · first tee ${esc(r.first_tee || 'not set')}</p>`;
+  html = html.replace('</header>', `<p class="sub head-sub">${plural(d.ids.length, 'player')} · first tee ${esc(r.first_tee || 'not set')}</p></header>`);
   if (d.repeats.length) html += `<div class="banner note">${d.repeats.map(x => `${esc(x.pair.map(D.nameOf).join(' & '))} shared a buggy before`).join('<br>')}</div>`;
   const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
   d.groups.forEach((g, gi) => {
@@ -170,13 +169,13 @@ ORG.playing = p => {
 };
 ORG.groupsview = p => {
   const r = D.round(p.rid);
-  return { html: `${navBack(roundName(r))}<div class="head"><h1 class="title">Groups and buggies</h1></div>${groupsBlock(r, false)}` };
+  return { html: `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups and buggies</h1></div></header>${groupsBlock(r, false)}` };
 };
 
 ORG.kb = p => {
   const r = D.round(p.rid);
   const d = UI.kbDraft && UI.kbDraft.rid === r.id ? UI.kbDraft : (UI.kbDraft = { rid: r.id, pairs: r.kb ? clone(r.kb) : [], sel: null });
-  let html = `${navBack(roundName(r))}<div class="head"><h1 class="title">KBs</h1></div>`;
+  let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">KBs</h1></div></header>`;
   if (!r.groups || !r.groups.length) return { html: html + sec('', cardOf('<div class="row sub">Draw the groups first</div>'), true) };
   if (!d.pairs.length) return { html: html + `<button class="btn" data-act="org-kb-make">Make KB pairs</button>` };
   html += sec('', cardOf(d.pairs.map(pr => `<div class="row">${pr.map(pid => `<button class="chip${d.sel === pid ? ' on' : ''}" data-act="org-kb-swap" data-pid="${pid}">${esc(D.nameOf(pid))}</button>`).join('<span class="sub">&</span>')}</div>`).join('')), true);
@@ -200,8 +199,7 @@ ORG.group = p => {
     return `<${c ? 'button' : 'div'} class="row"${c ? ` data-act="photo-full" data-rid="${p.rid}" data-gid="${gc.id}" data-seg="${sg}"` : ''}><span>${segName(sg)}</span><span class="right ${c && c.resolved ? 'c-g' : 'sub'}">${st}${c ? chev : ''}</span></${c ? 'button' : 'div'}>`;
   }).join('');
   return {
-    html: `${navBack(roundName(D.round(p.rid)))}<div class="head"><h1 class="title">Group ${gc.n}</h1></div>
-    <p class="sub">${esc(gc.labels.map(l => l.long).join(' v '))}</p>
+    html: `<header class="hero s">${navBack(roundName(D.round(p.rid)))}<div class="head"><h1 class="title">Group ${gc.n}</h1></div><p class="sub">${esc(gc.labels.map(l => l.long).join(' v '))}</p></header>
     ${sec(label('Card check'), cardOf(checks), true)}
     ${sec('', cardOf(head + rows), true)}`
   };
@@ -214,8 +212,7 @@ ORG.contest = p => {
   const win = D.winners(p.rid)[n];
   const fmtT = iso => { try { return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } };
   return {
-    html: `${navBack(roundName(D.round(p.rid)))}<div class="head"><h1 class="title">${CONTEST[c.type]} · ${n}</h1></div>
-    <p class="sub">Latest claim first</p>
+    html: `<header class="hero s">${navBack(roundName(D.round(p.rid)))}<div class="head"><h1 class="title">${CONTEST[c.type]} · ${n}</h1></div><p class="sub">Latest claim first</p></header>
     ${sec('', cardOf(claims.length ? claims.map(cl => `<div class="row"><span>${esc(D.nameOf(cl.pid))} <span class="sub">· group ${groupNo(p.rid, cl.gid)} · ${fmtT(cl.at)}</span></span>
       ${win === cl.pid ? `<button class="link" data-act="org-unwin" data-rid="${p.rid}" data-n="${n}">Winner ${sized(ICON.check, 18)}</button>` : `<button class="link" data-act="org-win" data-rid="${p.rid}" data-n="${n}" data-pid="${cl.pid}">Confirm</button>`}</div>`).join('') : '<div class="row sub">No claims yet</div>'), true)}`
   };
@@ -227,7 +224,7 @@ ORG.members = () => {
   const row = m => `<button class="hrow" data-act="org-go" data-v="member" data-pid="${m.id}"><span class="nm">${esc(m.name)}</span><span></span><span class="r b num">${fmtIndex(m.index)}</span>${chev}</button>`;
   const former = all.filter(m => m.active === false);
   return {
-    html: `${navBack('Organiser')}<div class="head"><h1 class="title">Members</h1></div>
+    html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Members</h1></div></header>
     ${sec('', cardOf(`<div class="hrow cols"><span></span><span></span><span class="r cap">Index</span><span></span></div>${all.filter(m => m.active !== false).map(row).join('')}<button class="row" data-act="org-go" data-v="member" data-pid=""><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}Add member</span></button>`), true)}
     ${former.length ? sec(label('Former members'), cardOf(former.map(row).join(''))) : ''}`
   };
@@ -235,7 +232,7 @@ ORG.members = () => {
 ORG.member = p => {
   const m = p.pid ? D.member(p.pid) : null;
   return {
-    html: `${navBack('Members')}<div class="head"><h1 class="title">${m ? esc(m.name) : 'New member'}</h1></div>
+    html: `<header class="hero s">${navBack('Members')}<div class="head"><h1 class="title">${m ? esc(m.name) : 'New member'}</h1></div></header>
     <form data-form="member" autocomplete="off" class="sec near">
       ${field('m-name', 'Name on the leaderboard', m ? m.name : '', 'placeholder="Mike P"')}
       ${field('m-full', 'Full name', m ? m.full : '')}
@@ -250,7 +247,7 @@ ORG.member = p => {
 
 /* ----- Courses ----- */
 ORG.courses = () => ({
-  html: `${navBack('Organiser')}<div class="head"><h1 class="title">Courses</h1></div>
+  html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Courses</h1></div></header>
   ${sec('', cardOf(D.courses().map(c => `<button class="row tall" data-act="org-go" data-v="course" data-cid="${c.id}"><span class="two"><span>${esc(c.name)}</span><span class="sub">${esc([c.area, c.holes ? 'Par ' + c.holes.reduce((s, h) => s + h.par, 0) : 'No card yet'].filter(Boolean).join(' · '))}</span></span>${chev}</button>`).join('') +
     `<button class="row" data-act="org-go" data-v="course" data-cid=""><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}Add course</span></button>`), true)}`
 });
@@ -264,7 +261,7 @@ ORG.course = p => {
     <input id="h-si-${i}" class="field sm" inputmode="numeric" value="${h.si || ''}" aria-label="Index hole ${i + 1}">
     <input id="h-m-${i}" class="field sm" inputmode="numeric" value="${h.m || ''}" aria-label="Metres hole ${i + 1}"></div>`).join('');
   return {
-    html: `${navBack('Courses')}<div class="head"><h1 class="title">${c ? esc(c.name) : 'New course'}</h1></div>
+    html: `<header class="hero s">${navBack('Courses')}<div class="head"><h1 class="title">${c ? esc(c.name) : 'New course'}</h1></div></header>
     <form data-form="course" autocomplete="off" class="sec near">
       ${field('c-name', 'Name', c ? c.name : '')}
       ${field('c-area', 'Area', c ? c.area : '', 'placeholder="Mayo"')}
@@ -280,7 +277,7 @@ ORG.course = p => {
 
 /* ----- Settings, log, export ----- */
 ORG.settings = () => ({
-  html: `${navBack('Organiser')}<div class="head"><h1 class="title">Settings</h1></div>
+  html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Settings</h1></div></header>
   <form data-form="settings" autocomplete="off" class="sec near">
     ${field('s-name', 'Society', D.society())}
     <div class="two-col">${field('s-best', 'Golfer of the Year: scores that count', D.goyBest(), 'inputmode="numeric"')}${field('s-allow', 'Handicap allowance %', Math.round(D.allowance() * 100), 'inputmode="numeric"')}</div>
@@ -293,7 +290,7 @@ ORG.settings = () => ({
   </form>`
 });
 ORG.log = () => ({
-  html: `${navBack('Organiser')}<div class="head"><h1 class="title">Change log</h1></div>
+  html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Change log</h1></div></header>
   ${sec('', cardOf(D.log().slice(0, 300).map(e => `<div class="logrow"><div class="b">${esc(e.action)}</div><div class="sub">${esc(e.detail)}</div>
     <div class="cap" style="margin-top:4px">${esc(e.by)} · ${e.at ? new Date(e.at).toLocaleString([], { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : ''}</div></div>`).join('') || '<div class="row sub">Nothing yet</div>'), true)}`
 });
@@ -317,7 +314,7 @@ function exportCsv() {
   return lines.join('\n');
 }
 ORG.export = () => ({
-  html: `${navBack('Organiser')}<div class="head"><h1 class="title">Export</h1></div>
+  html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Export</h1></div></header>
   ${sec(label('Everything (JSON)'), `<textarea class="export" id="exjson" readonly aria-label="All data as JSON">${esc(JSON.stringify(exportData(), null, 1))}</textarea>
     <button class="btn quiet" data-act="copy" data-target="exjson">Copy</button>`, true)}
   ${sec(label('Hole-by-hole scores (CSV)'), `<textarea class="export" id="excsv" readonly aria-label="Scores as CSV">${esc(exportCsv())}</textarea>

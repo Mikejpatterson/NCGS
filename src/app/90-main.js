@@ -440,7 +440,7 @@ function renderToast() {
   el.textContent = UI.toast;
 }
 
-tabs.innerHTML = [['hole', 'Hole'], ['rules', 'Ruling'], ['board', 'Results']]
+tabs.innerHTML = [['board', 'Results'], ['hole', 'Hole'], ['rules', 'Ruling']]
   .map(([k, l]) => `<button class="tab" data-act="tab" data-tab="${k}">${TABICON[k]}<span>${l}</span></button>`).join('');
 
 document.addEventListener('click', e => {

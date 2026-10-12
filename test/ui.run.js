@@ -177,7 +177,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await page.waitForSelector('.msg.ai .bub:not(.err):not(.wait)');
   t = await text();
   check('rules: verdict first and big, steps under it, rule number as a chip, my question stays', (await page.$eval('.msg.ai:last-of-type .verdict', e => e.textContent)) === 'Take relief.' && !!(await page.$('.bub .ab')) && (await page.$eval('.rulechip', e => e.textContent)) === 'Rule 17.1' && /red area/.test(t));
-  check('rules: a microphone button sits beside the box', !!(await page.$('.askbar .mic')) && JSON.stringify(await page.$$eval('.tab', b => b.map(x => x.dataset.tab))) === JSON.stringify(['hole', 'rules', 'board']));
+  check('rules: a microphone button sits beside the box', !!(await page.$('.askbar .mic')) && JSON.stringify(await page.$$eval('.tab', b => b.map(x => x.dataset.tab))) === JSON.stringify(['board', 'hole', 'rules']));
   check('rules: the input is still there and empty for the next question', (await page.$eval('#askin', e => e.value)) === '');
   await shot('08c-rules', true);
   await tap('[data-act="ask-clear"]');
