@@ -502,7 +502,9 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 
 /* Home-screen app: a solid black status bar (no iOS glass), and the page background matches the tab bar so any spare strip below it is invisible. */
 html { background: #fff; }
-body::before { content: none; }
+/* iOS draws a blur over the top of a home-screen app unless a fixed bar at the very top paints one solid colour, so there is one (and the tab bar below is solid too). */
+body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: max(env(safe-area-inset-top, 0px), 6px); background: var(--pine); z-index: 60; pointer-events: none; }
+.tabs { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
 .stv.out { color: var(--faint); }
 
 /* Strokes with points beside them, the word under (Scratch = 0 points, the same as a pick-up) */
