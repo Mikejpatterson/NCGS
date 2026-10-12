@@ -42,15 +42,6 @@ const ACT = {
   enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },
   set: el => setScore(el.dataset.pid, el.dataset.v),
   clear: el => clearScore(el.dataset.pid),
-  diag: () => go('diag', {}),
-  'diag-set': el => {
-    const root = document.documentElement;
-    DIAG.forEach(([c]) => { if (c) root.classList.remove(c); });
-    if (el.dataset.k) root.classList.add(el.dataset.k);
-    const vp = document.querySelector('meta[name=viewport]');
-    if (vp) vp.setAttribute('content', el.dataset.k === 'd-nocover' ? 'width=device-width,initial-scale=1' : 'width=device-width,initial-scale=1,viewport-fit=cover');
-    render();
-  },
   'contest-open': () => { UI.contestSheet = true; render(); },
   'contest-close': () => { UI.contestSheet = false; render(); },
   'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },

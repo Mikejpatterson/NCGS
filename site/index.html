@@ -505,15 +505,15 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 .hero.c { padding-top: calc(env(safe-area-inset-top, 0px) + 18px); }
 
 /* Pull to refresh: the page slides down and this sits in the gap */
-#ptr { position: fixed; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px) + 14px); z-index: 1; display: none; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; color: var(--green); font-size: var(--t-sub); font-weight: 600; }
-.ptr-ring { width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--press); border-top-color: var(--green); display: block; }
+#ptr { position: fixed; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px) + 14px); z-index: 1; display: none; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; color: #fff; font-size: var(--t-sub); font-weight: 600; }
+.ptr-ring { width: 26px; height: 26px; border-radius: 50%; border: 3px solid rgba(255,255,255,.3); border-top-color: #fff; display: block; }
 #ptr.spin .ptr-ring { animation: ptrspin .8s linear infinite; transform: none !important; }
 @keyframes ptrspin { to { transform: rotate(360deg); } }
 
 /* Home-screen app: a solid black status bar (no iOS glass), and the page background matches the tab bar so any spare strip below it is invisible. */
-html { background: #fff; }
-/* iOS draws a blur over the top of a home-screen app unless a fixed bar at the very top paints one solid colour, so there is one (and the tab bar below is solid too). */
-body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: max(env(safe-area-inset-top, 0px), 6px); background: var(--pine); z-index: 60; pointer-events: none; }
+/* The strip behind the clock takes the colour of the body, so the body is the header green and the app sits on top of it in the light page colour. */
+html, body { background: var(--pine); }
+#app { background: var(--bg); min-height: 100vh; }
 .tabs { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
 .stv.out { color: var(--faint); }
 
@@ -539,15 +539,9 @@ body { min-height: 100vh; }
 .stv { height: 70px; justify-content: center; }
 button.stv { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: var(--pine); width: 100%; border-radius: 14px; -webkit-user-select: none; user-select: none; }
 button.stv:active { background: var(--press); }
-
-/* Display test variants (temporary) */
-html.d-html { background: var(--pine); }
-html.d-body { background: none; } html.d-body body { background: var(--pine); } html.d-body #app { background: var(--bg); min-height: 100vh; }
-html.d-both { background: var(--pine); } html.d-both body { background: var(--pine); } html.d-both #app { background: var(--bg); min-height: 100vh; }
-html.d-nobar2 { background: var(--pine); } html.d-nobar2 body::before { display: none; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610120731"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610120736"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2111,7 +2105,6 @@ VIEWS.home = () => {
     ${tile('players', ICON.users, 'Players', plural(D.active().length, 'golfer'))}
     ${tile('org', ICON.lock, 'Organiser', 'PIN needed')}
   </div>`;
-  html += `<p class="c" style="margin-top:24px;text-align:center"><button class="link" data-act="diag">Display test</button></p>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   return { html };
 };
@@ -2383,19 +2376,6 @@ VIEWS.who = p => {
       ${sec('', cardOf(list.map(m => `<button class="row" data-act="pick" data-id="${m.id}"><span class="${m.id === DB.prefs.me ? 'b' : ''}">${esc(m.name)}</span>${m.id === DB.prefs.me ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : chev}</button>`).join('')), false)}`
   };
 };
-
-/* ----- Temporary: try different ways of treating the top of the screen on the phone itself ----- */
-const DIAG = [
-  ['', 'Normal (as now)'],
-  ['d-html', 'Green behind the page (html)'],
-  ['d-body', 'Green behind the page (body)'],
-  ['d-both', 'Green behind the page (both)'],
-  ['d-nobar2', 'Green (html) and no thin bar']
-];
-VIEWS.diag = () => ({
-  html: `${navBack(D.society())}<header class="hero s"><div class="head"><h1 class="title">Display test</h1></div><p class="sub">Tap each one and look at the strip behind the clock. Tell me which is green.</p></header>
-    ${sec('', cardOf(DIAG.map(([k, t]) => `<button class="row" data-act="diag-set" data-k="${k}"><span>${t}</span><span class="sub">${document.documentElement.classList.contains(k || 'none') || (!k && !DIAG.some(([c]) => c && document.documentElement.classList.contains(c))) ? 'On' : ''}</span></button>`).join('')))}`
-});
 
 /* ---- 30-play.js ---- */
 /* ================= PLAYING A ROUND ================= */
@@ -3606,15 +3586,6 @@ const ACT = {
   enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },
   set: el => setScore(el.dataset.pid, el.dataset.v),
   clear: el => clearScore(el.dataset.pid),
-  diag: () => go('diag', {}),
-  'diag-set': el => {
-    const root = document.documentElement;
-    DIAG.forEach(([c]) => { if (c) root.classList.remove(c); });
-    if (el.dataset.k) root.classList.add(el.dataset.k);
-    const vp = document.querySelector('meta[name=viewport]');
-    if (vp) vp.setAttribute('content', el.dataset.k === 'd-nocover' ? 'width=device-width,initial-scale=1' : 'width=device-width,initial-scale=1,viewport-fit=cover');
-    render();
-  },
   'contest-open': () => { UI.contestSheet = true; render(); },
   'contest-close': () => { UI.contestSheet = false; render(); },
   'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },
