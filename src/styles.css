@@ -890,3 +890,10 @@ html, body { background: var(--bg); }
 .entry .pr-dots { grid-area: dt; display: flex; align-items: center; min-height: 34px; margin-top: 4px; }
 .entry .pr-dots .dots { margin: 0; }
 .entry .stepper .pu { margin-top: 4px; margin-left: 10px; height: 32px; }
+
+/* ===== Liquid glass tab bar: clear, blurred, bright edge; the chosen tab is a lens of yellow glass ===== */
+.tabs { background: rgba(255, 255, 255, .68); -webkit-backdrop-filter: blur(30px) saturate(190%) brightness(1.05); backdrop-filter: blur(30px) saturate(190%) brightness(1.05); box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .95), inset 0 -1px 0 rgba(255, 255, 255, .4), inset 0 0 0 1px rgba(255, 255, 255, .55), 0 12px 32px rgba(20, 35, 27, .2), 0 0 0 .5px rgba(20, 35, 27, .12); }
+.tabs::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 55%); pointer-events: none; z-index: -1; }
+.tab { color: #36413B; }
+.tab.on { background: linear-gradient(180deg, rgba(255, 248, 214, .95), rgba(250, 232, 160, .7)); box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .95), inset 0 0 0 1px rgba(255, 255, 255, .6), 0 3px 10px rgba(122, 90, 0, .18); }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .tabs { background: rgba(255, 255, 255, .96); } }
