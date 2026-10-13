@@ -96,5 +96,7 @@ function initialsOf(m) {
   return n.slice(0, 2).toUpperCase();
 }
 
-/* A name with its initials badge, for leaderboard rows. Bold when it is you. */
-const avName = x => `<span class="lname${x.id === DB.prefs.me ? ' b' : ''}"><i class="av${x.id === DB.prefs.me ? ' me' : ''}" aria-hidden="true">${esc(initialsOf(D.member(x.id)))}</i><span>${esc(x.name)}</span></span>`;
+/* A name with its initials badge, for leaderboard rows. Bold when it is you; the badge is flag-yellow for the leader. */
+const avName = (x, sub, lead) => { const me = x.id === DB.prefs.me; return `<span class="lname${me ? ' b' : ''}"><i class="av${me ? ' is-me' : lead ? ' is-lead' : ''}" aria-hidden="true">${esc(initialsOf(D.member(x.id)))}</i><span class="ln"><span class="n">${esc(x.name)}${me ? ' <small class="you">YOU</small>' : ''}</span>${sub ? `<span class="cap">${esc(sub)}</span>` : ''}</span></span>`; };
+/* The small line under a name on a live leaderboard: how far ahead the leader is, and how many holes they have played. */
+const lbSub = (rows, x, r) => { if (!r || r.status !== 'live' || x.thru === undefined) return ''; const next = rows[1]; return rows[0] === x && next && x.total > next.total ? `Leads by ${x.total - next.total} \u00b7 thru ${x.thru}` : `thru ${x.thru}`; };
