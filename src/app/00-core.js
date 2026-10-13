@@ -30,6 +30,7 @@ const ICON = {
 };
 const sized = (icon, n) => icon.replace('<svg', `<svg width="${n}" height="${n}"`);
 const TABICON = {
+  home: svg('<path d="M4 11l8-7 8 7v9H4z"/>'),
   hole: svg('<path d="M6 21V4"/><path d="M6 4h12l-2.5 4L18 12H6"/>'),
   match: svg('<path d="M4 8h14"/><path d="M15 5l3 3-3 3"/><path d="M20 16H6"/><path d="M9 13l-3 3 3 3"/>'),
   rules: svg('<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M11.2 8.2a1.8 1.8 0 1 1 2.4 1.7c-.6.3-.9.6-.9 1.3"/><path d="M12.7 13.6v.2"/>'),
@@ -82,3 +83,18 @@ const sec = (label, body, near) => `<section class="sec${near ? ' near' : ''}">$
 const label = t => `<span class="sub">${t}</span>`;
 const cardOf = rows => `<div class="card">${rows}</div>`;
 const navBack = (lbl, act = 'back') => `<div class="nav"><button class="link" data-act="${act}">${ICON.back}${esc(lbl)}</button></div>`;
+
+/* The round badge on a person: first initial plus surname initial (Mike P is MP, Damien McPhillips is DMc). Taken from the full name. */
+function initialsOf(m) {
+  if (!m) return '';
+  const parts = String(m.full || '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length > 1) {
+    const last = parts[parts.length - 1];
+    return parts[0][0].toUpperCase() + (/^Mc[A-Z]/.test(last) ? 'Mc' : last[0].toUpperCase());
+  }
+  const n = String(m.name || '').replace(/[^A-Za-z]/g, '');
+  return n.slice(0, 2).toUpperCase();
+}
+
+/* A name with its initials badge, for leaderboard rows. Bold when it is you. */
+const avName = x => `<span class="lname${x.id === DB.prefs.me ? ' b' : ''}"><i class="av${x.id === DB.prefs.me ? ' me' : ''}" aria-hidden="true">${esc(initialsOf(D.member(x.id)))}</i><span>${esc(x.name)}</span></span>`;

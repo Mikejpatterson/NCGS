@@ -35,7 +35,10 @@ const ACT = {
   tab: el => {
     UI.contestSheet = false;
     const t = el.dataset.tab;
-    const rid = playRid();
+    if (t === 'home') { ACT.home(); return; }
+    const rid = playRid() || liveRid() || (upcoming()[0] || {}).id || ((D.rounds().filter(r => r.status === 'final').slice(-1)[0]) || {}).id;
+    if (!rid) { toast('No round yet'); return; }
+    if (cur().v === 'home' && t === 'hole') { ACT.play({ dataset: { rid } }); return; }
     while (UI.stack.length > 1 && !['tee', 'match', 'board', 'rules', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();
     if (t === 'hole') { UI.edit = false; UI.after = null; replaceTop(playHomeView(rid), { rid }); }
     else if (t === 'rules') { replaceTop('rules', { rid }); }
@@ -463,7 +466,7 @@ function render() {
   const showTabs = !UI.org && !!out.tabs;
   app.classList.toggle('no-tabs', !showTabs);
   tabs.hidden = !showTabs;
-  if (showTabs) document.documentElement.style.setProperty('--tabh', tabs.offsetHeight + 'px');
+  if (showTabs) document.documentElement.style.setProperty('--tabh', (tabs.offsetHeight + parseFloat(getComputedStyle(tabs).bottom || 0) || tabs.offsetHeight) + 'px');
   sizeAsk();
   tabs.querySelectorAll('.tab').forEach(b => {
     const on = b.dataset.tab === out.tabs;
@@ -507,7 +510,7 @@ function renderToast() {
   el.textContent = UI.toast;
 }
 
-tabs.innerHTML = [['board', 'Results'], ['hole', 'Hole'], ['rules', 'Ruling']]
+tabs.innerHTML = [['home', 'Home'], ['hole', 'Hole'], ['board', 'Results'], ['rules', 'Ruling']]
   .map(([k, l]) => `<button class="tab" data-act="tab" data-tab="${k}">${TABICON[k]}<span>${l}</span></button>`).join('');
 
 document.addEventListener('click', e => {

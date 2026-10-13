@@ -33,6 +33,32 @@ function playLabel(r) {
   const gc = computeR(r.id).groups.find(g => g.id === mine.id);
   return gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now';
 }
+/* The top three of a live round, and you if you are lower down. Taken from the same leaderboard as the Results tab. */
+function miniBoard(r) {
+  const res = resultsOf(r.id);
+  const rows = res && res.rows ? res.rows : [];
+  if (!rows.length) return '';
+  let show = rows.slice(0, 3);
+  const mine = DB.prefs.me ? rows.find(x => x.id === DB.prefs.me) : null;
+  if (mine && !show.includes(mine)) show = [show[0], show[1], mine];
+  return `<div class="mini num">${show.map(x => `<div class="mr${x.id === DB.prefs.me ? ' me' : ''}"><span class="mp">${esc(x.posLabel)}</span><span class="mn">${esc(x.name)}${x.id === DB.prefs.me ? ' <small>YOU</small>' : ''}</span><span class="mt">${x.total}</span></div>`).join('')}</div>`;
+}
+function homeHeadline(feature) {
+  if (!feature) return 'No round booked yet';
+  const nm = roundName(feature);
+  if (feature.status === 'live') {
+    const res = resultsOf(feature.id);
+    const rows = res && res.rows ? res.rows : [];
+    if (rows.length > 1 && rows[0].total > rows[1].total) { const d = rows[0].total - rows[1].total; return `${rows[0].name} leads ${nm} by ${d === 1 ? 'one' : d === 2 ? 'two' : d}`; }
+    if (rows.length > 1) return `${nm} is all square at the top`;
+    return `${nm} is under way`;
+  }
+  const days = feature.date ? daysFromToday(feature.date) : null;
+  if (days === 0) return `${nm} is on today`;
+  if (days === 1) return `${nm} is tomorrow`;
+  if (days > 1) return `${nm} is in ${days} days`;
+  return nm;
+}
 function nowCard(r) {
   const live = r.status === 'live';
   const playable = canScore(r) && (live || !r.date || daysFromToday(r.date) <= 0);
@@ -47,6 +73,7 @@ function nowCard(r) {
       ${line2 ? `<span class="now-line">${esc(line2)}</span>` : ''}
       <span class="now-line">${esc(heroFacts(r))}</span>
     </button>
+    ${live ? miniBoard(r) : ''}
     <div class="now-acts${playable || live ? '' : ' one'}">
       ${playable ? `<button class="go" data-act="play" data-rid="${r.id}">${playLabel(r)}</button>` : `<button class="go" data-act="round" data-rid="${r.id}">Course, groups and forecast</button>`}
       ${live ? `<button class="go alt" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>` : playable ? `<button class="go alt" data-act="round" data-rid="${r.id}">Groups</button>` : ''}
@@ -63,8 +90,11 @@ VIEWS.home = () => {
   const me = DB.prefs.me ? D.member(DB.prefs.me) : null;
   const myRow = me ? goy(season).find(x => x.id === me.id) : null;
   const standLine = myRow ? `<button class="hsub me-line" data-act="player" data-pid="${me.id}">${posWord(myRow.posLabel)} in Golfer of the Year${sized(ICON.chev, 14)}</button>` : '';
+  const hr = new Date().getHours();
+  const dateLine = new Date().toLocaleDateString('en-IE', { weekday: 'long', day: 'numeric', month: 'long' }) + (me ? ` · ${hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening'}, ${esc(me.name.split(' ')[0])}` : '');
   let html = `<header class="hero home"><div class="brand"><span class="badge">${FLAG_SVG}</span><span class="two"><span class="wordmark">${esc(D.society())}</span>${standLine}</span>
-    <button class="who-chip" data-act="who">${me ? esc(me.name) : 'Who are you?'}</button></div>
+    <button class="who-chip" data-act="who" aria-label="${me ? 'You are ' + esc(me.name) + '. Change' : 'Who are you?'}">${me ? esc(me.name) + `<span class="who-av">${esc(initialsOf(me))}</span>` : 'Who are you?'}</button></div>
+    <p class="greet">${dateLine}</p><h1 class="headline">${esc(homeHeadline(feature))}</h1>
     ${feature ? nowCard(feature) : '<div class="now"><div class="now-main"><span class="now-name">No round booked</span><span class="now-line">The organiser adds the next one.</span></div></div>'}</header>`;
   const table = goy(season);
   const lead = table[0];
@@ -82,7 +112,7 @@ VIEWS.home = () => {
   </div>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
-  return { html };
+  return { html, tabs: 'home' };
 };
 
 VIEWS.rounds = () => {
@@ -105,7 +135,7 @@ VIEWS.players = () => {
 };
 
 function goyRow(x) {
-  return `<button class="lrow goy" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="cap num">${x.counting.map(c => c.pts).join(' ')}</span><span class="b r">${x.total}</span></button>`;
+  return `<button class="lrow goy" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span>${avName(x)}<span class="cap num">${x.counting.map(c => c.pts).join(' ')}</span><span class="b r">${x.total}</span></button>`;
 }
 
 VIEWS.goy = () => {
@@ -261,7 +291,7 @@ function resultsBlock(r) {
   if (!res) return '';
   const app = res.source === 'app';
   let html = sec(label('Stableford'), cardOf(res.rows.map(x => {
-    const inner = `<span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
+    const inner = `<span class="sub">${x.posLabel}</span>${avName(x)}<span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
     return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')) + (res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : res.source === 'sheet' ? '<p class="cap note">From the society sheet</p>' : ''));
   if (res.kb.length) {

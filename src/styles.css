@@ -749,3 +749,86 @@ textarea.export + .btn, #restorejson + .btn { margin-top: 8px; }
 .rbtn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; border-radius: 18px; background: #e4e4ea; font-size: 1.05rem; font-weight: 700; transition: background-color .15s, transform .15s; }
 .rbtn:active { background: #d6d6dd; transform: scale(.985); }
 .rbtn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ================= 2026 look: warm white, rounded pine cards, floating pill tab bar ================= */
+:root {
+  --bg: #FAF8F3;
+  --press: #EEEBE3;
+  --fill: #EEF0EA;
+  --ring: 0 0 0 1px rgba(20, 35, 27, .07);
+  --lift: 0 0 0 1px rgba(20, 35, 27, .07);
+}
+html, body { background: var(--bg); }
+#app { padding-block-end: calc(120px + env(safe-area-inset-bottom, 0px)); }
+#app.no-tabs { padding-block-end: 24px; }
+.card, .tile, .lnk, .rcard { border-radius: 24px; box-shadow: var(--ring); }
+.btn.quiet { box-shadow: var(--ring); }
+.btn { border-radius: 28px; min-height: 56px; box-shadow: none; }
+.row, .lrow, .hrow, .grow, .mrow { min-height: 54px; }
+.title { color: var(--text); }
+
+/* Page headers (every screen except Home and the hole) are plain big titles on the page, like the mock-ups */
+.hero.s, .hero.c:not(.pine) { background: none; color: var(--text); border-radius: 0; margin: 0; padding: calc(env(safe-area-inset-top, 0px) + 12px) 4px 4px; }
+.hero.s .title { color: var(--text); font-size: 2.1rem; font-weight: 900; letter-spacing: -.03em; }
+.hero.s .link, .hero.s .back-icon, .hero.s .link.inline { color: var(--pine); }
+.hero.s .sub, .hero.s .cap, .hero.s .hsub { color: var(--sub); }
+.hero.s .pill.w { background: var(--flag); color: var(--pine); }
+.hero.s .pill.g { background: var(--green-soft); color: #155C2D; }
+.hero.s + .sec, .hero.s + .btn { margin-top: 16px; }
+
+/* Cards that stay pine: the hole, the front-page round */
+.hero.pine, .hero.home .now { background: var(--pine); color: #fff; border-radius: 28px; position: relative; overflow: hidden; }
+.hero.pine { margin: 8px 0 0; padding: 16px 18px 14px; }
+.hero.pine::after, .hero.home .now::after { content: ""; position: absolute; right: -60px; top: -60px; width: 190px; height: 190px; border-radius: 50%; background: rgba(247, 197, 22, .14); pointer-events: none; }
+
+/* Front page */
+.hero.home { background: none; color: var(--text); border-radius: 0; margin: 0; padding: calc(env(safe-area-inset-top, 0px) + 12px) 4px 0; }
+.hero.home .wordmark { color: var(--text); font-weight: 800; }
+.hero.home .hsub { color: var(--pine); }
+.hero.home .badge { background: var(--flag); color: var(--pine); }
+.who-chip { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 6px 0 14px; border-radius: 22px; background: #fff; color: var(--text); box-shadow: var(--ring); font-weight: 600; }
+.who-av { width: 32px; height: 32px; border-radius: 50%; background: var(--pine); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; }
+.greet { margin: 14px 0 0; font-size: var(--t-sub); color: var(--sub); font-weight: 500; }
+.headline { margin: 4px 0 0; font-size: 1.85rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; color: var(--text); text-wrap: balance; }
+.hero.home .now { margin-top: 14px; padding: 18px; }
+.hero.home .now > * { position: relative; z-index: 1; }
+.hero.home .now-name { font-size: 1.8rem; letter-spacing: -.02em; }
+.mini { margin-top: 14px; border-radius: 18px; background: rgba(255, 255, 255, .1); padding: 2px 14px; }
+.mr { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.mr + .mr { border-top: 1px solid rgba(255, 255, 255, .14); }
+.mr .mp { width: 20px; font-weight: 800; }
+.mr .mn { flex: 1; font-weight: 700; }
+.mr .mn small { font-size: .65rem; letter-spacing: .1em; color: var(--flag); font-weight: 800; }
+.mr .mt { font-size: 1.4rem; font-weight: 800; letter-spacing: -.02em; }
+.go { border-radius: 28px; min-height: 56px; }
+.links { grid-template-columns: 1fr 1fr; }
+.lnk { border-radius: 22px; }
+
+/* Floating pill tab bar */
+.tabs { left: 50%; right: auto; width: min(calc(100% - 32px), 448px); transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); height: 68px; border-radius: 34px; padding: 0 8px; gap: 2px; grid-template-columns: repeat(4, 1fr); align-items: center; background: rgba(255, 255, 255, .94); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border: 0; box-shadow: 0 8px 28px rgba(20, 35, 27, .16), 0 0 0 1px rgba(20, 35, 27, .08); }
+.tab { height: 52px; min-height: 52px; border-radius: 26px; font-size: .68rem; font-weight: 600; color: var(--sub); }
+.tab svg { width: 22px; height: 22px; }
+.tab.on { background: #FBEFB8; color: var(--pine); font-weight: 700; }
+.tab.on svg { color: var(--pine); }
+.askbar { bottom: calc(var(--tabh, 90px) + 4px); }
+.thread { padding-bottom: calc(var(--tabh, 90px) + var(--askh, 76px) + 16px); }
+.toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+
+/* Initials badges and the same plain titles on every page header */
+.hero.c:not(.pine) .title { color: var(--text); font-size: 2.1rem; font-weight: 900; letter-spacing: -.03em; }
+.hero.c:not(.pine) .link, .hero.c:not(.pine) .back-icon { color: var(--pine); }
+.hero.c:not(.pine) .sub, .hero.c:not(.pine) .cap { color: var(--sub); }
+.lname { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.lname > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.av { flex: none; width: 40px; height: 40px; border-radius: 50%; background: #E3EAE0; color: var(--pine); display: inline-flex; align-items: center; justify-content: center; font-style: normal; font-size: .72rem; font-weight: 800; letter-spacing: 0; }
+.av.me { background: var(--pine); color: #fff; }
+.lrow { min-height: 64px; }
+.lrow.goy { grid-template-columns: 36px minmax(0, 1fr) auto 40px; }
+.hero.c:not(.pine) .hrow2 .big { color: var(--text); font-size: 2.1rem !important; font-weight: 900; letter-spacing: -.03em; }
+.hero.c:not(.pine) .fact { background: #fff; box-shadow: var(--ring); color: var(--text); }
+.hero.c:not(.pine) .fact b { color: var(--pine); }
+.hero.c:not(.pine) .pill.w2 { color: var(--text); box-shadow: inset 0 0 0 1.5px rgba(20,35,27,.25); }
+.hero.pine { padding-top: calc(env(safe-area-inset-top, 0px) + 14px); }
+.hero.c:not(.pine) .hrow2 .big small { color: var(--sub); }
+.hero.c:not(.pine) { padding-top: calc(env(safe-area-inset-top, 0px) + 6px); padding-bottom: 2px; }
+#app { padding-block-end: calc(96px + env(safe-area-inset-bottom, 0px)); }

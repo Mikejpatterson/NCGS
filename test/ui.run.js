@@ -42,7 +42,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   // A past trip round (GameBook order, KBs, contests, groups)
   await tap('[data-act="round"][data-rid="2026-rio-real"]');
   t = await text();
-  check('round: GameBook order kept (Mike F 10th ahead of Damien on 23)', /10Mike F2311Damien23/.test(t));
+  check('round: GameBook order kept (Mike F 10th ahead of Damien on 23)', /10[A-Za-z]{2,3}Mike F2311[A-Za-z]{2,3}Damien23/.test(t));
   check('round: KBs and contests from the sheet', /Sean & Peadar67/.test(t) && /Nearest the pinPeadar/.test(t) && /Longest driveMike P/.test(t));
   check('round: buggies listed under groups', /Mike P & Dave/.test(t));
   await shot('02-round-rio-real', true);
@@ -57,14 +57,14 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   // An Irish round: points only, ties shown as ties
   await tap('[data-act="round"][data-rid="2026-westport"]');
   t = await text();
-  check('Irish round: level scores share a position', /T1Kieran32T1Sean32/.test(t) && /From the society sheet/.test(t));
+  check('Irish round: level scores share a position', /T1[A-Za-z]{2,3}Kieran32T1[A-Za-z]{2,3}Sean32/.test(t) && /From the society sheet/.test(t));
   await tap('[data-act="back"]');
   await tap('[data-act="back"]');
 
   // GOY table
   await tap('[data-act="goy"]');
   t = await text();
-  check('GOY: Colin 3rd and John K 4th on 100', /3Colin38 34 28100/.test(t) && /4John K36 33 31100/.test(t));
+  check('GOY: Colin 3rd and John K 4th on 100', /3[A-Za-z]{2,3}Colin38 34 28100/.test(t) && /4[A-Za-z]{2,3}John K36 33 31100/.test(t));
   await tap('[data-act="back"]');
 
   // Demo round: play
@@ -146,7 +146,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   // Buggy Wars and leaderboard
   await tap('.tab[data-tab="board"]');
   t = await text();
-  check('one Results tab bar, no separate Buggy tab', (await page.$$('.tab')).length === 3 && !(await page.$('.tab[data-tab="match"]')) && /Results/.test(t));
+  check('one Results tab bar, no separate Buggy tab', (await page.$$('.tab')).length === 4 && !(await page.$('.tab[data-tab="match"]')) && /Results/.test(t));
   check('Results has Leaderboard, Buggy Wars, Contests and Stats pills, Leaderboard first', JSON.stringify(await page.$$eval('.pills button', b => b.map(x => x.textContent.trim()))) === JSON.stringify(['Leaderboard', 'Buggy Wars', 'Contests', 'Stats']) && await page.$eval('.pills button.on', e => e.textContent.trim()) === 'Leaderboard');
   check('leaderboard: Stableford and KBs, no drinks (contests are on their own pill)', /Stableford|Demo round/.test(t) && /KBs/.test(t) && !/drinks|Buying/i.test(t) && !/Nearest the pin/.test(t));
   await tap('[data-act="respill"][data-p="bw"]');
@@ -177,7 +177,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await page.waitForSelector('.msg.ai .bub:not(.err):not(.wait)');
   t = await text();
   check('rules: verdict first and big, steps under it, rule number as a chip, my question stays', (await page.$eval('.msg.ai:last-of-type .verdict', e => e.textContent)) === 'Take relief.' && !!(await page.$('.bub .ab')) && (await page.$eval('.rulechip', e => e.textContent)) === 'Rule 17.1' && /red area/.test(t));
-  check('rules: a microphone button sits beside the box', !!(await page.$('.askbar .mic')) && JSON.stringify(await page.$$eval('.tab', b => b.map(x => x.dataset.tab))) === JSON.stringify(['board', 'hole', 'rules']));
+  check('rules: a microphone button sits beside the box', !!(await page.$('.askbar .mic')) && JSON.stringify(await page.$$eval('.tab', b => b.map(x => x.dataset.tab))) === JSON.stringify(['home', 'hole', 'board', 'rules']));
   check('rules: the input is still there and empty for the next question', (await page.$eval('#askin', e => e.value)) === '');
   await shot('08c-rules', true);
   await tap('[data-act="ask-clear"]');
