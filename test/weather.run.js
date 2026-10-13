@@ -9,7 +9,7 @@ const fake = (date, code, rain, wind) => { const hours = { time: [], temperature
   await pg.goto(URL); await pg.evaluate(() => localStorage.clear()); await pg.reload(); await pg.waitForSelector('.brand');
   const date = await pg.evaluate(() => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const r = n.D.round('demo-cabopino'); n.put('rounds', [Object.assign({}, r, { date: n.todayIso() })]); return n.todayIso(); });
   await pg.waitForTimeout(400);
-  const show = () => pg.evaluate(() => { const n = window.__ncgs; n.UI.stack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'demo-cabopino' } }]; n.render(); return { skel: !!document.querySelector('.wx-skel'), card: !!document.querySelector('.wx:not(.wx-skel)') }; });
+  const show = () => pg.evaluate(() => { const n = window.__ncgs; n.UI.stack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'demo-cabopino' } }]; n.render(); return { skel: !!document.querySelector('.wx-skel'), card: !!document.querySelector('.wx:not(.wx-skel):not(.wx-fail)') }; });
   // 1. nothing remembered: a placeholder holds the space at once
   await pg.evaluate(() => { window.__ncgs.UI.wx = {}; localStorage.removeItem('ncgs-wx'); });
   const a = await show();
@@ -28,7 +28,7 @@ const fake = (date, code, rain, wind) => { const hours = { time: [], temperature
   // 3b. a failed refresh never wipes out a good remembered forecast
   await pg.evaluate(([d, f]) => { window.__ncgs.UI.wx = {}; localStorage.setItem('ncgs-wx', JSON.stringify({ cabopino: { at: Date.now() - 40 * 60e3, data: f } })); }, [date, fake(date, 63, 70, 14)]);
   await show(); await pg.waitForTimeout(600);
-  check('an empty answer from the server keeps the remembered forecast', await pg.evaluate(() => !!document.querySelector('.wx:not(.wx-skel)')));
+  check('an empty answer from the server keeps the remembered forecast', await pg.evaluate(() => !!document.querySelector('.wx:not(.wx-skel):not(.wx-fail)')));
   // 4. all kinds of weather draw without overflow
   for (const code of [0, 2, 3, 45, 53, 63, 73, 95]) {
     await pg.evaluate(([d, f]) => { window.__ncgs.UI.wx = { cabopino: { state: 'done', data: f } }; }, [date, fake(date, code, 40, 38)]);
@@ -36,9 +36,18 @@ const fake = (date, code, rain, wind) => { const hours = { time: [], temperature
     const w = await pg.evaluate(() => { const e = document.querySelector('.wx'); return e && e.scrollWidth <= e.clientWidth + 1 && document.documentElement.scrollWidth <= window.innerWidth; });
     check('weather code ' + code + ' draws and fits the screen', !!w);
   }
-  // 5. a failed fetch leaves nothing broken behind
+  // 5. a failed fetch says so and offers a retry, instead of the card quietly vanishing
   await pg.evaluate(() => { window.__ncgs.UI.wx = { cabopino: { state: 'failed' } }; });
-  const f = await show(); check('a failed fetch shows nothing and does not loop', !f.skel && !f.card);
+  const f = await show();
+  check('a failed fetch shows a plain message with a retry button', !f.skel && !f.card && !!(await pg.$('.wx-fail[data-act="wx-retry"]')));
+  await pg.click('.wx-fail');
+  await pg.waitForTimeout(100);
+  check('tapping it tries again (placeholder appears)', !!(await pg.$('.wx-skel')) || !!(await pg.$('.wx:not(.wx-skel):not(.wx-fail)')));
+  // 6. a slow or empty first answer is retried once by itself before it gives up
+  await pg.evaluate(() => { window.__ncgs.UI.wx = {}; localStorage.removeItem('ncgs-wx'); });
+  await show();
+  await pg.waitForTimeout(3500);
+  check('after two empty answers the card says it is not available (not blank, not stuck)', !!(await pg.$('.wx-fail')) && !(await pg.$('.wx-skel')));
   check('no script errors', errs.length === 0, errs.slice(0, 2).join(' | '));
   await b.close(); console.log(ok ? 'all passed' : 'FAILED'); process.exit(ok ? 0 : 1);
 })();

@@ -266,6 +266,7 @@ button.lrow { width: 100%; text-align: left; }
 .sk-b { width: 90px; height: 36px; }
 @keyframes skpulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .sk { animation: none; } }
+.wx-fail { display: flex; flex-direction: column; gap: 4px; width: 100%; text-align: left; background: linear-gradient(160deg, #4B5F7A, #6E8399); min-height: 96px; justify-content: center; }
 .wx-hours { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 14px; padding: 10px 4px; background: rgba(255,255,255,.16); border-radius: 12px; text-align: center; }
 .wx-hours > span { display: flex; flex-direction: column; align-items: center; gap: 2px; font-variant-numeric: tabular-nums; }
 .wx-t { font-size: var(--t-cap); opacity: .9; }
@@ -737,7 +738,7 @@ textarea.export + .btn, #restorejson + .btn { margin-top: 8px; }
 .seg.pills button, .seg.pills.four button { white-space: normal; line-height: 1.15; padding-block: 6px; overflow-wrap: anywhere; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610131711","server":"61105d07"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610131800","server":"61105d07"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2185,10 +2186,10 @@ function localServer() {
   }
   return srv;
 }
-function call(req) {
+function call(req, ms) {
   if (BOOT.mode === 'live') {
     const ctl = new AbortController();
-    const timer = setTimeout(() => ctl.abort(), 25000);
+    const timer = setTimeout(() => ctl.abort(), ms || 25000);
     return fetch(BOOT.api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(req), redirect: 'follow', cache: 'no-store', signal: ctl.signal })
       .then(r => { if (!r.ok) throw Object.assign(new Error('http ' + r.status), { net: true }); return r.json(); })
       .catch(e => { if (e && e.net === undefined) e.net = true; throw e; })
@@ -2711,25 +2712,35 @@ function wxLine(kind, rain, wind) {
   const wind2 = wind >= 40 ? ' Very windy.' : wind >= 25 ? ' Breezy.' : wind >= 12 ? ' A light breeze.' : ' Hardly any wind.';
   return wet + wind2;
 }
+/* Fetch the forecast. The first call to the server can be slow, so one quiet retry before giving up. */
+function wxFetch(c, attempt) {
+  const keep = () => UI.wx[c.id] && UI.wx[c.id].state === 'done' && UI.wx[c.id].data && UI.wx[c.id].data.days;
+  const fail = () => {
+    if (attempt < 2) { setTimeout(() => wxFetch(c, attempt + 1), 2000); return; }
+    if (!keep()) UI.wx[c.id] = { state: 'failed' };
+    render();
+  };
+  call({ op: 'weather', lat: c.lat, lon: c.lon }, 15000).then(res => {
+    if (!(res && res.days)) { fail(); return; }
+    UI.wx[c.id] = { state: 'done', data: res };
+    const m = LS.get('ncgs-wx', {}) || {}; m[c.id] = { at: Date.now(), data: res }; LS.set('ncgs-wx', m);
+    render();
+  }).catch(fail);
+}
 function forecast(r) {
   const c = courseOf(r);
   const away = daysFromToday(r.date);
   if (!c || c.lat === null || c.lon === null || c.lat === undefined || away === null || away < 0 || away > 9) return '';
   /* The last forecast is kept on the phone, so it shows at once; a fresh one is fetched in the background when it is getting old. */
-  const refresh = () => call({ op: 'weather', lat: c.lat, lon: c.lon }).then(res => {
-    if (!(res && res.days) && UI.wx[c.id] && UI.wx[c.id].state === 'done' && UI.wx[c.id].data && UI.wx[c.id].data.days) { render(); return; } // no new forecast: keep the one we have
-    UI.wx[c.id] = { state: 'done', data: res };
-    if (res && res.days) { const m = LS.get('ncgs-wx', {}) || {}; m[c.id] = { at: Date.now(), data: res }; LS.set('ncgs-wx', m); }
-    render();
-  }).catch(() => { if (!UI.wx[c.id] || UI.wx[c.id].state !== 'done') UI.wx[c.id] = { state: 'failed' }; render(); });
   if (!UI.wx[c.id]) {
     const saved = (LS.get('ncgs-wx', {}) || {})[c.id];
     const age = saved ? Date.now() - saved.at : Infinity;
-    if (saved && saved.data && saved.data.days && age < 3 * 3600e3) { UI.wx[c.id] = { state: 'done', data: saved.data }; if (age > 30 * 60e3) refresh(); }
-    else { UI.wx[c.id] = { state: 'loading' }; refresh(); }
+    if (saved && saved.data && saved.data.days && age < 3 * 3600e3) { UI.wx[c.id] = { state: 'done', data: saved.data }; if (age > 30 * 60e3) wxFetch(c, 1); }
+    else { UI.wx[c.id] = { state: 'loading' }; wxFetch(c, 1); }
   }
   const st = UI.wx[c.id];
   if (st.state === 'loading') return sec(label('Forecast'), '<div class="wx wx-skel" aria-busy="true"><div class="wx-top"><span class="sk sk-ic"></span><div class="wx-main"><span class="sk sk-a"></span><span class="sk sk-b"></span></div></div><p class="wx-line">Getting the forecast…</p></div>');
+  if (st.state === 'failed') return sec(label('Forecast'), `<button class="wx wx-fail" data-act="wx-retry" data-cid="${c.id}"><span class="wx-name">Forecast not available right now</span><span class="wx-line">Tap to try again</span></button>`);
   if (st.state !== 'done' || !st.data || !st.data.days) return '';
   const d = st.data.days;
   const i = d.time.indexOf(r.date);
@@ -4542,6 +4553,7 @@ const ACT = {
     go(playHomeView(rid), { rid });
   },
   leaderboard: el => { UI.playRid = el.dataset.rid; UI.board = el.dataset.rid; UI.res = 'lb'; go('board', { rid: el.dataset.rid }); },
+  'wx-retry': el => { delete UI.wx[el.dataset.cid]; render(); },
   trip: el => go('trip', { rid: el.dataset.rid }),
   respill: el => { UI.res = el.dataset.p; UI.scrollTop = true; render(); },
   toggle: el => { UI.open[el.dataset.key] = !UI.open[el.dataset.key]; render(); },

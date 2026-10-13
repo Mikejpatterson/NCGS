@@ -46,10 +46,10 @@ function localServer() {
   }
   return srv;
 }
-function call(req) {
+function call(req, ms) {
   if (BOOT.mode === 'live') {
     const ctl = new AbortController();
-    const timer = setTimeout(() => ctl.abort(), 25000);
+    const timer = setTimeout(() => ctl.abort(), ms || 25000);
     return fetch(BOOT.api, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(req), redirect: 'follow', cache: 'no-store', signal: ctl.signal })
       .then(r => { if (!r.ok) throw Object.assign(new Error('http ' + r.status), { net: true }); return r.json(); })
       .catch(e => { if (e && e.net === undefined) e.net = true; throw e; })
