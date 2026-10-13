@@ -120,6 +120,42 @@ VIEWS.goy = () => {
 
 /* ----- A round ----- */
 const WX = { 0: 'Clear', 1: 'Mainly clear', 2: 'Partly cloudy', 3: 'Cloudy', 45: 'Fog', 48: 'Fog', 51: 'Drizzle', 53: 'Drizzle', 55: 'Drizzle', 56: 'Freezing drizzle', 57: 'Freezing drizzle', 61: 'Light rain', 63: 'Rain', 65: 'Heavy rain', 66: 'Freezing rain', 67: 'Freezing rain', 71: 'Light snow', 73: 'Snow', 75: 'Heavy snow', 77: 'Snow', 80: 'Showers', 81: 'Showers', 82: 'Heavy showers', 85: 'Snow showers', 86: 'Snow showers', 95: 'Thunderstorms', 96: 'Thunderstorms', 99: 'Thunderstorms' };
+/* Weather: one picture per kind of weather, drawn here so it works offline and always matches the app. */
+function wxKind(code) {
+  const c = Number(code);
+  if (c === 0) return 'sun';
+  if (c === 1 || c === 2) return 'part';
+  if (c === 3) return 'cloud';
+  if (c === 45 || c === 48) return 'fog';
+  if (c >= 51 && c <= 57) return 'drizzle';
+  if ((c >= 61 && c <= 67) || (c >= 80 && c <= 82)) return 'rain';
+  if ((c >= 71 && c <= 77) || c === 85 || c === 86) return 'snow';
+  if (c >= 95) return 'storm';
+  return 'cloud';
+}
+function wxIcon(kind, size) {
+  const sun = (x, y, r, rays) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#FFD23F"/>${rays ? [0, 45, 90, 135, 180, 225, 270, 315].map(a => `<line x1="${x}" y1="${y - r - 3}" x2="${x}" y2="${y - r - 7}" stroke="#FFD23F" stroke-width="3" stroke-linecap="round" transform="rotate(${a} ${x} ${y})"/>`).join('') : ''}`;
+  const cloud = (fill, dx, dy) => `<path transform="translate(${dx || 0} ${dy || 0})" d="M14 36h21a8.5 8.5 0 0 0 1-16.9A11 11 0 0 0 15 21.5 7.3 7.3 0 0 0 14 36z" fill="${fill || '#fff'}"/>`;
+  const drops = (n, col) => [17, 25, 33].slice(0, n).map(x => `<line x1="${x}" y1="39" x2="${x - 2}" y2="45" stroke="${col || '#8FD0FF'}" stroke-width="3" stroke-linecap="round"/>`).join('');
+  let g = '';
+  if (kind === 'sun') g = sun(24, 24, 9, true);
+  else if (kind === 'part') g = sun(18, 17, 7, true) + cloud('#fff', 2, 2);
+  else if (kind === 'cloud') g = cloud('#fff', 0, -2);
+  else if (kind === 'fog') g = cloud('#E3EAF2', 0, -4) + [38, 43].map((y, i) => `<line x1="${11 + i * 3}" y1="${y}" x2="${37 - i * 3}" y2="${y}" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`).join('');
+  else if (kind === 'drizzle') g = cloud('#EEF3F9', 0, -4) + drops(2, '#B7E1FF');
+  else if (kind === 'rain') g = cloud('#DCE6F2', 0, -4) + drops(3);
+  else if (kind === 'snow') g = cloud('#F4F8FC', 0, -4) + [[17, 41], [25, 44], [33, 41]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="2.4" fill="#fff"/>`).join('');
+  else if (kind === 'storm') g = cloud('#B9C4D3', 0, -5) + '<path d="M26 28l-7 11h5l-2 9 10-13h-6l3-7z" fill="#FFD23F"/>';
+  return `<svg class="wxi" viewBox="0 0 48 48" width="${size}" height="${size}" aria-hidden="true">${g}</svg>`;
+}
+/* One plain sentence about the day, from the numbers only. */
+function wxLine(kind, rain, wind) {
+  if (kind === 'storm') return 'Thunder about. Keep an eye on it before you go out.';
+  if (kind === 'snow') return 'Snow about. Check the course is open.';
+  const wet = rain >= 60 ? 'A wet one: waterproofs.' : rain >= 30 ? 'Showers possible: bring a waterproof.' : 'Looks dry.';
+  const wind2 = wind >= 40 ? ' Very windy.' : wind >= 25 ? ' Breezy.' : wind >= 12 ? ' A light breeze.' : ' Hardly any wind.';
+  return wet + wind2;
+}
 function forecast(r) {
   const c = courseOf(r);
   const away = daysFromToday(r.date);
@@ -135,6 +171,8 @@ function forecast(r) {
   const d = st.data.days;
   const i = d.time.indexOf(r.date);
   if (i < 0) return '';
+  const kind = wxKind(d.weather_code[i]);
+  const rain = Number(d.precipitation_probability_max[i]) || 0, wind = Math.round(Number(d.wind_speed_10m_max[i]) || 0);
   let hours = '';
   const h = st.data.hours;
   const start = Number(String(r.first_tee || '10:00').split(':')[0]);
@@ -143,11 +181,17 @@ function forecast(r) {
     for (let k = 0; k < 5; k++) {
       const stamp = `${r.date}T${String(start + k).padStart(2, '0')}:00`;
       const j = h.time.indexOf(stamp);
-      if (j >= 0) cells.push(`<span><span class="cap">${String(start + k).padStart(2, '0')}:00</span><span class="b">${Math.round(h.temperature_2m[j])}°</span><span class="cap">${h.precipitation_probability[j] !== null ? h.precipitation_probability[j] + '%' : ''}</span></span>`);
+      if (j >= 0) {
+        const pr = h.precipitation_probability[j];
+        cells.push(`<span><span class="wx-t">${String(start + k).padStart(2, '0')}:00</span>${wxIcon(wxKind(h.weather_code ? h.weather_code[j] : d.weather_code[i]), 30)}<span class="wx-d">${Math.round(h.temperature_2m[j])}°</span><span class="wx-r">${pr !== null && pr !== undefined ? pr + '%' : ''}</span></span>`);
+      }
     }
-    if (cells.length) hours = `<div class="hours">${cells.join('')}</div>`;
+    if (cells.length) hours = `<div class="wx-hours" aria-label="Hour by hour from the first tee time">${cells.join('')}</div>`;
   }
-  return sec(label('Forecast'), cardOf(`<div class="row tall"><span class="two"><span>${WX[d.weather_code[i]] || 'Mixed'}</span><span class="sub">Rain ${d.precipitation_probability_max[i]}% · Wind ${Math.round(d.wind_speed_10m_max[i])} km/h</span></span><span class="bignum">${Math.round(d.temperature_2m_max[i])}°<span class="sub"> ${Math.round(d.temperature_2m_min[i])}°</span></span></div>${hours}`));
+  return sec(label('Forecast'), `<div class="wx wx-${kind}">
+    <div class="wx-top">${wxIcon(kind, 72)}<div class="wx-main"><div class="wx-name">${WX[d.weather_code[i]] || 'Mixed'}</div><div class="wx-temp">${Math.round(d.temperature_2m_max[i])}°<span> ${Math.round(d.temperature_2m_min[i])}°</span></div></div></div>
+    <div class="wx-chips"><span class="wx-chip"><b>${rain}%</b> chance of rain</span><span class="wx-chip"><b>${wind}</b> km/h wind</span></div>
+    <p class="wx-line">${wxLine(kind, rain, wind)}</p>${hours}</div>`);
 }
 
 function groupsBlock(r, interactive) {
