@@ -25,6 +25,29 @@ function askRuling(t) {
   return `<div class="verdict">${inline(verdict.replace(/^\*\*|\*\*$/g, ''))}</div>${rest.trim() ? `<div class="rest">${askText(rest)}</div>` : ''}${rules.length ? `<div class="rules">${rules.map(r => `<span class="rulechip">${esc(r)}</span>`).join('')}</div>` : ''}`;
 }
 
+// A card from the checker: either one quick question with big tap answers, or the ruling itself.
+const boldBits = x => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+function askCardHtml(c, i, live) {
+  if (c.type === 'ask') {
+    return `<div class="qcard"><div class="qtext">${esc(c.question)}</div><div class="qopts">${c.options.map(o =>
+      `<button class="qopt${o.tag ? ' t-' + o.tag : ''}${/^not sure/i.test(o.label) ? ' dim' : ''}" data-act="ask-idea" data-q="${esc(o.label)}"${live ? '' : ' disabled'}>${o.tag ? `<span class="qtag">${o.tag === 'red' ? 'Red' : 'Yellow'}</span>` : ''}<span>${esc(o.label)}</span></button>`).join('')}</div></div>`;
+  }
+  const top = [c.topic, c.rule].filter(Boolean).join(' · ');
+  return `<div class="rcard">${top ? `<div class="rtop">${esc(top)}</div>` : ''}<div class="rverdict">${boldBits(c.verdict)}</div>${c.intro ? `<div class="rintro">${boldBits(c.intro)}</div>` : ''}
+    ${c.steps.length ? `<ol class="rsteps">${c.steps.map((x, n) => `<li><span class="rn">${n + 1}</span><span>${boldBits(x)}</span></li>`).join('')}</ol>` : ''}
+    ${c.note ? `<div class="rnote">${boldBits(c.note)}</div>` : ''}
+    <div class="ract"><button class="rbtn" data-act="ask-read" data-i="${i}">${ICON.speak}<span>Read out</span></button><button class="rbtn" data-act="ask-more">Ask more</button></div></div>`;
+}
+function askSpoken(c) { return [c.verdict, c.intro, ...c.steps.map((x, n) => 'Option ' + (n + 1) + '. ' + x), c.note].filter(Boolean).join('. ').replace(/\*\*/g, ''); }
+function askRead(i) {
+  const m = UI.chat[i];
+  if (!m || !m.card || m.card.type !== 'ruling' || !window.speechSynthesis) return toast("Reading out isn't available on this phone.");
+  const synth = window.speechSynthesis;
+  if (synth.speaking) { synth.cancel(); return; }
+  const u = new SpeechSynthesisUtterance(askSpoken(m.card)); u.lang = 'en-IE'; u.rate = 0.95;
+  synth.speak(u);
+}
+
 function askSources(list) {
   const ok = (list || []).filter(x => x && /^https:\/\//.test(x.url));
   if (!ok.length) return '';
@@ -36,8 +59,9 @@ function askThread() {
     return `<div class="ask-intro"><p class="b">Say what happened.</p><p class="sub">${SPEECH ? 'Tap the microphone and speak, or type.' : 'Tap the box, then the microphone on your keyboard to speak.'} You get a ruling you can read out, checked against the official rules.</p></div>
       <div class="ask-ideas">${ASK_IDEAS.map(q => `<button class="idea" data-act="ask-idea" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
   }
-  return UI.chat.map(m => m.role === 'user'
+  return UI.chat.map((m, i) => m.role === 'user'
     ? `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>`
+    : m.card ? `<div class="msg ai card">${askCardHtml(m.card, i, i === UI.chat.length - 1 && !UI.chatBusy)}${m.card.type === 'ruling' ? askSources(m.sources) : ''}</div>`
     : `<div class="msg ai"><div class="bub${m.error ? ' err' : ''}">${m.error ? esc(m.text) : askRuling(m.text) + askSources(m.sources)}</div></div>`).join('')
     + (UI.chatBusy ? '<div class="msg ai"><div class="bub wait" aria-label="Checking the rules"><i></i><i></i><i></i></div></div>' : '')
     + `<p class="cap ask-note">Checked against the official Rules of Golf (R&amp;A and USGA). For anything close, play a second ball and ask the organiser.</p>`;
@@ -207,7 +231,7 @@ function askQuestion(q) {
   const history = UI.chat.slice(0, -1).filter(m => !m.error).map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', text: m.text }));
   call({ op: 'ask', question: q, history }).then(res => {
     UI.chatBusy = false;
-    if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer, sources: res.sources || [] });
+    if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer, card: res.card || null, sources: res.sources || [] });
     else UI.chat.push({ role: 'ai', text: (res && res.error === 'bad' && /Unknown request/.test(res.message || '')) ? 'The rules checker is not switched on yet. The organiser needs to finish setting it up.' : ((res && res.message) || 'The rules checker could not answer just now.'), error: true });
     refreshThread();
   }).catch(() => {

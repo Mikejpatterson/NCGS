@@ -736,9 +736,32 @@ textarea.export + .btn, #restorejson + .btn { margin-top: 8px; }
 .chk.on { background: var(--green); border-color: var(--green); }
 .seg.pills.four { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 .seg.pills button, .seg.pills.four button { white-space: normal; line-height: 1.15; padding-block: 6px; overflow-wrap: anywhere; }
+
+/* Ruling cards: one quick question with big tap answers, then the ruling */
+.msg.ai.card { display: block; animation: msgin .22s ease-out both; }
+.qtext { font-size: var(--t-title); font-weight: 700; line-height: 1.22; letter-spacing: -.01em; margin: 6px 2px 12px; }
+.qopts { display: flex; flex-direction: column; gap: 8px; }
+.qopt { display: flex; align-items: center; gap: 12px; text-align: left; min-height: 56px; padding: 12px 16px; border-radius: 18px; background: #fff; font-size: 1.05rem; box-shadow: 0 0 0 .5px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.05); transition: background-color .15s, transform .15s; }
+.qopt:active:not(:disabled) { background: var(--press); transform: scale(.985); }
+.qopt:disabled { opacity: .55; }
+.qopt.dim { color: var(--sub); }
+.qtag { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 14px; font-size: .9rem; font-weight: 700; color: #fff; background: #c62828; flex: none; }
+.qopt.t-yellow .qtag { background: #f0b400; color: #1b1b1b; }
+.rtop { font-size: var(--t-sub); color: var(--sub); font-weight: 600; margin: 6px 2px 4px; }
+.rverdict { font-size: 2rem; font-weight: 800; line-height: 1.1; letter-spacing: -.02em; margin: 0 2px 6px; color: var(--text); }
+.rintro { font-size: var(--t-body); color: var(--sub); margin: 0 2px 10px; }
+.rsteps { list-style: none; margin: 0 0 10px; padding: 0; background: #fff; border-radius: 18px; box-shadow: 0 0 0 .5px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.05); }
+.rsteps li { display: flex; gap: 12px; align-items: flex-start; padding: 13px 16px; font-size: 1.05rem; line-height: 1.32; }
+.rsteps li + li { border-top: .5px solid rgba(0,0,0,.12); }
+.rn { flex: none; width: 30px; height: 30px; border-radius: 50%; background: #ececf0; display: inline-flex; align-items: center; justify-content: center; font-size: .9rem; font-weight: 700; margin-top: 1px; }
+.rnote { font-size: var(--t-sub); color: var(--sub); margin: 0 2px 12px; line-height: 1.35; }
+.ract { display: flex; gap: 10px; margin-top: 4px; }
+.rbtn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; border-radius: 18px; background: #e4e4ea; font-size: 1.05rem; font-weight: 700; transition: background-color .15s, transform .15s; }
+.rbtn:active { background: #d6d6dd; transform: scale(.985); }
+.rbtn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610131800","server":"61105d07"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610131920","server":"5b0c6166"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1446,7 +1469,7 @@ var NCGS = (function () {
   var PLAYER_TABLES = { checks: 1, cards: 1, log: 1 };
   var DEFAULT_PIN = '1234';
   // Stamped by build.js with a fingerprint of this file, so the app can tell whether the live server is the latest.
-  var BUILD = '61105d07';
+  var BUILD = '5b0c6166';
 
   function keyOf(table, row) {
     return SCHEMA[table].key.map(function (k) { return String(row[k]); }).join('|');
@@ -1645,7 +1668,9 @@ var NCGS = (function () {
     'You are a golf rules referee. You answer questions about the Rules of Golf as published by the R&A and the USGA, and nothing else. If asked about anything that is not a golf rule, say you only cover the Rules of Golf.',
     'The people asking are experienced club golfers standing on a course, speaking into a phone. Their question comes from voice dictation, so it may be rambling, loosely worded or slightly garbled. Work out the exact situation and answer that, not a generic version of it. If one fact would change the answer (for example whether the ball was in play, on the green, or in a bunker), give the answer for the most likely case and say in one short line what would change it.',
     'Before you answer, use the web search tool to read the current official Rules of Golf on randa.org or usga.org, so that you are not relying on memory. Check the exact rule, its wording and any penalty. Check whether the stroke play or match play version matters. Society days are stroke play or Stableford, which the Rules treat as stroke play (Rule 21.1), unless the person says it was match play.',
-    'How to answer: start with the ruling in one plain sentence that can be read out to the group. Then explain why, quoting or closely paraphrasing the rule, so a doubter can see the reasoning. Then say exactly what the player does next, and the penalty if any (for example "no penalty" or "one penalty stroke" or "two penalty strokes"). Name the rule number each time, for example Rule 11.1 or Rule 9.6. Use short sentences, no headings, no tables. Aim for 120 to 200 words. Mention a Local Rule or Committee decision only if it could change the answer.',
+    'How to answer: reply with ONE JSON object and nothing else (no text before or after it, no code fences). It is one of two kinds.',
+    'Kind 1, a question, only when one missing fact really changes the ruling and you cannot sensibly answer both ways: {"type":"ask","question":"Is the ball inside red or yellow stakes?","options":[{"label":"Red stakes or line","tag":"red"},{"label":"Yellow stakes or line","tag":"yellow"},{"label":"No stakes, just bushes"},{"label":"Not sure"}]}. 2 to 5 options, each a few words, the last one "Not sure" when that makes sense. "tag" is optional and only "red" or "yellow". Ask at most one question, never when the situation is already clear, and never again once the person has answered one: then give the ruling.',
+    'Kind 2, the ruling: {"type":"ruling","topic":"Unplayable ball","rule":"Rule 19","verdict":"1 penalty shot","intro":"Mick picks one of these:","steps":["Drop within **2 club-lengths**, no nearer the hole","Go **back on a line** from the flag through the ball, as far as he likes","Play again from **where he last hit**"],"note":"Count the penalty in Mick\'s score for the hole."}. "verdict" is the answer in a few plain words that can be read out, for example "No penalty" or "1 penalty shot" or "Play it as it lies". "topic" is two or three words. "rule" is the rule number, for example "Rule 11.1". "intro" is one short line leading into the steps and may be left out. "steps" are the things the player does or may choose between, 0 to 4 of them, each one short sentence, with the key words in **bold**; leave "steps" out when the verdict says it all. "note" is one or two short sentences with the reason, the match play difference, or the one thing that would change the answer; it may be left out. Use the player\'s name if they gave one. Mention a Local Rule or Committee decision only if it could change the answer. Keep the whole thing under about 120 words.',
     'Never guess. If the rules do not clearly cover it, or you could not find the rule, say so plainly. Never invent a rule number. Treat the search result for the current edition as the authority over anything you remember.'
   ].join('\n');
 
@@ -1924,6 +1949,31 @@ var NCGS = (function () {
     };
 
 
+    /* The checker answers with one JSON card ("ask" a question with tap answers, or a "ruling"). Anything else is passed on as plain text. */
+    function cleanStr(x, n) { return typeof x === 'string' ? x.replace(/\s+/g, ' ').trim().slice(0, n) : ''; }
+    function askCard(raw) {
+      var a = raw.indexOf('{'), b = raw.lastIndexOf('}');
+      if (a < 0 || b <= a) return null;
+      var j; try { j = JSON.parse(raw.slice(a, b + 1)); } catch (e) { return null; }
+      if (!j || typeof j !== 'object') return null;
+      if (j.type === 'ask') {
+        var opts = (Array.isArray(j.options) ? j.options : []).map(function (o) {
+          var label = cleanStr(o && o.label, 60), c = { label: label };
+          if (o && (o.tag === 'red' || o.tag === 'yellow')) c.tag = o.tag;
+          return label ? c : null;
+        }).filter(Boolean).slice(0, 5);
+        var question = cleanStr(j.question, 200);
+        return question && opts.length >= 2 ? { type: 'ask', question: question, options: opts } : null;
+      }
+      if (j.type === 'ruling') {
+        var verdict = cleanStr(j.verdict, 120);
+        if (!verdict) return null;
+        return { type: 'ruling', topic: cleanStr(j.topic, 40), rule: cleanStr(j.rule, 30), verdict: verdict, intro: cleanStr(j.intro, 120),
+          steps: (Array.isArray(j.steps) ? j.steps : []).map(function (x) { return cleanStr(x, 220); }).filter(Boolean).slice(0, 4), note: cleanStr(j.note, 300) };
+      }
+      return null;
+    }
+
     /* Rules checker: a question for Claude about the Rules of Golf, checked live against the official R&A / USGA rules.
        The key lives in the script properties (ANTHROPIC_KEY), never in the app. A daily cap stops a runaway bill. */
     ops.ask = function (req) {
@@ -1938,7 +1988,7 @@ var NCGS = (function () {
       if (used >= cap) throw err('limit', 'The rules checker has had its fill for today. Try again tomorrow, or ask the organiser.');
       var messages = [];
       (Array.isArray(req.history) ? req.history.slice(-6) : []).forEach(function (m) {
-        if (m && (m.role === 'user' || m.role === 'assistant') && typeof m.text === 'string' && m.text) messages.push({ role: m.role, content: m.text.slice(0, 1500) });
+        if (m && (m.role === 'user' || m.role === 'assistant') && typeof m.text === 'string' && m.text) messages.push({ role: m.role, content: m.text.slice(0, 2500) });
       });
       while (messages.length && messages[0].role !== 'user') messages.shift();
       messages = messages.filter(function (m, i) { return i === 0 || m.role !== messages[i - 1].role; });
@@ -1948,17 +1998,19 @@ var NCGS = (function () {
       var r = store.postJson('https://api.anthropic.com/v1/messages', { 'x-api-key': key, 'anthropic-version': '2023-06-01' },
         { model: store.getSecret('ASK_MODEL') || 'claude-sonnet-5-5', max_tokens: 1500, system: ASK_SYSTEM, messages: messages,
           tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 4, allowed_domains: ['randa.org', 'usga.org'] }] });
-      var blocks = (r && r.json && r.json.content) || [], text = '', sources = [], seen = {};
+      var blocks = (r && r.json && r.json.content) || [], text = '', sources = [], seen = {}, card = null, last = '';
       blocks.forEach(function (b) {
         if (!b || b.type !== 'text' || !b.text) return;
         text += b.text;
+        if (askCard(b.text)) last = b.text;
         (b.citations || []).forEach(function (c) {
           if (c && c.url && !seen[c.url] && /^https:\/\/([a-z0-9-]+\.)*(randa|usga)\.org(\/|$)/i.test(c.url)) { seen[c.url] = 1; sources.push({ url: c.url, title: String(c.title || c.url).slice(0, 120) }); }
         });
       });
       text = text.trim();
       if (!r || r.status !== 200 || !text) throw err('upstream', 'The rules checker could not answer just now. Try again in a minute.');
-      return { answer: text, sources: sources.slice(0, 4) };
+      card = askCard(last || text);
+      return { answer: card ? JSON.stringify(card) : text, card: card, sources: sources.slice(0, 4) };
     };
 
     /* Fill an empty store with the society's starting data. */
@@ -2067,6 +2119,7 @@ const ICON = {
   chev: svg('<path d="M9 5l7 7-7 7"/>'),
   down: svg('<path d="M6 9l6 6 6-6"/>'),
   x: svg('<path d="M6 6l12 12"/><path d="M18 6L6 18"/>'),
+  speak: svg('<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/>'),
   mic: svg('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/>'),
   send: svg('<path d="M12 19V5"/><path d="M5.5 11.5L12 5l6.5 6.5"/>'),
   check: svg('<path d="M5 12.5l4.5 4.5L19 7"/>'),
@@ -3906,6 +3959,29 @@ function askRuling(t) {
   return `<div class="verdict">${inline(verdict.replace(/^\*\*|\*\*$/g, ''))}</div>${rest.trim() ? `<div class="rest">${askText(rest)}</div>` : ''}${rules.length ? `<div class="rules">${rules.map(r => `<span class="rulechip">${esc(r)}</span>`).join('')}</div>` : ''}`;
 }
 
+// A card from the checker: either one quick question with big tap answers, or the ruling itself.
+const boldBits = x => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+function askCardHtml(c, i, live) {
+  if (c.type === 'ask') {
+    return `<div class="qcard"><div class="qtext">${esc(c.question)}</div><div class="qopts">${c.options.map(o =>
+      `<button class="qopt${o.tag ? ' t-' + o.tag : ''}${/^not sure/i.test(o.label) ? ' dim' : ''}" data-act="ask-idea" data-q="${esc(o.label)}"${live ? '' : ' disabled'}>${o.tag ? `<span class="qtag">${o.tag === 'red' ? 'Red' : 'Yellow'}</span>` : ''}<span>${esc(o.label)}</span></button>`).join('')}</div></div>`;
+  }
+  const top = [c.topic, c.rule].filter(Boolean).join(' · ');
+  return `<div class="rcard">${top ? `<div class="rtop">${esc(top)}</div>` : ''}<div class="rverdict">${boldBits(c.verdict)}</div>${c.intro ? `<div class="rintro">${boldBits(c.intro)}</div>` : ''}
+    ${c.steps.length ? `<ol class="rsteps">${c.steps.map((x, n) => `<li><span class="rn">${n + 1}</span><span>${boldBits(x)}</span></li>`).join('')}</ol>` : ''}
+    ${c.note ? `<div class="rnote">${boldBits(c.note)}</div>` : ''}
+    <div class="ract"><button class="rbtn" data-act="ask-read" data-i="${i}">${ICON.speak}<span>Read out</span></button><button class="rbtn" data-act="ask-more">Ask more</button></div></div>`;
+}
+function askSpoken(c) { return [c.verdict, c.intro, ...c.steps.map((x, n) => 'Option ' + (n + 1) + '. ' + x), c.note].filter(Boolean).join('. ').replace(/\*\*/g, ''); }
+function askRead(i) {
+  const m = UI.chat[i];
+  if (!m || !m.card || m.card.type !== 'ruling' || !window.speechSynthesis) return toast("Reading out isn't available on this phone.");
+  const synth = window.speechSynthesis;
+  if (synth.speaking) { synth.cancel(); return; }
+  const u = new SpeechSynthesisUtterance(askSpoken(m.card)); u.lang = 'en-IE'; u.rate = 0.95;
+  synth.speak(u);
+}
+
 function askSources(list) {
   const ok = (list || []).filter(x => x && /^https:\/\//.test(x.url));
   if (!ok.length) return '';
@@ -3917,8 +3993,9 @@ function askThread() {
     return `<div class="ask-intro"><p class="b">Say what happened.</p><p class="sub">${SPEECH ? 'Tap the microphone and speak, or type.' : 'Tap the box, then the microphone on your keyboard to speak.'} You get a ruling you can read out, checked against the official rules.</p></div>
       <div class="ask-ideas">${ASK_IDEAS.map(q => `<button class="idea" data-act="ask-idea" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
   }
-  return UI.chat.map(m => m.role === 'user'
+  return UI.chat.map((m, i) => m.role === 'user'
     ? `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>`
+    : m.card ? `<div class="msg ai card">${askCardHtml(m.card, i, i === UI.chat.length - 1 && !UI.chatBusy)}${m.card.type === 'ruling' ? askSources(m.sources) : ''}</div>`
     : `<div class="msg ai"><div class="bub${m.error ? ' err' : ''}">${m.error ? esc(m.text) : askRuling(m.text) + askSources(m.sources)}</div></div>`).join('')
     + (UI.chatBusy ? '<div class="msg ai"><div class="bub wait" aria-label="Checking the rules"><i></i><i></i><i></i></div></div>' : '')
     + `<p class="cap ask-note">Checked against the official Rules of Golf (R&amp;A and USGA). For anything close, play a second ball and ask the organiser.</p>`;
@@ -4088,7 +4165,7 @@ function askQuestion(q) {
   const history = UI.chat.slice(0, -1).filter(m => !m.error).map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', text: m.text }));
   call({ op: 'ask', question: q, history }).then(res => {
     UI.chatBusy = false;
-    if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer, sources: res.sources || [] });
+    if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer, card: res.card || null, sources: res.sources || [] });
     else UI.chat.push({ role: 'ai', text: (res && res.error === 'bad' && /Unknown request/.test(res.message || '')) ? 'The rules checker is not switched on yet. The organiser needs to finish setting it up.' : ((res && res.message) || 'The rules checker could not answer just now.'), error: true });
     refreshThread();
   }).catch(() => {
@@ -4575,6 +4652,8 @@ const ACT = {
   'ask-stop': () => askStop(),
   'ask-cancel': () => askCancel(),
   'ask-idea': el => askQuestion(el.dataset.q),
+  'ask-read': el => askRead(Number(el.dataset.i)),
+  'ask-more': () => askKeyboard(),
   'ask-clear': () => { UI.chat = []; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'contest-open': () => { UI.contestSheet = true; render(); },
   'contest-close': () => { UI.contestSheet = false; render(); },

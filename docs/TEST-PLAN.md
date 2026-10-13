@@ -19,6 +19,7 @@ Before every push: `node --test test/engine.test.js test/server.test.js`.
 | Speed | Main screens with 25 extra rounds | `break.ui.run.js` |
 | Every control | `crawl.run.js` taps every visible button, link and form submit on every reachable screen in four modes (new player, known player, organiser, mid-round player) and checks for script errors, dead buttons, "undefined"/"NaN" on screen, a way back to the front page from every screen, and that the phone's Back swipe stays in the app. Takes about 10 minutes per mode: `node test/crawl.run.js [player\|known\|organiser\|deep]` | `crawl.run.js` |
 | A whole round | Plays holes with real taps through entry, after, card check and finish, then backs out; checks the Back history stays short | `finish.run.js` |
+| Ruling screen | A question with tap answers, then the ruling card; Read out; Ask more; plain-text fallback | `ruling.run.js` |
 | Features | Testing mode, start hole, stats and player stats, backup/restore, organiser actions, guests, late changes, course snapshot, speech | the other `*.run.js` files |
 
 ## Manual, on a real phone (cannot be tested here)

@@ -49,6 +49,8 @@ const ACT = {
   'ask-stop': () => askStop(),
   'ask-cancel': () => askCancel(),
   'ask-idea': el => askQuestion(el.dataset.q),
+  'ask-read': el => askRead(Number(el.dataset.i)),
+  'ask-more': () => askKeyboard(),
   'ask-clear': () => { UI.chat = []; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'contest-open': () => { UI.contestSheet = true; render(); },
   'contest-close': () => { UI.contestSheet = false; render(); },

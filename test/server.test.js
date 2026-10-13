@@ -290,6 +290,28 @@ test('rules checker: joins the answer text and returns only official rule source
   assert.deepEqual(r.sources, [{ url: 'https://www.randa.org/en/rog/the-rules-of-golf/rule-11', title: 'Rule 11' }]);
 });
 
+test('rules checker: turns the checker\'s JSON into a question or a ruling card, ignores chatter around it, and never passes on junk', () => {
+  const say = text => () => ({ status: 200, json: { content: [{ type: 'text', text }] } });
+  const ask = text => askServer({ secrets: { ANTHROPIC_KEY: 'k' }, reply: say(text) }).s.api({ op: 'ask', question: 'Mick is in the bushes' });
+  const q = ask('{"type":"ask","question":"Is the ball inside red or yellow stakes?","options":[{"label":"Red stakes or line","tag":"red"},{"label":"Yellow","tag":"<script>"},{"label":""},{"label":"Not sure"}]}');
+  assert.equal(q.card.type, 'ask');
+  assert.deepEqual(q.card.options, [{ label: 'Red stakes or line', tag: 'red' }, { label: 'Yellow' }, { label: 'Not sure' }]);
+  const r = ask('Let me check the rules.\n```json\n{"type":"ruling","topic":"Unplayable ball","rule":"Rule 19","verdict":"1 penalty shot","intro":"Mick picks one:","steps":["Drop within **2 club-lengths**","","b","c","d","e"],"note":"Count it."}\n```');
+  assert.equal(r.card.type, 'ruling');
+  assert.equal(r.card.verdict, '1 penalty shot');
+  assert.equal(r.card.steps.length, 4, 'empty steps dropped, at most four');
+  assert.equal(JSON.parse(r.answer).verdict, '1 penalty shot', 'the text kept for the conversation is the clean card');
+  // a mid-search chatter block that has no card, then the card
+  const both = askServer({ secrets: { ANTHROPIC_KEY: 'k' }, reply: () => ({ status: 200, json: { content: [{ type: 'text', text: 'Searching…' }, { type: 'text', text: '{"type":"ruling","verdict":"No penalty"}' }] } }) }).s.api({ op: 'ask', question: 'x' });
+  assert.equal(both.card.verdict, 'No penalty');
+  // junk or half-formed cards fall back to plain text with no card
+  for (const bad of ['Take a drop.', '{"type":"ask","question":"Q","options":[{"label":"only one"}]}', '{"type":"ruling"}', '{"type":"other"}', '{broken']) {
+    const x = ask(bad);
+    assert.equal(x.card, null, bad);
+    assert.equal(x.answer, bad);
+  }
+});
+
 test('restore puts back what is missing and never overwrites a row that exists', () => {
   for (const [kind, s] of servers().list) {
     s.api({ op: 'seed', data: { members: [{ id: 'a', name: 'Al', index: 12.4, active: true }, { id: 'b', name: 'Bo', index: 20, active: true }], rounds: [ROUND] } });

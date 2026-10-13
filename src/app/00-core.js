@@ -12,6 +12,7 @@ const ICON = {
   chev: svg('<path d="M9 5l7 7-7 7"/>'),
   down: svg('<path d="M6 9l6 6 6-6"/>'),
   x: svg('<path d="M6 6l12 12"/><path d="M18 6L6 18"/>'),
+  speak: svg('<path d="M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/>'),
   mic: svg('<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21"/>'),
   send: svg('<path d="M12 19V5"/><path d="M5.5 11.5L12 5l6.5 6.5"/>'),
   check: svg('<path d="M5 12.5l4.5 4.5L19 7"/>'),

@@ -229,7 +229,9 @@ var NCGS = (function () {
     'You are a golf rules referee. You answer questions about the Rules of Golf as published by the R&A and the USGA, and nothing else. If asked about anything that is not a golf rule, say you only cover the Rules of Golf.',
     'The people asking are experienced club golfers standing on a course, speaking into a phone. Their question comes from voice dictation, so it may be rambling, loosely worded or slightly garbled. Work out the exact situation and answer that, not a generic version of it. If one fact would change the answer (for example whether the ball was in play, on the green, or in a bunker), give the answer for the most likely case and say in one short line what would change it.',
     'Before you answer, use the web search tool to read the current official Rules of Golf on randa.org or usga.org, so that you are not relying on memory. Check the exact rule, its wording and any penalty. Check whether the stroke play or match play version matters. Society days are stroke play or Stableford, which the Rules treat as stroke play (Rule 21.1), unless the person says it was match play.',
-    'How to answer: start with the ruling in one plain sentence that can be read out to the group. Then explain why, quoting or closely paraphrasing the rule, so a doubter can see the reasoning. Then say exactly what the player does next, and the penalty if any (for example "no penalty" or "one penalty stroke" or "two penalty strokes"). Name the rule number each time, for example Rule 11.1 or Rule 9.6. Use short sentences, no headings, no tables. Aim for 120 to 200 words. Mention a Local Rule or Committee decision only if it could change the answer.',
+    'How to answer: reply with ONE JSON object and nothing else (no text before or after it, no code fences). It is one of two kinds.',
+    'Kind 1, a question, only when one missing fact really changes the ruling and you cannot sensibly answer both ways: {"type":"ask","question":"Is the ball inside red or yellow stakes?","options":[{"label":"Red stakes or line","tag":"red"},{"label":"Yellow stakes or line","tag":"yellow"},{"label":"No stakes, just bushes"},{"label":"Not sure"}]}. 2 to 5 options, each a few words, the last one "Not sure" when that makes sense. "tag" is optional and only "red" or "yellow". Ask at most one question, never when the situation is already clear, and never again once the person has answered one: then give the ruling.',
+    'Kind 2, the ruling: {"type":"ruling","topic":"Unplayable ball","rule":"Rule 19","verdict":"1 penalty shot","intro":"Mick picks one of these:","steps":["Drop within **2 club-lengths**, no nearer the hole","Go **back on a line** from the flag through the ball, as far as he likes","Play again from **where he last hit**"],"note":"Count the penalty in Mick\'s score for the hole."}. "verdict" is the answer in a few plain words that can be read out, for example "No penalty" or "1 penalty shot" or "Play it as it lies". "topic" is two or three words. "rule" is the rule number, for example "Rule 11.1". "intro" is one short line leading into the steps and may be left out. "steps" are the things the player does or may choose between, 0 to 4 of them, each one short sentence, with the key words in **bold**; leave "steps" out when the verdict says it all. "note" is one or two short sentences with the reason, the match play difference, or the one thing that would change the answer; it may be left out. Use the player\'s name if they gave one. Mention a Local Rule or Committee decision only if it could change the answer. Keep the whole thing under about 120 words.',
     'Never guess. If the rules do not clearly cover it, or you could not find the rule, say so plainly. Never invent a rule number. Treat the search result for the current edition as the authority over anything you remember.'
   ].join('\n');
 
@@ -508,6 +510,31 @@ var NCGS = (function () {
     };
 
 
+    /* The checker answers with one JSON card ("ask" a question with tap answers, or a "ruling"). Anything else is passed on as plain text. */
+    function cleanStr(x, n) { return typeof x === 'string' ? x.replace(/\s+/g, ' ').trim().slice(0, n) : ''; }
+    function askCard(raw) {
+      var a = raw.indexOf('{'), b = raw.lastIndexOf('}');
+      if (a < 0 || b <= a) return null;
+      var j; try { j = JSON.parse(raw.slice(a, b + 1)); } catch (e) { return null; }
+      if (!j || typeof j !== 'object') return null;
+      if (j.type === 'ask') {
+        var opts = (Array.isArray(j.options) ? j.options : []).map(function (o) {
+          var label = cleanStr(o && o.label, 60), c = { label: label };
+          if (o && (o.tag === 'red' || o.tag === 'yellow')) c.tag = o.tag;
+          return label ? c : null;
+        }).filter(Boolean).slice(0, 5);
+        var question = cleanStr(j.question, 200);
+        return question && opts.length >= 2 ? { type: 'ask', question: question, options: opts } : null;
+      }
+      if (j.type === 'ruling') {
+        var verdict = cleanStr(j.verdict, 120);
+        if (!verdict) return null;
+        return { type: 'ruling', topic: cleanStr(j.topic, 40), rule: cleanStr(j.rule, 30), verdict: verdict, intro: cleanStr(j.intro, 120),
+          steps: (Array.isArray(j.steps) ? j.steps : []).map(function (x) { return cleanStr(x, 220); }).filter(Boolean).slice(0, 4), note: cleanStr(j.note, 300) };
+      }
+      return null;
+    }
+
     /* Rules checker: a question for Claude about the Rules of Golf, checked live against the official R&A / USGA rules.
        The key lives in the script properties (ANTHROPIC_KEY), never in the app. A daily cap stops a runaway bill. */
     ops.ask = function (req) {
@@ -522,7 +549,7 @@ var NCGS = (function () {
       if (used >= cap) throw err('limit', 'The rules checker has had its fill for today. Try again tomorrow, or ask the organiser.');
       var messages = [];
       (Array.isArray(req.history) ? req.history.slice(-6) : []).forEach(function (m) {
-        if (m && (m.role === 'user' || m.role === 'assistant') && typeof m.text === 'string' && m.text) messages.push({ role: m.role, content: m.text.slice(0, 1500) });
+        if (m && (m.role === 'user' || m.role === 'assistant') && typeof m.text === 'string' && m.text) messages.push({ role: m.role, content: m.text.slice(0, 2500) });
       });
       while (messages.length && messages[0].role !== 'user') messages.shift();
       messages = messages.filter(function (m, i) { return i === 0 || m.role !== messages[i - 1].role; });
@@ -532,17 +559,19 @@ var NCGS = (function () {
       var r = store.postJson('https://api.anthropic.com/v1/messages', { 'x-api-key': key, 'anthropic-version': '2023-06-01' },
         { model: store.getSecret('ASK_MODEL') || 'claude-sonnet-5-5', max_tokens: 1500, system: ASK_SYSTEM, messages: messages,
           tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 4, allowed_domains: ['randa.org', 'usga.org'] }] });
-      var blocks = (r && r.json && r.json.content) || [], text = '', sources = [], seen = {};
+      var blocks = (r && r.json && r.json.content) || [], text = '', sources = [], seen = {}, card = null, last = '';
       blocks.forEach(function (b) {
         if (!b || b.type !== 'text' || !b.text) return;
         text += b.text;
+        if (askCard(b.text)) last = b.text;
         (b.citations || []).forEach(function (c) {
           if (c && c.url && !seen[c.url] && /^https:\/\/([a-z0-9-]+\.)*(randa|usga)\.org(\/|$)/i.test(c.url)) { seen[c.url] = 1; sources.push({ url: c.url, title: String(c.title || c.url).slice(0, 120) }); }
         });
       });
       text = text.trim();
       if (!r || r.status !== 200 || !text) throw err('upstream', 'The rules checker could not answer just now. Try again in a minute.');
-      return { answer: text, sources: sources.slice(0, 4) };
+      card = askCard(last || text);
+      return { answer: card ? JSON.stringify(card) : text, card: card, sources: sources.slice(0, 4) };
     };
 
     /* Fill an empty store with the society's starting data. */

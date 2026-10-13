@@ -726,3 +726,26 @@ textarea.export + .btn, #restorejson + .btn { margin-top: 8px; }
 .chk.on { background: var(--green); border-color: var(--green); }
 .seg.pills.four { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 .seg.pills button, .seg.pills.four button { white-space: normal; line-height: 1.15; padding-block: 6px; overflow-wrap: anywhere; }
+
+/* Ruling cards: one quick question with big tap answers, then the ruling */
+.msg.ai.card { display: block; animation: msgin .22s ease-out both; }
+.qtext { font-size: var(--t-title); font-weight: 700; line-height: 1.22; letter-spacing: -.01em; margin: 6px 2px 12px; }
+.qopts { display: flex; flex-direction: column; gap: 8px; }
+.qopt { display: flex; align-items: center; gap: 12px; text-align: left; min-height: 56px; padding: 12px 16px; border-radius: 18px; background: #fff; font-size: 1.05rem; box-shadow: 0 0 0 .5px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.05); transition: background-color .15s, transform .15s; }
+.qopt:active:not(:disabled) { background: var(--press); transform: scale(.985); }
+.qopt:disabled { opacity: .55; }
+.qopt.dim { color: var(--sub); }
+.qtag { display: inline-flex; align-items: center; height: 28px; padding: 0 12px; border-radius: 14px; font-size: .9rem; font-weight: 700; color: #fff; background: #c62828; flex: none; }
+.qopt.t-yellow .qtag { background: #f0b400; color: #1b1b1b; }
+.rtop { font-size: var(--t-sub); color: var(--sub); font-weight: 600; margin: 6px 2px 4px; }
+.rverdict { font-size: 2rem; font-weight: 800; line-height: 1.1; letter-spacing: -.02em; margin: 0 2px 6px; color: var(--text); }
+.rintro { font-size: var(--t-body); color: var(--sub); margin: 0 2px 10px; }
+.rsteps { list-style: none; margin: 0 0 10px; padding: 0; background: #fff; border-radius: 18px; box-shadow: 0 0 0 .5px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.05); }
+.rsteps li { display: flex; gap: 12px; align-items: flex-start; padding: 13px 16px; font-size: 1.05rem; line-height: 1.32; }
+.rsteps li + li { border-top: .5px solid rgba(0,0,0,.12); }
+.rn { flex: none; width: 30px; height: 30px; border-radius: 50%; background: #ececf0; display: inline-flex; align-items: center; justify-content: center; font-size: .9rem; font-weight: 700; margin-top: 1px; }
+.rnote { font-size: var(--t-sub); color: var(--sub); margin: 0 2px 12px; line-height: 1.35; }
+.ract { display: flex; gap: 10px; margin-top: 4px; }
+.rbtn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; border-radius: 18px; background: #e4e4ea; font-size: 1.05rem; font-weight: 700; transition: background-color .15s, transform .15s; }
+.rbtn:active { background: #d6d6dd; transform: scale(.985); }
+.rbtn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
