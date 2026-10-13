@@ -704,7 +704,7 @@ textarea.export + .btn, #restorejson + .btn { margin-top: 8px; }
 .seg.pills button, .seg.pills.four button { white-space: normal; line-height: 1.15; padding-block: 6px; overflow-wrap: anywhere; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610121952","server":"dfa6e177"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610131224","server":"61105d07"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1412,7 +1412,7 @@ var NCGS = (function () {
   var PLAYER_TABLES = { checks: 1, cards: 1, log: 1 };
   var DEFAULT_PIN = '1234';
   // Stamped by build.js with a fingerprint of this file, so the app can tell whether the live server is the latest.
-  var BUILD = 'dfa6e177';
+  var BUILD = '61105d07';
 
   function keyOf(table, row) {
     return SCHEMA[table].key.map(function (k) { return String(row[k]); }).join('|');
@@ -1576,7 +1576,18 @@ var NCGS = (function () {
         if (fid) { try { dir = DriveApp.getFolderById(fid); } catch (e) { dir = null; } }
         if (!dir) { dir = DriveApp.createFolder('NCGS backups'); props.setProperty('BACKUPS', dir.getId()); }
         var name = 'NCGS backup ' + Utilities.formatDate(new Date(), 'Europe/Dublin', 'yyyy-MM-dd HH:mm');
-        var copy = DriveApp.getFileById(ss.getId()).makeCopy(name, dir);
+        var copy;
+        try {
+          /* A fresh spreadsheet holding a copy of every tab. A plain file copy would also copy the script attached to the sheet, which shows up as an "Untitled project". */
+          var snap = SpreadsheetApp.create(name);
+          ss.getSheets().forEach(function (sh) { sh.copyTo(snap).setName(sh.getName()); });
+          var blank = snap.getSheets()[0];
+          if (snap.getSheets().length > 1 && blank.getName() !== ss.getSheets()[0].getName()) snap.deleteSheet(blank);
+          copy = DriveApp.getFileById(snap.getId());
+          copy.moveTo(dir);
+        } catch (e) {
+          copy = DriveApp.getFileById(ss.getId()).makeCopy(name, dir);
+        }
         // keep the newest 14 copies
         var files = [], it = dir.getFiles();
         while (it.hasNext()) files.push(it.next());

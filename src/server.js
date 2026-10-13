@@ -194,7 +194,18 @@ var NCGS = (function () {
         if (fid) { try { dir = DriveApp.getFolderById(fid); } catch (e) { dir = null; } }
         if (!dir) { dir = DriveApp.createFolder('NCGS backups'); props.setProperty('BACKUPS', dir.getId()); }
         var name = 'NCGS backup ' + Utilities.formatDate(new Date(), 'Europe/Dublin', 'yyyy-MM-dd HH:mm');
-        var copy = DriveApp.getFileById(ss.getId()).makeCopy(name, dir);
+        var copy;
+        try {
+          /* A fresh spreadsheet holding a copy of every tab. A plain file copy would also copy the script attached to the sheet, which shows up as an "Untitled project". */
+          var snap = SpreadsheetApp.create(name);
+          ss.getSheets().forEach(function (sh) { sh.copyTo(snap).setName(sh.getName()); });
+          var blank = snap.getSheets()[0];
+          if (snap.getSheets().length > 1 && blank.getName() !== ss.getSheets()[0].getName()) snap.deleteSheet(blank);
+          copy = DriveApp.getFileById(snap.getId());
+          copy.moveTo(dir);
+        } catch (e) {
+          copy = DriveApp.getFileById(ss.getId()).makeCopy(name, dir);
+        }
         // keep the newest 14 copies
         var files = [], it = dir.getFiles();
         while (it.hasNext()) files.push(it.next());
