@@ -927,3 +927,6 @@ html, body { background: var(--bg); }
 @media (max-width: 360px) { .lrow.goy .av { display: none; } }
 .lrow.goy:first-of-type { background: #FFF3C4; }
 .lrow.goy .b.r { text-align: right; }
+
+/* Anything scrolled or tabbed into view lands above the floating tab bar, not under it */
+html { scroll-padding-bottom: calc(var(--tabh, 90px) + 16px); }
