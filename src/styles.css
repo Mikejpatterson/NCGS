@@ -908,3 +908,22 @@ html, body { background: var(--bg); }
 /* Selected tab: a stronger yellow glass lens, darker bolder icon and label */
 .tab.on { background: linear-gradient(180deg, rgba(255, 255, 255, .85), rgba(247, 197, 22, .62)); box-shadow: inset 0 2px 1px -1px #fff, inset 0 -2px 3px -1px rgba(255, 255, 255, .9), inset 0 0 0 1.5px rgba(255, 255, 255, .85), inset 0 0 16px rgba(255, 255, 255, .5), 0 0 0 1px rgba(214, 160, 0, .45), 0 6px 16px rgba(160, 110, 0, .32); color: #0B3D2C; font-weight: 800; text-shadow: none; }
 .tab.on svg { stroke-width: 2.5; color: #0B3D2C; filter: none; }
+
+/* Golfer of the Year: the leader in a pine card, each counting score as a green chip */
+.leadcard { position: relative; overflow: hidden; margin-top: 14px; border-radius: 28px; background: var(--pine); color: #fff; padding: 18px; display: flex; flex-direction: column; gap: 4px; }
+.leadcard::after { content: ""; position: absolute; right: -50px; top: -50px; width: 170px; height: 170px; border-radius: 50%; background: rgba(247, 197, 22, .14); }
+.leadcard > * { position: relative; z-index: 1; }
+.lc-k { font-size: .75rem; font-weight: 800; letter-spacing: .1em; color: var(--flag); }
+.lc-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.lc-n { font-size: 2.3rem; font-weight: 900; letter-spacing: -.03em; line-height: 1; }
+.lc-p { font-size: .95rem; font-weight: 700; color: rgba(255, 255, 255, .85); font-variant-numeric: tabular-nums; }
+.lc-p b { font-size: 3.2rem; font-weight: 900; letter-spacing: -.05em; line-height: .9; color: #fff; }
+.lc-s { margin-top: 8px; font-size: var(--t-sub); color: rgba(255, 255, 255, .85); }
+.chips { display: inline-flex; gap: 6px; }
+.chipn { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 30px; padding: 0 4px; border-radius: 15px; background: #E3EFE6; color: var(--pine); font-style: normal; font-size: .85rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.lrow.goy { grid-template-columns: 24px minmax(0, 1fr) auto 52px; gap: 6px; }
+.lrow.goy .lname { gap: 8px; }
+.lrow.goy .av { width: 34px; height: 34px; font-size: .62rem; }
+@media (max-width: 360px) { .lrow.goy .av { display: none; } }
+.lrow.goy:first-of-type { background: #FFF3C4; }
+.lrow.goy .b.r { text-align: right; }

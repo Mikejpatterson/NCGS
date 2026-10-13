@@ -64,7 +64,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   // GOY table
   await tap('[data-act="goy"]');
   t = await text();
-  check('GOY: Colin 3rd and John K 4th on 100', /3[A-Za-z]{2,3}Colin38 34 28100/.test(t) && /4[A-Za-z]{2,3}John K36 33 31100/.test(t));
+  check('GOY: Colin 3rd and John K 4th on 100', /3[A-Za-z]{2,3}Colin383428100/.test(t) && /4[A-Za-z]{2,3}John K363331100/.test(t));
   await tap('[data-act="back"]');
 
   // Demo round: play

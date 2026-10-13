@@ -135,7 +135,7 @@ VIEWS.players = () => {
 };
 
 function goyRow(x) {
-  return `<button class="lrow goy" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span>${avName(x)}<span class="cap num">${x.counting.map(c => c.pts).join(' ')}</span><span class="b r">${x.total}</span></button>`;
+  return `<button class="lrow goy" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span>${avName(x)}<span class="chips">${x.counting.map(c => `<i class="chipn">${c.pts}</i>`).join('')}</span><span class="b r">${x.total}</span></button>`;
 }
 
 VIEWS.goy = () => {
@@ -144,6 +144,7 @@ VIEWS.goy = () => {
   return {
     html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Golfer of the Year</h1></div>
       <p class="sub">${season} · best ${D.goyBest()} scores count</p>${yearPicker()}</header>
+      ${table[0] ? `<div class="leadcard"><span class="lc-k">LEADING</span><span class="lc-row"><span class="lc-n">${esc(table[0].name)}</span><span class="lc-p"><b>${table[0].total}</b> pts</span></span>${table[1] ? `<span class="lc-s">${table[0].total - table[1].total === 0 ? 'Level with' : (table[0].total - table[1].total) + ' point' + (table[0].total - table[1].total === 1 ? '' : 's') + ' clear of'} ${esc(table[1].name)}</span>` : ''}</div>` : ''}
       ${sec('', cardOf(table.map(goyRow).join('')), false)}`
   };
 };

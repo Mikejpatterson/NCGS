@@ -7,7 +7,7 @@
 - KBs is a pair competition with partners in different groups. Call it "KBs" and do not explain it in the app.
 - Never write "NCGS Golf Society". NCGS already means golf society.
 - The real data (`data/ncgs-2026.json`, `data/seed.json`) is never committed. This repository is public.
-- Design: pine green header bands, flag-yellow accent, system font, big touch targets, readable outdoors.
+- Design: warm white pages, rounded pine cards for the big moments (home round, hole, leader), flag-yellow accent, floating glass tab bar (Home, Hole, Results, Ruling), initials badges on people, system font, big touch targets, readable outdoors.
 - Run `node --test test/engine.test.js test/server.test.js` before every push.
 
 # Working with the owner
