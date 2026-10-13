@@ -904,3 +904,7 @@ html, body { background: var(--bg); }
 .tab { text-shadow: 0 0 8px rgba(255, 255, 255, .95), 0 0 2px rgba(255, 255, 255, .8); }
 .tab svg { filter: drop-shadow(0 0 4px rgba(255, 255, 255, .9)); }
 .tab.on { background: linear-gradient(180deg, rgba(255, 255, 255, .7), rgba(247, 197, 22, .34)); -webkit-backdrop-filter: blur(6px) saturate(180%) brightness(1.08); backdrop-filter: blur(6px) saturate(180%) brightness(1.08); box-shadow: inset 0 2px 1px -1px #fff, inset 0 -2px 2px -1px rgba(255, 255, 255, .8), inset 0 0 0 1px rgba(255, 255, 255, .65), inset 0 0 14px rgba(255, 255, 255, .4), 0 5px 14px rgba(122, 90, 0, .22); }
+
+/* Selected tab: a stronger yellow glass lens, darker bolder icon and label */
+.tab.on { background: linear-gradient(180deg, rgba(255, 255, 255, .85), rgba(247, 197, 22, .62)); box-shadow: inset 0 2px 1px -1px #fff, inset 0 -2px 3px -1px rgba(255, 255, 255, .9), inset 0 0 0 1.5px rgba(255, 255, 255, .85), inset 0 0 16px rgba(255, 255, 255, .5), 0 0 0 1px rgba(214, 160, 0, .45), 0 6px 16px rgba(160, 110, 0, .32); color: #0B3D2C; font-weight: 800; text-shadow: none; }
+.tab.on svg { stroke-width: 2.5; color: #0B3D2C; filter: none; }
