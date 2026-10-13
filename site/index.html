@@ -259,6 +259,13 @@ button.lrow { width: 100%; text-align: left; }
 .wx-chip { background: rgba(255,255,255,.2); border-radius: 999px; padding: 6px 12px; font-size: var(--t-sub); }
 .wx-chip b { font-weight: 800; }
 .wx-line { margin: 12px 0 0; font-size: var(--t-body); font-weight: 600; }
+.wx-skel { background: linear-gradient(160deg, #4B5F7A, #6E8399); min-height: 168px; }
+.sk { display: block; background: rgba(255,255,255,.28); border-radius: 10px; animation: skpulse 1.3s ease-in-out infinite; }
+.sk-ic { width: 72px; height: 72px; border-radius: 50%; flex: none; }
+.sk-a { width: 120px; height: 20px; margin-bottom: 10px; }
+.sk-b { width: 90px; height: 36px; }
+@keyframes skpulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sk { animation: none; } }
 .wx-hours { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 14px; padding: 10px 4px; background: rgba(255,255,255,.16); border-radius: 12px; text-align: center; }
 .wx-hours > span { display: flex; flex-direction: column; align-items: center; gap: 2px; font-variant-numeric: tabular-nums; }
 .wx-t { font-size: var(--t-cap); opacity: .9; }
@@ -730,7 +737,7 @@ textarea.export + .btn, #restorejson + .btn { margin-top: 8px; }
 .seg.pills button, .seg.pills.four button { white-space: normal; line-height: 1.15; padding-block: 6px; overflow-wrap: anywhere; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610131647","server":"61105d07"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610131711","server":"61105d07"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2708,13 +2715,21 @@ function forecast(r) {
   const c = courseOf(r);
   const away = daysFromToday(r.date);
   if (!c || c.lat === null || c.lon === null || c.lat === undefined || away === null || away < 0 || away > 9) return '';
-  const st = UI.wx[c.id];
-  if (!st) {
-    UI.wx[c.id] = { state: 'loading' };
-    call({ op: 'weather', lat: c.lat, lon: c.lon }).then(res => { UI.wx[c.id] = { state: 'done', data: res }; render(); })
-      .catch(() => { UI.wx[c.id] = { state: 'failed' }; });
-    return '';
+  /* The last forecast is kept on the phone, so it shows at once; a fresh one is fetched in the background when it is getting old. */
+  const refresh = () => call({ op: 'weather', lat: c.lat, lon: c.lon }).then(res => {
+    if (!(res && res.days) && UI.wx[c.id] && UI.wx[c.id].state === 'done' && UI.wx[c.id].data && UI.wx[c.id].data.days) { render(); return; } // no new forecast: keep the one we have
+    UI.wx[c.id] = { state: 'done', data: res };
+    if (res && res.days) { const m = LS.get('ncgs-wx', {}) || {}; m[c.id] = { at: Date.now(), data: res }; LS.set('ncgs-wx', m); }
+    render();
+  }).catch(() => { if (!UI.wx[c.id] || UI.wx[c.id].state !== 'done') UI.wx[c.id] = { state: 'failed' }; render(); });
+  if (!UI.wx[c.id]) {
+    const saved = (LS.get('ncgs-wx', {}) || {})[c.id];
+    const age = saved ? Date.now() - saved.at : Infinity;
+    if (saved && saved.data && saved.data.days && age < 3 * 3600e3) { UI.wx[c.id] = { state: 'done', data: saved.data }; if (age > 30 * 60e3) refresh(); }
+    else { UI.wx[c.id] = { state: 'loading' }; refresh(); }
   }
+  const st = UI.wx[c.id];
+  if (st.state === 'loading') return sec(label('Forecast'), '<div class="wx wx-skel" aria-busy="true"><div class="wx-top"><span class="sk sk-ic"></span><div class="wx-main"><span class="sk sk-a"></span><span class="sk sk-b"></span></div></div><p class="wx-line">Getting the forecast…</p></div>');
   if (st.state !== 'done' || !st.data || !st.data.days) return '';
   const d = st.data.days;
   const i = d.time.indexOf(r.date);

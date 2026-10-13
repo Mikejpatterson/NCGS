@@ -160,13 +160,21 @@ function forecast(r) {
   const c = courseOf(r);
   const away = daysFromToday(r.date);
   if (!c || c.lat === null || c.lon === null || c.lat === undefined || away === null || away < 0 || away > 9) return '';
-  const st = UI.wx[c.id];
-  if (!st) {
-    UI.wx[c.id] = { state: 'loading' };
-    call({ op: 'weather', lat: c.lat, lon: c.lon }).then(res => { UI.wx[c.id] = { state: 'done', data: res }; render(); })
-      .catch(() => { UI.wx[c.id] = { state: 'failed' }; });
-    return '';
+  /* The last forecast is kept on the phone, so it shows at once; a fresh one is fetched in the background when it is getting old. */
+  const refresh = () => call({ op: 'weather', lat: c.lat, lon: c.lon }).then(res => {
+    if (!(res && res.days) && UI.wx[c.id] && UI.wx[c.id].state === 'done' && UI.wx[c.id].data && UI.wx[c.id].data.days) { render(); return; } // no new forecast: keep the one we have
+    UI.wx[c.id] = { state: 'done', data: res };
+    if (res && res.days) { const m = LS.get('ncgs-wx', {}) || {}; m[c.id] = { at: Date.now(), data: res }; LS.set('ncgs-wx', m); }
+    render();
+  }).catch(() => { if (!UI.wx[c.id] || UI.wx[c.id].state !== 'done') UI.wx[c.id] = { state: 'failed' }; render(); });
+  if (!UI.wx[c.id]) {
+    const saved = (LS.get('ncgs-wx', {}) || {})[c.id];
+    const age = saved ? Date.now() - saved.at : Infinity;
+    if (saved && saved.data && saved.data.days && age < 3 * 3600e3) { UI.wx[c.id] = { state: 'done', data: saved.data }; if (age > 30 * 60e3) refresh(); }
+    else { UI.wx[c.id] = { state: 'loading' }; refresh(); }
   }
+  const st = UI.wx[c.id];
+  if (st.state === 'loading') return sec(label('Forecast'), '<div class="wx wx-skel" aria-busy="true"><div class="wx-top"><span class="sk sk-ic"></span><div class="wx-main"><span class="sk sk-a"></span><span class="sk sk-b"></span></div></div><p class="wx-line">Getting the forecast…</p></div>');
   if (st.state !== 'done' || !st.data || !st.data.days) return '';
   const d = st.data.days;
   const i = d.time.indexOf(r.date);

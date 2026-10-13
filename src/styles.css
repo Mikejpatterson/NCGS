@@ -249,6 +249,13 @@ button.lrow { width: 100%; text-align: left; }
 .wx-chip { background: rgba(255,255,255,.2); border-radius: 999px; padding: 6px 12px; font-size: var(--t-sub); }
 .wx-chip b { font-weight: 800; }
 .wx-line { margin: 12px 0 0; font-size: var(--t-body); font-weight: 600; }
+.wx-skel { background: linear-gradient(160deg, #4B5F7A, #6E8399); min-height: 168px; }
+.sk { display: block; background: rgba(255,255,255,.28); border-radius: 10px; animation: skpulse 1.3s ease-in-out infinite; }
+.sk-ic { width: 72px; height: 72px; border-radius: 50%; flex: none; }
+.sk-a { width: 120px; height: 20px; margin-bottom: 10px; }
+.sk-b { width: 90px; height: 36px; }
+@keyframes skpulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sk { animation: none; } }
 .wx-hours { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 14px; padding: 10px 4px; background: rgba(255,255,255,.16); border-radius: 12px; text-align: center; }
 .wx-hours > span { display: flex; flex-direction: column; align-items: center; gap: 2px; font-variant-numeric: tabular-nums; }
 .wx-t { font-size: var(--t-cap); opacity: .9; }
