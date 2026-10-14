@@ -958,9 +958,102 @@ body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 
 .tabs { background: linear-gradient(135deg, rgba(255, 255, 255, .36), rgba(255, 255, 255, .06) 45%, rgba(255, 255, 255, .24)); -webkit-backdrop-filter: blur(22px) saturate(260%) contrast(1.04) brightness(1.12); backdrop-filter: blur(22px) saturate(260%) contrast(1.04) brightness(1.12); box-shadow: inset 0 2px 1px -1px #fff, inset 0 -2px 2px -1px rgba(255, 255, 255, .8), inset 2px 0 3px -2px #fff, inset -2px 0 3px -2px #fff, inset 0 0 28px rgba(255, 255, 255, .35), 0 0 0 1px rgba(255, 255, 255, .35), 0 18px 40px rgba(20, 35, 27, .26), 0 0 0 .5px rgba(20, 35, 27, .16); }
 .tab { text-shadow: 0 0 10px rgba(255, 255, 255, 1), 0 0 3px rgba(255, 255, 255, .9); }
 .tab.on { background: linear-gradient(180deg, rgba(255, 255, 255, .6), rgba(247, 197, 22, .5)); }
+
+/* ===== Richer pages: Home tiles, Past rounds, Players, Stats ===== */
+.av.sm { width: 28px; height: 28px; font-size: .5rem; }
+.av.lg { width: 46px; height: 46px; font-size: .8rem; }
+.stack { display: inline-flex; flex: none; }
+.stack .av { box-shadow: 0 0 0 2px #fff; }
+.stack .av + .av { margin-left: -9px; }
+.stack .av:nth-child(2) { background: #D4E3D8; }
+.stack .av:nth-child(3) { background: #C3D8CA; }
+.stack .av:nth-child(4) { background: #B3CDBB; }
+
+/* Home: the Golfer of the Year feature card and four tiles that each look different */
+.feat { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 16px; padding: 18px; border-radius: 28px; text-align: left; color: #fff; background: linear-gradient(150deg, #14573F, #0B3D2E 70%); }
+.feat::after { content: ""; position: absolute; right: -50px; top: -60px; width: 190px; height: 190px; border-radius: 50%; background: rgba(247, 197, 22, .16); pointer-events: none; }
+.feat > * { position: relative; z-index: 1; }
+.ft-k { display: inline-flex; align-items: center; gap: 6px; font-size: .72rem; font-weight: 800; letter-spacing: .1em; color: var(--flag); }
+.ft-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.ft-n { font-size: 2.1rem; font-weight: 900; letter-spacing: -.03em; line-height: 1; }
+.ft-p { font-size: .95rem; font-weight: 700; color: rgba(255, 255, 255, .85); font-variant-numeric: tabular-nums; }
+.ft-p b { font-size: 3rem; font-weight: 900; letter-spacing: -.05em; line-height: .9; color: #fff; }
+.ft-foot { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: var(--t-sub); color: rgba(255, 255, 255, .85); }
+.ft-foot .stack .av { box-shadow: 0 0 0 2px #14573F; background: #E3EAE0; }
+.ft-me { margin-left: auto; font-weight: 800; color: var(--flag); }
+.links { gap: 12px; margin-top: 12px; }
+.lnk { position: relative; min-height: 124px; justify-content: flex-end; gap: 2px; padding: 14px 16px; border-radius: 24px; overflow: hidden; }
+.lnk-ic { position: absolute; left: 14px; top: 14px; width: 44px; height: 44px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; background: #E3EFE6; color: var(--pine); }
+.lnk .stack { position: absolute; right: 12px; top: 18px; }
+.lnk.sun { background: linear-gradient(160deg, #FFF3C4, #FADF7A); box-shadow: 0 0 0 1px rgba(160, 110, 0, .18); }
+.lnk.sun .lnk-ic { background: rgba(255, 255, 255, .7); color: #7A5200; }
+.lnk.sun .lnk-t { color: #4A3300; }
+.lnk.sun .lnk-s { color: #7A5200; }
+.lnk.leaf { background: linear-gradient(160deg, #E8F3EA, #CFE5D5); box-shadow: 0 0 0 1px rgba(11, 61, 46, .12); }
+.lnk.leaf .lnk-ic { background: rgba(255, 255, 255, .75); }
+.lnk-t { font-size: 1.1rem; font-weight: 800; letter-spacing: -.01em; }
+
+/* Past rounds */
+.prow { gap: 12px; }
+.prow .two { flex: 1; min-width: 0; }
+.dchip { flex: none; width: 48px; height: 54px; border-radius: 14px; background: #E8F1EA; color: var(--pine); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+.dchip b { font-size: 1.3rem; font-weight: 900; letter-spacing: -.02em; }
+.dchip small { font-size: .62rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; }
+.dchip.none { background: var(--fill); color: var(--faint); }
+.wn { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.wn-t { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 3px; min-width: 0; }
+.wn-n { font-size: var(--t-cap); color: var(--sub); font-weight: 600; max-width: 96px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chipn { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 26px; padding: 0 8px; border-radius: 13px; background: #E3EFE6; color: var(--pine); font-style: normal; font-size: .85rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* Players */
+.posp { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 13px; background: var(--fill); color: var(--sub); font-size: var(--t-cap); font-weight: 800; }
+.posp.p1 { background: var(--flag); color: #14231B; }
+.posp.p2 { background: #DDE1DE; color: #14231B; }
+.posp.p3 { background: #EBCFAE; color: #4A2F10; }
+
+/* Stats */
+.sumtiles { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 16px; }
+.sumtiles > div { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: 20px; min-width: 0; }
+.sumtiles b { font-size: 2rem; font-weight: 900; letter-spacing: -.04em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.sumtiles .cap { font-size: .7rem; font-weight: 700; }
+.st-a { background: var(--pine); color: #fff; }
+.st-a .cap { color: #BFD6C8; }
+.st-b { background: linear-gradient(160deg, #FFF3C4, #FADF7A); color: #4A3300; }
+.st-b .cap { color: #7A5200; }
+.st-c { background: linear-gradient(160deg, #E8F3EA, #CFE5D5); color: var(--pine); }
+.st-c .cap { color: #3E6B57; }
+.shd { display: inline-flex; align-items: center; gap: 10px; }
+.shi { width: 30px; height: 30px; border-radius: 10px; background: #E3EFE6; color: var(--pine); display: inline-flex; align-items: center; justify-content: center; }
+.sht { font-size: 1.12rem; font-weight: 800; letter-spacing: -.01em; color: var(--text); }
+.shs { font-size: var(--t-sub); color: var(--sub); }
+.srow { display: grid; grid-template-columns: 28px 40px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; min-height: 64px; padding: 10px 16px; text-align: left; }
+.srow + .srow { border-top: 1px solid rgba(20, 35, 27, .07); }
+.srow.top { background: #FFF9DC; }
+.srow:active { background: var(--fill); }
+.rk { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 900; color: var(--sub); font-variant-numeric: tabular-nums; }
+.rk.r1 { background: var(--flag); color: #14231B; }
+.rk.r2 { background: #DDE1DE; color: #14231B; }
+.rk.r3 { background: #EBCFAE; color: #4A2F10; }
+.sn { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.sn .n { font-weight: 700; font-size: 1.02rem; }
+.bar { display: block; height: 6px; border-radius: 3px; background: #EEF0EA; width: 100%; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, #3F9A68, #167A41); }
+.srow.top .bar i { background: linear-gradient(90deg, #F7C516, #E0A800); }
+.sv { font-size: 1.4rem; font-weight: 900; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.srow.top .sv { color: var(--green); }
+.lnk { min-height: 148px; }
+.av.sm { width: 30px; height: 30px; font-size: .55rem; }
+.stack .av + .av { margin-left: -6px; }
+.dchip.none { color: var(--faint); }
+.idx { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.05; font-size: .95rem; font-weight: 800; font-variant-numeric: tabular-nums; margin-right: 4px; }
+.idx small { font-size: .6rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--sub); }
+.sumtiles b { font-size: min(2rem, 7.5vw); overflow-wrap: anywhere; }
+.sumtiles .cap { overflow-wrap: anywhere; }
+.sumtiles { gap: 8px; }
+.sumtiles > div { padding: 10px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610140623","server":"5b0c6166"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610140652","server":"5b0c6166"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2330,6 +2423,9 @@ const ICON = {
   camera: svg('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),
   course: svg('<path d="M7 21V5"/><path d="M7 5l9 3.5L7 12"/><ellipse cx="12" cy="20" rx="8" ry="1.6"/>'),
   gear: svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'),
+  bars: svg('<path d="M5 20V11"/><path d="M12 20V4"/><path d="M19 20v-6"/>'),
+  medal: svg('<circle cx="12" cy="9" r="5"/><path d="M8.5 13.5L7 21l5-3 5 3-1.5-7.5"/>'),
+  flagpin: svg('<path d="M7 21V4"/><path d="M7 4l10 3.5L7 11"/>'),
   trophy: svg('<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5v1.5A3 3 0 0 0 8 10.5"/><path d="M16 6h3v1.5a3 3 0 0 1-3 3"/><path d="M12 13v4"/><path d="M8.5 20h7"/>'),
   plus: svg('<path d="M12 5v14M5 12h14"/>'),
   share: svg('<path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>')
@@ -2406,6 +2502,12 @@ function initialsOf(m) {
 const avName = (x, sub, lead) => { const me = x.id === DB.prefs.me; return `<span class="lname${me ? ' b' : ''}"><i class="av${me ? ' is-me' : lead ? ' is-lead' : ''}" aria-hidden="true">${esc(initialsOf(D.member(x.id)))}</i><span class="ln"><span class="n">${esc(x.name)}${me ? ' <small class="you">YOU</small>' : ''}</span>${sub ? `<span class="cap">${esc(sub)}</span>` : ''}</span></span>`; };
 /* The small line under a name on a live leaderboard: how far ahead the leader is, and how many holes they have played. */
 const lbSub = (rows, x, r) => { if (!r || r.status !== 'live' || x.thru === undefined) return ''; const next = rows[1]; return rows[0] === x && next && x.total > next.total ? `Leads by ${x.total - next.total} \u00b7 thru ${x.thru}` : `thru ${x.thru}`; };
+
+/* Small round badge with initials, and an overlapping stack of them */
+const avBadge = (id, cls) => `<i class="av${cls ? ' ' + cls : ''}" aria-hidden="true">${esc(initialsOf(D.member(id)))}</i>`;
+const avStack = ids => `<span class="stack" aria-hidden="true">${ids.map(id => avBadge(id, 'sm')).join('')}</span>`;
+/* Section heading with a little icon chip, used on the richer pages */
+const sh = (title, icon, sub) => `<span class="shd"><span class="shi">${sized(icon, 18)}</span><span class="sht">${esc(title)}</span>${sub ? `<span class="shs">${esc(sub)}</span>` : ''}</span>`;
 
 /* ---- 10-data.js ---- */
 /* ---------- Data: one shared copy, kept on every phone ----------
@@ -2837,6 +2939,15 @@ function winnerText(r) {
   const top = res.rows.filter(x => x.pos === 1);
   return `<span class="sub">${esc(top.map(x => x.name).join(', '))} ${top[0].total}</span>`;
 }
+function pastRow(r) {
+  const res = resultsOf(r.id);
+  const top = res && res.rows ? res.rows.filter(x => x.pos === 1) : [];
+  const d = r.date ? parseDay(r.date) : null;
+  const when = d ? `<span class="dchip"><b>${d.getDate()}</b><small>${MONTHS[d.getMonth()].slice(0, 3)}</small></span>` : `<span class="dchip none">${sized(ICON.flagpin, 22)}</span>`;
+  const sub = [r.trip, r.course_name].filter(Boolean)[0] || '';
+  const win = top.length ? `<span class="wn">${avStack(top.slice(0, 2).map(x => x.id))}<span class="wn-t"><span class="wn-n">${esc(top.map(x => x.name).join(', '))}</span><span class="chipn">${top[0].total}</span></span></span>` : '';
+  return `<button class="row tall prow" data-act="round" data-rid="${r.id}">${when}<span class="two"><span class="b">${esc(roundName(r))}</span>${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</span><span class="right">${win}${chev}</span></button>`;
+}
 const statusPill = r => {
   if (isDemo(r)) return '<span class="pill w">Demo</span>';
   if (r.status === 'live') { const c = computeR(r.id); const thru = c ? Math.min(...c.groups.map(g => g.holesDone)) : 0; return `<span class="pill w">${thru ? 'Thru ' + thru : 'Live'}</span>`; }
@@ -2925,16 +3036,21 @@ VIEWS.home = () => {
   const table = goy(season);
   const lead = table[0];
   const pastAll = D.rounds().filter(r => r.status === 'final').reverse();
-  const tile = (act, icon, t, s2) => `<button class="lnk" data-act="${act}"><span class="lnk-ic">${sized(icon, 24)}</span><span class="lnk-t">${t}</span><span class="lnk-s">${s2}</span></button>`;
+  const tile = (act, icon, t, s2, cls, extra, rid) => `<button class="lnk${cls ? ' ' + cls : ''}" data-act="${act}"${rid ? ` data-rid="${rid}"` : ''}><span class="lnk-ic">${sized(icon, 24)}</span>${extra || ''}<span class="lnk-t">${t}</span><span class="lnk-s">${s2}</span></button>`;
   const tripFor = feature && feature.trip ? feature : (D.rounds().filter(r => r.trip).slice(-1)[0] || null);
   const tripList = tripFor ? tripRounds(tripFor) : [];
-  const tripTile = tripList.length > 1 ? `<button class="lnk" data-act="trip" data-rid="${tripFor.id}"><span class="lnk-ic">${sized(ICON.trophy, 24)}</span><span class="lnk-t">Trip standings</span><span class="lnk-s">${esc(tripFor.trip)}</span></button>` : '';
-  html += `<div class="links">
+  const tripTile = tripList.length > 1 ? tile('trip', ICON.flagpin, 'Trip standings', esc(tripFor.trip), 'sun', '', tripFor.id) : '';
+  const top3 = table.slice(0, 3);
+  const myPos = me && myRow ? `<span class="ft-me">You are ${posWord(myRow.posLabel)}</span>` : '';
+  const goyFeat = lead
+    ? `<button class="feat" data-act="goy"><span class="ft-k">${sized(ICON.medal, 16)}GOLFER OF THE YEAR</span><span class="ft-row"><span class="ft-n">${esc(lead.name)}</span><span class="ft-p"><b>${lead.total}</b> pts</span></span><span class="ft-foot">${avStack(top3.map(x => x.id))}<span class="ft-t">Best ${D.goyBest()} scores count</span>${myPos}</span></button>`
+    : tile('goy', ICON.medal, 'Golfer of the Year', 'Best ' + D.goyBest() + ' scores count');
+  const goyHidden = lead ? `<span class="vh">Golfer of the Year ${esc(lead.name)} leads on ${lead.total}</span>` : '';
+  html += `${goyFeat}${goyHidden}<div class="links">
     ${tripTile}
-    ${tile('rounds', ICON.history, 'Past rounds', played.length ? `${played.length} played` : 'None played yet')}
-    ${tile('goy', ICON.trophy, 'Golfer of the Year', lead ? `${esc(lead.name)} leads on ${lead.total}` : 'Best ' + D.goyBest() + ' scores count')}
-    ${tile('stats', ICON.history, 'Stats', 'KBs, birdies, averages')}
-    ${tile('players', ICON.users, 'Players', plural(D.regulars().length, 'golfer'))}
+    ${tile('rounds', ICON.history, 'Past rounds', played.length ? `${played.length} played` : 'None played yet', 'plain')}
+    ${tile('stats', ICON.bars, 'Stats', 'KBs, birdies, averages', 'leaf')}
+    ${tile('players', ICON.users, 'Players', plural(D.regulars().length, 'golfer'), 'plain', avStack(D.regulars().slice(0, 4).map(m => m.id)))}
   </div>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
@@ -2946,7 +3062,7 @@ VIEWS.rounds = () => {
   const past = D.rounds().filter(r => r.status === 'final' && !isDemo(r) && (r.season || seasonOf()) === yr).reverse();
   return {
     html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Past rounds</h1></div><p class="sub">Tap a round for the scorecards</p>${yearPicker()}</header>
-      ${past.length ? sec('', cardOf(past.map(r => roundRow(r, winnerText(r))).join('')), false) : sec('', '<div class="prose">No rounds played yet.</div>', false)}`
+      ${past.length ? sec('', cardOf(past.map(pastRow).join('')), false) : sec('', '<div class="prose">No rounds played yet.</div>', false)}`
   };
 };
 
@@ -2956,7 +3072,7 @@ VIEWS.players = () => {
   const pos = Object.fromEntries(table.map(x => [x.id, x.posLabel]));
   return {
     html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Players</h1></div><p class="sub">Tap a name for their cards</p></header>
-      ${sec('', cardOf(D.regulars().map(m => `<button class="row tall" data-act="player" data-pid="${m.id}"><span class="two"><span>${esc(m.name)}</span><span class="sub">${esc([m.full && m.full !== m.name ? m.full : '', 'Index ' + fmtIndex(m.index)].filter(Boolean).join(' · '))}</span></span><span class="right">${pos[m.id] ? `<span class="sub">${posWord(pos[m.id])}</span>` : ''}${chev}</span></button>`).join('')), false)}`
+      ${sec('', cardOf(D.regulars().map(m => `<button class="row tall prow" data-act="player" data-pid="${m.id}">${avBadge(m.id, 'lg')}<span class="two"><span class="b">${esc(m.name)}</span><span class="sub">${esc(m.full && m.full !== m.name ? m.full : 'Index ' + fmtIndex(m.index))}</span></span><span class="right"><span class="idx" title="Handicap index"><small>Index</small>${esc(fmtIndex(m.index))}</span>${pos[m.id] ? `<span class="posp p${/^\d+$/.test(pos[m.id]) && Number(pos[m.id]) <= 3 ? pos[m.id] : ''}">${posWord(pos[m.id])}</span>` : ''}${chev}</span></button>`).join('')), false)}`
   };
 };
 
@@ -3220,18 +3336,28 @@ VIEWS.stats = () => {
   const yr = yearOn();
   const members = D.regulars();
   const all = members.map(m => ({ id: m.id, name: m.name, st: E.playerSummary(playerEntries(m.id, yr)) })).filter(x => x.st.rounds);
-  const board = (title, key, unit, min) => {
-    const rows = all.filter(x => x.st[key] > (min || 0)).sort((a, b) => b.st[key] - a.st[key] || a.name.localeCompare(b.name));
-    if (!rows.length) return '';
-    return sec(label(title), cardOf(rows.map(x => `<button class="lrow" data-act="player" data-pid="${x.id}"><span></span><span>${esc(x.name)}</span><span class="b r">${x.st[key]}${unit || ''}</span></button>`).join('')));
+  const statBoard = (title, icon, list, disp, sub) => {
+    if (!list.length) return '';
+    const max = Math.max(...list.map(x => x.v)) || 1;
+    let rank = 0, prev = null;
+    return sec(sh(title, icon, sub), cardOf(list.map((x, i) => {
+      if (x.v !== prev) { rank = i + 1; prev = x.v; }
+      return `<button class="srow${rank === 1 ? ' top' : ''}" data-act="player" data-pid="${x.id}"><span class="rk r${rank <= 3 ? rank : 0}">${rank}</span>${avBadge(x.id)}<span class="sn"><span class="n">${esc(x.name)}</span><span class="bar"><i style="width:${Math.max(4, Math.round(x.v / max * 100))}%"></i></span></span><span class="sv">${disp(x)}</span></button>`;
+    }).join('')));
   };
-  const avg = all.filter(x => x.st.rounds >= 1).sort((a, b) => b.st.average - a.st.average || a.name.localeCompare(b.name));
+  const board = (title, icon, key, unit, min, sub) => statBoard(title, icon,
+    all.filter(x => x.st[key] > (min || 0)).sort((a, b) => b.st[key] - a.st[key] || a.name.localeCompare(b.name)).map(x => ({ id: x.id, name: x.name, v: x.st[key] })),
+    x => `${x.v}${unit || ''}`, sub);
+  const avg = all.filter(x => x.st.rounds >= 1).sort((a, b) => b.st.average - a.st.average || a.name.localeCompare(b.name)).map(x => ({ id: x.id, name: x.name, v: x.st.average }));
   let html = `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Stats</h1></div><p class="sub">Tap a name for their own numbers</p>${yearPicker()}</header>`;
   if (!all.length) return { html: html + sec('', '<div class="prose">Stats appear once a round has been played.</div>') };
-  html += board('KBs', 'kbs');
-  html += board('Round wins', 'wins');
-  html += board('Birdies', 'birdies');
-  html += sec(label('Average points'), cardOf(avg.map(x => `<button class="lrow" data-act="player" data-pid="${x.id}"><span></span><span>${esc(x.name)}</span><span class="b r">${fmt1(x.st.average)}</span></button>`).join('')));
+  const bestRound = all.slice().sort((a, b) => (b.st.best || 0) - (a.st.best || 0))[0];
+  const nRounds = seasonRounds(yr).filter(r => r.status === 'final').length;
+  html += `<div class="sumtiles"><div class="st-a"><span class="cap">Rounds played</span><b>${nRounds}</b></div><div class="st-b"><span class="cap">Best round</span><b>${bestRound.st.best}</b><span class="cap">${esc(bestRound.name)}</span></div><div class="st-c"><span class="cap">Top average</span><b>${fmt1(avg[0].v)}</b><span class="cap">${esc(avg[0].name)}</span></div></div>`;
+  html += board('KBs', ICON.users, 'kbs');
+  html += board('Round wins', ICON.trophy, 'wins');
+  html += board('Birdies', ICON.flagpin, 'birdies');
+  html += statBoard('Average points', ICON.bars, avg, x => fmt1(x.v));
   return { html };
 };
 
