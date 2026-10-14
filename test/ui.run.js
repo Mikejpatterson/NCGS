@@ -80,7 +80,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   check('hole tab goes straight to entering scores: hole 15, par 3 with nearest the pin, Buggy pills', /Hole\s*15/i.test(t) && /Par\s*3\s*Index\s*14/.test(t) && /Nearest the pin/.test(t) && /Buggy 1/.test(t));
   check('hole 15 entry fits on one iPhone screen', await fits());
   await shot('05-tee');
-  check('hole screen: no All groups or Enter scores step, a Home exit and a tappable hole number', !(await page.$('.pillbtn[data-act="round"]')) && !(await page.$('.tee')) && !!(await page.$('.entback')) && !!(await page.$('.holebtn')) && !!(await page.$('.entry .stepper')));
+  check('hole screen: no All groups or Enter scores step, the tab bar and a tappable hole number, no Home or Results pills on top', !(await page.$('.pillbtn')) && !(await page.$('.tee')) && !(await page.$('.entback')) && !!(await page.$('.tab.on[data-tab="hole"]')) && !!(await page.$('.holebtn')) && !!(await page.$('.entry .stepper')));
   await tap('.holebtn');
   check('go to hole: all 18 shown, scored ones filled, hole 15 ringed as next', (await page.$$('.hs')).length === 18 && (await page.$$('.hs.done')).length === 14 && (await page.$eval('.hs.nxt', e => e.textContent)) === '15');
   await shot('05b-holes');
@@ -92,8 +92,8 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await tap('.holebtn'); await tap('.hs[data-n="17"]');
   t = await text();
   check('go to hole: a later hole can be scored early', /Hole\s*17/i.test(t) && /4 scores to go/.test(t));
-  await tap('[data-act="entry-back"]');
-  check('Back from there returns to the hole screen', /Hole\s*15/i.test(await text()) && !!(await page.$('.entry .stepper')));
+  await tap('.tab[data-tab="hole"]');
+  check('the Hole tab from there returns to the hole screen', /Hole\s*15/i.test(await text()) && !!(await page.$('.entry .stepper')));
   await tap('.holebtn'); await tap('[data-act="holes-close"]');
   check('the hole picker closes with Done', !(await page.$('.hs-sheet')));
   const pids = await page.$$eval('.stepper', els => els.map(e => e.querySelector('[data-pid]').dataset.pid));
@@ -143,7 +143,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   check('reload opens straight on the next hole', /Hole\s*16/i.test(await text()));
 
   // Buggy Wars and leaderboard
-  await tap('.entnav [data-tab="board"], .tab[data-tab="board"]');
+  await tap('.tab[data-tab="board"]');
   t = await text();
   check('one Results tab bar, no separate Buggy tab', (await page.$$('.tab')).length === 4 && !(await page.$('.tab[data-tab="match"]')) && /Results/.test(await page.textContent('#tabs')) && /Leaderboard/.test(t));
   check('Results has Scores, Buggy Wars, Contests and Stats pills, Scores first', JSON.stringify(await page.$$eval('.pills button', b => b.map(x => x.textContent.trim()))) === JSON.stringify(['Scores', 'Buggy Wars', 'Contests', 'Stats']) && await page.$eval('.pills button.on', e => e.textContent.trim()) === 'Scores');

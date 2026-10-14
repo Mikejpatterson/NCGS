@@ -1398,3 +1398,5 @@ body { font-variant-numeric: tabular-nums; }
 .entnav .entright { gap: 8px; }
 .entnav .pillbtn { padding: 0 14px; font-size: .9rem; }
 @media (max-width: 380px) { .entry .stepper .pu, .entry .stepper .pu.on { padding: 0 10px; font-size: .8rem; margin-left: 2px; } }
+/* Score entry now keeps the tab bar: the Save button sits just above it */
+#app:not(.no-tabs) .entry .savebar { bottom: 0; padding-bottom: 6px; padding-top: 10px; background: linear-gradient(to top, var(--bg) 78%, rgba(250, 249, 244, 0)); box-shadow: none; }

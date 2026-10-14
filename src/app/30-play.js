@@ -131,8 +131,8 @@ VIEWS.entry = () => {
   let html = '<div class="entry">';
   if (ctx.mode === 'org') html += `<p class="cap">Correcting group ${gc.n}</p>`;
   const tt = ((D.round(ctx.rid).groups || []).find(x => x.id === ctx.gid) || {}).teeTime;
-  html += `<div class="entnav"><button class="entback" data-act="entry-back" aria-label="Back">${ICON.back}<span>${ctx.mode === 'org' ? 'Back' : 'Home'}</span></button>${ctx.mode === 'org' ? (tt ? `<span class="entgrp">${esc(tt)} group</span>` : '') : `<span class="entright"><button class="pillbtn" data-act="tab" data-tab="board">Results</button><button class="pillbtn" data-act="tab" data-tab="rules">Ruling</button></span>`}</div>
-  <header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small>${ctx.mode === 'org' ? `<b class="entn">${ctx.n}</b>` : `<button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${ctx.n}"><b class="entn">${ctx.n}</b><span class="hdown">${ICON.down}</span></button>`}</div><div class="entr"><b>Par ${h.par}</b><span>Index ${h.si}${h.yards ? ` · ${h.yards} yds` : ''}</span></div></div><div class="prog" role="img" aria-label="Hole ${ctx.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(n => `<i class="${n === ctx.n ? 'cur' : n < ctx.n ? 'done' : ''}"></i>`).join('')}</div></header>`;
+  if (ctx.mode === 'org') html += `<div class="entnav"><button class="entback" data-act="entry-back" aria-label="Back">${ICON.back}<span>Back</span></button>${tt ? `<span class="entgrp">${esc(tt)} group</span>` : ''}</div>`;
+  html += `<header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small>${ctx.mode === 'org' ? `<b class="entn">${ctx.n}</b>` : `<button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${ctx.n}"><b class="entn">${ctx.n}</b><span class="hdown">${ICON.down}</span></button>`}</div><div class="entr"><b>Par ${h.par}</b><span>Index ${h.si}${h.yards ? ` · ${h.yards} yds` : ''}</span></div></div><div class="prog" role="img" aria-label="Hole ${ctx.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(n => `<i class="${n === ctx.n ? 'cur' : n < ctx.n ? 'done' : ''}"></i>`).join('')}</div></header>`;
   if (final) html += `<div class="banner" style="margin-top:12px">This round is final.</div>${ctx.mode === 'org' ? '<button class="btn quiet" data-act="reopen">Reopen round</button>' : ''}`;
   const clash = DB.conflicts.filter(c => c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n);
   if (clash.length) html += `<div class="banner" style="margin-top:12px">Another phone saved ${clash.map(c => `${esc(D.nameOf(c.player))} ${fmtGross(c.server)}`).join(', ')}</div>`;
@@ -158,7 +158,7 @@ VIEWS.entry = () => {
     </div></div>`;
   }
   if (ctx.mode === 'player') html += holesSheet(ctx.rid, gc, ctx.n);
-  return { html };
+  return ctx.mode === 'player' ? { html, tabs: 'hole' } : { html };
 };
 
 function setScore(pid, v) {
