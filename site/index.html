@@ -1246,9 +1246,55 @@ body { font-variant-numeric: tabular-nums; }
 .lrow .ln, .lname > .ln { overflow: visible; }
 .lname .ln .cap { white-space: normal; }
 .grow .b.num { white-space: nowrap; min-width: 4.6ch; }
+
+/* ===== Polish: feel ===== */
+/* Screens ease in when you move between them (not on every refresh of the data) */
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+#app.enter > * { animation: rise .24s ease-out both; }
+#app.enter > *:nth-child(2) { animation-delay: .03s; }
+#app.enter > *:nth-child(3) { animation-delay: .06s; }
+#app.enter > *:nth-child(n+4) { animation-delay: .09s; }
+/* Everything tappable answers the thumb */
+.btn, .lnk, .feat, .row, .lrow, .idea, .seg button, .tile, .entback, .undochip { transition: transform .12s ease, background-color .15s ease, box-shadow .15s ease; }
+.btn:active, .lnk:active, .feat:active, .idea:active { transform: scale(.985); }
+.row:active, .lrow:active { background-color: var(--fill); }
+@media (prefers-reduced-motion: reduce) { #app.enter > * { animation: none; } .btn:active, .lnk:active, .feat:active, .idea:active { transform: none; } }
+
+/* Primary buttons are green everywhere. Yellow is only for the scoring save, on the hole screen. */
+.savebar .btn:not(.quiet) { background: var(--green); color: #fff; }
+.entry .savebar .btn:not(.quiet), .entry + .savebar .btn:not(.quiet) { background: var(--flag); color: #0B3D2C; }
+
+/* Scorecard page header */
+.cardlink { color: var(--pine); font-weight: 700; text-decoration: none; }
+.hero.s .note { margin: 8px 0 0; }
+.hero.s .note .pill.w { background: #fff; color: var(--sub); box-shadow: inset 0 0 0 1.5px rgba(20, 35, 27, .18); }
+.hero.s .tiles { margin-top: 14px; }
+
+/* Scorecard marks: colour as well as shape, rounded */
+.mk { width: 30px; height: 30px; font-weight: 700; }
+.mk.birdie { background: var(--green); color: #fff; border: 0; border-radius: 50%; outline: 0; }
+.mk.eagle { background: var(--flag); color: var(--pine); border: 0; border-radius: 50%; outline: 2px solid var(--flag); outline-offset: 2px; font-weight: 800; }
+.mk.bogey { background: #FBE9E7; color: #8F1D1D; border: 0; border-radius: 9px; outline: 0; }
+.mk.double { background: #F3C9C4; color: #7A1410; border: 0; border-radius: 9px; outline: 0; }
+.cardlink, .hero.s .link.inline.cardlink { text-decoration: none !important; }
+.mk.bogey { background: #EEF0EA; color: var(--text); }
+.mk.double { background: #DDE3DE; color: var(--text); }
+
+/* Large text: long lines wrap instead of being cut; the two-nine scorecard scrolls sideways inside its card */
+.logrow .sub { white-space: normal; overflow-wrap: anywhere; }
+.hole-row.cols .cap { white-space: normal; overflow: visible; }
+.hole-row { grid-template-columns: minmax(2.4ch, .6fr) 1fr 1fr 1fr; }
+.sc-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.cardlink { display: inline-block; padding: 12px 0; margin: -12px 0; }
+
+/* Home tiles: one yellow highlight (the trip), the rest calm white cards with a green icon chip */
+.lnk.leaf { background: #fff; box-shadow: var(--ring); }
+.lnk.leaf .lnk-ic { background: #E3EFE6; }
+.feat::after { right: -38px; top: -52px; width: 140px; height: 140px; background: rgba(247, 197, 22, .16); }
+.ft-p b { position: relative; z-index: 2; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141553","server":"5b0c6166"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141639","server":"5b0c6166"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3248,7 +3294,7 @@ VIEWS.home = () => {
     ${tripTile}
     ${tile('rounds', ICON.history, 'Past rounds', played.length ? `${played.length} played` : 'None played yet', 'plain')}
     ${tile('stats', ICON.bars, 'Stats', 'KBs, birdies, averages', 'leaf')}
-    ${tile('players', ICON.users, 'Players', plural(D.regulars().length, 'golfer'), 'plain', avStack(D.regulars().slice(0, 4).map(m => m.id)))}
+    ${tile('players', ICON.users, 'Players', plural(D.regulars().length, 'golfer'), 'plain', avStack(D.regulars().slice(0, 3).map(m => m.id)))}
   </div>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
@@ -3632,7 +3678,7 @@ VIEWS.card = p => {
   const sub = [r.date ? fmtDate(r.date, true) : roundWhenShort(r), tee ? `${tee.name} · Par ${tee.par}` : '', `Playing hcp ${pl.ph}`].filter(Boolean).join(' · ');
   const html = `<header class="hero s">${navBack('Back')}
     <div class="head"><h1 class="title">${esc(pl.name)}</h1>${me && r.status === 'final' ? `<span class="sub">${posWord(me.posLabel)}</span>` : ''}</div>
-    <p class="sub"><button class="link inline" data-act="round" data-rid="${r.id}">${esc(roundName(r))}</button> · ${esc(sub)}</p>
+    <p class="sub"><button class="link inline cardlink" data-act="round" data-rid="${r.id}">${esc(roundName(r))}</button> · ${esc(sub)}</p>
     ${isDemo(r) ? '<div class="note"><span class="pill w">Demo scores</span></div>' : ''}
     <div class="tiles"><div class="tile flag"><span class="cap">Points</span><span class="bignum">${pl.total}</span></div><div class="tile"><span class="cap">Out</span><span class="bignum">${F.pts}</span></div><div class="tile"><span class="cap">In</span><span class="bignum">${B.pts}</span></div></div></header>
     <div class="card sc-wrap">${table}</div>`;
@@ -5046,7 +5092,7 @@ function withPlayerChanged(r, pid, newPid) {
 /* ----- Members ----- */
 ORG.members = () => {
   const all = D.members();
-  const row = m => `<button class="hrow" data-act="org-go" data-v="member" data-pid="${m.id}"><span class="nm">${esc(m.name)}</span><span></span><span class="r b num">${fmtIndex(m.index)}</span>${chev}</button>`;
+  const row = m => `<button class="hrow" data-act="org-go" data-v="member" data-pid="${m.id}"><span class="nm lname">${avBadge(m.id)}<span class="ln"><span class="n">${esc(m.name)}</span></span></span><span></span><span class="r b num">${fmtIndex(m.index)}</span>${chev}</button>`;
   const former = all.filter(m => m.active === false && !isGuest(m));
   return {
     html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Members</h1></div></header>
@@ -5655,7 +5701,7 @@ function render() {
     if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
   });
   if (UI.scrollCur) { UI.scrollCur = false; const c = document.getElementById('cur'); if (c) c.scrollIntoView({ block: 'center' }); else scroller().scrollTop = 0; }
-  else if (UI.scrollTop) { UI.scrollTop = false; scroller().scrollTop = 0; }
+  else if (UI.scrollTop) { UI.scrollTop = false; scroller().scrollTop = 0; app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter'); }
   renderToast();
   syncHistory();
 }
