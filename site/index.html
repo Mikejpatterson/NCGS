@@ -1139,9 +1139,13 @@ body::before { display: none; }
 .seg.pills, .seg.pills.four { display: grid; grid-auto-flow: row; grid-template-columns: repeat(auto-fit, minmax(4.6rem, 1fr)); gap: 6px; }
 .seg.pills button, .seg.pills.four button { flex: none; width: 100%; min-width: 0; padding: 0 4px; font-size: .8rem; }
 .seg.pills button, .seg.pills.four button { font-size: .74rem; letter-spacing: -.01em; }
+
+/* Results selector: always 2 x 2 equal pills */
+.seg.pills.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.seg.pills.four button { font-size: .95rem; letter-spacing: 0; min-height: 46px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141241","server":"5b0c6166"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141250","server":"5b0c6166"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
