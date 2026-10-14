@@ -47,9 +47,9 @@ VIEWS.tee = () => {
       ${clashRows ? sec('', cardOf(clashRows), true) : ''}
       ${teams}
       <p class="cap shotkey"><span class="sd">●</span> a shot you get on this hole</p>
+      <button class="btn entergo" data-act="enter">${hasDraft ? 'Continue scores' : 'Enter scores'}</button>
       ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span>${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
       ${checkRows ? sec(label('Scorecard'), cardOf(checkRows)) : ''}
-      <button class="btn" data-act="enter"${checkRows ? ' style="margin-top:16px"' : ''}>${hasDraft ? 'Continue scores' : 'Enter scores'}</button>
       ${saveWarning()}</div>${holesSheet(rid, gc, null)}`
   };
 };

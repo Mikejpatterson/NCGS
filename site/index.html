@@ -1403,9 +1403,11 @@ body { font-variant-numeric: tabular-nums; }
 .sit-i { width: 44px; height: 44px; margin-bottom: 8px; }
 .sit-i svg { width: 28px; height: 28px; }
 .sit:nth-child(2) .sit-i, .sit:nth-child(3) .sit-i { background: #E3EFE6; }
+.tee > .btn[data-act="enter"] { position: static; box-shadow: none; }
+.tee .entergo { margin-top: 14px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141734","server":"562d6962"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141745","server":"562d6962"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3859,9 +3861,9 @@ VIEWS.tee = () => {
       ${clashRows ? sec('', cardOf(clashRows), true) : ''}
       ${teams}
       <p class="cap shotkey"><span class="sd">●</span> a shot you get on this hole</p>
+      <button class="btn entergo" data-act="enter">${hasDraft ? 'Continue scores' : 'Enter scores'}</button>
       ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span>${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
       ${checkRows ? sec(label('Scorecard'), cardOf(checkRows)) : ''}
-      <button class="btn" data-act="enter"${checkRows ? ' style="margin-top:16px"' : ''}>${hasDraft ? 'Continue scores' : 'Enter scores'}</button>
       ${saveWarning()}</div>${holesSheet(rid, gc, null)}`
   };
 };

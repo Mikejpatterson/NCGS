@@ -1393,3 +1393,5 @@ body { font-variant-numeric: tabular-nums; }
 .sit-i { width: 44px; height: 44px; margin-bottom: 8px; }
 .sit-i svg { width: 28px; height: 28px; }
 .sit:nth-child(2) .sit-i, .sit:nth-child(3) .sit-i { background: #E3EFE6; }
+.tee > .btn[data-act="enter"] { position: static; box-shadow: none; }
+.tee .entergo { margin-top: 14px; }
