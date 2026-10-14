@@ -16,8 +16,8 @@ function pastRow(r) {
   const top = res && res.rows ? res.rows.filter(x => x.pos === 1) : [];
   const d = r.date ? parseDay(r.date) : null;
   const when = d ? `<span class="dchip"><b>${d.getDate()}</b><small>${MONTHS[d.getMonth()].slice(0, 3)}</small></span>` : `<span class="dchip none">${sized(ICON.flagpin, 22)}</span>`;
-  const sub = [r.trip, r.course_name].filter(Boolean)[0] || '';
-  const win = top.length ? `<span class="wn">${avStack(top.slice(0, 2).map(x => x.id))}<span class="wn-t"><span class="wn-n">${esc(top.map(x => x.name).join(', '))}</span><span class="chipn">${top[0].total}</span></span></span>` : '';
+  const sub = [[r.trip, r.course_name].filter(Boolean)[0], top.length ? top.map(x => x.name).join(', ') : ''].filter(Boolean).join(' \u00b7 ');
+  const win = top.length ? `<span class="wn">${avStack(top.slice(0, 2).map(x => x.id))}<span class="chipn scorechip">${top[0].total}</span></span>` : '';
   return `<button class="row tall prow" data-act="round" data-rid="${r.id}">${when}<span class="two"><span class="b">${esc(roundName(r))}</span>${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</span><span class="right">${win}${chev}</span></button>`;
 }
 const statusPill = r => {
@@ -149,7 +149,7 @@ VIEWS.players = () => {
 };
 
 function goyRow(x) {
-  return `<button class="lrow goy" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span>${avName(x)}<span class="chips">${x.counting.map(c => `<i class="chipn">${c.pts}</i>`).join('')}</span><span class="b r">${x.total}</span></button>`;
+  return `<button class="lrow goy" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span>${avName(x, `<span class="chips">${x.counting.map(c => `<i class="chipn">${c.pts}</i>`).join('')}</span>`, false, true)}<span class="b r tot">${x.total}</span></button>`;
 }
 
 VIEWS.goy = () => {
@@ -377,7 +377,7 @@ VIEWS.round = p => {
 /* ----- Stats: one golfer, and the whole society ----- */
 const fmt1 = v => v === null || v === undefined ? '–' : (Math.round(v * 10) / 10).toLocaleString('en-IE', { minimumFractionDigits: Number.isInteger(Math.round(v * 10) / 10) ? 0 : 1 });
 function scoreChart(entries, avg) {
-  const W = 340, H = 150, padL = 26, padB = 22, padT = 10, n = entries.length;
+  const W = 340, H = 168, padL = 28, padB = 24, padT = 24, n = entries.length;
   const max = Math.max(36, ...entries.map(e => e.total)), step = n > 1 ? (W - padL) / n : W - padL, bw = Math.min(34, step * 0.62);
   const y = v => padT + (H - padT - padB) * (1 - v / max);
   const bars = entries.map((e, i) => {
@@ -388,7 +388,7 @@ function scoreChart(entries, avg) {
   const aveLine = avg === null ? '' : `<line class="avg" x1="${padL}" x2="${W}" y1="${y(avg).toFixed(1)}" y2="${y(avg).toFixed(1)}"/>`;
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Stableford points in each round, average ${fmt1(avg)}">${grid}${bars}${aveLine}</svg>`;
 }
-const shortRound = e => { const w = String(e.name || '').replace(/\b(GC|Golf Club|Golf Links|Golf)\b/g, '').trim().split(/\s+/)[0] || ''; return w.length > 6 ? w.slice(0, 5) + '.' : w; };
+const shortRound = e => { const w = String(e.name || '').replace(/\b(GC|Golf Club|Golf Links|Golf)\b/g, '').trim().split(/\s+/)[0] || ''; return w.slice(0, 3); };
 function statRow(label, value, sub) { return `<div class="row"><span>${label}${sub ? `<span class="sub"> ${sub}</span>` : ''}</span><span class="b num">${value}</span></div>`; }
 function playerStatsBlock(pid) {
   const entries = playerEntries(pid);
@@ -518,6 +518,6 @@ VIEWS.who = p => {
   const list = D.regulars();
   return {
     html: `<header class="hero s">${UI.stack.length > 1 ? navBack('Back') : '<div class="nav"></div>'}<div class="head"><h1 class="title">Who are you?</h1></div><p class="sub">So your scores and card are yours.</p></header>
-      ${sec('', cardOf(list.map(m => `<button class="row" data-act="pick" data-id="${m.id}"><span class="${m.id === DB.prefs.me ? 'b' : ''}">${esc(m.name)}</span>${m.id === DB.prefs.me ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : chev}</button>`).join('')), false)}`
+      ${sec('', cardOf(list.map(m => `<button class="row" data-act="pick" data-id="${m.id}"><span class="lname${m.id === DB.prefs.me ? ' b' : ''}">${avBadge(m.id, m.id === DB.prefs.me ? 'is-me' : '')}<span class="ln"><span class="n">${esc(m.name)}</span>${m.full && m.full !== m.name ? `<span class="cap">${esc(m.full)}</span>` : ''}</span></span>${m.id === DB.prefs.me ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : chev}</button>`).join('')), false)}`
   };
 };

@@ -30,14 +30,14 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await shot('01-home', true);
   let t = await text();
   check('home: next round first, then Past rounds, Golfer of the Year, Players tiles, a quiet Organiser link, and no year in the header', !/2026 season/.test(t) && /Past rounds\s*8 played/.test(t) && /Golfer of the Year\s*Sean leads on 115/.test(t) && /Players\s*12 golfers/.test(t) && !!(await page.$('.foot [data-act="org"]')) && !(await page.$('.links [data-act="org"]')));
-  check('home: the list of past rounds is not on the front page', !/Kieran, Sean\s*32/.test(t));
+  check('home: the list of past rounds is not on the front page', !/Kieran, Sean/.test(t));
   await tap('[data-act="trip"]');
   t = await text();
   check('home: Trip standings tile opens the whole-trip table with a link to each day', /Marbella/.test(t) && /All 3 rounds count/.test(t) && (await page.$$('[data-act="leaderboard"]')).length === 3);
   await tap('[data-act="back"]');
   await tap('[data-act="rounds"]');
   t = await text();
-  check('past rounds screen lists all eight; Westport shows the tie', (await page.$$('[data-act="round"]')).length >= 8 && /Kieran, Sean\s*32/.test(t));
+  check('past rounds screen lists all eight; Westport shows the tie', (await page.$$('[data-act="round"]')).length >= 8 && /Kieran, Sean/.test(t));
 
   // A past trip round (GameBook order, KBs, contests, groups)
   await tap('[data-act="round"][data-rid="2026-rio-real"]');

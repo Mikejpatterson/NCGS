@@ -628,7 +628,7 @@ function buggyView(rid) {
     }
   });
   return {
-    html: `      ${!inMatch && groups.length > 1 ? `<div class="seg" style="margin-top:8px">${groups.map(g => `<button class="${g.id === gid ? 'on' : ''}" data-act="mgroup" data-gid="${g.id}" aria-pressed="${g.id === gid}">Group ${g.n}</button>`).join('')}</div>` : ''}
+    html: `      ${!inMatch && groups.length > 1 ? `<div class="seg pills grp">${groups.map(g => `<button class="${g.id === gid ? 'on' : ''}" data-act="mgroup" data-gid="${g.id}" aria-pressed="${g.id === gid}">Group ${g.n}</button>`).join('')}</div>` : ''}
       ${sec(`${pill(0)}<span class="sub" style="flex:1">${esc(L[0].long)}</span>`, '', true)}
       <div class="sec-label" style="margin-top:-4px">${pill(1)}<span class="sub" style="flex:1">${esc(L[1].long)}</span></div>
       ${cardOf(summary)}
@@ -740,7 +740,7 @@ function tripTable(list) {
     return { id: pid, name: D.nameOf(pid), per, total: per.reduce((s, v) => s + (v || 0), 0) };
   }), 'total', 'desc');
   const allFinal = list.every(r => r.status === 'final');
-  const cols = `grid-template-columns:26px minmax(0,1fr) repeat(${list.length},30px) 38px`;
+  const cols = `grid-template-columns:minmax(2.6ch,auto) minmax(0,1fr) repeat(${list.length},minmax(30px,auto)) minmax(38px,auto)`;
   return sec(`${label(`All ${list.length} rounds count`)}${allFinal ? '<span class="pill g">Final</span>' : '<span class="pill w">In progress</span>'}`,
     cardOf(`<div class="lrow" style="${cols};min-height:36px"><span></span><span></span>${list.map(r => `<span class="cap r">D${r.trip_day || r.seq}</span>`).join('')}<span class="cap r">Total</span></div>
     ${rows.map(row => `<button class="lrow" style="${cols}" data-act="player" data-pid="${row.id}"><span class="sub">${row.posLabel}</span>${avName(row, null, row.pos === 1)}${row.per.map(v => `<span class="r sub">${v === null ? '–' : v}</span>`).join('')}<span class="r b">${row.total}</span></button>`).join('')}`), true);
