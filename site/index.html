@@ -1292,9 +1292,42 @@ body { font-variant-numeric: tabular-nums; }
 .lnk.leaf .lnk-ic { background: #E3EFE6; }
 .feat::after { right: -38px; top: -52px; width: 140px; height: 140px; background: rgba(247, 197, 22, .16); }
 .ft-p b { position: relative; z-index: 2; }
+
+/* Glass v6: close to Apple's liquid glass. Almost clear, light blur so you can see through it,
+   bright rim light on the edges, and a clear lens for the chosen tab. */
+.tabs {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, .10) 55%, rgba(255, 255, 255, .20));
+  -webkit-backdrop-filter: blur(5px) saturate(190%) brightness(1.06); backdrop-filter: blur(5px) saturate(190%) brightness(1.06);
+  box-shadow:
+    inset 0 1.5px 1px -.5px rgba(255, 255, 255, .95),
+    inset 0 -1.5px 1px -.5px rgba(255, 255, 255, .55),
+    inset 1.5px 0 1px -1px rgba(255, 255, 255, .6),
+    inset -1.5px 0 1px -1px rgba(255, 255, 255, .6),
+    inset 0 0 18px rgba(255, 255, 255, .22),
+    0 0 0 .5px rgba(20, 35, 27, .16),
+    0 10px 28px rgba(20, 35, 27, .16);
+}
+.tabs::before { background: linear-gradient(180deg, rgba(255, 255, 255, .28), rgba(255, 255, 255, 0) 45%); }
+.tab { color: #14231B; font-weight: 700; text-shadow: 0 0 6px rgba(255, 255, 255, .95), 0 0 2px rgba(255, 255, 255, .9); }
+.tab svg { filter: drop-shadow(0 0 3px rgba(255, 255, 255, .9)); }
+.tab.on {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .34), rgba(255, 255, 255, .12) 60%, rgba(255, 255, 255, .26));
+  -webkit-backdrop-filter: blur(1.5px) saturate(210%) brightness(1.1); backdrop-filter: blur(1.5px) saturate(210%) brightness(1.1);
+  box-shadow:
+    inset 0 2px 1px -1px #fff,
+    inset 0 -2px 2px -1px rgba(255, 255, 255, .8),
+    inset 2px 0 2px -1.5px rgba(255, 255, 255, .8),
+    inset -2px 0 2px -1.5px rgba(255, 255, 255, .8),
+    inset 0 0 14px rgba(255, 255, 255, .35),
+    0 0 0 1px rgba(255, 255, 255, .5),
+    0 3px 10px rgba(20, 35, 27, .16);
+  color: var(--pine); font-weight: 800;
+}
+.tab.on svg { filter: drop-shadow(0 0 3px rgba(255, 255, 255, .9)); }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .tabs { background: rgba(255, 255, 255, .92); } }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141639","server":"5b0c6166"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141654","server":"5b0c6166"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
