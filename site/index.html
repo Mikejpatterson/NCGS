@@ -1410,9 +1410,12 @@ body { font-variant-numeric: tabular-nums; }
 @media (max-width: 380px) { .entry .stepper .pu, .entry .stepper .pu.on { padding: 0 10px; font-size: .8rem; margin-left: 2px; } }
 /* Score entry now keeps the tab bar: the Save button sits just above it */
 #app:not(.no-tabs) .entry .savebar { bottom: 0; padding-bottom: 6px; padding-top: 10px; background: linear-gradient(to top, var(--bg) 78%, rgba(250, 249, 244, 0)); box-shadow: none; }
+
+/* Let the page rubber-band at the bottom (and top, once the pull-to-refresh is done) like a normal iPhone app */
+#app { overscroll-behavior-y: auto; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141853","server":"562d6962"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141910","server":"562d6962"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
