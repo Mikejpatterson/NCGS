@@ -714,7 +714,7 @@ VIEWS.board = () => {
 
   const pillTxt = r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r);
   html += sec(`${label(esc(roundName(r)))}${pillTxt}`, cardOf(res.rows.map(x => {
-    const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1 && r.status === 'live')}<span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
+    const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
     return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')), true);
   if (res.kb.length) { const low = E.kbLowest(res.kb); html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''))); }
@@ -741,10 +741,10 @@ function tripTable(list) {
     return { id: pid, name: D.nameOf(pid), per, total: per.reduce((s, v) => s + (v || 0), 0) };
   }), 'total', 'desc');
   const allFinal = list.every(r => r.status === 'final');
-  const cols = `grid-template-columns:36px minmax(0,1fr) repeat(${list.length},32px) 40px`;
+  const cols = `grid-template-columns:26px minmax(0,1fr) repeat(${list.length},30px) 38px`;
   return sec(`${label(`All ${list.length} rounds count`)}${allFinal ? '<span class="pill g">Final</span>' : '<span class="pill w">In progress</span>'}`,
     cardOf(`<div class="lrow" style="${cols};min-height:36px"><span></span><span></span>${list.map(r => `<span class="cap r">D${r.trip_day || r.seq}</span>`).join('')}<span class="cap r">Total</span></div>
-    ${rows.map(row => `<button class="lrow" style="${cols}" data-act="player" data-pid="${row.id}"><span class="sub">${row.posLabel}</span><span class="${row.id === DB.prefs.me ? 'b' : ''}">${esc(row.name)}</span>${row.per.map(v => `<span class="r sub">${v === null ? '–' : v}</span>`).join('')}<span class="r b">${row.total}</span></button>`).join('')}`), true);
+    ${rows.map(row => `<button class="lrow" style="${cols}" data-act="player" data-pid="${row.id}"><span class="sub">${row.posLabel}</span>${avName(row, null, row.pos === 1)}${row.per.map(v => `<span class="r sub">${v === null ? '–' : v}</span>`).join('')}<span class="r b">${row.total}</span></button>`).join('')}`), true);
 }
 
 /* ----- Results card ----- */

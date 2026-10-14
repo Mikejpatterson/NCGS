@@ -1093,3 +1093,11 @@ body::before { display: none; }
   color: var(--pine);
 }
 .entright .pill.w2 { background: #fff; color: var(--sub); box-shadow: inset 0 0 0 1.5px rgba(20, 35, 27, .22); }
+.hero.s .tile .bignum, .hero.c:not(.pine) .tile .bignum { color: var(--text); }
+.hero.s .tile .cap, .hero.c:not(.pine) .tile .cap { color: var(--sub); }
+.hero.s .tile, .hero.c:not(.pine) .tile { background: #fff; box-shadow: var(--ring); }
+.hero.s .tile.flag, .hero.c:not(.pine) .tile.flag { background: var(--flag); box-shadow: none; }
+.hero.s .tile.flag .cap, .hero.s .tile.flag .bignum, .hero.c:not(.pine) .tile.flag .cap, .hero.c:not(.pine) .tile.flag .bignum { color: var(--pine); }
+.lrow[style*="repeat("] .av { width: 28px; height: 28px; font-size: .6rem; flex: none; }
+.lrow[style*="repeat("] .lname { gap: 8px; }
+.lrow[style*="repeat("] { column-gap: 6px; padding-inline: 12px; }

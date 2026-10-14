@@ -50,7 +50,7 @@ function miniBoard(r) {
   let show = rows.slice(0, 3);
   const mine = DB.prefs.me ? rows.find(x => x.id === DB.prefs.me) : null;
   if (mine && !show.includes(mine)) show = [show[0], show[1], mine];
-  return `<div class="mini num">${show.map(x => `<div class="mr${x.id === DB.prefs.me ? ' me' : ''}"><span class="mp">${esc(x.posLabel)}</span><span class="mn">${esc(x.name)}${x.id === DB.prefs.me ? ' <small>YOU</small>' : ''}</span><span class="mt">${x.total}</span></div>`).join('')}</div>`;
+  return `<div class="mini num">${show.map(x => `<div class="mr${x.id === DB.prefs.me ? ' me' : ''}"><span class="mp">${esc(x.posLabel)}</span><span class="mn">${esc(x.name)}</span><span class="mt">${x.total}</span></div>`).join('')}</div>`;
 }
 function homeHeadline(feature) {
   if (!feature) return 'No round booked yet';
@@ -306,7 +306,7 @@ function resultsBlock(r) {
   if (!res) return '';
   const app = res.source === 'app';
   let html = sec(label('Stableford'), cardOf(res.rows.map(x => {
-    const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1 && r.status === 'live')}<span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
+    const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
     return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')) + (res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : res.source === 'sheet' ? '<p class="cap note">From the society sheet</p>' : ''));
   if (res.kb.length) {
