@@ -1085,9 +1085,27 @@ body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 
 html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 body::before { display: none; }
 #app { position: fixed; top: env(safe-area-inset-top, 0px); right: 0; bottom: 0; left: 0; max-width: none; margin: 0; min-height: 0; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; scroll-padding-bottom: calc(var(--tabh, 90px) + 16px); padding-inline: max(16px, calc((100vw - 448px) / 2)); }
+.entright { display: inline-flex; align-items: center; gap: 10px; }
+.tee .entcard { margin-bottom: 4px; }
+
+/* Glass v5: frosted, slightly cool bar so the lighter lens clearly stands out */
+.tabs {
+  background: linear-gradient(180deg, rgba(228, 233, 229, .62), rgba(214, 221, 216, .50));
+  -webkit-backdrop-filter: blur(26px) saturate(200%) brightness(1.02); backdrop-filter: blur(26px) saturate(200%) brightness(1.02);
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .9), inset 0 -1px 0 rgba(255, 255, 255, .35), inset 0 0 0 1px rgba(255, 255, 255, .45), 0 14px 34px rgba(20, 35, 27, .22), 0 0 0 .5px rgba(20, 35, 27, .18);
+}
+.tabs::before { background: linear-gradient(180deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 50%); }
+.tab { text-shadow: none; color: #2B3630; }
+.tab svg { filter: none; }
+.tab.on {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(255, 255, 255, .78) 60%, rgba(255, 255, 255, .9));
+  box-shadow: inset 0 2px 1px -1px #fff, inset 0 -3px 4px -2px rgba(20, 35, 27, .10), inset 0 0 0 1px rgba(255, 255, 255, .9), 0 0 0 1px rgba(20, 35, 27, .09), 0 6px 14px rgba(20, 35, 27, .22);
+  color: var(--pine);
+}
+.entright .pill.w2 { background: #fff; color: var(--sub); box-shadow: inset 0 0 0 1.5px rgba(20, 35, 27, .22); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141136","server":"5b0c6166"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141146","server":"5b0c6166"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3531,8 +3549,9 @@ VIEWS.tee = () => {
   const clashRows = [...new Set(clash.map(c => c.hole))].map(hn => `<button class="row" data-act="conflict" data-n="${hn}"><span>Hole ${hn}</span><span class="right"><span class="pill w">Saved on two phones</span>${chev}</span></button>`).join('');
   return {
     tabs: 'hole',
-    html: `<div class="tee"><header class="hero c"><div class="hrow2"><button class="back-icon" data-act="home" aria-label="Home">${ICON.back}</button><h1 class="big"><button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${n}"><small>Hole</small>${n}<span class="hdown">${ICON.down}</span></button></h1>${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></div>
-      <div class="pills2"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span>${h.yards ? `<span class="fact">${h.yards}<b>yds</b></span>` : ''}${contest ? `<span class="pill flag">${CONTEST[contest.type]}</span>` : ''}</div></header>
+    html: `<div class="tee"><div class="entnav"><button class="entback" data-act="home" aria-label="Home">${ICON.back}<span>Home</span></button><span class="entright">${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></span></div>
+      <header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${n}"><b class="entn">${n}</b><span class="hdown">${ICON.down}</span></button></div><div class="entr"><b>Par ${h.par}</b><span>Index ${h.si}${h.yards ? ` · ${h.yards} yds` : ''}</span></div></div><div class="prog" role="img" aria-label="Hole ${n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === n ? 'cur' : k < n ? 'done' : ''}"></i>`).join('')}</div></header>
+      ${contest ? `<div class="pills2" style="margin-top:12px"><span class="pill flag">${CONTEST[contest.type]}</span></div>` : ''}
       ${clashRows ? sec('', cardOf(clashRows), true) : ''}
       ${teams}
       ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span>${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
