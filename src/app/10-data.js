@@ -206,6 +206,14 @@ function put(table, rows, log) { send({ op: 'put', table, rows, pin: ORGPIN.pin,
 function removeRows(table, rows, log) { send({ op: 'remove', table, rows, pin: ORGPIN.pin, log }); }
 
 /* ----- Reading the data ----- */
+/* Groups and KB pairs go together: a round with groups always shows valid KB pairs, even if none were saved yet (the same on every phone) */
+function withKb(list) {
+  return list.map(r => {
+    if (!r.groups || r.groups.length < 2 || E.kbValid(r.groups, r.kb)) return r;
+    const kb = E.kbEffective(r, list.filter(x => x.id !== r.id));
+    return kb ? Object.assign({}, r, { kb }) : r;
+  });
+}
 const D = {
   members: () => memo('members', () => view().members.slice().sort((a, b) => a.name.localeCompare(b.name))),
   active: () => D.members().filter(m => m.active !== false),
@@ -216,8 +224,8 @@ const D = {
   nameOf: id => (D.member(id) || { name: id || '' }).name,
   courses: () => view().courses.slice().sort((a, b) => a.name.localeCompare(b.name)),
   course: id => view().courses.find(c => c.id === id) || null,
-  rounds: () => memo('rounds', () => view().rounds.slice().sort((a, b) => (a.season || 0) - (b.season || 0) || (a.seq || 0) - (b.seq || 0) || String(a.date || '').localeCompare(String(b.date || '')))),
-  round: id => view().rounds.find(r => r.id === id) || null,
+  rounds: () => memo('rounds', () => withKb(view().rounds).slice().sort((a, b) => (a.season || 0) - (b.season || 0) || (a.seq || 0) - (b.seq || 0) || String(a.date || '').localeCompare(String(b.date || '')))),
+  round: id => D.rounds().find(r => r.id === id) || null,
   setting: (k, d) => { const s = view().settings.find(x => x.key === k); return s && s.value !== null && s.value !== '' ? s.value : d; },
   scores: rid => memo('sc:' + rid, () => {
     const out = {};

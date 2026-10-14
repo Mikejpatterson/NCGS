@@ -356,3 +356,27 @@ test('KB pairs: when every partner has been used, it still pairs people and repo
   assert.equal(res.pairs.length, 2);
   assert.equal(res.repeats.length, 2);
 });
+
+test('KB pairs go with the groups: valid pairs are kept, missing or stale pairs are worked out again, the same on every phone', () => {
+  const ids = Array.from({ length: 12 }, (_, i) => 'p' + i);
+  const groups = E.randomDraw(ids, [], 11, []).groups;
+  const round = { id: '2026-x', groups, kb: null };
+  const kb1 = E.kbEffective(round, []);
+  assert.ok(E.kbValid(groups, kb1), 'a drawn round always has valid KB pairs');
+  assert.deepEqual(E.kbEffective(round, []), kb1, 'same groups and history, same pairs');
+  assert.deepEqual(E.kbEffective(Object.assign({}, round, { kb: kb1 }), []), kb1, 'saved valid pairs are kept as they are');
+  // groups change so a saved pair now sits in one group: it is replaced, not kept
+  const g = groups.map(x => ({ ...x }));
+  const [a, b] = kb1[0];
+  const gA = g.find(x => x.teams.flat().includes(a)), gB = g.find(x => x.teams.flat().includes(b));
+  assert.ok(gA.id !== gB.id);
+  const moved = groups.map(x => x.id === gA.id ? x : { ...x, teams: x.teams.map(t => t.filter(p => p !== b)) });
+  const stale = { id: '2026-x', groups: moved.map(x => x.id === gA.id ? { ...x, teams: [x.teams[0].concat([b]), ...x.teams.slice(1)] } : x), kb: kb1 };
+  assert.ok(!E.kbValid(stale.groups, stale.kb));
+  assert.ok(E.kbValid(stale.groups, E.kbEffective(stale, [])), 'stale pairs are redrawn to fit the new groups');
+  // earlier rounds' pairs are avoided
+  const earlier = { id: '2026-a', kb: kb1.slice() };
+  const next = E.kbEffective({ id: '2026-y', groups: E.randomDraw(ids, [], 12, []).groups, kb: null }, [earlier]);
+  const old = new Set(kb1.map(p => p.slice().sort().join('+')));
+  assert.equal(next.filter(p => old.has(p.slice().sort().join('+'))).length, 0, 'no repeat partners');
+});

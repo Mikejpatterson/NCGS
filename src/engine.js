@@ -484,6 +484,34 @@
     return best || { pairs: [], spare: ids, repeats: [] };
   }
 
+  /** A KB list is only good if it matches the groups: pairs of two, in different groups, nobody twice, everyone paired bar one. */
+  function kbValid(groups, kb) {
+    if (!Array.isArray(kb) || !kb.length || !Array.isArray(groups) || groups.length < 2) return false;
+    const groupOf = {};
+    groups.forEach(g => g.teams.flat().forEach(pid => { groupOf[pid] = g.id; }));
+    const n = Object.keys(groupOf).length, seen = new Set();
+    for (const pr of kb) {
+      if (!Array.isArray(pr) || pr.length !== 2) return false;
+      const [a, b] = pr;
+      if (!groupOf[a] || !groupOf[b] || groupOf[a] === groupOf[b] || seen.has(a) || seen.has(b)) return false;
+      seen.add(a); seen.add(b);
+    }
+    return seen.size >= n - 1;
+  }
+
+  /** The KB pairs a round should have. Groups and KB pairs go together: if the saved pairs are missing or no longer fit the groups,
+   *  work them out from the groups. The same groups and history always give the same answer, so every phone agrees. */
+  function kbEffective(round, others) {
+    if (!round || !round.groups || round.groups.length < 2) return round ? round.kb || null : null;
+    if (kbValid(round.groups, round.kb)) return round.kb;
+    const history = (others || []).slice().sort((x, y) => String(x.id).localeCompare(String(y.id)))
+      .flatMap(x => (x.kb && x.kb.length ? x.kb : ((x.results && x.results.kb) || []).map(k => [k[0], k[1]])));
+    let h = 7;
+    for (const ch of String(round.id)) h = (h * 31 + ch.charCodeAt(0)) % 99991;
+    const res = kbPairsFor(round.groups, h + 1, history);
+    return res.pairs.length ? res.pairs : null;
+  }
+
   /* ---------- Countback and season tables ---------- */
 
   /** Countback as the society uses it: back 9, back 6, back 3, then the 18th, 17th and backwards.
@@ -675,7 +703,7 @@
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,
-    teamsFor, groupSizes, addMinutes, teeTimesFrom, makeGroups, randomDraw, shuffle, kbPairsFor,
+    kbValid, kbEffective, teamsFor, groupSizes, addMinutes, teeTimesFrom, makeGroups, randomDraw, shuffle, kbPairsFor,
     countbackKey, compareKeys, rankByKey, finalOrder, kbStandings, goyStandings, scoreMark, pickupStrokes
   };
 });

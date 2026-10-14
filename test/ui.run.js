@@ -241,6 +241,12 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   check('first phone\'s scores kept', kept.every(v => v === 4), JSON.stringify(kept));
   await page2.close();
 
+  // Groups and KB pairs go together: a round with groups and nothing saved for KBs still shows valid pairs
+  await page.evaluate(() => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const base = n.D.round('demo-cabopino'); n.put('rounds', [Object.assign({}, base, { id: 'kb-none', name: 'KB none', status: 'upcoming', kb: null, date: '2026-12-01' })]); n.DB.prefs.me = 'mike-p'; n.UI.rtab = 'kb'; n.UI.stack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'kb-none' } }]; n.render(); });
+  await page.waitForTimeout(250);
+  check('a round with groups always shows KB pairs, none left out', (await page.$$('.kbcard')).length === 6 && !/not drawn yet/.test(await text()));
+  await page.evaluate(() => { const n = window.__ncgs; n.UI.rtab = 'groups'; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); });
+
   // Organiser
   await page.evaluate(() => { window.__ncgs.UI.org = false; });
   await tap('.tab[data-tab="home"]');
