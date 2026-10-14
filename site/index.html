@@ -1143,9 +1143,112 @@ body::before { display: none; }
 /* Results selector: always 2 x 2 equal pills */
 .seg.pills.four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .seg.pills.four button { font-size: .95rem; letter-spacing: 0; min-height: 46px; }
+
+/* =====================================================================
+   DESIGN SYSTEM PASS
+   One type scale, tabular figures, minimum sizes, 44px touch targets,
+   one selector style, meaningful colour only.
+   ===================================================================== */
+:root {
+  --fs-label: .74rem; --fs-cap: .82rem; --fs-sub: .9rem; --fs-body: 1rem; --fs-lead: 1.2rem;
+  --r-card: 24px; --tap: 44px;
+}
+body { font-variant-numeric: tabular-nums; }
+
+/* The page already starts below the clock, so headers need no extra gap there */
+.hero.s, .hero.c:not(.pine) { padding-top: 12px; }
+
+/* Nothing smaller than 12px except tiny caps labels (which are bold and spaced) */
+.tab { font-size: .72rem; }
+.dchip small { font-size: .7rem; }
+.idx small { font-size: .68rem; }
+.av.sm { font-size: .62rem; }
+.entry .stv small { font-size: .74rem; }
+.mr .mn small { font-size: .7rem; }
+.sc thead th, .sc thead th.hn { font-size: .7rem; }
+.chart text { font-size: 11px; }
+.chart text.v { font-size: 12px; font-weight: 700; }
+
+/* Figures in leaderboards keep room for three digits so 99 to 100 never shifts anything */
+.lrow .b.r, .lrow .r.b, .lrow .tot { min-width: 3ch; text-align: right; }
+.lrow.goy { grid-template-columns: 30px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
+.lrow.goy .tot { font-size: 1.7rem; font-weight: 900; letter-spacing: -.03em; min-width: 3.2ch; }
+.lrow.goy .lname .cap { display: block; margin-top: 4px; }
+.lrow.goy .chips { display: inline-flex; gap: 4px; }
+.lrow.goy .chipn { min-width: 30px; height: 22px; padding: 0 6px; font-size: .78rem; border-radius: 11px; }
+.lrow.goy .av { display: grid; width: 38px; height: 38px; font-size: .68rem; flex: none; }
+@media (max-width: 360px) { .lrow.goy .av { display: grid; } }
+
+/* Past rounds: date chip, course and winner, then the winner badge and score */
+.prow .two { gap: 2px; }
+.prow .two .b { font-size: 1.05rem; line-height: 1.2; overflow-wrap: anywhere; }
+.prow .two .sub { font-size: var(--fs-cap); line-height: 1.25; white-space: normal; }
+.prow .wn { gap: 8px; flex: none; }
+.chipn.scorechip { min-width: 40px; height: 30px; font-size: 1rem; font-weight: 800; border-radius: 15px; padding: 0 10px; }
+
+/* Scoring: every control is at least 44px tall */
+.entry .stepper .pu, .entry .stepper .pu.on { height: 44px; min-height: 44px; padding: 0 16px; border-radius: 22px; font-size: .86rem; white-space: nowrap; overflow: visible; width: auto; margin-left: 8px; margin-top: 4px; }
+.entry .pr-top .nm { min-height: 44px; }
+.entry .pr { min-height: 100px; }
+.entr .undochip { min-height: 44px; }
+.askbar .mic, .askbar .send, .askbar .stop, .askbar .x { min-width: 44px; min-height: 44px; width: 44px; height: 44px; }
+
+/* One selector style everywhere: round pills. Groups on the Buggy Wars tab use it too. */
+.seg.pills.grp { margin: 12px 0 8px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.seg.pills.grp button { font-size: .95rem; }
+
+/* Stats tiles: calm and consistent. Green for good things, plain grey for the rough ones. */
+.stile.tf, .stile.tb { --tone: var(--green); --soft: var(--green-soft); }
+.stile.tr { --tone: #55625A; --soft: #EEF0EA; }
+
+/* Who are you / Players style rows */
+.row .lname { gap: 12px; }
+.row .lname .cap { display: block; }
+
+/* Ruling suggestions read as tappable cards */
+.idea { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 56px; padding: 12px 16px; border-radius: 20px; box-shadow: var(--ring); }
+.idea::after { content: ""; flex: none; width: 8px; height: 8px; border-top: 2px solid var(--faint); border-right: 2px solid var(--faint); transform: rotate(45deg); }
+.ask-ideas { gap: 10px; }
+
+/* Chart card breathes */
+.chartcard { padding: 14px 14px 8px; }
+.entry .pr { grid-template-columns: 40px minmax(0, 1fr) 48px 66px 48px; column-gap: 6px; padding-inline: 14px; }
+.entry .stepper .pu, .entry .stepper .pu.on { padding: 0 14px; }
+.entry .stepper .pu, .entry .stepper .pu.on { width: max-content; flex: none; }
+
+/* Trip table: day scores quiet, total strong */
+.lrow[style*="repeat("] .r.sub { font-weight: 600; color: var(--sub); }
+.lrow[style*="repeat("] .r.b { font-weight: 900; font-size: 1.1rem; }
+
+/* Stats summary tiles: three calm cards, number in pine */
+.sumtiles > div { background: #fff !important; box-shadow: var(--ring); color: var(--text); }
+.sumtiles b { color: var(--pine); }
+.sumtiles .cap { color: var(--sub); }
+
+/* Ruling: the lead line is a sentence, not a second title */
+.ask-intro .b { font-size: var(--fs-lead); font-weight: 800; }
+
+/* Home: one heavy green card (today's round). Golfer of the Year is a light card with a gold medal. */
+.feat { background: #fff; color: var(--text); box-shadow: var(--ring); }
+.feat::after { background: rgba(247, 197, 22, .20); }
+.ft-k { color: #7A5200; }
+.ft-k svg { color: #C98F00; }
+.ft-p { color: var(--sub); }
+.ft-p b { color: var(--pine); }
+.ft-foot { color: var(--sub); }
+.ft-foot .stack .av { box-shadow: 0 0 0 2px #fff; }
+.ft-me { color: var(--pine); }
+.hero.home { padding: 12px 0 0; }
+.hero.s, .hero.c:not(.pine) { padding-inline: 0; }
+
+/* Position column grows with the text size; captions under names may wrap rather than clip */
+.lrow, .lrow.drop { grid-template-columns: minmax(2.4ch, auto) minmax(0, 1fr) auto; }
+.lrow .ln, .lname > .ln { overflow: visible; }
+.lname .ln .cap { white-space: normal; }
+.grow .b.num { white-space: nowrap; min-width: 4.6ch; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141250","server":"5b0c6166"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141553","server":"5b0c6166"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2591,7 +2694,7 @@ function initialsOf(m) {
 }
 
 /* A name with its initials badge, for leaderboard rows. Bold when it is you; the badge is flag-yellow for the leader. */
-const avName = (x, sub, lead) => { const me = x.id === DB.prefs.me; return `<span class="lname${me ? ' b' : ''}"><i class="av${me ? ' is-me' : lead ? ' is-lead' : ''}" aria-hidden="true">${esc(initialsOf(D.member(x.id)))}</i><span class="ln"><span class="n">${esc(x.name)}</span>${sub ? `<span class="cap">${esc(sub)}</span>` : ''}</span></span>`; };
+const avName = (x, sub, lead, raw) => { const me = x.id === DB.prefs.me; return `<span class="lname${me ? ' b' : ''}"><i class="av${me ? ' is-me' : lead ? ' is-lead' : ''}" aria-hidden="true">${esc(initialsOf(D.member(x.id)))}</i><span class="ln"><span class="n">${esc(x.name)}</span>${sub ? `<span class="cap">${raw ? sub : esc(sub)}</span>` : ''}</span></span>`; };
 /* The small line under a name on a live leaderboard: how far ahead the leader is, and how many holes they have played. */
 const lbSub = (rows, x, r) => { if (!r || r.status !== 'live' || x.thru === undefined) return ''; const next = rows[1]; return rows[0] === x && next && x.total > next.total ? `Leads by ${x.total - next.total} \u00b7 thru ${x.thru}` : `thru ${x.thru}`; };
 
@@ -3039,8 +3142,8 @@ function pastRow(r) {
   const top = res && res.rows ? res.rows.filter(x => x.pos === 1) : [];
   const d = r.date ? parseDay(r.date) : null;
   const when = d ? `<span class="dchip"><b>${d.getDate()}</b><small>${MONTHS[d.getMonth()].slice(0, 3)}</small></span>` : `<span class="dchip none">${sized(ICON.flagpin, 22)}</span>`;
-  const sub = [r.trip, r.course_name].filter(Boolean)[0] || '';
-  const win = top.length ? `<span class="wn">${avStack(top.slice(0, 2).map(x => x.id))}<span class="wn-t"><span class="wn-n">${esc(top.map(x => x.name).join(', '))}</span><span class="chipn">${top[0].total}</span></span></span>` : '';
+  const sub = [[r.trip, r.course_name].filter(Boolean)[0], top.length ? top.map(x => x.name).join(', ') : ''].filter(Boolean).join(' \u00b7 ');
+  const win = top.length ? `<span class="wn">${avStack(top.slice(0, 2).map(x => x.id))}<span class="chipn scorechip">${top[0].total}</span></span>` : '';
   return `<button class="row tall prow" data-act="round" data-rid="${r.id}">${when}<span class="two"><span class="b">${esc(roundName(r))}</span>${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</span><span class="right">${win}${chev}</span></button>`;
 }
 const statusPill = r => {
@@ -3172,7 +3275,7 @@ VIEWS.players = () => {
 };
 
 function goyRow(x) {
-  return `<button class="lrow goy" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span>${avName(x)}<span class="chips">${x.counting.map(c => `<i class="chipn">${c.pts}</i>`).join('')}</span><span class="b r">${x.total}</span></button>`;
+  return `<button class="lrow goy" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span>${avName(x, `<span class="chips">${x.counting.map(c => `<i class="chipn">${c.pts}</i>`).join('')}</span>`, false, true)}<span class="b r tot">${x.total}</span></button>`;
 }
 
 VIEWS.goy = () => {
@@ -3400,7 +3503,7 @@ VIEWS.round = p => {
 /* ----- Stats: one golfer, and the whole society ----- */
 const fmt1 = v => v === null || v === undefined ? '–' : (Math.round(v * 10) / 10).toLocaleString('en-IE', { minimumFractionDigits: Number.isInteger(Math.round(v * 10) / 10) ? 0 : 1 });
 function scoreChart(entries, avg) {
-  const W = 340, H = 150, padL = 26, padB = 22, padT = 10, n = entries.length;
+  const W = 340, H = 168, padL = 28, padB = 24, padT = 24, n = entries.length;
   const max = Math.max(36, ...entries.map(e => e.total)), step = n > 1 ? (W - padL) / n : W - padL, bw = Math.min(34, step * 0.62);
   const y = v => padT + (H - padT - padB) * (1 - v / max);
   const bars = entries.map((e, i) => {
@@ -3411,7 +3514,7 @@ function scoreChart(entries, avg) {
   const aveLine = avg === null ? '' : `<line class="avg" x1="${padL}" x2="${W}" y1="${y(avg).toFixed(1)}" y2="${y(avg).toFixed(1)}"/>`;
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Stableford points in each round, average ${fmt1(avg)}">${grid}${bars}${aveLine}</svg>`;
 }
-const shortRound = e => { const w = String(e.name || '').replace(/\b(GC|Golf Club|Golf Links|Golf)\b/g, '').trim().split(/\s+/)[0] || ''; return w.length > 6 ? w.slice(0, 5) + '.' : w; };
+const shortRound = e => { const w = String(e.name || '').replace(/\b(GC|Golf Club|Golf Links|Golf)\b/g, '').trim().split(/\s+/)[0] || ''; return w.slice(0, 3); };
 function statRow(label, value, sub) { return `<div class="row"><span>${label}${sub ? `<span class="sub"> ${sub}</span>` : ''}</span><span class="b num">${value}</span></div>`; }
 function playerStatsBlock(pid) {
   const entries = playerEntries(pid);
@@ -3541,7 +3644,7 @@ VIEWS.who = p => {
   const list = D.regulars();
   return {
     html: `<header class="hero s">${UI.stack.length > 1 ? navBack('Back') : '<div class="nav"></div>'}<div class="head"><h1 class="title">Who are you?</h1></div><p class="sub">So your scores and card are yours.</p></header>
-      ${sec('', cardOf(list.map(m => `<button class="row" data-act="pick" data-id="${m.id}"><span class="${m.id === DB.prefs.me ? 'b' : ''}">${esc(m.name)}</span>${m.id === DB.prefs.me ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : chev}</button>`).join('')), false)}`
+      ${sec('', cardOf(list.map(m => `<button class="row" data-act="pick" data-id="${m.id}"><span class="lname${m.id === DB.prefs.me ? ' b' : ''}">${avBadge(m.id, m.id === DB.prefs.me ? 'is-me' : '')}<span class="ln"><span class="n">${esc(m.name)}</span>${m.full && m.full !== m.name ? `<span class="cap">${esc(m.full)}</span>` : ''}</span></span>${m.id === DB.prefs.me ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : chev}</button>`).join('')), false)}`
   };
 };
 
@@ -4176,7 +4279,7 @@ function buggyView(rid) {
     }
   });
   return {
-    html: `      ${!inMatch && groups.length > 1 ? `<div class="seg" style="margin-top:8px">${groups.map(g => `<button class="${g.id === gid ? 'on' : ''}" data-act="mgroup" data-gid="${g.id}" aria-pressed="${g.id === gid}">Group ${g.n}</button>`).join('')}</div>` : ''}
+    html: `      ${!inMatch && groups.length > 1 ? `<div class="seg pills grp">${groups.map(g => `<button class="${g.id === gid ? 'on' : ''}" data-act="mgroup" data-gid="${g.id}" aria-pressed="${g.id === gid}">Group ${g.n}</button>`).join('')}</div>` : ''}
       ${sec(`${pill(0)}<span class="sub" style="flex:1">${esc(L[0].long)}</span>`, '', true)}
       <div class="sec-label" style="margin-top:-4px">${pill(1)}<span class="sub" style="flex:1">${esc(L[1].long)}</span></div>
       ${cardOf(summary)}
@@ -4288,7 +4391,7 @@ function tripTable(list) {
     return { id: pid, name: D.nameOf(pid), per, total: per.reduce((s, v) => s + (v || 0), 0) };
   }), 'total', 'desc');
   const allFinal = list.every(r => r.status === 'final');
-  const cols = `grid-template-columns:26px minmax(0,1fr) repeat(${list.length},30px) 38px`;
+  const cols = `grid-template-columns:minmax(2.6ch,auto) minmax(0,1fr) repeat(${list.length},minmax(30px,auto)) minmax(38px,auto)`;
   return sec(`${label(`All ${list.length} rounds count`)}${allFinal ? '<span class="pill g">Final</span>' : '<span class="pill w">In progress</span>'}`,
     cardOf(`<div class="lrow" style="${cols};min-height:36px"><span></span><span></span>${list.map(r => `<span class="cap r">D${r.trip_day || r.seq}</span>`).join('')}<span class="cap r">Total</span></div>
     ${rows.map(row => `<button class="lrow" style="${cols}" data-act="player" data-pid="${row.id}"><span class="sub">${row.posLabel}</span>${avName(row, null, row.pos === 1)}${row.per.map(v => `<span class="r sub">${v === null ? '–' : v}</span>`).join('')}<span class="r b">${row.total}</span></button>`).join('')}`), true);
