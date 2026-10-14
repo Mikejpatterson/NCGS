@@ -940,9 +940,13 @@ html, body { background: var(--bg); }
 
 /* Anything scrolled or tabbed into view lands above the floating tab bar, not under it */
 html { scroll-padding-bottom: calc(var(--tabh, 90px) + 16px); }
+
+/* Pull to refresh: the page behind is warm white now, so the ring and words are pine, not white */
+#ptr { color: var(--pine); }
+.ptr-ring { width: 30px; height: 30px; border: 3.5px solid rgba(11, 61, 46, .18); border-top-color: var(--pine); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610140536","server":"5b0c6166"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610140541","server":"5b0c6166"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.

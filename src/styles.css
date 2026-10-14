@@ -930,3 +930,7 @@ html, body { background: var(--bg); }
 
 /* Anything scrolled or tabbed into view lands above the floating tab bar, not under it */
 html { scroll-padding-bottom: calc(var(--tabh, 90px) + 16px); }
+
+/* Pull to refresh: the page behind is warm white now, so the ring and words are pine, not white */
+#ptr { color: var(--pine); }
+.ptr-ring { width: 30px; height: 30px; border: 3.5px solid rgba(11, 61, 46, .18); border-top-color: var(--pine); }
