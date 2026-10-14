@@ -202,12 +202,21 @@ ORG.groupsview = p => {
   return { html: `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups and buggies</h1></div></header>${groupsBlock(r, false)}` };
 };
 
+/* Every KB pair from the other rounds (rounds scored in the app, and imported ones), so a new draw can avoid repeat partners */
+function priorKbPairs(rid) {
+  return D.rounds().filter(x => x.id !== rid).flatMap(x => (x.kb && x.kb.length ? x.kb : ((x.results && x.results.kb) || []).map(k => [k[0], k[1]])));
+}
 ORG.kb = p => {
   const r = D.round(p.rid);
   const d = UI.kbDraft && UI.kbDraft.rid === r.id ? UI.kbDraft : (UI.kbDraft = { rid: r.id, pairs: r.kb ? clone(r.kb) : [], sel: null });
   let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">KBs</h1></div></header>`;
   if (!r.groups || !r.groups.length) return { html: html + sec('', cardOf('<div class="row sub">Draw the groups first</div>'), true) };
+  if (!d.pairs.length && !r.kb) { const res = E.kbPairsFor(r.groups, (Date.now() % 100000) + 3, priorKbPairs(r.id)); d.pairs = res.pairs; }   // start from a fresh draw: just check it and save
   if (!d.pairs.length) return { html: html + `<button class="btn" data-act="org-kb-make">Make KB pairs</button>` };
+  const seenKb = new Set(priorKbPairs(r.id).map(pr => [pr[0], pr[1]].sort().join('+')));
+  const again = d.pairs.filter(pr => seenKb.has([pr[0], pr[1]].sort().join('+')));
+  if (again.length) html += `<p class="cap note">${again.map(pr => esc(pr.map(D.nameOf).join(' & '))).join(', ')} ${again.length === 1 ? 'have' : 'have'} been KB partners before.</p>`;
+  else html += '<p class="cap note">No repeat partners.</p>';
   html += sec('', cardOf(d.pairs.map(pr => `<div class="row">${pr.map(pid => `<button class="chip${d.sel === pid ? ' on' : ''}" data-act="org-kb-swap" data-pid="${pid}">${esc(D.nameOf(pid))}</button>`).join('<span class="sub">&</span>')}</div>`).join('')), true);
   html += `<button class="btn" data-act="org-kb-save">Save KBs</button><div class="foot"><button class="link" data-act="org-kb-make">Shuffle</button><button class="link c-b" data-act="org-kb-clear">No KBs</button></div>`;
   return { html };

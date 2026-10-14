@@ -1452,7 +1452,7 @@ body { font-variant-numeric: tabular-nums; }
 .mgk { white-space: nowrap; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141937","server":"562d6962"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141947","server":"562d6962"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1912,24 +1912,32 @@ body { font-variant-numeric: tabular-nums; }
     return { groups, repeats: flagRepeats(groups, priorRoundsGroups || []) };
   }
 
-  /** KB pairs: partners always in different groups. */
-  function kbPairsFor(groups, seed) {
+  /** KB pairs: partners always in different groups, and (when it can be done) nobody paired with someone
+   *  they have already been paired with. history: earlier KB pairs, [[a, b], ...]. Returns the draw with the
+   *  fewest repeats found; repeats lists any pair that could not be avoided. */
+  function kbPairsFor(groups, seed, history) {
     const groupOf = {};
     groups.forEach(g => g.teams.flat().forEach(pid => { groupOf[pid] = g.id; }));
     const ids = Object.keys(groupOf);
-    for (let attempt = 0; attempt < 200; attempt++) {
+    const seen = new Set((history || []).filter(pr => pr && pr.length === 2).map(pr => pairKey(pr[0], pr[1])));
+    let best = null;
+    for (let attempt = 0; attempt < 400; attempt++) {
       const pool = shuffle(ids, (seed || 1) + attempt * 7919);
       const pairs = [];
       let ok = true;
       while (pool.length > 1 && ok) {
         const a = pool.shift();
-        const j = pool.findIndex(b => groupOf[b] !== groupOf[a]);
+        let j = pool.findIndex(b => groupOf[b] !== groupOf[a] && !seen.has(pairKey(a, b)));
+        if (j < 0) j = pool.findIndex(b => groupOf[b] !== groupOf[a]);
         if (j < 0) { ok = false; break; }
         pairs.push([a, pool.splice(j, 1)[0]]);
       }
-      if (ok) return { pairs, spare: pool };
+      if (!ok) continue;
+      const repeats = pairs.filter(pr => seen.has(pairKey(pr[0], pr[1])));
+      if (!best || repeats.length < best.repeats.length) best = { pairs, spare: pool, repeats };
+      if (!repeats.length) break;
     }
-    return { pairs: [], spare: ids };
+    return best || { pairs: [], spare: ids, repeats: [] };
   }
 
   /* ---------- Countback and season tables ---------- */
@@ -3715,12 +3723,12 @@ VIEWS.round = p => {
   }
   const mine = myGroup(r.id);
   const hasKb = !!(r.kb && r.kb.length);
-  const tabsAvail = ['groups'].concat(hasKb ? ['kb'] : [], ['weather', 'course']);
+  const tabsAvail = ['groups', 'kb', 'weather', 'course'];
   const rt = tabsAvail.includes(UI.rtab) ? UI.rtab : 'groups';
   const tabName = { groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
   const pillsHtml = `<div class="seg pills rtabs${tabsAvail.length > 3 ? ' four' : ''}" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${tabName[k]}</button>`).join('')}</div>`;
   const courseBody = c && c.about ? `<p class="prose">${esc(c.about)}</p>` : '<p class="prose sub">No course notes yet.</p>';
-  const roundBody = rt === 'groups' ? groupCards(r) : rt === 'kb' ? kbCards(r) : rt === 'weather' ? (forecast(r) || sec('', cardOf('<div class="row"><span class="sub">No forecast yet. It appears in the 9 days before the round.</span></div>'), true)) : sec('', courseBody, true);
+  const roundBody = rt === 'groups' ? groupCards(r) : rt === 'kb' ? (hasKb ? kbCards(r) : sec('', cardOf('<div class="row"><span class="sub">KB pairs are not drawn yet</span></div>'), true)) : rt === 'weather' ? (forecast(r) || sec('', cardOf('<div class="row"><span class="sub">No forecast yet. It appears in the 9 days before the round.</span></div>'), true)) : sec('', courseBody, true);
   const playable = canScore(r) && (r.status === 'live' || (r.status === 'upcoming' && (!r.date || daysFromToday(r.date) <= 0)));
   if (playable) {
     if (!DB.prefs.me || !mine) html += `<button class="btn" data-act="play" data-rid="${r.id}">Play now</button>`;
@@ -5198,12 +5206,21 @@ ORG.groupsview = p => {
   return { html: `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups and buggies</h1></div></header>${groupsBlock(r, false)}` };
 };
 
+/* Every KB pair from the other rounds (rounds scored in the app, and imported ones), so a new draw can avoid repeat partners */
+function priorKbPairs(rid) {
+  return D.rounds().filter(x => x.id !== rid).flatMap(x => (x.kb && x.kb.length ? x.kb : ((x.results && x.results.kb) || []).map(k => [k[0], k[1]])));
+}
 ORG.kb = p => {
   const r = D.round(p.rid);
   const d = UI.kbDraft && UI.kbDraft.rid === r.id ? UI.kbDraft : (UI.kbDraft = { rid: r.id, pairs: r.kb ? clone(r.kb) : [], sel: null });
   let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">KBs</h1></div></header>`;
   if (!r.groups || !r.groups.length) return { html: html + sec('', cardOf('<div class="row sub">Draw the groups first</div>'), true) };
+  if (!d.pairs.length && !r.kb) { const res = E.kbPairsFor(r.groups, (Date.now() % 100000) + 3, priorKbPairs(r.id)); d.pairs = res.pairs; }   // start from a fresh draw: just check it and save
   if (!d.pairs.length) return { html: html + `<button class="btn" data-act="org-kb-make">Make KB pairs</button>` };
+  const seenKb = new Set(priorKbPairs(r.id).map(pr => [pr[0], pr[1]].sort().join('+')));
+  const again = d.pairs.filter(pr => seenKb.has([pr[0], pr[1]].sort().join('+')));
+  if (again.length) html += `<p class="cap note">${again.map(pr => esc(pr.map(D.nameOf).join(' & '))).join(', ')} ${again.length === 1 ? 'have' : 'have'} been KB partners before.</p>`;
+  else html += '<p class="cap note">No repeat partners.</p>';
   html += sec('', cardOf(d.pairs.map(pr => `<div class="row">${pr.map(pid => `<button class="chip${d.sel === pid ? ' on' : ''}" data-act="org-kb-swap" data-pid="${pid}">${esc(D.nameOf(pid))}</button>`).join('<span class="sub">&</span>')}</div>`).join('')), true);
   html += `<button class="btn" data-act="org-kb-save">Save KBs</button><div class="foot"><button class="link" data-act="org-kb-make">Shuffle</button><button class="link c-b" data-act="org-kb-clear">No KBs</button></div>`;
   return { html };
@@ -5623,13 +5640,14 @@ const ACT = {
     const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
     const groups = d.groups.map((g, i) => ({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }));
     const ids = new Set(groups.flatMap(g => g.teams.flat()));
-    const kb = r.kb && r.kb.every(pr => pr.every(pid => ids.has(pid))) ? r.kb : null;
+    let kb = r.kb && r.kb.every(pr => pr.every(pid => ids.has(pid))) ? r.kb : null;
+    if (!kb) { const res = E.kbPairsFor(groups, (Date.now() % 100000) + 3, priorKbPairs(r.id)); kb = res.pairs.length ? res.pairs : null; }   // every drawn round gets KB pairs, no repeat partners
     put('rounds', [Object.assign({}, r, { groups, kb })], { action: 'Groups saved', detail: `${roundName(r)}: ${groups.map(g => `${g.teeTime} ${g.teams.map(t => t.map(D.nameOf).join(' & ')).join(' v ')}`).join('; ')}` });
     UI.draft = null;
     back();
-    toast('Groups saved');
+    toast('Groups and KB pairs saved');
   },
-  'org-kb-make': () => { const r = D.round(cur().p.rid); const res = E.kbPairsFor(r.groups, (Date.now() % 100000) + 3); UI.kbDraft = { rid: r.id, pairs: res.pairs, sel: null }; render(); },
+  'org-kb-make': () => { const r = D.round(cur().p.rid); const res = E.kbPairsFor(r.groups, (Date.now() % 100000) + 3, priorKbPairs(r.id)); UI.kbDraft = { rid: r.id, pairs: res.pairs, sel: null }; render(); },
   'org-kb-swap': el => {
     const d = UI.kbDraft;
     const pid = el.dataset.pid;

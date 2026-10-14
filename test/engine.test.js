@@ -329,3 +329,30 @@ test('roundStats: the opposite of a comeback, and a steady pair of nines', () =>
   assert.deepEqual(s.steady.map(x => x.name), ['Bob']);
   assert.deepEqual(s.comeback, []);
 });
+
+test('KB pairs: no repeat partners from earlier rounds when it can be avoided, still never in the same group', () => {
+  const ids = Array.from({ length: 12 }, (_, i) => 'p' + i);
+  const groupsOf = (seed) => E.randomDraw(ids, [], seed, []).groups;
+  for (let seed = 1; seed <= 40; seed++) {
+    const groups = groupsOf(seed);
+    const groupOf = {}; groups.forEach(g => g.teams.flat().forEach(p => { groupOf[p] = g.id; }));
+    // three earlier rounds of KB pairs
+    const history = [];
+    for (let r = 0; r < 3; r++) history.push(...E.kbPairsFor(groupsOf(100 + seed + r), 7 + r, history).pairs);
+    const res = E.kbPairsFor(groups, seed * 13, history);
+    const old = new Set(history.map(([a, b]) => [a, b].sort().join('+')));
+    res.pairs.forEach(([a, b]) => { assert.notEqual(groupOf[a], groupOf[b]); });
+    const reps = res.pairs.filter(([a, b]) => old.has([a, b].sort().join('+')));
+    assert.equal(reps.length, res.repeats.length, 'repeats are reported honestly');
+    assert.ok(res.pairs.length === 6, 'everyone is paired');
+    assert.equal(reps.length, 0, `seed ${seed}: 12 golfers and 3 earlier rounds leave plenty of new partners`);
+  }
+});
+
+test('KB pairs: when every partner has been used, it still pairs people and reports the repeats', () => {
+  const groups = [{ id: 'g1', teams: [['a', 'b']] }, { id: 'g2', teams: [['c', 'd']] }];
+  const history = [['a', 'c'], ['a', 'd'], ['b', 'c'], ['b', 'd']];
+  const res = E.kbPairsFor(groups, 5, history);
+  assert.equal(res.pairs.length, 2);
+  assert.equal(res.repeats.length, 2);
+});

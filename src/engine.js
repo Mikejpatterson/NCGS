@@ -456,24 +456,32 @@
     return { groups, repeats: flagRepeats(groups, priorRoundsGroups || []) };
   }
 
-  /** KB pairs: partners always in different groups. */
-  function kbPairsFor(groups, seed) {
+  /** KB pairs: partners always in different groups, and (when it can be done) nobody paired with someone
+   *  they have already been paired with. history: earlier KB pairs, [[a, b], ...]. Returns the draw with the
+   *  fewest repeats found; repeats lists any pair that could not be avoided. */
+  function kbPairsFor(groups, seed, history) {
     const groupOf = {};
     groups.forEach(g => g.teams.flat().forEach(pid => { groupOf[pid] = g.id; }));
     const ids = Object.keys(groupOf);
-    for (let attempt = 0; attempt < 200; attempt++) {
+    const seen = new Set((history || []).filter(pr => pr && pr.length === 2).map(pr => pairKey(pr[0], pr[1])));
+    let best = null;
+    for (let attempt = 0; attempt < 400; attempt++) {
       const pool = shuffle(ids, (seed || 1) + attempt * 7919);
       const pairs = [];
       let ok = true;
       while (pool.length > 1 && ok) {
         const a = pool.shift();
-        const j = pool.findIndex(b => groupOf[b] !== groupOf[a]);
+        let j = pool.findIndex(b => groupOf[b] !== groupOf[a] && !seen.has(pairKey(a, b)));
+        if (j < 0) j = pool.findIndex(b => groupOf[b] !== groupOf[a]);
         if (j < 0) { ok = false; break; }
         pairs.push([a, pool.splice(j, 1)[0]]);
       }
-      if (ok) return { pairs, spare: pool };
+      if (!ok) continue;
+      const repeats = pairs.filter(pr => seen.has(pairKey(pr[0], pr[1])));
+      if (!best || repeats.length < best.repeats.length) best = { pairs, spare: pool, repeats };
+      if (!repeats.length) break;
     }
-    return { pairs: [], spare: ids };
+    return best || { pairs: [], spare: ids, repeats: [] };
   }
 
   /* ---------- Countback and season tables ---------- */

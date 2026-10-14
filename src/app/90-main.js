@@ -202,13 +202,14 @@ const ACT = {
     const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
     const groups = d.groups.map((g, i) => ({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }));
     const ids = new Set(groups.flatMap(g => g.teams.flat()));
-    const kb = r.kb && r.kb.every(pr => pr.every(pid => ids.has(pid))) ? r.kb : null;
+    let kb = r.kb && r.kb.every(pr => pr.every(pid => ids.has(pid))) ? r.kb : null;
+    if (!kb) { const res = E.kbPairsFor(groups, (Date.now() % 100000) + 3, priorKbPairs(r.id)); kb = res.pairs.length ? res.pairs : null; }   // every drawn round gets KB pairs, no repeat partners
     put('rounds', [Object.assign({}, r, { groups, kb })], { action: 'Groups saved', detail: `${roundName(r)}: ${groups.map(g => `${g.teeTime} ${g.teams.map(t => t.map(D.nameOf).join(' & ')).join(' v ')}`).join('; ')}` });
     UI.draft = null;
     back();
-    toast('Groups saved');
+    toast('Groups and KB pairs saved');
   },
-  'org-kb-make': () => { const r = D.round(cur().p.rid); const res = E.kbPairsFor(r.groups, (Date.now() % 100000) + 3); UI.kbDraft = { rid: r.id, pairs: res.pairs, sel: null }; render(); },
+  'org-kb-make': () => { const r = D.round(cur().p.rid); const res = E.kbPairsFor(r.groups, (Date.now() % 100000) + 3, priorKbPairs(r.id)); UI.kbDraft = { rid: r.id, pairs: res.pairs, sel: null }; render(); },
   'org-kb-swap': el => {
     const d = UI.kbDraft;
     const pid = el.dataset.pid;
