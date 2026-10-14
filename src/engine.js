@@ -501,14 +501,25 @@
 
   /** The KB pairs a round should have. Groups and KB pairs go together: if the saved pairs are missing or no longer fit the groups,
    *  work them out from the groups. The same groups and history always give the same answer, so every phone agrees. */
+  /** The groups that take part in KBs. A group can be left out (noKb), for example after late drop-outs leave 3 groups of 3.
+   *  The flag lives on the group itself, so nothing new is stored. All groups left out means no KBs in the round. */
+  function kbGroups(round) {
+    return round && round.groups ? round.groups.filter(g => !g.noKb) : [];
+  }
+  function kbOff(round) {
+    return !!(round && round.groups && round.groups.length && round.groups.every(g => g.noKb));
+  }
+
   function kbEffective(round, others) {
     if (!round || !round.groups || round.groups.length < 2) return round ? round.kb || null : null;
-    if (kbValid(round.groups, round.kb)) return round.kb;
+    const kg = kbGroups(round);
+    if (kg.length < 2) return null;
+    if (kbValid(kg, round.kb)) return round.kb;
     const history = (others || []).slice().sort((x, y) => String(x.id).localeCompare(String(y.id)))
       .flatMap(x => (x.kb && x.kb.length ? x.kb : ((x.results && x.results.kb) || []).map(k => [k[0], k[1]])));
     let h = 7;
     for (const ch of String(round.id)) h = (h * 31 + ch.charCodeAt(0)) % 99991;
-    const res = kbPairsFor(round.groups, h + 1, history);
+    const res = kbPairsFor(kg, h + 1, history);
     return res.pairs.length ? res.pairs : null;
   }
 
@@ -703,7 +714,7 @@
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,
-    kbValid, kbEffective, teamsFor, groupSizes, addMinutes, teeTimesFrom, makeGroups, randomDraw, shuffle, kbPairsFor,
+    kbValid, kbEffective, kbGroups, kbOff, teamsFor, groupSizes, addMinutes, teeTimesFrom, makeGroups, randomDraw, shuffle, kbPairsFor,
     countbackKey, compareKeys, rankByKey, finalOrder, kbStandings, goyStandings, scoreMark, pickupStrokes
   };
 });

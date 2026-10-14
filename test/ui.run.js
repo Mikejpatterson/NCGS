@@ -293,11 +293,11 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   check('groups saved on the round', /10 players · 3 groups/.test(t));
   await tap('[data-act="org-go"][data-v="kb"]');
   await tap('[data-act="org-kb-make"]');
-  const pairs = await page.$$eval('.row', els => els.length);
+  const pairs = await page.$$eval('.row', els => els.filter(e => e.querySelector('.chip')).length);
   check('KB pairs made', pairs === 5);
   await tap('[data-act="org-kb-save"]');
   // The round is now on the home screen as the next round
-  await page.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); });
+  await page.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.orgStack = [{ v: 'home', p: {} }]; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); });
   await page.waitForTimeout(100);
   t = await text();
   check('home shows the new round under Coming up', /Also on/.test(t) && /Sun 18 Apr/.test(t) && /09:30/.test(t) && /Past rounds\s*8 played/.test(t), t.slice(0, 200));
@@ -348,12 +348,28 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
 
   // Small phone
   await page.setViewportSize({ width: 375, height: 548 });
-  await page.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); });
+  await page.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.orgStack = [{ v: 'home', p: {} }]; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); });
   await page.waitForTimeout(100);
   await shot('17-se-home');
   const overflowX = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   check('no sideways scrolling on a small iPhone', !overflowX);
 
+  // Leaving a group out of the KBs, and turning KBs off for the round (organiser)
+  await page.evaluate(() => { const n = window.__ncgs; n.UI.org = true; n.UI.orgUnlocked = true; n.UI.kbDraft = null; n.UI.orgStack = [{ v: 'home', p: {} }, { v: 'kb', p: { rid: 'kb-none' } }]; n.render(); });
+  await page.waitForTimeout(250);
+  const kbPage = await text();
+  check('organiser KBs: every group listed with In, and the pairs below', /Groups in the KBs/.test(kbPage) && (await page.$$('[data-act="org-kb-group"]')).length >= 2);
+  await tap('[data-act="org-kb-group"]');
+  await page.waitForTimeout(250);
+  const kbLeft = await page.evaluate(() => { const r = window.__ncgs.D.round('kb-none'); const out = new Set(r.groups.filter(g => g.noKb).flatMap(g => g.teams.flat())); return { out: out.size, bad: (r.kb || []).flat().some(p => out.has(p)), pairs: (r.kb || []).length }; });
+  check('leaving a group out: nobody from it is in a pair', kbLeft.out > 0 && !kbLeft.bad && kbLeft.pairs > 0, JSON.stringify(kbLeft));
+  await tap('[data-act="org-kb-clear"]');
+  await page.waitForTimeout(250);
+  check('KBs off: no pairs for the round and a Turn KBs back on button', !(await page.evaluate(() => (window.__ncgs.D.round('kb-none').kb || []).length)) && !!(await page.$('[data-act="org-kb-on"]')));
+  await tap('[data-act="org-kb-on"]');
+  await page.waitForTimeout(250);
+  check('KBs back on: pairs drawn again', (await page.evaluate(() => (window.__ncgs.D.round('kb-none').kb || []).length)) > 0);
+  await page.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); });
   check('no script errors', errors.length === 0, errors.join(' | '));
   await browser.close();
   results.forEach(r => console.log(r.join('  ')));

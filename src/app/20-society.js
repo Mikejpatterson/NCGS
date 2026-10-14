@@ -390,7 +390,7 @@ VIEWS.round = p => {
   const tabName = { groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
   const pillsHtml = `<div class="seg pills rtabs${tabsAvail.length > 3 ? ' four' : ''}" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${tabName[k]}</button>`).join('')}</div>`;
   const courseBody = c && c.about ? `<p class="prose">${esc(c.about)}</p>` : '<p class="prose sub">No course notes yet.</p>';
-  const roundBody = rt === 'groups' ? groupCards(r) : rt === 'kb' ? (hasKb ? kbCards(r) : sec('', cardOf('<div class="row"><span class="sub">KB pairs are not drawn yet</span></div>'), true)) : rt === 'weather' ? (forecast(r) || sec('', cardOf('<div class="row"><span class="sub">No forecast yet. It appears in the 9 days before the round.</span></div>'), true)) : sec('', courseBody, true);
+  const roundBody = rt === 'groups' ? groupCards(r) : rt === 'kb' ? (hasKb ? kbCards(r) : sec('', cardOf(`<div class="row"><span class="sub">${E.kbOff(r) ? 'No KBs in this round' : 'KB pairs are not drawn yet'}</span></div>`), true)) : rt === 'weather' ? (forecast(r) || sec('', cardOf('<div class="row"><span class="sub">No forecast yet. It appears in the 9 days before the round.</span></div>'), true)) : sec('', courseBody, true);
   const playable = canScore(r) && (r.status === 'live' || (r.status === 'upcoming' && (!r.date || daysFromToday(r.date) <= 0)));
   if (playable) {
     if (!DB.prefs.me || !mine) html += `<button class="btn" data-act="play" data-rid="${r.id}">Play now</button>`;

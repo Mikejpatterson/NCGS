@@ -200,16 +200,18 @@ const ACT = {
     const r = D.round(cur().p.rid);
     const d = draftFor(r);
     const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
-    const groups = d.groups.map((g, i) => ({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }));
+    const allOff = E.kbOff(r);   // KBs switched off for the whole round stays off if the groups are redrawn
+    const groups = d.groups.map((g, i) => Object.assign({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }, allOff ? { noKb: true } : {}));
     const ids = new Set(groups.flatMap(g => g.teams.flat()));
-    let kb = E.kbValid(groups, r.kb) ? r.kb : null;
-    if (!kb) { const res = E.kbPairsFor(groups, (Date.now() % 100000) + 3, priorKbPairs(r.id)); kb = res.pairs.length ? res.pairs : null; }   // every drawn round gets KB pairs, no repeat partners
+    const kg = E.kbGroups(Object.assign({}, r, { groups }));
+    let kb = E.kbValid(kg, r.kb) ? r.kb : null;
+    if (!kb && kg.length > 1) { const res = E.kbPairsFor(kg, (Date.now() % 100000) + 3, priorKbPairs(r.id)); kb = res.pairs.length ? res.pairs : null; }   // every drawn round gets KB pairs, no repeat partners
     put('rounds', [Object.assign({}, r, { groups, kb })], { action: 'Groups saved', detail: `${roundName(r)}: ${groups.map(g => `${g.teeTime} ${g.teams.map(t => t.map(D.nameOf).join(' & ')).join(' v ')}`).join('; ')}` });
     UI.draft = null;
     back();
     toast('Groups and KB pairs saved');
   },
-  'org-kb-make': () => { const r = D.round(cur().p.rid); const res = E.kbPairsFor(r.groups, (Date.now() % 100000) + 3, priorKbPairs(r.id)); UI.kbDraft = { rid: r.id, pairs: res.pairs, sel: null }; render(); },
+  'org-kb-make': () => { const r = D.round(cur().p.rid); const res = E.kbPairsFor(E.kbGroups(r), (Date.now() % 100000) + 3, priorKbPairs(r.id)); UI.kbDraft = { rid: r.id, pairs: res.pairs, sel: null }; render(); },
   'org-kb-swap': el => {
     const d = UI.kbDraft;
     const pid = el.dataset.pid;
@@ -220,7 +222,14 @@ const ACT = {
     render();
   },
   'org-kb-save': () => { const r = D.round(cur().p.rid); put('rounds', [Object.assign({}, r, { kb: UI.kbDraft.pairs })], { action: 'KBs saved', detail: `${roundName(r)}: ${UI.kbDraft.pairs.map(pr => pr.map(D.nameOf).join(' & ')).join('; ')}` }); UI.kbDraft = null; back(); toast('KBs saved'); },
-  'org-kb-clear': () => { const r = D.round(cur().p.rid); put('rounds', [Object.assign({}, r, { kb: null })], { action: 'KBs removed', detail: roundName(r) }); UI.kbDraft = null; back(); },
+  'org-kb-clear': () => { const r = D.round(cur().p.rid); put('rounds', [Object.assign({}, r, { kb: null, groups: r.groups.map(g => Object.assign({}, g, { noKb: true })) })], { action: 'KBs turned off', detail: roundName(r) }); UI.kbDraft = null; render(); toast('KBs are off for this round'); },
+  'org-kb-on': () => { const r = D.round(cur().p.rid); put('rounds', [Object.assign({}, r, { kb: null, groups: r.groups.map(g => Object.assign({}, g, { noKb: false })) })], { action: 'KBs turned on', detail: roundName(r) }); UI.kbDraft = null; render(); toast('KBs are on, pairs drawn'); },
+  'org-kb-group': el => {
+    const r = D.round(cur().p.rid), gid = el.dataset.gid;
+    const groups = r.groups.map(g => g.id === gid ? Object.assign({}, g, { noKb: !g.noKb }) : g);
+    put('rounds', [Object.assign({}, r, { kb: null, groups })], { action: 'KB groups changed', detail: `${roundName(r)}: ${groups.filter(g => g.noKb).map(g => 'Group ' + g.n).join(', ') || 'all groups in'}${groups.some(g => g.noKb) ? ' left out' : ''}` });
+    UI.kbDraft = null; render();
+  },
   'org-win': el => {
     const n = Number(el.dataset.n);
     put('winners', [{ round: el.dataset.rid, hole: n, player: el.dataset.pid }], { action: 'Contest winner confirmed', detail: `${roundName(D.round(el.dataset.rid))} · ${CONTEST[contestOn(el.dataset.rid, n).type]} on ${n}: ${D.nameOf(el.dataset.pid)}` });

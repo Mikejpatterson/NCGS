@@ -380,3 +380,20 @@ test('KB pairs go with the groups: valid pairs are kept, missing or stale pairs 
   const old = new Set(kb1.map(p => p.slice().sort().join('+')));
   assert.equal(next.filter(p => old.has(p.slice().sort().join('+'))).length, 0, 'no repeat partners');
 });
+
+test('KBs can be left out for one group or the whole round (late drop-outs: 3 groups of 3)', () => {
+  const mk = (ids, noKb) => ({ id: 'g' + ids[0], n: 1, noKb, teams: [ids] });
+  const r = { id: 'r1', groups: [mk(['a', 'b', 'c']), mk(['d', 'e', 'f']), mk(['g', 'h', 'i'])] };
+  const all = E.kbEffective(r, []);
+  assert.equal(all.length, 4, '9 players make 4 pairs and one spare');
+  r.groups[2].noKb = true;
+  const some = E.kbEffective(r, []);
+  assert.ok(some.flat().every(p => !['g', 'h', 'i'].includes(p)), 'a group that is left out has nobody in a pair');
+  assert.equal(some.length, 3);
+  assert.ok(E.kbValid(E.kbGroups(r), some));
+  r.groups.forEach(g => { g.noKb = true; });
+  assert.ok(E.kbOff(r));
+  assert.equal(E.kbEffective(r, []), null, 'all groups left out means no KBs at all');
+  r.groups[0].noKb = false;
+  assert.equal(E.kbEffective(r, []), null, 'one group on its own cannot make KB pairs');
+});

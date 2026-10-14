@@ -1452,7 +1452,7 @@ body { font-variant-numeric: tabular-nums; }
 .mgk { white-space: nowrap; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610142019","server":"562d6962"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610142057","server":"562d6962"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -1957,14 +1957,25 @@ body { font-variant-numeric: tabular-nums; }
 
   /** The KB pairs a round should have. Groups and KB pairs go together: if the saved pairs are missing or no longer fit the groups,
    *  work them out from the groups. The same groups and history always give the same answer, so every phone agrees. */
+  /** The groups that take part in KBs. A group can be left out (noKb), for example after late drop-outs leave 3 groups of 3.
+   *  The flag lives on the group itself, so nothing new is stored. All groups left out means no KBs in the round. */
+  function kbGroups(round) {
+    return round && round.groups ? round.groups.filter(g => !g.noKb) : [];
+  }
+  function kbOff(round) {
+    return !!(round && round.groups && round.groups.length && round.groups.every(g => g.noKb));
+  }
+
   function kbEffective(round, others) {
     if (!round || !round.groups || round.groups.length < 2) return round ? round.kb || null : null;
-    if (kbValid(round.groups, round.kb)) return round.kb;
+    const kg = kbGroups(round);
+    if (kg.length < 2) return null;
+    if (kbValid(kg, round.kb)) return round.kb;
     const history = (others || []).slice().sort((x, y) => String(x.id).localeCompare(String(y.id)))
       .flatMap(x => (x.kb && x.kb.length ? x.kb : ((x.results && x.results.kb) || []).map(k => [k[0], k[1]])));
     let h = 7;
     for (const ch of String(round.id)) h = (h * 31 + ch.charCodeAt(0)) % 99991;
-    const res = kbPairsFor(round.groups, h + 1, history);
+    const res = kbPairsFor(kg, h + 1, history);
     return res.pairs.length ? res.pairs : null;
   }
 
@@ -2159,7 +2170,7 @@ body { font-variant-numeric: tabular-nums; }
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,
-    kbValid, kbEffective, teamsFor, groupSizes, addMinutes, teeTimesFrom, makeGroups, randomDraw, shuffle, kbPairsFor,
+    kbValid, kbEffective, kbGroups, kbOff, teamsFor, groupSizes, addMinutes, teeTimesFrom, makeGroups, randomDraw, shuffle, kbPairsFor,
     countbackKey, compareKeys, rankByKey, finalOrder, kbStandings, goyStandings, scoreMark, pickupStrokes
   };
 });
@@ -3159,9 +3170,10 @@ function removeRows(table, rows, log) { send({ op: 'remove', table, rows, pin: O
 /* Groups and KB pairs go together: a round with groups always shows valid KB pairs, even if none were saved yet (the same on every phone) */
 function withKb(list) {
   return list.map(r => {
-    if (!r.groups || r.groups.length < 2 || E.kbValid(r.groups, r.kb)) return r;
+    if (!r.groups || r.groups.length < 2) return r;
+    if (E.kbValid(E.kbGroups(r), r.kb)) return r;
     const kb = E.kbEffective(r, list.filter(x => x.id !== r.id));
-    return kb ? Object.assign({}, r, { kb }) : r;
+    return (kb || r.kb) ? Object.assign({}, r, { kb: kb || null }) : r;
   });
 }
 const D = {
@@ -3764,7 +3776,7 @@ VIEWS.round = p => {
   const tabName = { groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
   const pillsHtml = `<div class="seg pills rtabs${tabsAvail.length > 3 ? ' four' : ''}" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${tabName[k]}</button>`).join('')}</div>`;
   const courseBody = c && c.about ? `<p class="prose">${esc(c.about)}</p>` : '<p class="prose sub">No course notes yet.</p>';
-  const roundBody = rt === 'groups' ? groupCards(r) : rt === 'kb' ? (hasKb ? kbCards(r) : sec('', cardOf('<div class="row"><span class="sub">KB pairs are not drawn yet</span></div>'), true)) : rt === 'weather' ? (forecast(r) || sec('', cardOf('<div class="row"><span class="sub">No forecast yet. It appears in the 9 days before the round.</span></div>'), true)) : sec('', courseBody, true);
+  const roundBody = rt === 'groups' ? groupCards(r) : rt === 'kb' ? (hasKb ? kbCards(r) : sec('', cardOf(`<div class="row"><span class="sub">${E.kbOff(r) ? 'No KBs in this round' : 'KB pairs are not drawn yet'}</span></div>`), true)) : rt === 'weather' ? (forecast(r) || sec('', cardOf('<div class="row"><span class="sub">No forecast yet. It appears in the 9 days before the round.</span></div>'), true)) : sec('', courseBody, true);
   const playable = canScore(r) && (r.status === 'live' || (r.status === 'upcoming' && (!r.date || daysFromToday(r.date) <= 0)));
   if (playable) {
     if (!DB.prefs.me || !mine) html += `<button class="btn" data-act="play" data-rid="${r.id}">Play now</button>`;
@@ -5074,7 +5086,7 @@ function nextChecklist(r) {
     { ok: !!(r.groups && r.groups.length), t: 'Players and groups', go: ['playing', r.id], need: true },
     { ok: !!r.first_tee, t: 'First tee time', go: ['details', r.id], need: true },
     { ok: !!(r.contests && r.contests.length), t: 'Contests', go: ['details', r.id], need: false },
-    { ok: !!(r.kb && r.kb.length), t: 'KBs', go: ['kb', r.id], need: false }
+    { ok: !!(E.kbOff(r) || (r.kb && r.kb.length)), t: 'KBs', go: ['kb', r.id], need: false }
   ];
   const left = items.filter(i => i.need && !i.ok).length;
   const head = `<span class="two"><span>${esc(roundName(r))}</span><span class="sub">${left ? `${plural(left, 'thing')} to do` : 'Ready to go'}</span></span>`;
@@ -5133,7 +5145,7 @@ ORG.round = p => {
     <button class="row tall" data-act="org-go" data-v="details" data-rid="${r.id}"><span class="two"><span>Details</span><span class="sub">${esc(details)}</span></span>${chev}</button>
     <button class="row tall" data-act="org-go" data-v="${locked ? 'groupsview' : 'playing'}" data-rid="${r.id}"><span class="two"><span>Groups and buggies</span><span class="sub">${r.groups && r.groups.length ? `${plural(nPlayers, 'player')} · ${plural(r.groups.length, 'group')}` : 'Not drawn'}</span></span>${chev}</button>
     ${r.groups && r.groups.length && r.status !== 'final' ? `<button class="row tall" data-act="org-go" data-v="late" data-rid="${r.id}"><span class="two"><span>Change a player</span><span class="sub">Swap someone in, or let someone drop out</span></span>${chev}</button>` : ''}
-    <button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`), true);
+    <button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${E.kbOff(r) ? 'Off' : r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`), true);
   if (c && (!c.holes || !tee)) html += `<div class="banner note">${esc(c.name)} needs ${!c.holes ? 'its par and stroke index for each hole' : 'tee details'} before scores can be entered. <button class="link inline" data-act="org-go" data-v="course" data-cid="${c.id}">Add them</button></div>`;
   const comp = computeR(r.id);
   if (comp && r.status !== 'upcoming') {
@@ -5251,14 +5263,18 @@ ORG.kb = p => {
   const d = UI.kbDraft && UI.kbDraft.rid === r.id ? UI.kbDraft : (UI.kbDraft = { rid: r.id, pairs: r.kb ? clone(r.kb) : [], sel: null });
   let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">KBs</h1></div></header>`;
   if (!r.groups || !r.groups.length) return { html: html + sec('', cardOf('<div class="row sub">Draw the groups first</div>'), true) };
-  if (!d.pairs.length && !r.kb) { const res = E.kbPairsFor(r.groups, (Date.now() % 100000) + 3, priorKbPairs(r.id)); d.pairs = res.pairs; }   // start from a fresh draw: just check it and save
+  if (E.kbOff(r)) return { html: html + sec('', cardOf('<div class="row"><span class="sub">KBs are off for this round. No pairs, no KBs on the results.</span></div>'), true) + `<button class="btn" data-act="org-kb-on">Turn KBs back on</button>` };
+    const kg = E.kbGroups(r);
+  if (r.groups.length > 1) html += sec('Groups in the KBs', cardOf(r.groups.map(g => `<button class="row tall" data-act="org-kb-group" data-gid="${g.id}"><span class="two"><span>Group ${g.n}</span><span class="sub">${esc(g.teams.flat().map(D.nameOf).join(', '))}</span></span><span class="b">${g.noKb ? 'Left out' : 'In'}</span></button>`).join('')), true);
+  if (kg.length < 2) return { html: html + sec('', cardOf('<div class="row"><span class="sub">KBs need two groups or more. Put another group back in.</span></div>'), true) + `<div class="foot"><button class="link c-b" data-act="org-kb-clear">Turn KBs off for the round</button></div>` };
+  if (!d.pairs.length && !r.kb) { const res = E.kbPairsFor(kg, (Date.now() % 100000) + 3, priorKbPairs(r.id)); d.pairs = res.pairs; }   // start from a fresh draw: just check it and save
   if (!d.pairs.length) return { html: html + `<button class="btn" data-act="org-kb-make">Make KB pairs</button>` };
   const seenKb = new Set(priorKbPairs(r.id).map(pr => [pr[0], pr[1]].sort().join('+')));
   const again = d.pairs.filter(pr => seenKb.has([pr[0], pr[1]].sort().join('+')));
   if (again.length) html += `<p class="cap note">${again.map(pr => esc(pr.map(D.nameOf).join(' & '))).join(', ')} ${again.length === 1 ? 'have' : 'have'} been KB partners before.</p>`;
   else html += '<p class="cap note">No repeat partners.</p>';
   html += sec('', cardOf(d.pairs.map(pr => `<div class="row">${pr.map(pid => `<button class="chip${d.sel === pid ? ' on' : ''}" data-act="org-kb-swap" data-pid="${pid}">${esc(D.nameOf(pid))}</button>`).join('<span class="sub">&</span>')}</div>`).join('')), true);
-  html += `<button class="btn" data-act="org-kb-save">Save KBs</button><div class="foot"><button class="link" data-act="org-kb-make">Shuffle</button><button class="link c-b" data-act="org-kb-clear">No KBs</button></div>`;
+  html += `<button class="btn" data-act="org-kb-save">Save KBs</button><div class="foot"><button class="link" data-act="org-kb-make">Shuffle</button><button class="link c-b" data-act="org-kb-clear">Turn KBs off for the round</button></div>`;
   return { html };
 };
 
@@ -5674,16 +5690,18 @@ const ACT = {
     const r = D.round(cur().p.rid);
     const d = draftFor(r);
     const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
-    const groups = d.groups.map((g, i) => ({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }));
+    const allOff = E.kbOff(r);   // KBs switched off for the whole round stays off if the groups are redrawn
+    const groups = d.groups.map((g, i) => Object.assign({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }, allOff ? { noKb: true } : {}));
     const ids = new Set(groups.flatMap(g => g.teams.flat()));
-    let kb = E.kbValid(groups, r.kb) ? r.kb : null;
-    if (!kb) { const res = E.kbPairsFor(groups, (Date.now() % 100000) + 3, priorKbPairs(r.id)); kb = res.pairs.length ? res.pairs : null; }   // every drawn round gets KB pairs, no repeat partners
+    const kg = E.kbGroups(Object.assign({}, r, { groups }));
+    let kb = E.kbValid(kg, r.kb) ? r.kb : null;
+    if (!kb && kg.length > 1) { const res = E.kbPairsFor(kg, (Date.now() % 100000) + 3, priorKbPairs(r.id)); kb = res.pairs.length ? res.pairs : null; }   // every drawn round gets KB pairs, no repeat partners
     put('rounds', [Object.assign({}, r, { groups, kb })], { action: 'Groups saved', detail: `${roundName(r)}: ${groups.map(g => `${g.teeTime} ${g.teams.map(t => t.map(D.nameOf).join(' & ')).join(' v ')}`).join('; ')}` });
     UI.draft = null;
     back();
     toast('Groups and KB pairs saved');
   },
-  'org-kb-make': () => { const r = D.round(cur().p.rid); const res = E.kbPairsFor(r.groups, (Date.now() % 100000) + 3, priorKbPairs(r.id)); UI.kbDraft = { rid: r.id, pairs: res.pairs, sel: null }; render(); },
+  'org-kb-make': () => { const r = D.round(cur().p.rid); const res = E.kbPairsFor(E.kbGroups(r), (Date.now() % 100000) + 3, priorKbPairs(r.id)); UI.kbDraft = { rid: r.id, pairs: res.pairs, sel: null }; render(); },
   'org-kb-swap': el => {
     const d = UI.kbDraft;
     const pid = el.dataset.pid;
@@ -5694,7 +5712,14 @@ const ACT = {
     render();
   },
   'org-kb-save': () => { const r = D.round(cur().p.rid); put('rounds', [Object.assign({}, r, { kb: UI.kbDraft.pairs })], { action: 'KBs saved', detail: `${roundName(r)}: ${UI.kbDraft.pairs.map(pr => pr.map(D.nameOf).join(' & ')).join('; ')}` }); UI.kbDraft = null; back(); toast('KBs saved'); },
-  'org-kb-clear': () => { const r = D.round(cur().p.rid); put('rounds', [Object.assign({}, r, { kb: null })], { action: 'KBs removed', detail: roundName(r) }); UI.kbDraft = null; back(); },
+  'org-kb-clear': () => { const r = D.round(cur().p.rid); put('rounds', [Object.assign({}, r, { kb: null, groups: r.groups.map(g => Object.assign({}, g, { noKb: true })) })], { action: 'KBs turned off', detail: roundName(r) }); UI.kbDraft = null; render(); toast('KBs are off for this round'); },
+  'org-kb-on': () => { const r = D.round(cur().p.rid); put('rounds', [Object.assign({}, r, { kb: null, groups: r.groups.map(g => Object.assign({}, g, { noKb: false })) })], { action: 'KBs turned on', detail: roundName(r) }); UI.kbDraft = null; render(); toast('KBs are on, pairs drawn'); },
+  'org-kb-group': el => {
+    const r = D.round(cur().p.rid), gid = el.dataset.gid;
+    const groups = r.groups.map(g => g.id === gid ? Object.assign({}, g, { noKb: !g.noKb }) : g);
+    put('rounds', [Object.assign({}, r, { kb: null, groups })], { action: 'KB groups changed', detail: `${roundName(r)}: ${groups.filter(g => g.noKb).map(g => 'Group ' + g.n).join(', ') || 'all groups in'}${groups.some(g => g.noKb) ? ' left out' : ''}` });
+    UI.kbDraft = null; render();
+  },
   'org-win': el => {
     const n = Number(el.dataset.n);
     put('winners', [{ round: el.dataset.rid, hole: n, player: el.dataset.pid }], { action: 'Contest winner confirmed', detail: `${roundName(D.round(el.dataset.rid))} · ${CONTEST[contestOn(el.dataset.rid, n).type]} on ${n}: ${D.nameOf(el.dataset.pid)}` });

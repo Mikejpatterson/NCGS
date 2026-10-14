@@ -209,9 +209,10 @@ function removeRows(table, rows, log) { send({ op: 'remove', table, rows, pin: O
 /* Groups and KB pairs go together: a round with groups always shows valid KB pairs, even if none were saved yet (the same on every phone) */
 function withKb(list) {
   return list.map(r => {
-    if (!r.groups || r.groups.length < 2 || E.kbValid(r.groups, r.kb)) return r;
+    if (!r.groups || r.groups.length < 2) return r;
+    if (E.kbValid(E.kbGroups(r), r.kb)) return r;
     const kb = E.kbEffective(r, list.filter(x => x.id !== r.id));
-    return kb ? Object.assign({}, r, { kb }) : r;
+    return (kb || r.kb) ? Object.assign({}, r, { kb: kb || null }) : r;
   });
 }
 const D = {

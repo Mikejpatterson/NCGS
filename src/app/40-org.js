@@ -34,7 +34,7 @@ function nextChecklist(r) {
     { ok: !!(r.groups && r.groups.length), t: 'Players and groups', go: ['playing', r.id], need: true },
     { ok: !!r.first_tee, t: 'First tee time', go: ['details', r.id], need: true },
     { ok: !!(r.contests && r.contests.length), t: 'Contests', go: ['details', r.id], need: false },
-    { ok: !!(r.kb && r.kb.length), t: 'KBs', go: ['kb', r.id], need: false }
+    { ok: !!(E.kbOff(r) || (r.kb && r.kb.length)), t: 'KBs', go: ['kb', r.id], need: false }
   ];
   const left = items.filter(i => i.need && !i.ok).length;
   const head = `<span class="two"><span>${esc(roundName(r))}</span><span class="sub">${left ? `${plural(left, 'thing')} to do` : 'Ready to go'}</span></span>`;
@@ -93,7 +93,7 @@ ORG.round = p => {
     <button class="row tall" data-act="org-go" data-v="details" data-rid="${r.id}"><span class="two"><span>Details</span><span class="sub">${esc(details)}</span></span>${chev}</button>
     <button class="row tall" data-act="org-go" data-v="${locked ? 'groupsview' : 'playing'}" data-rid="${r.id}"><span class="two"><span>Groups and buggies</span><span class="sub">${r.groups && r.groups.length ? `${plural(nPlayers, 'player')} · ${plural(r.groups.length, 'group')}` : 'Not drawn'}</span></span>${chev}</button>
     ${r.groups && r.groups.length && r.status !== 'final' ? `<button class="row tall" data-act="org-go" data-v="late" data-rid="${r.id}"><span class="two"><span>Change a player</span><span class="sub">Swap someone in, or let someone drop out</span></span>${chev}</button>` : ''}
-    <button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`), true);
+    <button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${E.kbOff(r) ? 'Off' : r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`), true);
   if (c && (!c.holes || !tee)) html += `<div class="banner note">${esc(c.name)} needs ${!c.holes ? 'its par and stroke index for each hole' : 'tee details'} before scores can be entered. <button class="link inline" data-act="org-go" data-v="course" data-cid="${c.id}">Add them</button></div>`;
   const comp = computeR(r.id);
   if (comp && r.status !== 'upcoming') {
@@ -211,14 +211,18 @@ ORG.kb = p => {
   const d = UI.kbDraft && UI.kbDraft.rid === r.id ? UI.kbDraft : (UI.kbDraft = { rid: r.id, pairs: r.kb ? clone(r.kb) : [], sel: null });
   let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">KBs</h1></div></header>`;
   if (!r.groups || !r.groups.length) return { html: html + sec('', cardOf('<div class="row sub">Draw the groups first</div>'), true) };
-  if (!d.pairs.length && !r.kb) { const res = E.kbPairsFor(r.groups, (Date.now() % 100000) + 3, priorKbPairs(r.id)); d.pairs = res.pairs; }   // start from a fresh draw: just check it and save
+  if (E.kbOff(r)) return { html: html + sec('', cardOf('<div class="row"><span class="sub">KBs are off for this round. No pairs, no KBs on the results.</span></div>'), true) + `<button class="btn" data-act="org-kb-on">Turn KBs back on</button>` };
+    const kg = E.kbGroups(r);
+  if (r.groups.length > 1) html += sec('Groups in the KBs', cardOf(r.groups.map(g => `<button class="row tall" data-act="org-kb-group" data-gid="${g.id}"><span class="two"><span>Group ${g.n}</span><span class="sub">${esc(g.teams.flat().map(D.nameOf).join(', '))}</span></span><span class="b">${g.noKb ? 'Left out' : 'In'}</span></button>`).join('')), true);
+  if (kg.length < 2) return { html: html + sec('', cardOf('<div class="row"><span class="sub">KBs need two groups or more. Put another group back in.</span></div>'), true) + `<div class="foot"><button class="link c-b" data-act="org-kb-clear">Turn KBs off for the round</button></div>` };
+  if (!d.pairs.length && !r.kb) { const res = E.kbPairsFor(kg, (Date.now() % 100000) + 3, priorKbPairs(r.id)); d.pairs = res.pairs; }   // start from a fresh draw: just check it and save
   if (!d.pairs.length) return { html: html + `<button class="btn" data-act="org-kb-make">Make KB pairs</button>` };
   const seenKb = new Set(priorKbPairs(r.id).map(pr => [pr[0], pr[1]].sort().join('+')));
   const again = d.pairs.filter(pr => seenKb.has([pr[0], pr[1]].sort().join('+')));
   if (again.length) html += `<p class="cap note">${again.map(pr => esc(pr.map(D.nameOf).join(' & '))).join(', ')} ${again.length === 1 ? 'have' : 'have'} been KB partners before.</p>`;
   else html += '<p class="cap note">No repeat partners.</p>';
   html += sec('', cardOf(d.pairs.map(pr => `<div class="row">${pr.map(pid => `<button class="chip${d.sel === pid ? ' on' : ''}" data-act="org-kb-swap" data-pid="${pid}">${esc(D.nameOf(pid))}</button>`).join('<span class="sub">&</span>')}</div>`).join('')), true);
-  html += `<button class="btn" data-act="org-kb-save">Save KBs</button><div class="foot"><button class="link" data-act="org-kb-make">Shuffle</button><button class="link c-b" data-act="org-kb-clear">No KBs</button></div>`;
+  html += `<button class="btn" data-act="org-kb-save">Save KBs</button><div class="foot"><button class="link" data-act="org-kb-make">Shuffle</button><button class="link c-b" data-act="org-kb-clear">Turn KBs off for the round</button></div>`;
   return { html };
 };
 
