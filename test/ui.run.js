@@ -77,10 +77,10 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await tap('[data-act="pick"][data-id="mike-p"]');
   await page.waitForSelector('[data-act="enter"]');
   t = await text();
-  check('tee: hole 15, par 3 with nearest the pin, Buggy pills', /Hole\s*15/.test(t) && /Par\s*3\s*Index\s*14/.test(t) && /Nearest the pin/.test(t) && /Buggy 1/.test(t));
+  check('tee: hole 15, par 3 with nearest the pin, Buggy pills', /Hole\s*15/i.test(t) && /Par\s*3\s*Index\s*14/.test(t) && /Nearest the pin/.test(t) && /Buggy 1/.test(t));
   check('tee fits on one iPhone screen', await fits());
   await shot('05-tee');
-  check('tee: a home chevron and a tappable hole number', !!(await page.$('.hero .back-icon[data-act="home"]')) && !!(await page.$('.holebtn')));
+  check('tee: a home chevron and a tappable hole number', !!(await page.$('.entback[data-act="home"]')) && !!(await page.$('.holebtn')));
   await tap('.holebtn');
   check('go to hole: all 18 shown, scored ones filled, hole 15 ringed as next', (await page.$$('.hs')).length === 18 && (await page.$$('.hs.done')).length === 14 && (await page.$eval('.hs.nxt', e => e.textContent)) === '15');
   await shot('05b-holes');
@@ -88,12 +88,12 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   t = await text();
   check('go to hole: a scored hole opens to change it', /Hole\s*3/i.test(t) && /Save changes/.test(t));
   await page.goBack(); await page.waitForTimeout(300);
-  check('the phone back gesture returns to the hole screen', /Hole\s*15/.test(await text()) && !!(await page.$('[data-act="enter"]')));
+  check('the phone back gesture returns to the hole screen', /Hole\s*15/i.test(await text()) && !!(await page.$('[data-act="enter"]')));
   await tap('.holebtn'); await tap('.hs[data-n="17"]');
   t = await text();
   check('go to hole: a later hole can be scored early', /Hole\s*17/i.test(t) && /4 scores to go/.test(t));
   await tap('[data-act="entry-back"]');
-  check('Back from there returns to the hole screen', /Hole\s*15/.test(await text()) && !!(await page.$('[data-act="enter"]')));
+  check('Back from there returns to the hole screen', /Hole\s*15/i.test(await text()) && !!(await page.$('[data-act="enter"]')));
   await tap('.holebtn'); await tap('[data-act="holes-close"]');
   check('the hole picker closes with Done', !(await page.$('.hs-sheet')));
   await tap('[data-act="enter"]');
@@ -136,12 +136,12 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   check('undo returns to the entry with the scores kept', /Save hole 15/.test(await text()));
   await tap('[data-act="save"]');
   await tap('[data-act="next"]');
-  check('next hole is 16', /Hole\s*16/.test(await text()));
+  check('next hole is 16', /Hole\s*16/i.test(await text()));
 
   // Reload keeps everything (phone copy + queue)
   await page.reload();
   await page.waitForSelector('[data-act="enter"]');
-  check('reload opens straight on the next hole', /Hole\s*16/.test(await text()));
+  check('reload opens straight on the next hole', /Hole\s*16/i.test(await text()));
 
   // Buggy Wars and leaderboard
   await tap('.tab[data-tab="board"]');

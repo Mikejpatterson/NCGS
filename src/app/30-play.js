@@ -41,8 +41,9 @@ VIEWS.tee = () => {
   const clashRows = [...new Set(clash.map(c => c.hole))].map(hn => `<button class="row" data-act="conflict" data-n="${hn}"><span>Hole ${hn}</span><span class="right"><span class="pill w">Saved on two phones</span>${chev}</span></button>`).join('');
   return {
     tabs: 'hole',
-    html: `<div class="tee"><header class="hero c"><div class="hrow2"><button class="back-icon" data-act="home" aria-label="Home">${ICON.back}</button><h1 class="big"><button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${n}"><small>Hole</small>${n}<span class="hdown">${ICON.down}</span></button></h1>${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></div>
-      <div class="pills2"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span>${h.yards ? `<span class="fact">${h.yards}<b>yds</b></span>` : ''}${contest ? `<span class="pill flag">${CONTEST[contest.type]}</span>` : ''}</div></header>
+    html: `<div class="tee"><div class="entnav"><button class="entback" data-act="home" aria-label="Home">${ICON.back}<span>Home</span></button><span class="entright">${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></span></div>
+      <header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${n}"><b class="entn">${n}</b><span class="hdown">${ICON.down}</span></button></div><div class="entr"><b>Par ${h.par}</b><span>Index ${h.si}${h.yards ? ` · ${h.yards} yds` : ''}</span></div></div><div class="prog" role="img" aria-label="Hole ${n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === n ? 'cur' : k < n ? 'done' : ''}"></i>`).join('')}</div></header>
+      ${contest ? `<div class="pills2" style="margin-top:12px"><span class="pill flag">${CONTEST[contest.type]}</span></div>` : ''}
       ${clashRows ? sec('', cardOf(clashRows), true) : ''}
       ${teams}
       ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span>${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}

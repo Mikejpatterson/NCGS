@@ -1075,3 +1075,21 @@ body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 
 html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
 body::before { display: none; }
 #app { position: fixed; top: env(safe-area-inset-top, 0px); right: 0; bottom: 0; left: 0; max-width: none; margin: 0; min-height: 0; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; scroll-padding-bottom: calc(var(--tabh, 90px) + 16px); padding-inline: max(16px, calc((100vw - 448px) / 2)); }
+.entright { display: inline-flex; align-items: center; gap: 10px; }
+.tee .entcard { margin-bottom: 4px; }
+
+/* Glass v5: frosted, slightly cool bar so the lighter lens clearly stands out */
+.tabs {
+  background: linear-gradient(180deg, rgba(228, 233, 229, .62), rgba(214, 221, 216, .50));
+  -webkit-backdrop-filter: blur(26px) saturate(200%) brightness(1.02); backdrop-filter: blur(26px) saturate(200%) brightness(1.02);
+  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .9), inset 0 -1px 0 rgba(255, 255, 255, .35), inset 0 0 0 1px rgba(255, 255, 255, .45), 0 14px 34px rgba(20, 35, 27, .22), 0 0 0 .5px rgba(20, 35, 27, .18);
+}
+.tabs::before { background: linear-gradient(180deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 50%); }
+.tab { text-shadow: none; color: #2B3630; }
+.tab svg { filter: none; }
+.tab.on {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(255, 255, 255, .78) 60%, rgba(255, 255, 255, .9));
+  box-shadow: inset 0 2px 1px -1px #fff, inset 0 -3px 4px -2px rgba(20, 35, 27, .10), inset 0 0 0 1px rgba(255, 255, 255, .9), 0 0 0 1px rgba(20, 35, 27, .09), 0 6px 14px rgba(20, 35, 27, .22);
+  color: var(--pine);
+}
+.entright .pill.w2 { background: #fff; color: var(--sub); box-shadow: inset 0 0 0 1.5px rgba(20, 35, 27, .22); }
