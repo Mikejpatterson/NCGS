@@ -1103,9 +1103,17 @@ body::before { display: none; }
   color: var(--pine);
 }
 .entright .pill.w2 { background: #fff; color: var(--sub); box-shadow: inset 0 0 0 1.5px rgba(20, 35, 27, .22); }
+.hero.s .tile .bignum, .hero.c:not(.pine) .tile .bignum { color: var(--text); }
+.hero.s .tile .cap, .hero.c:not(.pine) .tile .cap { color: var(--sub); }
+.hero.s .tile, .hero.c:not(.pine) .tile { background: #fff; box-shadow: var(--ring); }
+.hero.s .tile.flag, .hero.c:not(.pine) .tile.flag { background: var(--flag); box-shadow: none; }
+.hero.s .tile.flag .cap, .hero.s .tile.flag .bignum, .hero.c:not(.pine) .tile.flag .cap, .hero.c:not(.pine) .tile.flag .bignum { color: var(--pine); }
+.lrow[style*="repeat("] .av { width: 28px; height: 28px; font-size: .6rem; flex: none; }
+.lrow[style*="repeat("] .lname { gap: 8px; }
+.lrow[style*="repeat("] { column-gap: 6px; padding-inline: 12px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141146","server":"5b0c6166"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141214","server":"5b0c6166"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2551,7 +2559,7 @@ function initialsOf(m) {
 }
 
 /* A name with its initials badge, for leaderboard rows. Bold when it is you; the badge is flag-yellow for the leader. */
-const avName = (x, sub, lead) => { const me = x.id === DB.prefs.me; return `<span class="lname${me ? ' b' : ''}"><i class="av${me ? ' is-me' : lead ? ' is-lead' : ''}" aria-hidden="true">${esc(initialsOf(D.member(x.id)))}</i><span class="ln"><span class="n">${esc(x.name)}${me ? ' <small class="you">YOU</small>' : ''}</span>${sub ? `<span class="cap">${esc(sub)}</span>` : ''}</span></span>`; };
+const avName = (x, sub, lead) => { const me = x.id === DB.prefs.me; return `<span class="lname${me ? ' b' : ''}"><i class="av${me ? ' is-me' : lead ? ' is-lead' : ''}" aria-hidden="true">${esc(initialsOf(D.member(x.id)))}</i><span class="ln"><span class="n">${esc(x.name)}</span>${sub ? `<span class="cap">${esc(sub)}</span>` : ''}</span></span>`; };
 /* The small line under a name on a live leaderboard: how far ahead the leader is, and how many holes they have played. */
 const lbSub = (rows, x, r) => { if (!r || r.status !== 'live' || x.thru === undefined) return ''; const next = rows[1]; return rows[0] === x && next && x.total > next.total ? `Leads by ${x.total - next.total} \u00b7 thru ${x.thru}` : `thru ${x.thru}`; };
 
@@ -3033,7 +3041,7 @@ function miniBoard(r) {
   let show = rows.slice(0, 3);
   const mine = DB.prefs.me ? rows.find(x => x.id === DB.prefs.me) : null;
   if (mine && !show.includes(mine)) show = [show[0], show[1], mine];
-  return `<div class="mini num">${show.map(x => `<div class="mr${x.id === DB.prefs.me ? ' me' : ''}"><span class="mp">${esc(x.posLabel)}</span><span class="mn">${esc(x.name)}${x.id === DB.prefs.me ? ' <small>YOU</small>' : ''}</span><span class="mt">${x.total}</span></div>`).join('')}</div>`;
+  return `<div class="mini num">${show.map(x => `<div class="mr${x.id === DB.prefs.me ? ' me' : ''}"><span class="mp">${esc(x.posLabel)}</span><span class="mn">${esc(x.name)}</span><span class="mt">${x.total}</span></div>`).join('')}</div>`;
 }
 function homeHeadline(feature) {
   if (!feature) return 'No round booked yet';
@@ -3289,7 +3297,7 @@ function resultsBlock(r) {
   if (!res) return '';
   const app = res.source === 'app';
   let html = sec(label('Stableford'), cardOf(res.rows.map(x => {
-    const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1 && r.status === 'live')}<span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
+    const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
     return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')) + (res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : res.source === 'sheet' ? '<p class="cap note">From the society sheet</p>' : ''));
   if (res.kb.length) {
@@ -4222,7 +4230,7 @@ VIEWS.board = () => {
 
   const pillTxt = r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r);
   html += sec(`${label(esc(roundName(r)))}${pillTxt}`, cardOf(res.rows.map(x => {
-    const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1 && r.status === 'live')}<span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
+    const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
     return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')), true);
   if (res.kb.length) { const low = E.kbLowest(res.kb); html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''))); }
@@ -4249,10 +4257,10 @@ function tripTable(list) {
     return { id: pid, name: D.nameOf(pid), per, total: per.reduce((s, v) => s + (v || 0), 0) };
   }), 'total', 'desc');
   const allFinal = list.every(r => r.status === 'final');
-  const cols = `grid-template-columns:36px minmax(0,1fr) repeat(${list.length},32px) 40px`;
+  const cols = `grid-template-columns:26px minmax(0,1fr) repeat(${list.length},30px) 38px`;
   return sec(`${label(`All ${list.length} rounds count`)}${allFinal ? '<span class="pill g">Final</span>' : '<span class="pill w">In progress</span>'}`,
     cardOf(`<div class="lrow" style="${cols};min-height:36px"><span></span><span></span>${list.map(r => `<span class="cap r">D${r.trip_day || r.seq}</span>`).join('')}<span class="cap r">Total</span></div>
-    ${rows.map(row => `<button class="lrow" style="${cols}" data-act="player" data-pid="${row.id}"><span class="sub">${row.posLabel}</span><span class="${row.id === DB.prefs.me ? 'b' : ''}">${esc(row.name)}</span>${row.per.map(v => `<span class="r sub">${v === null ? '–' : v}</span>`).join('')}<span class="r b">${row.total}</span></button>`).join('')}`), true);
+    ${rows.map(row => `<button class="lrow" style="${cols}" data-act="player" data-pid="${row.id}"><span class="sub">${row.posLabel}</span>${avName(row, null, row.pos === 1)}${row.per.map(v => `<span class="r sub">${v === null ? '–' : v}</span>`).join('')}<span class="r b">${row.total}</span></button>`).join('')}`), true);
 }
 
 /* ----- Results card ----- */
