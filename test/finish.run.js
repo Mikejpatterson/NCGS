@@ -11,12 +11,11 @@ let ok = true; const check = (n, c, x) => { console.log((c ? 'PASS  ' : 'FAIL  '
   const tap = async s => { await pg.click(s, { timeout: 4000 }); await pg.waitForTimeout(140); };
   const have = async s => !!(await pg.$(s)) && await (await pg.$(s)).isVisible();
   await tap('[data-act="play"]');
-  check('Hole screen opens', await top() === 'tee', await top());
+  check('Hole tab opens the score entry', await top() === 'tee' && !!(await pg.$('.entry .stepper')), await top());
   let holes = 0, seen = new Set();
   for (let guard = 0; guard < 60; guard++) {
     const t = await top(); seen.add(t);
-    if (t === 'tee') { await tap('[data-act="enter"]'); continue; }
-    if (t === 'entry') {
+    if (t === 'tee' || t === 'entry') {
       // give every player in the group a score using the + button (first tap gives par-ish), then save
       const pids = await pg.$$eval('[data-act="set"][data-dir="up"]', els => els.map(e => e.dataset.pid));
       for (const pid of pids) { await pg.click(`[data-act="set"][data-pid="${pid}"][data-dir="up"]`); await pg.waitForTimeout(60); }
@@ -34,7 +33,7 @@ let ok = true; const check = (n, c, x) => { console.log((c ? 'PASS  ' : 'FAIL  '
     check('unexpected screen ' + t, false); break;
   }
   check('scores saved for a lot of holes', holes >= 3, 'holes ' + holes);
-  check('screens seen in order: entry, after, and finish or check', seen.has('entry') && seen.has('after'), [...seen].join(','));
+  check('screens seen in order: entry, after, and finish or check', (seen.has('entry') || seen.has('tee')) && seen.has('after'), [...seen].join(','));
   const depth = await pg.evaluate(() => window.__ncgs.UI.stack.length);
   check('the Back history is short after a whole round (no stack of identical hole screens)', depth <= 3, 'stack depth ' + depth);
   const end = await top();

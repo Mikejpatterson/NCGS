@@ -1395,3 +1395,6 @@ body { font-variant-numeric: tabular-nums; }
 .sit:nth-child(2) .sit-i, .sit:nth-child(3) .sit-i { background: #E3EFE6; }
 .tee > .btn[data-act="enter"] { position: static; box-shadow: none; }
 .tee .entergo { margin-top: 14px; }
+.entnav .entright { gap: 8px; }
+.entnav .pillbtn { padding: 0 14px; font-size: .9rem; }
+@media (max-width: 380px) { .entry .stepper .pu, .entry .stepper .pu.on { padding: 0 10px; font-size: .8rem; margin-left: 2px; } }

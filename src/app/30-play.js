@@ -14,45 +14,31 @@ function playHomeView(rid) {
 }
 function myConflicts(rid, gid) { return DB.conflicts.filter(c => c.round === rid && c.grp === gid); }
 
+/* The Hole tab goes straight to entering the scores for the next hole. Anything that needs attention (a card photo to check,
+   a hole saved on two phones) shows under the players on that screen. */
 VIEWS.tee = () => {
   const rid = playRid();
-  const r = D.round(rid);
   const comp = computeR(rid);
   const g = myGroup(rid);
   if (!comp || !g) return VIEWS.round({ rid });
   const gc = comp.groups.find(x => x.id === g.id);
-  const n = gc.nextHole;
-  if (!n) return VIEWS.finish();
-  UI.hole = n;
-  const h = holeOf(rid, n);
-  const seg = n <= 9 ? 'front' : 'back';
-  const m = gc.matches[seg].status;
-  const mShow = m.state === 'pending' ? { text: 'All square', leader: null } : m;
-  const d = (((DB.prefs.drafts[rid] || {})[g.id]) || {})[n];
-  const hasDraft = d && Object.keys(d).some(k => k[0] !== '_');
-  const contest = contestOn(rid, n);
-  const buggies = gc.teams.length === 2;
-  const teams = gc.teams.map((t, i) => sec(buggies ? pill(i) : '', cardOf(t.map(pid => dropRow(rid, { id: pid }, `<span>${esc(D.nameOf(pid))}</span><span class="right">${dots(comp.players[pid].holes[n].shots)}${dropChev}</span>`, 'row')).join('')), i === 1)).join('');
+  if (!gc.nextHole) return VIEWS.finish();
+  // Stay on the hole being scored while this phone is still working on it, even if another phone saved it meanwhile
+  const t = UI.teeHole, dr = ((DB.prefs.drafts[rid] || {})[g.id] || {})[t];
+  const mine = t && gc.holes[t] && (!gc.holes[t].complete || (dr && Object.keys(dr).some(k => k[0] !== '_')));
+  UI.hole = UI.teeHole = mine ? t : gc.nextHole;
+  UI.edit = false;
+  return VIEWS.entry();
+};
+function needsAttention(rid, gc, gid) {
   const checkRows = ['front', 'back'].filter(sg => nineComplete(gc, sg)).map(sg => {
-    const c = D.check(rid, g.id, sg);
+    const c = D.check(rid, gid, sg);
     return c && c.resolved ? '' : checkRow(sg, c);
   }).join('');
-  const clash = myConflicts(rid, g.id);
+  const clash = myConflicts(rid, gid);
   const clashRows = [...new Set(clash.map(c => c.hole))].map(hn => `<button class="row" data-act="conflict" data-n="${hn}"><span>Hole ${hn}</span><span class="right"><span class="pill w">Saved on two phones</span>${chev}</span></button>`).join('');
-  return {
-    tabs: 'hole',
-    html: `<div class="tee"><div class="entnav teenav">${isDemo(r) ? '<span class="pill w2">Demo</span>' : '<span></span>'}<button class="pillbtn" data-act="round" data-rid="${rid}">All groups</button></div>
-      <header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${n}"><b class="entn">${n}</b><span class="hdown">${ICON.down}</span></button></div><div class="entr"><b>Par ${h.par}</b><span>Index ${h.si}${h.yards ? ` · ${h.yards} yds` : ''}</span></div></div><div class="prog" role="img" aria-label="Hole ${n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === n ? 'cur' : k < n ? 'done' : ''}"></i>`).join('')}</div></header>
-      ${contest ? `<div class="pills2" style="margin-top:12px"><span class="pill flag">${CONTEST[contest.type]}</span></div>` : ''}
-      ${clashRows ? sec('', cardOf(clashRows), true) : ''}
-      ${teams}
-      <p class="cap shotkey"><span class="sd">●</span> a shot you get on this hole</p>
-      <button class="btn entergo" data-act="enter">${hasDraft ? 'Continue scores' : 'Enter scores'}</button>
-      ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span>${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
-      ${checkRows ? sec(label('Scorecard'), cardOf(checkRows)) : ''}
-      ${saveWarning()}</div>${holesSheet(rid, gc, null)}`
-  };
-};
+  return (clashRows ? sec('', cardOf(clashRows), true) : '') + (checkRows ? sec(label('Scorecard'), cardOf(checkRows)) : '');
+}
 // "Go to hole": every hole at once. Scored holes are filled, the next one to play is ringed, the one on screen is outlined.
 function holesSheet(rid, gc, here) {
   if (!UI.holeSheet) return '';
@@ -145,7 +131,7 @@ VIEWS.entry = () => {
   let html = '<div class="entry">';
   if (ctx.mode === 'org') html += `<p class="cap">Correcting group ${gc.n}</p>`;
   const tt = ((D.round(ctx.rid).groups || []).find(x => x.id === ctx.gid) || {}).teeTime;
-  html += `<div class="entnav"><button class="entback" data-act="entry-back" aria-label="Back">${ICON.back}<span>${ctx.mode === 'org' ? 'Back' : 'Round'}</span></button>${tt ? `<span class="entgrp">${esc(tt)} group</span>` : ''}</div>
+  html += `<div class="entnav"><button class="entback" data-act="entry-back" aria-label="Back">${ICON.back}<span>${ctx.mode === 'org' ? 'Back' : 'Home'}</span></button>${ctx.mode === 'org' ? (tt ? `<span class="entgrp">${esc(tt)} group</span>` : '') : `<span class="entright"><button class="pillbtn" data-act="tab" data-tab="board">Results</button><button class="pillbtn" data-act="tab" data-tab="rules">Ruling</button></span>`}</div>
   <header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small>${ctx.mode === 'org' ? `<b class="entn">${ctx.n}</b>` : `<button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${ctx.n}"><b class="entn">${ctx.n}</b><span class="hdown">${ICON.down}</span></button>`}</div><div class="entr"><b>Par ${h.par}</b><span>Index ${h.si}${h.yards ? ` · ${h.yards} yds` : ''}</span></div></div><div class="prog" role="img" aria-label="Hole ${ctx.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(n => `<i class="${n === ctx.n ? 'cur' : n < ctx.n ? 'done' : ''}"></i>`).join('')}</div></header>`;
   if (final) html += `<div class="banner" style="margin-top:12px">This round is final.</div>${ctx.mode === 'org' ? '<button class="btn quiet" data-act="reopen">Reopen round</button>' : ''}`;
   const clash = DB.conflicts.filter(c => c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n);
@@ -157,6 +143,7 @@ VIEWS.entry = () => {
     const right = d._claim ? `<span class="b">${esc(D.nameOf(d._claim))}</span>` : `<span class="sub">${lead ? `${esc(D.nameOf(lead.pid))} leads` : 'Add'}</span>`;
     html += sec('', `<button class="card row" data-act="contest-open"><span>${CONTEST[contest.type]}</span><span class="right">${right}${chev}</span></button>`);
   }
+  if (ctx.mode === 'player' && !ctx.edit) html += needsAttention(ctx.rid, gc, ctx.gid);
   const who = missing.length && missing.length <= 2 ? ' · ' + missing.map(D.nameOf).join(', ') : '';
   const lbl = missing.length ? `${plural(missing.length, 'score')} to go${esc(who)}` : ctx.mode === 'org' ? 'Save correction' : ctx.edit ? 'Save changes' : `Save hole ${ctx.n}`;
   html += `<div class="savebar"><button class="btn ${missing.length ? 'quiet' : ''}" data-act="save">${lbl}</button></div></div>`;

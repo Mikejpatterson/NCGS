@@ -23,10 +23,10 @@ const scenarios = [
   ['rules', async p => { await clickAny(p, '#tabs .tab:nth-child(4)'); }],
   ['hole-pick', async p => { await clickAny(p, '[data-act="play"]'); }],
   ['hole-tee', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]'); }],
-  ['entry', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="enter"]'); }],
-  ['entry-100', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="enter"]');
+  ['entry', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]'); }],
+  ['entry-100', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]');
      for (const pid of await p.$$eval('[data-act="set"][data-dir="up"]', e => e.map(x => x.dataset.pid))) { for (let i = 0; i < 6; i++) await p.click(`[data-act="set"][data-dir="up"][data-pid="${pid}"]`, { timeout: 2000 }).catch(() => {}); } await p.waitForTimeout(150); }],
-  ['after', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="enter"]');
+  ['after', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]');
      for (const pid of await p.$$eval('[data-act="set"][data-dir="up"]', e => e.map(x => x.dataset.pid))) await p.click(`[data-act="set"][data-dir="up"][data-pid="${pid}"]`); await clickAny(p, '[data-act="save"]'); await p.waitForTimeout(300); }],
 ];
 const metrics = () => {

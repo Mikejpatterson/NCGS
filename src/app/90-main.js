@@ -22,6 +22,7 @@ const ACT = {
     if (!DB.prefs.me || !myGroup(rid)) { go('who', { then: rid }); return; }
     UI.edit = false;
     UI.after = null;
+    UI.teeHole = null;
     if (backTo(e => ['tee', 'match', 'board', 'rules', 'finish'].includes(e.v))) { UI.playRid = rid; replaceTop(playHomeView(rid), { rid }); return; }
     UI.playRid = rid;
     go(playHomeView(rid), { rid });
@@ -40,7 +41,7 @@ const ACT = {
     if (!rid) { toast('No round yet'); return; }
     if (cur().v === 'home' && t === 'hole') { ACT.play({ dataset: { rid } }); return; }
     while (UI.stack.length > 1 && !['tee', 'match', 'board', 'rules', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();
-    if (t === 'hole') { UI.edit = false; UI.after = null; replaceTop(playHomeView(rid), { rid }); }
+    if (t === 'hole') { UI.edit = false; UI.after = null; UI.teeHole = null; replaceTop(playHomeView(rid), { rid }); }
     else if (t === 'rules') { replaceTop('rules', { rid }); }
     else if (t === 'match') { UI.board = null; UI.res = 'bw'; UI.scrollTop = true; replaceTop('board', { rid }); }
     else { UI.board = null; UI.res = UI.res === 'bw' || UI.res === 'ct' ? UI.res : 'lb'; replaceTop('board', { rid }); }
@@ -80,7 +81,7 @@ const ACT = {
     if (cur().v === 'entry') replaceTop('entry', { rid }); else go('entry', { rid });
   },
   undo: () => undoSave(),
-  next: () => { UI.after = null; replaceTop('tee', { rid: playRid() }); },
+  next: () => { UI.after = null; UI.teeHole = null; replaceTop('tee', { rid: playRid() }); },
   'to-finish': () => { UI.after = null; replaceTop('finish', { rid: playRid() }); },
   conflict: el => { UI.hole = Number(el.dataset.n); UI.edit = true; const ctx = entryCtx(); clearDraft(ctx); go('entry', { rid: playRid() }); },
   submit: () => {

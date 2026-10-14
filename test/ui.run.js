@@ -75,12 +75,12 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await tap('[data-act="play"]');
   check('Play now asks who you are first', /Who are you\?/.test(await text()));
   await tap('[data-act="pick"][data-id="mike-p"]');
-  await page.waitForSelector('[data-act="enter"]');
+  await page.waitForSelector('.entry .stepper');
   t = await text();
-  check('tee: hole 15, par 3 with nearest the pin, Buggy pills', /Hole\s*15/i.test(t) && /Par\s*3\s*Index\s*14/.test(t) && /Nearest the pin/.test(t) && /Buggy 1/.test(t));
-  check('tee fits on one iPhone screen', await fits());
+  check('hole tab goes straight to entering scores: hole 15, par 3 with nearest the pin, Buggy pills', /Hole\s*15/i.test(t) && /Par\s*3\s*Index\s*14/.test(t) && /Nearest the pin/.test(t) && /Buggy 1/.test(t));
+  check('hole 15 entry fits on one iPhone screen', await fits());
   await shot('05-tee');
-  check('tee: no duplicate Home button, an All groups button and a tappable hole number', !(await page.$('.tee .entback')) && !!(await page.$('.tee .pillbtn[data-act="round"]')) && !!(await page.$('.holebtn')));
+  check('hole screen: no All groups or Enter scores step, a Home exit and a tappable hole number', !(await page.$('.pillbtn[data-act="round"]')) && !(await page.$('.tee')) && !!(await page.$('.entback')) && !!(await page.$('.holebtn')) && !!(await page.$('.entry .stepper')));
   await tap('.holebtn');
   check('go to hole: all 18 shown, scored ones filled, hole 15 ringed as next', (await page.$$('.hs')).length === 18 && (await page.$$('.hs.done')).length === 14 && (await page.$eval('.hs.nxt', e => e.textContent)) === '15');
   await shot('05b-holes');
@@ -88,15 +88,14 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   t = await text();
   check('go to hole: a scored hole opens to change it', /Hole\s*3/i.test(t) && /Save changes/.test(t));
   await page.goBack(); await page.waitForTimeout(300);
-  check('the phone back gesture returns to the hole screen', /Hole\s*15/i.test(await text()) && !!(await page.$('[data-act="enter"]')));
+  check('the phone back gesture returns to the hole screen', /Hole\s*15/i.test(await text()) && !!(await page.$('.entry .stepper')));
   await tap('.holebtn'); await tap('.hs[data-n="17"]');
   t = await text();
   check('go to hole: a later hole can be scored early', /Hole\s*17/i.test(t) && /4 scores to go/.test(t));
   await tap('[data-act="entry-back"]');
-  check('Back from there returns to the hole screen', /Hole\s*15/i.test(await text()) && !!(await page.$('[data-act="enter"]')));
+  check('Back from there returns to the hole screen', /Hole\s*15/i.test(await text()) && !!(await page.$('.entry .stepper')));
   await tap('.holebtn'); await tap('[data-act="holes-close"]');
   check('the hole picker closes with Done', !(await page.$('.hs-sheet')));
-  await tap('[data-act="enter"]');
   const pids = await page.$$eval('.stepper', els => els.map(e => e.querySelector('[data-pid]').dataset.pid));
   for (const pid of pids) await stepTo(page, pid, 3);
   await shot('06-entry');
@@ -140,11 +139,11 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
 
   // Reload keeps everything (phone copy + queue)
   await page.reload();
-  await page.waitForSelector('[data-act="enter"]');
+  await page.waitForSelector('.entry .stepper');
   check('reload opens straight on the next hole', /Hole\s*16/i.test(await text()));
 
   // Buggy Wars and leaderboard
-  await tap('.tab[data-tab="board"]');
+  await tap('.entnav [data-tab="board"], .tab[data-tab="board"]');
   t = await text();
   check('one Results tab bar, no separate Buggy tab', (await page.$$('.tab')).length === 4 && !(await page.$('.tab[data-tab="match"]')) && /Results/.test(await page.textContent('#tabs')) && /Leaderboard/.test(t));
   check('Results has Scores, Buggy Wars, Contests and Stats pills, Scores first', JSON.stringify(await page.$$eval('.pills button', b => b.map(x => x.textContent.trim()))) === JSON.stringify(['Scores', 'Buggy Wars', 'Contests', 'Stats']) && await page.$eval('.pills button.on', e => e.textContent.trim()) === 'Scores');
@@ -223,14 +222,13 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   const page2 = await ctx.newPage();
   page2.on('pageerror', e => errors.push('page2: ' + e.message));
   await page2.goto(URL);
-  await page2.waitForSelector('[data-act="enter"]');
-  await page2.click('[data-act="enter"]');
+  await page2.waitForSelector('.entry .stepper');
   await page.click('.tab[data-tab="hole"]');
-  await page.click('[data-act="enter"]');
+  await page.waitForSelector('.entry .stepper');
+  for (const pid of pids) await stepTo(page2, pid, 5);   // the second phone is part way through typing when the first one saves
   for (const pid of pids) await stepTo(page, pid, 4);
   await page.click('[data-act="save"]');
   await sync();
-  for (const pid of pids) await stepTo(page2, pid, 5);
   await page2.click('[data-act="save"]');
   await page2.evaluate(() => window.__ncgs.flush().then(() => window.__ncgs.sync()));
   await page2.waitForTimeout(400);
