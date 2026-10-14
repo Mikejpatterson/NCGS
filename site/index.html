@@ -759,9 +759,190 @@ textarea.export + .btn, #restorejson + .btn { margin-top: 8px; }
 .rbtn { flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; border-radius: 18px; background: #e4e4ea; font-size: 1.05rem; font-weight: 700; transition: background-color .15s, transform .15s; }
 .rbtn:active { background: #d6d6dd; transform: scale(.985); }
 .rbtn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ================= 2026 look: warm white, rounded pine cards, floating pill tab bar ================= */
+:root {
+  --bg: #FAF8F3;
+  --press: #EEEBE3;
+  --fill: #EEF0EA;
+  --ring: 0 0 0 1px rgba(20, 35, 27, .07);
+  --lift: 0 0 0 1px rgba(20, 35, 27, .07);
+}
+html, body { background: var(--bg); }
+#app { padding-block-end: calc(120px + env(safe-area-inset-bottom, 0px)); }
+#app.no-tabs { padding-block-end: 24px; }
+.card, .tile, .lnk, .rcard { border-radius: 24px; box-shadow: var(--ring); }
+.btn.quiet { box-shadow: var(--ring); }
+.btn { border-radius: 28px; min-height: 56px; box-shadow: none; }
+.row, .lrow, .hrow, .grow, .mrow { min-height: 54px; }
+.title { color: var(--text); }
+
+/* Page headers (every screen except Home and the hole) are plain big titles on the page, like the mock-ups */
+.hero.s, .hero.c:not(.pine) { background: none; color: var(--text); border-radius: 0; margin: 0; padding: calc(env(safe-area-inset-top, 0px) + 12px) 4px 4px; }
+.hero.s .title { color: var(--text); font-size: 2.1rem; font-weight: 900; letter-spacing: -.03em; }
+.hero.s .link, .hero.s .back-icon, .hero.s .link.inline { color: var(--pine); }
+.hero.s .sub, .hero.s .cap, .hero.s .hsub { color: var(--sub); }
+.hero.s .pill.w { background: var(--flag); color: var(--pine); }
+.hero.s .pill.g { background: var(--green-soft); color: #155C2D; }
+.hero.s + .sec, .hero.s + .btn { margin-top: 16px; }
+
+/* Cards that stay pine: the hole, the front-page round */
+.hero.pine, .hero.home .now { background: var(--pine); color: #fff; border-radius: 28px; position: relative; overflow: hidden; }
+.hero.pine { margin: 8px 0 0; padding: 16px 18px 14px; }
+.hero.pine::after, .hero.home .now::after { content: ""; position: absolute; right: -60px; top: -60px; width: 190px; height: 190px; border-radius: 50%; background: rgba(247, 197, 22, .14); pointer-events: none; }
+
+/* Front page */
+.hero.home { background: none; color: var(--text); border-radius: 0; margin: 0; padding: calc(env(safe-area-inset-top, 0px) + 12px) 4px 0; }
+.hero.home .wordmark { color: var(--text); font-weight: 800; }
+.hero.home .hsub { color: var(--pine); }
+.hero.home .badge { background: var(--flag); color: var(--pine); }
+.who-chip { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 6px 0 14px; border-radius: 22px; background: #fff; color: var(--text); box-shadow: var(--ring); font-weight: 600; }
+.who-av { width: 32px; height: 32px; border-radius: 50%; background: var(--pine); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; }
+.greet { margin: 14px 0 0; font-size: var(--t-sub); color: var(--sub); font-weight: 500; }
+.headline { margin: 4px 0 0; font-size: 1.85rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; color: var(--text); text-wrap: balance; }
+.hero.home .now { margin-top: 14px; padding: 18px; }
+.hero.home .now > * { position: relative; z-index: 1; }
+.hero.home .now-name { font-size: 1.8rem; letter-spacing: -.02em; }
+.mini { margin-top: 14px; border-radius: 18px; background: rgba(255, 255, 255, .1); padding: 2px 14px; }
+.mr { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.mr + .mr { border-top: 1px solid rgba(255, 255, 255, .14); }
+.mr .mp { width: 20px; font-weight: 800; }
+.mr .mn { flex: 1; font-weight: 700; }
+.mr .mn small { font-size: .65rem; letter-spacing: .1em; color: var(--flag); font-weight: 800; }
+.mr .mt { font-size: 1.4rem; font-weight: 800; letter-spacing: -.02em; }
+.go { border-radius: 28px; min-height: 56px; }
+.links { grid-template-columns: 1fr 1fr; }
+.lnk { border-radius: 22px; }
+
+/* Floating pill tab bar */
+.tabs { left: 50%; right: auto; width: min(calc(100% - 32px), 448px); transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); height: 68px; border-radius: 34px; padding: 0 8px; gap: 2px; grid-template-columns: repeat(4, 1fr); align-items: center; background: rgba(255, 255, 255, .94); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border: 0; box-shadow: 0 8px 28px rgba(20, 35, 27, .16), 0 0 0 1px rgba(20, 35, 27, .08); }
+.tab { height: 52px; min-height: 52px; border-radius: 26px; font-size: .68rem; font-weight: 600; color: var(--sub); }
+.tab svg { width: 22px; height: 22px; }
+.tab.on { background: #FBEFB8; color: var(--pine); font-weight: 700; }
+.tab.on svg { color: var(--pine); }
+.askbar { bottom: calc(var(--tabh, 90px) + 4px); }
+.thread { padding-bottom: calc(var(--tabh, 90px) + var(--askh, 76px) + 16px); }
+.toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+
+/* Initials badges and the same plain titles on every page header */
+.hero.c:not(.pine) .title { color: var(--text); font-size: 2.1rem; font-weight: 900; letter-spacing: -.03em; }
+.hero.c:not(.pine) .link, .hero.c:not(.pine) .back-icon { color: var(--pine); }
+.hero.c:not(.pine) .sub, .hero.c:not(.pine) .cap { color: var(--sub); }
+.lname { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.lname > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.av { flex: none; width: 40px; height: 40px; border-radius: 50%; background: #E3EAE0; color: var(--pine); display: inline-flex; align-items: center; justify-content: center; font-style: normal; font-size: .72rem; font-weight: 800; letter-spacing: 0; }
+.av.is-me { background: var(--pine); color: #fff; }
+.lrow { min-height: 64px; }
+.lrow.goy { grid-template-columns: 36px minmax(0, 1fr) auto 40px; }
+.hero.c:not(.pine) .hrow2 .big { color: var(--text); font-size: min(2.1rem, 9.5vw) !important; font-weight: 900; letter-spacing: -.03em; }
+.hero.c:not(.pine) .fact { background: #fff; box-shadow: var(--ring); color: var(--text); }
+.hero.c:not(.pine) .fact b { color: var(--pine); }
+.hero.c:not(.pine) .pill.w2 { color: var(--text); box-shadow: inset 0 0 0 1.5px rgba(20,35,27,.25); }
+.hero.pine { padding-top: calc(env(safe-area-inset-top, 0px) + 14px); }
+.hero.c:not(.pine) .hrow2 .big small { color: var(--sub); }
+.hero.c:not(.pine) { padding-top: calc(env(safe-area-inset-top, 0px) + 6px); padding-bottom: 2px; }
+#app { padding-block-end: calc(96px + env(safe-area-inset-bottom, 0px)); }
+
+/* ===== Scoring a hole, like the mock-up: name and dots on the left, round minus / big score / plus on the right ===== */
+.hero.pine .hrow2 .big { font-size: 4.2rem; letter-spacing: -.05em; }
+.hero.pine .hrow2 .big small { color: var(--flag); font-weight: 800; letter-spacing: .1em; font-size: .72rem; text-transform: uppercase; }
+.prog { display: flex; gap: 3px; margin-top: 12px; position: relative; z-index: 1; }
+.prog i { flex: 1; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, .25); }
+.prog i.done { background: #fff; }
+.prog i.now { background: var(--flag); }
+.entry .pr { display: grid; grid-template-columns: minmax(0, 1fr) 48px 76px 48px; grid-template-areas: "nm dn sc up" "pu dn sc up" "dc dc dc dc"; align-items: center; column-gap: 8px; padding: 10px 14px 10px 18px; min-height: 92px; }
+.entry .pr-top { grid-area: nm; align-self: end; margin: 0; min-height: 0; }
+.entry .pr-top .nm { display: flex; flex-wrap: wrap; align-items: center; column-gap: 6px; font-size: 1.1rem; font-weight: 800; }
+.entry .pr-top .nm .dots.s { order: 3; flex-basis: 100%; margin-top: 6px; min-height: 10px; }
+.entry .dots.s i { width: 10px; height: 10px; }
+.entry .dropcard.in { grid-area: dc; margin: 8px -14px -10px -18px; }
+.entry .stepper { display: contents; }
+.entry .st { width: 48px; height: 48px; border-radius: 50%; font-size: 1.7rem; font-weight: 600; background: var(--fill); color: var(--text); }
+.entry .st[data-dir="down"] { grid-area: dn; }
+.entry .st[data-dir="up"] { grid-area: up; background: var(--pine); color: #fff; }
+.entry .st:disabled { opacity: .3; }
+.entry .stv, .entry button.stv, .entry div.stv { grid-area: sc; height: 64px; width: 76px; }
+.entry .stv b { font-size: 2.5rem; position: relative; }
+.entry .stv b sup { font-size: 1.2rem; font-weight: 900; color: var(--pine); vertical-align: baseline; position: relative; top: -1em; line-height: 0; }
+.entry .stv small { font-size: .65rem; }
+.entry .stv.none { font-size: 1rem; color: var(--faint); font-weight: 700; }
+.entry .stepper .pu { grid-area: pu; justify-self: start; align-self: start; height: 34px; padding: 0 14px; border-radius: 17px; font-size: .8rem; font-weight: 700; margin-top: 6px; background: var(--fill); color: var(--sub); position: relative; }
+.entry .stepper .pu::after { content: ""; position: absolute; inset: -6px -6px; }
+.entry .stepper .pu.on { background: var(--green); color: #fff; }
+.entry .pr + .pr { border-top: 1px solid rgba(20, 35, 27, .08); }
+.savebar .btn:not(.quiet) { background: var(--flag); color: #0B3D2C; font-weight: 900; font-size: 1.1rem; box-shadow: none; }
+.savebar .btn.quiet { color: var(--pine); font-weight: 800; }
+
+/* ===== Leaderboard, like the mock-up ===== */
+.lbhead .eyebrow { margin: 4px 0 0; font-size: .75rem; font-weight: 800; letter-spacing: .08em; color: var(--pine); display: flex; align-items: center; }
+.lbhead .eyebrow .pulse { background: var(--pine); }
+.lbhead .sub { margin: 2px 0 0; }
+.seg.pills.four { grid-auto-flow: column; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; }
+.seg.pills.four button, .seg.pills button { font-size: .8rem; padding-inline: 2px; min-height: 40px; }
+.lrow { grid-template-columns: 28px minmax(0, 1fr) auto; min-height: 68px; }
+.lrow .sub { font-size: 1.1rem; font-weight: 800; color: var(--sub); }
+.lrow .lname { font-size: 1.05rem; font-weight: 700; }
+.lrow .ln { display: flex; flex-direction: column; min-width: 0; gap: 1px; }
+.lrow .ln .n { overflow: hidden; text-overflow: ellipsis; }
+.lrow .ln .cap { font-size: .8rem; font-weight: 400; }
+.you { font-size: .65rem; letter-spacing: .1em; color: var(--pine); font-weight: 800; }
+.lrow .r .b { font-size: 1.75rem; font-weight: 900; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.av.is-lead { background: var(--flag); color: #14231B; }
+.lrow:has(.av.is-lead) { background: #FFF3C4; }
+.lrow:has(.av.is-me) { background: #E8F1EA; }
+.lrow.goy .lname { font-size: 1.05rem; }
+.lrow.goy { grid-template-columns: 28px minmax(0, 1fr) auto 48px; }
+.lrow.goy .b.r { font-size: 1.6rem; font-weight: 900; }
+.prog i.cur { background: var(--flag); }
+.entry .pr { grid-template-columns: auto minmax(0, 1fr) 48px 76px 48px; grid-template-areas: "nm nm dn sc up" "dt pu dn sc up" "dc dc dc dc dc"; min-height: 84px; padding-block: 8px; }
+.entry .pr-top { grid-area: nm; }
+.entry .pr-top .nm .dots.s { display: none; }
+.entry .pr-dots { grid-area: dt; display: flex; align-items: center; min-height: 34px; margin-top: 4px; }
+.entry .pr-dots .dots { margin: 0; }
+.entry .stepper .pu { margin-top: 4px; margin-left: 10px; height: 32px; }
+
+/* ===== Liquid glass tab bar: clear, blurred, bright edge; the chosen tab is a lens of yellow glass ===== */
+.tabs { background: rgba(255, 255, 255, .68); -webkit-backdrop-filter: blur(30px) saturate(190%) brightness(1.05); backdrop-filter: blur(30px) saturate(190%) brightness(1.05); box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .95), inset 0 -1px 0 rgba(255, 255, 255, .4), inset 0 0 0 1px rgba(255, 255, 255, .55), 0 12px 32px rgba(20, 35, 27, .2), 0 0 0 .5px rgba(20, 35, 27, .12); }
+.tabs::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 55%); pointer-events: none; z-index: -1; }
+.tab { color: #36413B; }
+.tab.on { background: linear-gradient(180deg, rgba(255, 248, 214, .95), rgba(250, 232, 160, .7)); box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .95), inset 0 0 0 1px rgba(255, 255, 255, .6), 0 3px 10px rgba(122, 90, 0, .18); }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .tabs { background: rgba(255, 255, 255, .96); } }
+
+/* ===== More glass: clearer, stronger blur and colour lift, bright rim light all the way round, a curved highlight across the top ===== */
+.tabs { background: linear-gradient(135deg, rgba(255, 255, 255, .46), rgba(255, 255, 255, .14) 42%, rgba(255, 255, 255, .32)); -webkit-backdrop-filter: blur(14px) saturate(230%) contrast(1.06) brightness(1.1); backdrop-filter: blur(14px) saturate(230%) contrast(1.06) brightness(1.1); box-shadow: inset 0 2px 1px -1px rgba(255, 255, 255, 1), inset 0 -2px 2px -1px rgba(255, 255, 255, .7), inset 2px 0 3px -2px rgba(255, 255, 255, .9), inset -2px 0 3px -2px rgba(255, 255, 255, .9), inset 0 0 24px rgba(255, 255, 255, .3), 0 16px 38px rgba(20, 35, 27, .24), 0 0 0 .5px rgba(20, 35, 27, .14); }
+.tabs::before { background: radial-gradient(130% 100% at 50% -35%, rgba(255, 255, 255, .8), rgba(255, 255, 255, 0) 62%); }
+.tab { text-shadow: 0 0 8px rgba(255, 255, 255, .95), 0 0 2px rgba(255, 255, 255, .8); }
+.tab svg { filter: drop-shadow(0 0 4px rgba(255, 255, 255, .9)); }
+.tab.on { background: linear-gradient(180deg, rgba(255, 255, 255, .7), rgba(247, 197, 22, .34)); -webkit-backdrop-filter: blur(6px) saturate(180%) brightness(1.08); backdrop-filter: blur(6px) saturate(180%) brightness(1.08); box-shadow: inset 0 2px 1px -1px #fff, inset 0 -2px 2px -1px rgba(255, 255, 255, .8), inset 0 0 0 1px rgba(255, 255, 255, .65), inset 0 0 14px rgba(255, 255, 255, .4), 0 5px 14px rgba(122, 90, 0, .22); }
+
+/* Selected tab: a stronger yellow glass lens, darker bolder icon and label */
+.tab.on { background: linear-gradient(180deg, rgba(255, 255, 255, .85), rgba(247, 197, 22, .62)); box-shadow: inset 0 2px 1px -1px #fff, inset 0 -2px 3px -1px rgba(255, 255, 255, .9), inset 0 0 0 1.5px rgba(255, 255, 255, .85), inset 0 0 16px rgba(255, 255, 255, .5), 0 0 0 1px rgba(214, 160, 0, .45), 0 6px 16px rgba(160, 110, 0, .32); color: #0B3D2C; font-weight: 800; text-shadow: none; }
+.tab.on svg { stroke-width: 2.5; color: #0B3D2C; filter: none; }
+
+/* Golfer of the Year: the leader in a pine card, each counting score as a green chip */
+.leadcard { position: relative; overflow: hidden; margin-top: 14px; border-radius: 28px; background: var(--pine); color: #fff; padding: 18px; display: flex; flex-direction: column; gap: 4px; }
+.leadcard::after { content: ""; position: absolute; right: -50px; top: -50px; width: 170px; height: 170px; border-radius: 50%; background: rgba(247, 197, 22, .14); }
+.leadcard > * { position: relative; z-index: 1; }
+.lc-k { font-size: .75rem; font-weight: 800; letter-spacing: .1em; color: var(--flag); }
+.lc-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.lc-n { font-size: 2.3rem; font-weight: 900; letter-spacing: -.03em; line-height: 1; }
+.lc-p { font-size: .95rem; font-weight: 700; color: rgba(255, 255, 255, .85); font-variant-numeric: tabular-nums; }
+.lc-p b { font-size: 3.2rem; font-weight: 900; letter-spacing: -.05em; line-height: .9; color: #fff; }
+.lc-s { margin-top: 8px; font-size: var(--t-sub); color: rgba(255, 255, 255, .85); }
+.chips { display: inline-flex; gap: 6px; }
+.chipn { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 30px; padding: 0 4px; border-radius: 15px; background: #E3EFE6; color: var(--pine); font-style: normal; font-size: .85rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+.lrow.goy { grid-template-columns: 24px minmax(0, 1fr) auto 52px; gap: 6px; }
+.lrow.goy .lname { gap: 8px; }
+.lrow.goy .av { width: 34px; height: 34px; font-size: .62rem; }
+@media (max-width: 360px) { .lrow.goy .av { display: none; } }
+.lrow.goy:first-of-type { background: #FFF3C4; }
+.lrow.goy .b.r { text-align: right; }
+
+/* Anything scrolled or tabbed into view lands above the floating tab bar, not under it */
+html { scroll-padding-bottom: calc(var(--tabh, 90px) + 16px); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610131920","server":"5b0c6166"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610140536","server":"5b0c6166"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2137,6 +2318,7 @@ const ICON = {
 };
 const sized = (icon, n) => icon.replace('<svg', `<svg width="${n}" height="${n}"`);
 const TABICON = {
+  home: svg('<path d="M4 11l8-7 8 7v9H4z"/>'),
   hole: svg('<path d="M6 21V4"/><path d="M6 4h12l-2.5 4L18 12H6"/>'),
   match: svg('<path d="M4 8h14"/><path d="M15 5l3 3-3 3"/><path d="M20 16H6"/><path d="M9 13l-3 3 3 3"/>'),
   rules: svg('<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M11.2 8.2a1.8 1.8 0 1 1 2.4 1.7c-.6.3-.9.6-.9 1.3"/><path d="M12.7 13.6v.2"/>'),
@@ -2189,6 +2371,23 @@ const sec = (label, body, near) => `<section class="sec${near ? ' near' : ''}">$
 const label = t => `<span class="sub">${t}</span>`;
 const cardOf = rows => `<div class="card">${rows}</div>`;
 const navBack = (lbl, act = 'back') => `<div class="nav"><button class="link" data-act="${act}">${ICON.back}${esc(lbl)}</button></div>`;
+
+/* The round badge on a person: first initial plus surname initial (Mike P is MP, Damien McPhillips is DMc). Taken from the full name. */
+function initialsOf(m) {
+  if (!m) return '';
+  const parts = String(m.full || '').trim().split(/\s+/).filter(Boolean);
+  if (parts.length > 1) {
+    const last = parts[parts.length - 1];
+    return parts[0][0].toUpperCase() + (/^Mc[A-Z]/.test(last) ? 'Mc' : last[0].toUpperCase());
+  }
+  const n = String(m.name || '').replace(/[^A-Za-z]/g, '');
+  return n.slice(0, 2).toUpperCase();
+}
+
+/* A name with its initials badge, for leaderboard rows. Bold when it is you; the badge is flag-yellow for the leader. */
+const avName = (x, sub, lead) => { const me = x.id === DB.prefs.me; return `<span class="lname${me ? ' b' : ''}"><i class="av${me ? ' is-me' : lead ? ' is-lead' : ''}" aria-hidden="true">${esc(initialsOf(D.member(x.id)))}</i><span class="ln"><span class="n">${esc(x.name)}${me ? ' <small class="you">YOU</small>' : ''}</span>${sub ? `<span class="cap">${esc(sub)}</span>` : ''}</span></span>`; };
+/* The small line under a name on a live leaderboard: how far ahead the leader is, and how many holes they have played. */
+const lbSub = (rows, x, r) => { if (!r || r.status !== 'live' || x.thru === undefined) return ''; const next = rows[1]; return rows[0] === x && next && x.total > next.total ? `Leads by ${x.total - next.total} \u00b7 thru ${x.thru}` : `thru ${x.thru}`; };
 
 /* ---- 10-data.js ---- */
 /* ---------- Data: one shared copy, kept on every phone ----------
@@ -2642,6 +2841,32 @@ function playLabel(r) {
   const gc = computeR(r.id).groups.find(g => g.id === mine.id);
   return gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now';
 }
+/* The top three of a live round, and you if you are lower down. Taken from the same leaderboard as the Results tab. */
+function miniBoard(r) {
+  const res = resultsOf(r.id);
+  const rows = res && res.rows ? res.rows : [];
+  if (!rows.length) return '';
+  let show = rows.slice(0, 3);
+  const mine = DB.prefs.me ? rows.find(x => x.id === DB.prefs.me) : null;
+  if (mine && !show.includes(mine)) show = [show[0], show[1], mine];
+  return `<div class="mini num">${show.map(x => `<div class="mr${x.id === DB.prefs.me ? ' me' : ''}"><span class="mp">${esc(x.posLabel)}</span><span class="mn">${esc(x.name)}${x.id === DB.prefs.me ? ' <small>YOU</small>' : ''}</span><span class="mt">${x.total}</span></div>`).join('')}</div>`;
+}
+function homeHeadline(feature) {
+  if (!feature) return 'No round booked yet';
+  const nm = roundName(feature);
+  if (feature.status === 'live') {
+    const res = resultsOf(feature.id);
+    const rows = res && res.rows ? res.rows : [];
+    if (rows.length > 1 && rows[0].total > rows[1].total) { const d = rows[0].total - rows[1].total; return `${rows[0].name} leads ${nm} by ${d === 1 ? 'one' : d === 2 ? 'two' : d}`; }
+    if (rows.length > 1) return `${nm} is all square at the top`;
+    return `${nm} is under way`;
+  }
+  const days = feature.date ? daysFromToday(feature.date) : null;
+  if (days === 0) return `${nm} is on today`;
+  if (days === 1) return `${nm} is tomorrow`;
+  if (days > 1) return `${nm} is in ${days} days`;
+  return nm;
+}
 function nowCard(r) {
   const live = r.status === 'live';
   const playable = canScore(r) && (live || !r.date || daysFromToday(r.date) <= 0);
@@ -2656,6 +2881,7 @@ function nowCard(r) {
       ${line2 ? `<span class="now-line">${esc(line2)}</span>` : ''}
       <span class="now-line">${esc(heroFacts(r))}</span>
     </button>
+    ${live ? miniBoard(r) : ''}
     <div class="now-acts${playable || live ? '' : ' one'}">
       ${playable ? `<button class="go" data-act="play" data-rid="${r.id}">${playLabel(r)}</button>` : `<button class="go" data-act="round" data-rid="${r.id}">Course, groups and forecast</button>`}
       ${live ? `<button class="go alt" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>` : playable ? `<button class="go alt" data-act="round" data-rid="${r.id}">Groups</button>` : ''}
@@ -2672,8 +2898,11 @@ VIEWS.home = () => {
   const me = DB.prefs.me ? D.member(DB.prefs.me) : null;
   const myRow = me ? goy(season).find(x => x.id === me.id) : null;
   const standLine = myRow ? `<button class="hsub me-line" data-act="player" data-pid="${me.id}">${posWord(myRow.posLabel)} in Golfer of the Year${sized(ICON.chev, 14)}</button>` : '';
+  const hr = new Date().getHours();
+  const dateLine = new Date().toLocaleDateString('en-IE', { weekday: 'long', day: 'numeric', month: 'long' }) + (me ? ` · ${hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening'}, ${esc(me.name.split(' ')[0])}` : '');
   let html = `<header class="hero home"><div class="brand"><span class="badge">${FLAG_SVG}</span><span class="two"><span class="wordmark">${esc(D.society())}</span>${standLine}</span>
-    <button class="who-chip" data-act="who">${me ? esc(me.name) : 'Who are you?'}</button></div>
+    <button class="who-chip" data-act="who" aria-label="${me ? 'You are ' + esc(me.name) + '. Change' : 'Who are you?'}">${me ? esc(me.name) + `<span class="who-av">${esc(initialsOf(me))}</span>` : 'Who are you?'}</button></div>
+    <p class="greet">${dateLine}</p><h1 class="headline">${esc(homeHeadline(feature))}</h1>
     ${feature ? nowCard(feature) : '<div class="now"><div class="now-main"><span class="now-name">No round booked</span><span class="now-line">The organiser adds the next one.</span></div></div>'}</header>`;
   const table = goy(season);
   const lead = table[0];
@@ -2691,7 +2920,7 @@ VIEWS.home = () => {
   </div>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
-  return { html };
+  return { html, tabs: 'home' };
 };
 
 VIEWS.rounds = () => {
@@ -2714,7 +2943,7 @@ VIEWS.players = () => {
 };
 
 function goyRow(x) {
-  return `<button class="lrow goy" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="cap num">${x.counting.map(c => c.pts).join(' ')}</span><span class="b r">${x.total}</span></button>`;
+  return `<button class="lrow goy" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span>${avName(x)}<span class="chips">${x.counting.map(c => `<i class="chipn">${c.pts}</i>`).join('')}</span><span class="b r">${x.total}</span></button>`;
 }
 
 VIEWS.goy = () => {
@@ -2723,6 +2952,7 @@ VIEWS.goy = () => {
   return {
     html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Golfer of the Year</h1></div>
       <p class="sub">${season} · best ${D.goyBest()} scores count</p>${yearPicker()}</header>
+      ${table[0] ? `<div class="leadcard"><span class="lc-k">LEADING</span><span class="lc-row"><span class="lc-n">${esc(table[0].name)}</span><span class="lc-p"><b>${table[0].total}</b> pts</span></span>${table[1] ? `<span class="lc-s">${table[0].total - table[1].total === 0 ? 'Level with' : (table[0].total - table[1].total) + ' point' + (table[0].total - table[1].total === 1 ? '' : 's') + ' clear of'} ${esc(table[1].name)}</span>` : ''}</div>` : ''}
       ${sec('', cardOf(table.map(goyRow).join('')), false)}`
   };
 };
@@ -2870,7 +3100,7 @@ function resultsBlock(r) {
   if (!res) return '';
   const app = res.source === 'app';
   let html = sec(label('Stableford'), cardOf(res.rows.map(x => {
-    const inner = `<span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
+    const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1 && r.status === 'live')}<span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
     return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')) + (res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : res.source === 'sheet' ? '<p class="cap note">From the society sheet</p>' : ''));
   if (res.kb.length) {
@@ -3198,7 +3428,8 @@ function entryRow(pid, val, shots, par, rid) {
     ? `<div class="stv none" data-pid="${pid}" data-n="" aria-live="polite">Par ${par}</div>`
     : `<button class="stv${scratch ? ' out' : ''}" data-act="clear" data-pid="${pid}" data-n="${base}" aria-label="${name}: ${base} strokes. Tap to clear and start again from par"><b>${base}<sup>${pts}</sup></b><small>${word}</small></button>`;
   return `<div class="pr${flash}">
-    <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dots(shots, true)}${dpl ? dropChev : ''}</button></div>
+    <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dpl ? dropChev : ''}</button></div>
+    <div class="pr-dots" aria-label="${shots} ${shots === 1 ? 'shot' : 'shots'}">${dots(shots, true)}</div>
     ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
     <div class="stepper" role="group" aria-label="Strokes for ${name}">
       <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
@@ -3220,7 +3451,7 @@ VIEWS.entry = () => {
   const buggies = gc.teams.length === 2;
   let html = '<div class="entry">';
   if (ctx.mode === 'org') html += `<p class="cap">Correcting group ${gc.n}</p>`;
-  html += `<header class="hero c"><div class="hrow2"><button class="back-icon" data-act="entry-back" aria-label="Back">${ICON.back}</button><h1 class="big">${ctx.mode === 'org' ? `<small>Hole</small>${ctx.n}` : `<button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${ctx.n}"><small>Hole</small>${ctx.n}<span class="hdown">${ICON.down}</span></button>`}</h1><span class="facts"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span></span></div></header>`;
+  html += `<header class="hero c pine"><div class="hrow2"><button class="back-icon" data-act="entry-back" aria-label="Back">${ICON.back}</button><h1 class="big">${ctx.mode === 'org' ? `<small>Hole</small>${ctx.n}` : `<button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${ctx.n}"><small>Hole</small>${ctx.n}<span class="hdown">${ICON.down}</span></button>`}</h1><span class="facts"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span></span></div><div class="prog" role="img" aria-label="Hole ${ctx.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(n => `<i class="${n === ctx.n ? 'cur' : pids.every(pid => comp.players[pid].holes[n].gross !== null) ? 'done' : ''}"></i>`).join('')}</div></header>`;
   if (final) html += `<div class="banner" style="margin-top:12px">This round is final.</div>${ctx.mode === 'org' ? '<button class="btn quiet" data-act="reopen">Reopen round</button>' : ''}`;
   const clash = DB.conflicts.filter(c => c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n);
   if (clash.length) html += `<div class="banner" style="margin-top:12px">Another phone saved ${clash.map(c => `${esc(D.nameOf(c.player))} ${fmtGross(c.server)}`).join(', ')}</div>`;
@@ -3365,7 +3596,7 @@ VIEWS.after = () => {
   } else next = `<button class="btn" data-act="to-finish">See the card</button>`;
   return {
     tabs: 'hole',
-    html: `<header class="hero c"><div class="hrow2"><h1 class="big"><small>Hole</small>${a.n}</h1><span class="saved">${sized(ICON.check, 20)} Saved</span><button class="link" data-act="undo">Undo</button></div></header>
+    html: `<header class="hero c pine"><div class="hrow2"><h1 class="big"><small>Hole</small>${a.n}</h1><span class="saved">${sized(ICON.check, 20)} Saved</span><button class="link" data-act="undo">Undo</button></div></header>
       <div class="res">${head}</div>
       ${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}
       ${sec('', cardOf(rows))}
@@ -3764,7 +3995,9 @@ VIEWS.board = () => {
   const stats = res0 && res0.comp && res0.source === 'app' ? statsOf(sel) : null;
   const avail = ['lb', hasBuggy && 'bw', hasContests && 'ct', stats && 'st'].filter(Boolean);
   const pillSel = avail.includes(UI.res) ? UI.res : 'lb';
-  let html = `<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">Results</h1></div></header>`;
+  const live0 = r.status === 'live';
+  const thru0 = live0 && res0 && res0.rows.length ? Math.max(...res0.rows.map(x => x.thru || 0)) : 0;
+  let html = `<header class="hero c lbhead">${live0 ? `<p class="eyebrow"><span class="pulse"></span>LIVE${thru0 ? ' \u00b7 THRU ' + thru0 : ''}</p>` : ''}<div class="hrow2"><h1 class="big">Leaderboard</h1></div><p class="sub">${esc(roundName(r))} \u00b7 Stableford</p></header>`;
   if (avail.length > 1) {
     const names = { lb: 'Leaderboard', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
     html += `<div class="seg pills${avail.length > 3 ? ' four' : ''}" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
@@ -3787,7 +4020,7 @@ VIEWS.board = () => {
 
   const pillTxt = r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r);
   html += sec(`${label(esc(roundName(r)))}${pillTxt}`, cardOf(res.rows.map(x => {
-    const inner = `<span class="sub">${x.posLabel}</span><span class="${x.id === DB.prefs.me ? 'b' : ''}">${esc(x.name)}</span><span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
+    const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1 && r.status === 'live')}<span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
     return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
   }).join('')), true);
   if (res.kb.length) { const low = E.kbLowest(res.kb); html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''))); }
@@ -4638,7 +4871,10 @@ const ACT = {
   tab: el => {
     UI.contestSheet = false;
     const t = el.dataset.tab;
-    const rid = playRid();
+    if (t === 'home') { ACT.home(); return; }
+    const rid = playRid() || liveRid() || (upcoming()[0] || {}).id || ((D.rounds().filter(r => r.status === 'final').slice(-1)[0]) || {}).id;
+    if (!rid) { toast('No round yet'); return; }
+    if (cur().v === 'home' && t === 'hole') { ACT.play({ dataset: { rid } }); return; }
     while (UI.stack.length > 1 && !['tee', 'match', 'board', 'rules', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();
     if (t === 'hole') { UI.edit = false; UI.after = null; replaceTop(playHomeView(rid), { rid }); }
     else if (t === 'rules') { replaceTop('rules', { rid }); }
@@ -5066,7 +5302,7 @@ function render() {
   const showTabs = !UI.org && !!out.tabs;
   app.classList.toggle('no-tabs', !showTabs);
   tabs.hidden = !showTabs;
-  if (showTabs) document.documentElement.style.setProperty('--tabh', tabs.offsetHeight + 'px');
+  if (showTabs) document.documentElement.style.setProperty('--tabh', (tabs.offsetHeight + parseFloat(getComputedStyle(tabs).bottom || 0) || tabs.offsetHeight) + 'px');
   sizeAsk();
   tabs.querySelectorAll('.tab').forEach(b => {
     const on = b.dataset.tab === out.tabs;
@@ -5110,7 +5346,7 @@ function renderToast() {
   el.textContent = UI.toast;
 }
 
-tabs.innerHTML = [['board', 'Results'], ['hole', 'Hole'], ['rules', 'Ruling']]
+tabs.innerHTML = [['home', 'Home'], ['hole', 'Hole'], ['board', 'Results'], ['rules', 'Ruling']]
   .map(([k, l]) => `<button class="tab" data-act="tab" data-tab="${k}">${TABICON[k]}<span>${l}</span></button>`).join('');
 
 document.addEventListener('click', e => {
