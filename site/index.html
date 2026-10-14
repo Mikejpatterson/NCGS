@@ -1051,9 +1051,43 @@ body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 
 .sumtiles .cap { overflow-wrap: anywhere; }
 .sumtiles { gap: 8px; }
 .sumtiles > div { padding: 10px; }
+
+/* Scoring header like the mock-up */
+.entnav { display: flex; align-items: center; justify-content: space-between; min-height: 48px; margin: 0 -4px; }
+.entback { display: inline-flex; align-items: center; gap: 2px; min-height: 44px; padding: 0 8px; background: none; border: 0; color: var(--pine); font: inherit; font-size: 1rem; font-weight: 700; }
+.entback svg { width: 20px; height: 20px; }
+.entgrp { font-size: .9rem; font-weight: 600; color: var(--sub); padding-right: 4px; }
+.hero.pine.entcard { padding: 16px 18px; margin-top: 4px; }
+.entrow { display: flex; align-items: flex-end; justify-content: space-between; position: relative; z-index: 1; }
+.entl small { display: block; font-size: .75rem; font-weight: 800; letter-spacing: .1em; color: var(--flag); }
+.entl .holebtn { margin: 0; padding: 0; min-height: 0; align-items: center; }
+.entn { display: block; font-size: 4.5rem; font-weight: 900; letter-spacing: -.05em; line-height: .9; color: #fff; font-variant-numeric: tabular-nums; }
+.entr { text-align: right; padding-bottom: 4px; }
+.entr b { display: block; font-size: 1.5rem; font-weight: 800; color: #fff; }
+.entr span { display: block; font-size: .88rem; color: rgba(255, 255, 255, .82); margin-top: 2px; }
+.entcard .prog { margin-top: 14px; }
+.entcard .prog i { height: 5px; }
+
+/* Selected tab: clean glass lens, no colour patch (so nothing looks hidden behind it) */
+.tab.on {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .95), rgba(255, 255, 255, .7));
+  -webkit-backdrop-filter: blur(8px) saturate(180%); backdrop-filter: blur(8px) saturate(180%);
+  box-shadow: 0 0 0 1px rgba(20, 35, 27, .10), 0 3px 10px rgba(20, 35, 27, .16), inset 0 1.5px 0 #fff, inset 0 -1px 2px rgba(20, 35, 27, .08);
+  color: var(--pine); font-weight: 800; text-shadow: none;
+}
+.tab.on svg { color: var(--pine); stroke-width: 2.4; filter: none; }
+
+/* Results selector: tidy 2 x 2 grid */
+.seg.pills.four { display: grid; grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; }
+.seg.pills.four button { flex: none; width: 100%; min-height: 44px; font-size: .95rem; white-space: nowrap; }
+
+/* The page scrolls inside #app, which starts below the clock, so iOS draws no fade over the top */
+html, body { height: 100%; overflow: hidden; overscroll-behavior: none; }
+body::before { display: none; }
+#app { position: fixed; top: env(safe-area-inset-top, 0px); right: 0; bottom: 0; left: 0; max-width: none; margin: 0; min-height: 0; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior-y: none; scroll-padding-bottom: calc(var(--tabh, 90px) + 16px); padding-inline: max(16px, calc((100vw - 448px) / 2)); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610140652","server":"5b0c6166"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141136","server":"5b0c6166"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2509,6 +2543,9 @@ const avStack = ids => `<span class="stack" aria-hidden="true">${ids.map(id => a
 /* Section heading with a little icon chip, used on the richer pages */
 const sh = (title, icon, sub) => `<span class="shd"><span class="shi">${sized(icon, 18)}</span><span class="sht">${esc(title)}</span>${sub ? `<span class="shs">${esc(sub)}</span>` : ''}</span>`;
 
+/* The page scrolls inside #app (below the clock), not the whole window. */
+function scroller() { return document.getElementById('app') || document.scrollingElement; }
+
 /* ---- 10-data.js ---- */
 /* ---------- Data: one shared copy, kept on every phone ----------
    The phone keeps the last copy it saw, so the app opens instantly and works without signal.
@@ -3595,7 +3632,9 @@ VIEWS.entry = () => {
   const buggies = gc.teams.length === 2;
   let html = '<div class="entry">';
   if (ctx.mode === 'org') html += `<p class="cap">Correcting group ${gc.n}</p>`;
-  html += `<header class="hero c pine"><div class="hrow2"><button class="back-icon" data-act="entry-back" aria-label="Back">${ICON.back}</button><h1 class="big">${ctx.mode === 'org' ? `<small>Hole</small>${ctx.n}` : `<button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${ctx.n}"><small>Hole</small>${ctx.n}<span class="hdown">${ICON.down}</span></button>`}</h1><span class="facts"><span class="fact">Par<b>${h.par}</b></span><span class="fact">Index<b>${h.si}</b></span></span></div><div class="prog" role="img" aria-label="Hole ${ctx.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(n => `<i class="${n === ctx.n ? 'cur' : pids.every(pid => comp.players[pid].holes[n].gross !== null) ? 'done' : ''}"></i>`).join('')}</div></header>`;
+  const tt = ((D.round(ctx.rid).groups || []).find(x => x.id === ctx.gid) || {}).teeTime;
+  html += `<div class="entnav"><button class="entback" data-act="entry-back" aria-label="Back">${ICON.back}<span>${ctx.mode === 'org' ? 'Back' : 'Round'}</span></button>${tt ? `<span class="entgrp">${esc(tt)} group</span>` : ''}</div>
+  <header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small>${ctx.mode === 'org' ? `<b class="entn">${ctx.n}</b>` : `<button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${ctx.n}"><b class="entn">${ctx.n}</b><span class="hdown">${ICON.down}</span></button>`}</div><div class="entr"><b>Par ${h.par}</b><span>Index ${h.si}${h.yards ? ` · ${h.yards} yds` : ''}</span></div></div><div class="prog" role="img" aria-label="Hole ${ctx.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(n => `<i class="${n === ctx.n ? 'cur' : n < ctx.n ? 'done' : ''}"></i>`).join('')}</div></header>`;
   if (final) html += `<div class="banner" style="margin-top:12px">This round is final.</div>${ctx.mode === 'org' ? '<button class="btn quiet" data-act="reopen">Reopen round</button>' : ''}`;
   const clash = DB.conflicts.filter(c => c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n);
   if (clash.length) html += `<div class="banner" style="margin-top:12px">Another phone saved ${clash.map(c => `${esc(D.nameOf(c.player))} ${fmtGross(c.server)}`).join(', ')}</div>`;
@@ -4521,7 +4560,7 @@ function refreshThread() {
   const bar = document.querySelector('.hero .hrow2');
   if (bar && !bar.querySelector('[data-act="ask-clear"]') && UI.chat.length) bar.insertAdjacentHTML('beforeend', '<button class="link" data-act="ask-clear">New question</button>');
   if (bar && !UI.chat.length) { const b = bar.querySelector('[data-act="ask-clear"]'); if (b) b.remove(); }
-  window.scrollTo(0, document.body.scrollHeight);
+  { const s = scroller(); s.scrollTop = s.scrollHeight; }
 }
 
 function askQuestion(q) {
@@ -4540,14 +4579,15 @@ function askQuestion(q) {
   UI.chatBusy = true;
   refreshThread();
   const history = UI.chat.slice(0, -1).filter(m => !m.error).map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', text: m.text }));
-  call({ op: 'ask', question: q, history }).then(res => {
+  call({ op: 'ask', question: q, history }, 70000).then(res => {
     UI.chatBusy = false;
     if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer, card: res.card || null, sources: res.sources || [] });
     else UI.chat.push({ role: 'ai', text: (res && res.error === 'bad' && /Unknown request/.test(res.message || '')) ? 'The rules checker is not switched on yet. The organiser needs to finish setting it up.' : ((res && res.message) || 'The rules checker could not answer just now.'), error: true });
     refreshThread();
-  }).catch(() => {
+  }).catch(e => {
     UI.chatBusy = false;
-    UI.chat.push({ role: 'ai', text: 'No signal right now. Try again when you have some.', error: true });
+    const slow = e && e.name === 'AbortError';
+    UI.chat.push({ role: 'ai', text: !navigator.onLine ? 'No signal right now. Try again when you have some.' : slow ? 'The rules checker took too long to answer. Tap New question and try again.' : 'The rules checker did not answer just now' + (e && e.message ? ' (' + e.message + ')' : '') + '. Try again in a moment.', error: true });
     refreshThread();
   });
 }
@@ -5453,8 +5493,8 @@ function render() {
     b.classList.toggle('on', on);
     if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
   });
-  if (UI.scrollCur) { UI.scrollCur = false; const c = document.getElementById('cur'); if (c) c.scrollIntoView({ block: 'center' }); else window.scrollTo(0, 0); }
-  else if (UI.scrollTop) { UI.scrollTop = false; window.scrollTo(0, 0); }
+  if (UI.scrollCur) { UI.scrollCur = false; const c = document.getElementById('cur'); if (c) c.scrollIntoView({ block: 'center' }); else scroller().scrollTop = 0; }
+  else if (UI.scrollTop) { UI.scrollTop = false; scroller().scrollTop = 0; }
   renderToast();
   syncHistory();
 }
@@ -5516,7 +5556,7 @@ function placeAskBar() {
   const kb = vv ? Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) : 0;
   document.documentElement.style.setProperty('--kb', kb + 'px');
 }
-document.addEventListener('focusin', e => { if (e.target && e.target.id === 'askin') { document.body.classList.add('typing'); placeAskBar(); setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 250); } });
+document.addEventListener('focusin', e => { if (e.target && e.target.id === 'askin') { document.body.classList.add('typing'); placeAskBar(); setTimeout(() => { const s = scroller(); s.scrollTop = s.scrollHeight; }, 250); } });
 document.addEventListener('focusout', e => {
   if (!e.target || e.target.id !== 'askin') return;
   setTimeout(() => { if (document.activeElement && document.activeElement.id === 'askin') return; document.body.classList.remove('typing'); document.documentElement.style.setProperty('--kb', '0px'); }, 150);
@@ -5576,13 +5616,13 @@ if (window.claude && typeof window.claude.use === 'function') {
     if (!busy) { ring.style.transform = `rotate(${dist * 6}deg)`; txt.textContent = dist >= GO ? 'Release to refresh' : 'Pull to refresh'; }
   };
   document.addEventListener('touchstart', e => {
-    if (busy || e.touches.length !== 1 || window.scrollY > 0 || blocked(e.target)) { y0 = null; return; }
+    if (busy || e.touches.length !== 1 || scroller().scrollTop > 0 || blocked(e.target)) { y0 = null; return; }
     y0 = e.touches[0].clientY; p = 0;
   }, { passive: true });
   document.addEventListener('touchmove', e => {
     if (y0 === null) return;
     const dy = e.touches[0].clientY - y0;
-    if (window.scrollY > 0 || dy <= 0) { if (p) { p = 0; lay(0, false); } if (dy <= 0) y0 = e.touches[0].clientY; return; }
+    if (scroller().scrollTop > 0 || dy <= 0) { if (p) { p = 0; lay(0, false); } if (dy <= 0) y0 = e.touches[0].clientY; return; }
     p = Math.min(110, dy * 0.55);
     if (e.cancelable) e.preventDefault();   // no native bounce while we show the gap
     lay(p, false);
