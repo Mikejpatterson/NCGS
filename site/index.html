@@ -1,6 +1,6 @@
 <!doctype html><html lang="en-IE"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0B3D2E">
+<meta name="theme-color" content="#FAF8F3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -944,9 +944,23 @@ html { scroll-padding-bottom: calc(var(--tabh, 90px) + 16px); }
 /* Pull to refresh: the page behind is warm white now, so the ring and words are pine, not white */
 #ptr { color: var(--pine); }
 .ptr-ring { width: 30px; height: 30px; border: 3.5px solid rgba(11, 61, 46, .18); border-top-color: var(--pine); }
+
+/* ===== Round 3: calmer selector pills, a solid strip behind the clock, glassier tab bar ===== */
+/* The pills: one row when they fit, wrapping to a second row only when text is large. Words never break mid-word. */
+.seg.pills, .seg.pills.four { display: flex; flex-wrap: wrap; gap: 2px; padding: 4px; border-radius: 22px; }
+.seg.pills button, .seg.pills.four button { flex: 1 1 auto; white-space: nowrap; overflow-wrap: normal; padding: 0 6px; min-height: 42px; font-size: .92rem; font-weight: 600; border-radius: 18px; text-align: center; line-height: 1.2; }
+.seg.pills button.on { background: #fff; box-shadow: 0 1px 3px rgba(20, 35, 27, .16); color: var(--pine); font-weight: 800; }
+
+/* iPhone iOS 26 smudges anything that scrolls under the clock. A solid strip in the page colour sits there, so the top looks like the mock-ups. */
+body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top, 0px); background: var(--bg); z-index: 60; pointer-events: none; }
+
+/* Glassier bar: far more see-through, stronger blur and colour lift, a bright edge */
+.tabs { background: linear-gradient(135deg, rgba(255, 255, 255, .36), rgba(255, 255, 255, .06) 45%, rgba(255, 255, 255, .24)); -webkit-backdrop-filter: blur(22px) saturate(260%) contrast(1.04) brightness(1.12); backdrop-filter: blur(22px) saturate(260%) contrast(1.04) brightness(1.12); box-shadow: inset 0 2px 1px -1px #fff, inset 0 -2px 2px -1px rgba(255, 255, 255, .8), inset 2px 0 3px -2px #fff, inset -2px 0 3px -2px #fff, inset 0 0 28px rgba(255, 255, 255, .35), 0 0 0 1px rgba(255, 255, 255, .35), 0 18px 40px rgba(20, 35, 27, .26), 0 0 0 .5px rgba(20, 35, 27, .16); }
+.tab { text-shadow: 0 0 10px rgba(255, 255, 255, 1), 0 0 3px rgba(255, 255, 255, .9); }
+.tab.on { background: linear-gradient(180deg, rgba(255, 255, 255, .6), rgba(247, 197, 22, .5)); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610140541","server":"5b0c6166"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610140623","server":"5b0c6166"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -4003,7 +4017,7 @@ VIEWS.board = () => {
   const thru0 = live0 && res0 && res0.rows.length ? Math.max(...res0.rows.map(x => x.thru || 0)) : 0;
   let html = `<header class="hero c lbhead">${live0 ? `<p class="eyebrow"><span class="pulse"></span>LIVE${thru0 ? ' \u00b7 THRU ' + thru0 : ''}</p>` : ''}<div class="hrow2"><h1 class="big">Leaderboard</h1></div><p class="sub">${esc(roundName(r))} \u00b7 Stableford</p></header>`;
   if (avail.length > 1) {
-    const names = { lb: 'Leaderboard', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
+    const names = { lb: 'Scores', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
     html += `<div class="seg pills${avail.length > 3 ? ' four' : ''}" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
   }
   if (pillSel === 'bw') return { tabs: 'board', html: html + buggyView(sel).html };
