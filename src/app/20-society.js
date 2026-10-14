@@ -11,6 +11,15 @@ function winnerText(r) {
   const top = res.rows.filter(x => x.pos === 1);
   return `<span class="sub">${esc(top.map(x => x.name).join(', '))} ${top[0].total}</span>`;
 }
+function pastRow(r) {
+  const res = resultsOf(r.id);
+  const top = res && res.rows ? res.rows.filter(x => x.pos === 1) : [];
+  const d = r.date ? parseDay(r.date) : null;
+  const when = d ? `<span class="dchip"><b>${d.getDate()}</b><small>${MONTHS[d.getMonth()].slice(0, 3)}</small></span>` : `<span class="dchip none">${sized(ICON.flagpin, 22)}</span>`;
+  const sub = [r.trip, r.course_name].filter(Boolean)[0] || '';
+  const win = top.length ? `<span class="wn">${avStack(top.slice(0, 2).map(x => x.id))}<span class="wn-t"><span class="wn-n">${esc(top.map(x => x.name).join(', '))}</span><span class="chipn">${top[0].total}</span></span></span>` : '';
+  return `<button class="row tall prow" data-act="round" data-rid="${r.id}">${when}<span class="two"><span class="b">${esc(roundName(r))}</span>${sub ? `<span class="sub">${esc(sub)}</span>` : ''}</span><span class="right">${win}${chev}</span></button>`;
+}
 const statusPill = r => {
   if (isDemo(r)) return '<span class="pill w">Demo</span>';
   if (r.status === 'live') { const c = computeR(r.id); const thru = c ? Math.min(...c.groups.map(g => g.holesDone)) : 0; return `<span class="pill w">${thru ? 'Thru ' + thru : 'Live'}</span>`; }
@@ -99,16 +108,21 @@ VIEWS.home = () => {
   const table = goy(season);
   const lead = table[0];
   const pastAll = D.rounds().filter(r => r.status === 'final').reverse();
-  const tile = (act, icon, t, s2) => `<button class="lnk" data-act="${act}"><span class="lnk-ic">${sized(icon, 24)}</span><span class="lnk-t">${t}</span><span class="lnk-s">${s2}</span></button>`;
+  const tile = (act, icon, t, s2, cls, extra, rid) => `<button class="lnk${cls ? ' ' + cls : ''}" data-act="${act}"${rid ? ` data-rid="${rid}"` : ''}><span class="lnk-ic">${sized(icon, 24)}</span>${extra || ''}<span class="lnk-t">${t}</span><span class="lnk-s">${s2}</span></button>`;
   const tripFor = feature && feature.trip ? feature : (D.rounds().filter(r => r.trip).slice(-1)[0] || null);
   const tripList = tripFor ? tripRounds(tripFor) : [];
-  const tripTile = tripList.length > 1 ? `<button class="lnk" data-act="trip" data-rid="${tripFor.id}"><span class="lnk-ic">${sized(ICON.trophy, 24)}</span><span class="lnk-t">Trip standings</span><span class="lnk-s">${esc(tripFor.trip)}</span></button>` : '';
-  html += `<div class="links">
+  const tripTile = tripList.length > 1 ? tile('trip', ICON.flagpin, 'Trip standings', esc(tripFor.trip), 'sun', '', tripFor.id) : '';
+  const top3 = table.slice(0, 3);
+  const myPos = me && myRow ? `<span class="ft-me">You are ${posWord(myRow.posLabel)}</span>` : '';
+  const goyFeat = lead
+    ? `<button class="feat" data-act="goy"><span class="ft-k">${sized(ICON.medal, 16)}GOLFER OF THE YEAR</span><span class="ft-row"><span class="ft-n">${esc(lead.name)}</span><span class="ft-p"><b>${lead.total}</b> pts</span></span><span class="ft-foot">${avStack(top3.map(x => x.id))}<span class="ft-t">Best ${D.goyBest()} scores count</span>${myPos}</span></button>`
+    : tile('goy', ICON.medal, 'Golfer of the Year', 'Best ' + D.goyBest() + ' scores count');
+  const goyHidden = lead ? `<span class="vh">Golfer of the Year ${esc(lead.name)} leads on ${lead.total}</span>` : '';
+  html += `${goyFeat}${goyHidden}<div class="links">
     ${tripTile}
-    ${tile('rounds', ICON.history, 'Past rounds', played.length ? `${played.length} played` : 'None played yet')}
-    ${tile('goy', ICON.trophy, 'Golfer of the Year', lead ? `${esc(lead.name)} leads on ${lead.total}` : 'Best ' + D.goyBest() + ' scores count')}
-    ${tile('stats', ICON.history, 'Stats', 'KBs, birdies, averages')}
-    ${tile('players', ICON.users, 'Players', plural(D.regulars().length, 'golfer'))}
+    ${tile('rounds', ICON.history, 'Past rounds', played.length ? `${played.length} played` : 'None played yet', 'plain')}
+    ${tile('stats', ICON.bars, 'Stats', 'KBs, birdies, averages', 'leaf')}
+    ${tile('players', ICON.users, 'Players', plural(D.regulars().length, 'golfer'), 'plain', avStack(D.regulars().slice(0, 4).map(m => m.id)))}
   </div>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
@@ -120,7 +134,7 @@ VIEWS.rounds = () => {
   const past = D.rounds().filter(r => r.status === 'final' && !isDemo(r) && (r.season || seasonOf()) === yr).reverse();
   return {
     html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Past rounds</h1></div><p class="sub">Tap a round for the scorecards</p>${yearPicker()}</header>
-      ${past.length ? sec('', cardOf(past.map(r => roundRow(r, winnerText(r))).join('')), false) : sec('', '<div class="prose">No rounds played yet.</div>', false)}`
+      ${past.length ? sec('', cardOf(past.map(pastRow).join('')), false) : sec('', '<div class="prose">No rounds played yet.</div>', false)}`
   };
 };
 
@@ -130,7 +144,7 @@ VIEWS.players = () => {
   const pos = Object.fromEntries(table.map(x => [x.id, x.posLabel]));
   return {
     html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Players</h1></div><p class="sub">Tap a name for their cards</p></header>
-      ${sec('', cardOf(D.regulars().map(m => `<button class="row tall" data-act="player" data-pid="${m.id}"><span class="two"><span>${esc(m.name)}</span><span class="sub">${esc([m.full && m.full !== m.name ? m.full : '', 'Index ' + fmtIndex(m.index)].filter(Boolean).join(' · '))}</span></span><span class="right">${pos[m.id] ? `<span class="sub">${posWord(pos[m.id])}</span>` : ''}${chev}</span></button>`).join('')), false)}`
+      ${sec('', cardOf(D.regulars().map(m => `<button class="row tall prow" data-act="player" data-pid="${m.id}">${avBadge(m.id, 'lg')}<span class="two"><span class="b">${esc(m.name)}</span><span class="sub">${esc(m.full && m.full !== m.name ? m.full : 'Index ' + fmtIndex(m.index))}</span></span><span class="right"><span class="idx" title="Handicap index"><small>Index</small>${esc(fmtIndex(m.index))}</span>${pos[m.id] ? `<span class="posp p${/^\d+$/.test(pos[m.id]) && Number(pos[m.id]) <= 3 ? pos[m.id] : ''}">${posWord(pos[m.id])}</span>` : ''}${chev}</span></button>`).join('')), false)}`
   };
 };
 
@@ -394,18 +408,28 @@ VIEWS.stats = () => {
   const yr = yearOn();
   const members = D.regulars();
   const all = members.map(m => ({ id: m.id, name: m.name, st: E.playerSummary(playerEntries(m.id, yr)) })).filter(x => x.st.rounds);
-  const board = (title, key, unit, min) => {
-    const rows = all.filter(x => x.st[key] > (min || 0)).sort((a, b) => b.st[key] - a.st[key] || a.name.localeCompare(b.name));
-    if (!rows.length) return '';
-    return sec(label(title), cardOf(rows.map(x => `<button class="lrow" data-act="player" data-pid="${x.id}"><span></span><span>${esc(x.name)}</span><span class="b r">${x.st[key]}${unit || ''}</span></button>`).join('')));
+  const statBoard = (title, icon, list, disp, sub) => {
+    if (!list.length) return '';
+    const max = Math.max(...list.map(x => x.v)) || 1;
+    let rank = 0, prev = null;
+    return sec(sh(title, icon, sub), cardOf(list.map((x, i) => {
+      if (x.v !== prev) { rank = i + 1; prev = x.v; }
+      return `<button class="srow${rank === 1 ? ' top' : ''}" data-act="player" data-pid="${x.id}"><span class="rk r${rank <= 3 ? rank : 0}">${rank}</span>${avBadge(x.id)}<span class="sn"><span class="n">${esc(x.name)}</span><span class="bar"><i style="width:${Math.max(4, Math.round(x.v / max * 100))}%"></i></span></span><span class="sv">${disp(x)}</span></button>`;
+    }).join('')));
   };
-  const avg = all.filter(x => x.st.rounds >= 1).sort((a, b) => b.st.average - a.st.average || a.name.localeCompare(b.name));
+  const board = (title, icon, key, unit, min, sub) => statBoard(title, icon,
+    all.filter(x => x.st[key] > (min || 0)).sort((a, b) => b.st[key] - a.st[key] || a.name.localeCompare(b.name)).map(x => ({ id: x.id, name: x.name, v: x.st[key] })),
+    x => `${x.v}${unit || ''}`, sub);
+  const avg = all.filter(x => x.st.rounds >= 1).sort((a, b) => b.st.average - a.st.average || a.name.localeCompare(b.name)).map(x => ({ id: x.id, name: x.name, v: x.st.average }));
   let html = `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Stats</h1></div><p class="sub">Tap a name for their own numbers</p>${yearPicker()}</header>`;
   if (!all.length) return { html: html + sec('', '<div class="prose">Stats appear once a round has been played.</div>') };
-  html += board('KBs', 'kbs');
-  html += board('Round wins', 'wins');
-  html += board('Birdies', 'birdies');
-  html += sec(label('Average points'), cardOf(avg.map(x => `<button class="lrow" data-act="player" data-pid="${x.id}"><span></span><span>${esc(x.name)}</span><span class="b r">${fmt1(x.st.average)}</span></button>`).join('')));
+  const bestRound = all.slice().sort((a, b) => (b.st.best || 0) - (a.st.best || 0))[0];
+  const nRounds = seasonRounds(yr).filter(r => r.status === 'final').length;
+  html += `<div class="sumtiles"><div class="st-a"><span class="cap">Rounds played</span><b>${nRounds}</b></div><div class="st-b"><span class="cap">Best round</span><b>${bestRound.st.best}</b><span class="cap">${esc(bestRound.name)}</span></div><div class="st-c"><span class="cap">Top average</span><b>${fmt1(avg[0].v)}</b><span class="cap">${esc(avg[0].name)}</span></div></div>`;
+  html += board('KBs', ICON.users, 'kbs');
+  html += board('Round wins', ICON.trophy, 'wins');
+  html += board('Birdies', ICON.flagpin, 'birdies');
+  html += statBoard('Average points', ICON.bars, avg, x => fmt1(x.v));
   return { html };
 };
 

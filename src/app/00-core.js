@@ -24,6 +24,9 @@ const ICON = {
   camera: svg('<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>'),
   course: svg('<path d="M7 21V5"/><path d="M7 5l9 3.5L7 12"/><ellipse cx="12" cy="20" rx="8" ry="1.6"/>'),
   gear: svg('<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>'),
+  bars: svg('<path d="M5 20V11"/><path d="M12 20V4"/><path d="M19 20v-6"/>'),
+  medal: svg('<circle cx="12" cy="9" r="5"/><path d="M8.5 13.5L7 21l5-3 5 3-1.5-7.5"/>'),
+  flagpin: svg('<path d="M7 21V4"/><path d="M7 4l10 3.5L7 11"/>'),
   trophy: svg('<path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5v1.5A3 3 0 0 0 8 10.5"/><path d="M16 6h3v1.5a3 3 0 0 1-3 3"/><path d="M12 13v4"/><path d="M8.5 20h7"/>'),
   plus: svg('<path d="M12 5v14M5 12h14"/>'),
   share: svg('<path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>')
@@ -100,3 +103,9 @@ function initialsOf(m) {
 const avName = (x, sub, lead) => { const me = x.id === DB.prefs.me; return `<span class="lname${me ? ' b' : ''}"><i class="av${me ? ' is-me' : lead ? ' is-lead' : ''}" aria-hidden="true">${esc(initialsOf(D.member(x.id)))}</i><span class="ln"><span class="n">${esc(x.name)}${me ? ' <small class="you">YOU</small>' : ''}</span>${sub ? `<span class="cap">${esc(sub)}</span>` : ''}</span></span>`; };
 /* The small line under a name on a live leaderboard: how far ahead the leader is, and how many holes they have played. */
 const lbSub = (rows, x, r) => { if (!r || r.status !== 'live' || x.thru === undefined) return ''; const next = rows[1]; return rows[0] === x && next && x.total > next.total ? `Leads by ${x.total - next.total} \u00b7 thru ${x.thru}` : `thru ${x.thru}`; };
+
+/* Small round badge with initials, and an overlapping stack of them */
+const avBadge = (id, cls) => `<i class="av${cls ? ' ' + cls : ''}" aria-hidden="true">${esc(initialsOf(D.member(id)))}</i>`;
+const avStack = ids => `<span class="stack" aria-hidden="true">${ids.map(id => avBadge(id, 'sm')).join('')}</span>`;
+/* Section heading with a little icon chip, used on the richer pages */
+const sh = (title, icon, sub) => `<span class="shd"><span class="shi">${sized(icon, 18)}</span><span class="sht">${esc(title)}</span>${sub ? `<span class="shs">${esc(sub)}</span>` : ''}</span>`;

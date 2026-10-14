@@ -948,3 +948,96 @@ body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 
 .tabs { background: linear-gradient(135deg, rgba(255, 255, 255, .36), rgba(255, 255, 255, .06) 45%, rgba(255, 255, 255, .24)); -webkit-backdrop-filter: blur(22px) saturate(260%) contrast(1.04) brightness(1.12); backdrop-filter: blur(22px) saturate(260%) contrast(1.04) brightness(1.12); box-shadow: inset 0 2px 1px -1px #fff, inset 0 -2px 2px -1px rgba(255, 255, 255, .8), inset 2px 0 3px -2px #fff, inset -2px 0 3px -2px #fff, inset 0 0 28px rgba(255, 255, 255, .35), 0 0 0 1px rgba(255, 255, 255, .35), 0 18px 40px rgba(20, 35, 27, .26), 0 0 0 .5px rgba(20, 35, 27, .16); }
 .tab { text-shadow: 0 0 10px rgba(255, 255, 255, 1), 0 0 3px rgba(255, 255, 255, .9); }
 .tab.on { background: linear-gradient(180deg, rgba(255, 255, 255, .6), rgba(247, 197, 22, .5)); }
+
+/* ===== Richer pages: Home tiles, Past rounds, Players, Stats ===== */
+.av.sm { width: 28px; height: 28px; font-size: .5rem; }
+.av.lg { width: 46px; height: 46px; font-size: .8rem; }
+.stack { display: inline-flex; flex: none; }
+.stack .av { box-shadow: 0 0 0 2px #fff; }
+.stack .av + .av { margin-left: -9px; }
+.stack .av:nth-child(2) { background: #D4E3D8; }
+.stack .av:nth-child(3) { background: #C3D8CA; }
+.stack .av:nth-child(4) { background: #B3CDBB; }
+
+/* Home: the Golfer of the Year feature card and four tiles that each look different */
+.feat { position: relative; overflow: hidden; display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 16px; padding: 18px; border-radius: 28px; text-align: left; color: #fff; background: linear-gradient(150deg, #14573F, #0B3D2E 70%); }
+.feat::after { content: ""; position: absolute; right: -50px; top: -60px; width: 190px; height: 190px; border-radius: 50%; background: rgba(247, 197, 22, .16); pointer-events: none; }
+.feat > * { position: relative; z-index: 1; }
+.ft-k { display: inline-flex; align-items: center; gap: 6px; font-size: .72rem; font-weight: 800; letter-spacing: .1em; color: var(--flag); }
+.ft-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+.ft-n { font-size: 2.1rem; font-weight: 900; letter-spacing: -.03em; line-height: 1; }
+.ft-p { font-size: .95rem; font-weight: 700; color: rgba(255, 255, 255, .85); font-variant-numeric: tabular-nums; }
+.ft-p b { font-size: 3rem; font-weight: 900; letter-spacing: -.05em; line-height: .9; color: #fff; }
+.ft-foot { display: flex; align-items: center; gap: 10px; margin-top: 8px; font-size: var(--t-sub); color: rgba(255, 255, 255, .85); }
+.ft-foot .stack .av { box-shadow: 0 0 0 2px #14573F; background: #E3EAE0; }
+.ft-me { margin-left: auto; font-weight: 800; color: var(--flag); }
+.links { gap: 12px; margin-top: 12px; }
+.lnk { position: relative; min-height: 124px; justify-content: flex-end; gap: 2px; padding: 14px 16px; border-radius: 24px; overflow: hidden; }
+.lnk-ic { position: absolute; left: 14px; top: 14px; width: 44px; height: 44px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; background: #E3EFE6; color: var(--pine); }
+.lnk .stack { position: absolute; right: 12px; top: 18px; }
+.lnk.sun { background: linear-gradient(160deg, #FFF3C4, #FADF7A); box-shadow: 0 0 0 1px rgba(160, 110, 0, .18); }
+.lnk.sun .lnk-ic { background: rgba(255, 255, 255, .7); color: #7A5200; }
+.lnk.sun .lnk-t { color: #4A3300; }
+.lnk.sun .lnk-s { color: #7A5200; }
+.lnk.leaf { background: linear-gradient(160deg, #E8F3EA, #CFE5D5); box-shadow: 0 0 0 1px rgba(11, 61, 46, .12); }
+.lnk.leaf .lnk-ic { background: rgba(255, 255, 255, .75); }
+.lnk-t { font-size: 1.1rem; font-weight: 800; letter-spacing: -.01em; }
+
+/* Past rounds */
+.prow { gap: 12px; }
+.prow .two { flex: 1; min-width: 0; }
+.dchip { flex: none; width: 48px; height: 54px; border-radius: 14px; background: #E8F1EA; color: var(--pine); display: inline-flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; }
+.dchip b { font-size: 1.3rem; font-weight: 900; letter-spacing: -.02em; }
+.dchip small { font-size: .62rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-top: 3px; }
+.dchip.none { background: var(--fill); color: var(--faint); }
+.wn { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.wn-t { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 3px; min-width: 0; }
+.wn-n { font-size: var(--t-cap); color: var(--sub); font-weight: 600; max-width: 96px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chipn { display: inline-flex; align-items: center; justify-content: center; min-width: 34px; height: 26px; padding: 0 8px; border-radius: 13px; background: #E3EFE6; color: var(--pine); font-style: normal; font-size: .85rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+/* Players */
+.posp { display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 13px; background: var(--fill); color: var(--sub); font-size: var(--t-cap); font-weight: 800; }
+.posp.p1 { background: var(--flag); color: #14231B; }
+.posp.p2 { background: #DDE1DE; color: #14231B; }
+.posp.p3 { background: #EBCFAE; color: #4A2F10; }
+
+/* Stats */
+.sumtiles { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 16px; }
+.sumtiles > div { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: 20px; min-width: 0; }
+.sumtiles b { font-size: 2rem; font-weight: 900; letter-spacing: -.04em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.sumtiles .cap { font-size: .7rem; font-weight: 700; }
+.st-a { background: var(--pine); color: #fff; }
+.st-a .cap { color: #BFD6C8; }
+.st-b { background: linear-gradient(160deg, #FFF3C4, #FADF7A); color: #4A3300; }
+.st-b .cap { color: #7A5200; }
+.st-c { background: linear-gradient(160deg, #E8F3EA, #CFE5D5); color: var(--pine); }
+.st-c .cap { color: #3E6B57; }
+.shd { display: inline-flex; align-items: center; gap: 10px; }
+.shi { width: 30px; height: 30px; border-radius: 10px; background: #E3EFE6; color: var(--pine); display: inline-flex; align-items: center; justify-content: center; }
+.sht { font-size: 1.12rem; font-weight: 800; letter-spacing: -.01em; color: var(--text); }
+.shs { font-size: var(--t-sub); color: var(--sub); }
+.srow { display: grid; grid-template-columns: 28px 40px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; min-height: 64px; padding: 10px 16px; text-align: left; }
+.srow + .srow { border-top: 1px solid rgba(20, 35, 27, .07); }
+.srow.top { background: #FFF9DC; }
+.srow:active { background: var(--fill); }
+.rk { width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 900; color: var(--sub); font-variant-numeric: tabular-nums; }
+.rk.r1 { background: var(--flag); color: #14231B; }
+.rk.r2 { background: #DDE1DE; color: #14231B; }
+.rk.r3 { background: #EBCFAE; color: #4A2F10; }
+.sn { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.sn .n { font-weight: 700; font-size: 1.02rem; }
+.bar { display: block; height: 6px; border-radius: 3px; background: #EEF0EA; width: 100%; overflow: hidden; }
+.bar i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, #3F9A68, #167A41); }
+.srow.top .bar i { background: linear-gradient(90deg, #F7C516, #E0A800); }
+.sv { font-size: 1.4rem; font-weight: 900; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.srow.top .sv { color: var(--green); }
+.lnk { min-height: 148px; }
+.av.sm { width: 30px; height: 30px; font-size: .55rem; }
+.stack .av + .av { margin-left: -6px; }
+.dchip.none { color: var(--faint); }
+.idx { display: inline-flex; flex-direction: column; align-items: center; line-height: 1.05; font-size: .95rem; font-weight: 800; font-variant-numeric: tabular-nums; margin-right: 4px; }
+.idx small { font-size: .6rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--sub); }
+.sumtiles b { font-size: min(2rem, 7.5vw); overflow-wrap: anywhere; }
+.sumtiles .cap { overflow-wrap: anywhere; }
+.sumtiles { gap: 8px; }
+.sumtiles > div { padding: 10px; }

@@ -33,7 +33,7 @@ const { chromium } = require('playwright');
   const t = await text();
   check('Stats page lists KBs, wins and averages', /KBs/.test(t) && /Average points/.test(t) && /Round wins/.test(t));
   // a player's own page
-  await tap('.lrow[data-act="player"]');
+  await tap('[data-act="player"]');
   const pt = await text();
   check('player page shows a scores chart and their numbers', !!(await pg.$('svg.chart')) && /Numbers/.test(pt) && /Average/.test(pt) && /KBs/.test(pt));
   check('hole-by-hole numbers appear for a scored round', /Birdies/.test(pt) && /Par 4s/.test(pt));
