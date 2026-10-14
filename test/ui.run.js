@@ -86,12 +86,12 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await shot('05b-holes');
   await tap('.hs[data-n="3"]');
   t = await text();
-  check('go to hole: a scored hole opens to change it', /Hole\s*3/.test(t) && /Save changes/.test(t));
+  check('go to hole: a scored hole opens to change it', /Hole\s*3/i.test(t) && /Save changes/.test(t));
   await page.goBack(); await page.waitForTimeout(300);
   check('the phone back gesture returns to the hole screen', /Hole\s*15/.test(await text()) && !!(await page.$('[data-act="enter"]')));
   await tap('.holebtn'); await tap('.hs[data-n="17"]');
   t = await text();
-  check('go to hole: a later hole can be scored early', /Hole\s*17/.test(t) && /4 scores to go/.test(t));
+  check('go to hole: a later hole can be scored early', /Hole\s*17/i.test(t) && /4 scores to go/.test(t));
   await tap('[data-act="entry-back"]');
   check('Back from there returns to the hole screen', /Hole\s*15/.test(await text()) && !!(await page.$('[data-act="enter"]')));
   await tap('.holebtn'); await tap('[data-act="holes-close"]');

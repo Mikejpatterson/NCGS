@@ -473,8 +473,8 @@ function render() {
     b.classList.toggle('on', on);
     if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
   });
-  if (UI.scrollCur) { UI.scrollCur = false; const c = document.getElementById('cur'); if (c) c.scrollIntoView({ block: 'center' }); else window.scrollTo(0, 0); }
-  else if (UI.scrollTop) { UI.scrollTop = false; window.scrollTo(0, 0); }
+  if (UI.scrollCur) { UI.scrollCur = false; const c = document.getElementById('cur'); if (c) c.scrollIntoView({ block: 'center' }); else scroller().scrollTop = 0; }
+  else if (UI.scrollTop) { UI.scrollTop = false; scroller().scrollTop = 0; }
   renderToast();
   syncHistory();
 }
@@ -536,7 +536,7 @@ function placeAskBar() {
   const kb = vv ? Math.max(0, Math.round(window.innerHeight - vv.height - vv.offsetTop)) : 0;
   document.documentElement.style.setProperty('--kb', kb + 'px');
 }
-document.addEventListener('focusin', e => { if (e.target && e.target.id === 'askin') { document.body.classList.add('typing'); placeAskBar(); setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 250); } });
+document.addEventListener('focusin', e => { if (e.target && e.target.id === 'askin') { document.body.classList.add('typing'); placeAskBar(); setTimeout(() => { const s = scroller(); s.scrollTop = s.scrollHeight; }, 250); } });
 document.addEventListener('focusout', e => {
   if (!e.target || e.target.id !== 'askin') return;
   setTimeout(() => { if (document.activeElement && document.activeElement.id === 'askin') return; document.body.classList.remove('typing'); document.documentElement.style.setProperty('--kb', '0px'); }, 150);
@@ -596,13 +596,13 @@ if (window.claude && typeof window.claude.use === 'function') {
     if (!busy) { ring.style.transform = `rotate(${dist * 6}deg)`; txt.textContent = dist >= GO ? 'Release to refresh' : 'Pull to refresh'; }
   };
   document.addEventListener('touchstart', e => {
-    if (busy || e.touches.length !== 1 || window.scrollY > 0 || blocked(e.target)) { y0 = null; return; }
+    if (busy || e.touches.length !== 1 || scroller().scrollTop > 0 || blocked(e.target)) { y0 = null; return; }
     y0 = e.touches[0].clientY; p = 0;
   }, { passive: true });
   document.addEventListener('touchmove', e => {
     if (y0 === null) return;
     const dy = e.touches[0].clientY - y0;
-    if (window.scrollY > 0 || dy <= 0) { if (p) { p = 0; lay(0, false); } if (dy <= 0) y0 = e.touches[0].clientY; return; }
+    if (scroller().scrollTop > 0 || dy <= 0) { if (p) { p = 0; lay(0, false); } if (dy <= 0) y0 = e.touches[0].clientY; return; }
     p = Math.min(110, dy * 0.55);
     if (e.cancelable) e.preventDefault();   // no native bounce while we show the gap
     lay(p, false);

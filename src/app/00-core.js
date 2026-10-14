@@ -109,3 +109,6 @@ const avBadge = (id, cls) => `<i class="av${cls ? ' ' + cls : ''}" aria-hidden="
 const avStack = ids => `<span class="stack" aria-hidden="true">${ids.map(id => avBadge(id, 'sm')).join('')}</span>`;
 /* Section heading with a little icon chip, used on the richer pages */
 const sh = (title, icon, sub) => `<span class="shd"><span class="shi">${sized(icon, 18)}</span><span class="sht">${esc(title)}</span>${sub ? `<span class="shs">${esc(sub)}</span>` : ''}</span>`;
+
+/* The page scrolls inside #app (below the clock), not the whole window. */
+function scroller() { return document.getElementById('app') || document.scrollingElement; }

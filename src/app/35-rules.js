@@ -210,7 +210,7 @@ function refreshThread() {
   const bar = document.querySelector('.hero .hrow2');
   if (bar && !bar.querySelector('[data-act="ask-clear"]') && UI.chat.length) bar.insertAdjacentHTML('beforeend', '<button class="link" data-act="ask-clear">New question</button>');
   if (bar && !UI.chat.length) { const b = bar.querySelector('[data-act="ask-clear"]'); if (b) b.remove(); }
-  window.scrollTo(0, document.body.scrollHeight);
+  { const s = scroller(); s.scrollTop = s.scrollHeight; }
 }
 
 function askQuestion(q) {
@@ -229,14 +229,15 @@ function askQuestion(q) {
   UI.chatBusy = true;
   refreshThread();
   const history = UI.chat.slice(0, -1).filter(m => !m.error).map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', text: m.text }));
-  call({ op: 'ask', question: q, history }).then(res => {
+  call({ op: 'ask', question: q, history }, 70000).then(res => {
     UI.chatBusy = false;
     if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer, card: res.card || null, sources: res.sources || [] });
     else UI.chat.push({ role: 'ai', text: (res && res.error === 'bad' && /Unknown request/.test(res.message || '')) ? 'The rules checker is not switched on yet. The organiser needs to finish setting it up.' : ((res && res.message) || 'The rules checker could not answer just now.'), error: true });
     refreshThread();
-  }).catch(() => {
+  }).catch(e => {
     UI.chatBusy = false;
-    UI.chat.push({ role: 'ai', text: 'No signal right now. Try again when you have some.', error: true });
+    const slow = e && e.name === 'AbortError';
+    UI.chat.push({ role: 'ai', text: !navigator.onLine ? 'No signal right now. Try again when you have some.' : slow ? 'The rules checker took too long to answer. Tap New question and try again.' : 'The rules checker did not answer just now' + (e && e.message ? ' (' + e.message + ')' : '') + '. Try again in a moment.', error: true });
     refreshThread();
   });
 }
