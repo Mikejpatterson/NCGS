@@ -329,6 +329,35 @@ function resultsBlock(r) {
   return html;
 }
 
+/* ----- The page for a round that is coming up or live: Groups first, KBs next, then weather and course ----- */
+function groupCards(r) {
+  if (!r.groups || !r.groups.length) return sec('', '<div class="card"><div class="row"><span class="sub">Groups are not drawn yet</span></div></div>', true);
+  const comp = computeR(r.id), tee = teeOf(r);
+  const phOf = pid => (r.ph && r.ph[pid] !== undefined ? r.ph[pid] : comp ? comp.players[pid].ph : tee && D.member(pid) ? E.playingHandicap(D.member(pid).index, tee, allowanceOf(r)) : null);
+  const mine = myGroup(r.id);
+  const live = r.status === 'live' ? comp : null;
+  const status = g => { const gc = live ? live.groups.find(x => x.id === g.id) : null; return gc ? (gc.complete ? 'Finished' : gc.holesDone ? 'Thru ' + gc.holesDone : '') : ''; };
+  const pl = (g, pid, i) => {
+    const m = D.member(pid), ph = phOf(pid), can = tee && m;
+    return `<${can ? 'button' : 'div'} class="mgp"${can ? ` data-act="hcp" data-pid="${pid}" data-rid="${r.id}"` : ''}>${avBadge(pid)}<span class="mgn">${g.teams.length > 1 ? dot(i) : ''}<span>${esc(D.nameOf(pid))}</span></span>${ph === null ? '' : `<span class="mgh"><small>PLAYS OFF</small><b>${ph}</b></span>`}</${can ? 'button' : 'div'}>`;
+  };
+  let html = '';
+  if (mine) {
+    html += `<section class="hero pine mygroup"><div class="mgt"><span class="mgtime">${esc(mine.teeTime || r.first_tee || '')}</span><span class="mgk">YOUR GROUP · ${mine.n}</span></div>${mine.teams.map((t, i) => t.map(pid => pl(mine, pid, i)).join('')).join('')}</section>`;
+  }
+  const others = r.groups.filter(g => !mine || g.id !== mine.id);
+  if (others.length) html += `<div class="gl">${mine ? 'Other groups' : 'Groups'}</div>` + others.map(g => {
+    const key = r.id + g.id, open = !!UI.open[key], st = status(g);
+    return `<div class="gcard${open ? ' open' : ''}"><button class="gch" data-act="toggle" data-key="${key}" aria-expanded="${open}"><span class="gctime">${esc(g.teeTime || '')}</span><span class="gcn">Group ${g.n}</span>${st ? `<span class="pill w2 gcs">${esc(st)}</span>` : ''}<span class="gchev">${chev}</span></button>
+      <div class="gcp">${g.teams.map((t, i) => t.map(pid => `<span class="gcpl">${avBadge(pid, 'sm')}${g.teams.length > 1 ? dot(i) : ''}<span>${esc(D.nameOf(pid))}</span></span>`).join('')).join('')}</div>${open ? `<div class="gcx">${g.teams.map((t, i) => t.map(pid => pl(g, pid, i)).join('')).join('')}</div>` : ''}</div>`;
+  }).join('');
+  if (tee && mine) html += `<p class="cap note">${esc(tee.name)} tees · Slope ${tee.slope} · Rating ${tee.rating} · Par ${tee.par} · ${Math.round(allowanceOf(r) * 100)}%</p>`;
+  return html;
+}
+function kbCards(r) {
+  const gOf = pid => (r.groups || []).find(g => g.teams.some(t => t.includes(pid)));
+  return `<div class="kbs">${r.kb.map(pr => `<div class="kbcard">${avStack(pr)}<span class="kbn">${esc(pr.map(D.nameOf).join(' & '))}</span><span class="kbg">${pr.map(pid => { const g = gOf(pid); return g ? 'G' + g.n : ''; }).filter(Boolean).join(' · ')}</span></div>`).join('')}</div>`;
+}
 VIEWS.round = p => {
   const r = D.round(p.rid);
   if (!r) return { html: `${navBack(D.society())}<div class="head"><h1 class="title">Round not found</h1></div>` };
@@ -354,11 +383,13 @@ VIEWS.round = p => {
     if (r.source !== 'imported' || (resultsOf(r.id) || { rows: [] }).rows.length) html += `<button class="btn quiet" data-act="results" data-rid="${r.id}">Share results</button>`;
     return { html };
   }
-  html += forecast(r);
-  if (c && c.about) html += sec(label('The course'), `<p class="prose">${esc(c.about)}</p>`);
-  html += groupsBlock(r, true);
-  if (r.kb && r.kb.length) html += sec(label('KBs'), cardOf(r.kb.map(pr => `<div class="row"><span>${esc(pr.map(D.nameOf).join(' & '))}</span></div>`).join('')));
   const mine = myGroup(r.id);
+  const hasKb = !!(r.kb && r.kb.length);
+  const tabsAvail = ['groups'].concat(hasKb ? ['kb'] : [], ['info']);
+  const rt = tabsAvail.includes(UI.rtab) ? UI.rtab : 'groups';
+  const tabName = { groups: 'Groups', kb: 'KBs', info: 'Weather and course' };
+  const pillsHtml = `<div class="seg pills rtabs" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${k === 'info' ? 'Course' : tabName[k]}</button>`).join('')}</div>`;
+  const roundBody = rt === 'groups' ? groupCards(r) : rt === 'kb' ? kbCards(r) : forecast(r) + (c && c.about ? sec(label('The course'), `<p class="prose">${esc(c.about)}</p>`) : '');
   const playable = canScore(r) && (r.status === 'live' || (r.status === 'upcoming' && (!r.date || daysFromToday(r.date) <= 0)));
   if (playable) {
     if (!DB.prefs.me || !mine) html += `<button class="btn" data-act="play" data-rid="${r.id}">Play now</button>`;
@@ -368,6 +399,7 @@ VIEWS.round = p => {
     }
     if (DB.prefs.me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(DB.prefs.me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
   }
+  html += pillsHtml + roundBody;
   if (r.status === 'live') html += `<button class="btn quiet" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>`;
   return { html };
 };
