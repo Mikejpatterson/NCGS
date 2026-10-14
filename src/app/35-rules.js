@@ -59,7 +59,7 @@ function askSources(list) {
 function askThread() {
   if (!UI.chat.length && !UI.chatBusy) {
     return `<div class="ask-intro"><p class="b">Say what happened.</p><p class="sub">${SPEECH ? 'Tap the microphone and speak, or type.' : 'Tap the box, then the microphone on your keyboard to speak.'} You get a ruling you can read out, checked against the official rules.</p></div>
-      <div class="ask-ideas">${ASK_IDEAS.map(q => `<button class="idea" data-act="ask-idea" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
+      <div class="ask-ideas">${ASK_IDEAS.slice(0, 4).map(q => `<button class="idea" data-act="ask-idea" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
   }
   return UI.chat.map((m, i) => m.role === 'user'
     ? `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>`

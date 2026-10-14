@@ -1353,3 +1353,13 @@ body { font-variant-numeric: tabular-nums; }
 .rquote blockquote { margin: 0; padding-left: 12px; border-left: 3px solid var(--flag); font-size: .95rem; line-height: 1.45; color: var(--text); overflow-wrap: anywhere; }
 .rqn { margin: 10px 0 0; font-size: .85rem; color: var(--sub); line-height: 1.35; }
 .rquote .srcs { margin-top: 10px; }
+
+/* UX pass 1: Hole screen keeps one job (enter scores) in reach; no duplicate Home; no decoration blob */
+.teenav { display: flex; align-items: center; justify-content: space-between; min-height: 48px; }
+.pillbtn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1.5px rgba(20, 35, 27, .22); color: var(--pine); font: inherit; font-size: .95rem; font-weight: 700; }
+.hero.pine.entcard::after { display: none; }
+.shotkey { margin: 10px 4px 0; display: flex; align-items: center; gap: 8px; }
+.shotkey .sd { color: var(--text); font-size: 10px; letter-spacing: 2px; margin: 0; }
+.tee > .btn[data-act="enter"] { position: sticky; bottom: calc(var(--tabh, 90px) + 10px); z-index: 5; box-shadow: 0 8px 22px rgba(20, 35, 27, .28); }
+.tee { padding-bottom: 8px; }
+.teenav .pill.w2 { background: #fff; color: var(--sub); box-shadow: inset 0 0 0 1.5px rgba(20, 35, 27, .22); }

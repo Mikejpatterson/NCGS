@@ -80,7 +80,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   check('tee: hole 15, par 3 with nearest the pin, Buggy pills', /Hole\s*15/i.test(t) && /Par\s*3\s*Index\s*14/.test(t) && /Nearest the pin/.test(t) && /Buggy 1/.test(t));
   check('tee fits on one iPhone screen', await fits());
   await shot('05-tee');
-  check('tee: a home chevron and a tappable hole number', !!(await page.$('.entback[data-act="home"]')) && !!(await page.$('.holebtn')));
+  check('tee: no duplicate Home button, an All groups button and a tappable hole number', !(await page.$('.tee .entback')) && !!(await page.$('.tee .pillbtn[data-act="round"]')) && !!(await page.$('.holebtn')));
   await tap('.holebtn');
   check('go to hole: all 18 shown, scored ones filled, hole 15 ringed as next', (await page.$$('.hs')).length === 18 && (await page.$$('.hs.done')).length === 14 && (await page.$eval('.hs.nxt', e => e.textContent)) === '15');
   await shot('05b-holes');
@@ -245,7 +245,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
 
   // Organiser
   await page.evaluate(() => { window.__ncgs.UI.org = false; });
-  await tap('.tab[data-tab="board"]');
+  await tap('.tab[data-tab="home"]');
   await tap('[data-act="org"]');
   await page.fill('#pin', '0000');
   await tap('form[data-form="pin"] button');

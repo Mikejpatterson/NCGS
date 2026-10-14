@@ -1363,9 +1363,19 @@ body { font-variant-numeric: tabular-nums; }
 .rquote blockquote { margin: 0; padding-left: 12px; border-left: 3px solid var(--flag); font-size: .95rem; line-height: 1.45; color: var(--text); overflow-wrap: anywhere; }
 .rqn { margin: 10px 0 0; font-size: .85rem; color: var(--sub); line-height: 1.35; }
 .rquote .srcs { margin-top: 10px; }
+
+/* UX pass 1: Hole screen keeps one job (enter scores) in reach; no duplicate Home; no decoration blob */
+.teenav { display: flex; align-items: center; justify-content: space-between; min-height: 48px; }
+.pillbtn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 18px; border: 0; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1.5px rgba(20, 35, 27, .22); color: var(--pine); font: inherit; font-size: .95rem; font-weight: 700; }
+.hero.pine.entcard::after { display: none; }
+.shotkey { margin: 10px 4px 0; display: flex; align-items: center; gap: 8px; }
+.shotkey .sd { color: var(--text); font-size: 10px; letter-spacing: 2px; margin: 0; }
+.tee > .btn[data-act="enter"] { position: sticky; bottom: calc(var(--tabh, 90px) + 10px); z-index: 5; box-shadow: 0 8px 22px rgba(20, 35, 27, .28); }
+.tee { padding-bottom: 8px; }
+.teenav .pill.w2 { background: #fff; color: var(--sub); box-shadow: inset 0 0 0 1.5px rgba(20, 35, 27, .22); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141706","server":"562d6962"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141729","server":"562d6962"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3813,11 +3823,12 @@ VIEWS.tee = () => {
   const clashRows = [...new Set(clash.map(c => c.hole))].map(hn => `<button class="row" data-act="conflict" data-n="${hn}"><span>Hole ${hn}</span><span class="right"><span class="pill w">Saved on two phones</span>${chev}</span></button>`).join('');
   return {
     tabs: 'hole',
-    html: `<div class="tee"><div class="entnav"><button class="entback" data-act="home" aria-label="Home">${ICON.back}<span>Home</span></button><span class="entright">${isDemo(r) ? '<span class="pill w2">Demo</span>' : ''}<button class="link" data-act="round" data-rid="${rid}">Groups</button></span></div>
+    html: `<div class="tee"><div class="entnav teenav">${isDemo(r) ? '<span class="pill w2">Demo</span>' : '<span></span>'}<button class="pillbtn" data-act="round" data-rid="${rid}">All groups</button></div>
       <header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${n}"><b class="entn">${n}</b><span class="hdown">${ICON.down}</span></button></div><div class="entr"><b>Par ${h.par}</b><span>Index ${h.si}${h.yards ? ` · ${h.yards} yds` : ''}</span></div></div><div class="prog" role="img" aria-label="Hole ${n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === n ? 'cur' : k < n ? 'done' : ''}"></i>`).join('')}</div></header>
       ${contest ? `<div class="pills2" style="margin-top:12px"><span class="pill flag">${CONTEST[contest.type]}</span></div>` : ''}
       ${clashRows ? sec('', cardOf(clashRows), true) : ''}
       ${teams}
+      <p class="cap shotkey"><span class="sd">●</span> a shot you get on this hole</p>
       ${buggies ? sec(label('Buggy Wars'), cardOf(`<button class="row" data-act="tab" data-tab="match"><span>${segName(seg)}</span>${statusPills(mShow)}</button>`)) : ''}
       ${checkRows ? sec(label('Scorecard'), cardOf(checkRows)) : ''}
       <button class="btn" data-act="enter"${checkRows ? ' style="margin-top:16px"' : ''}>${hasDraft ? 'Continue scores' : 'Enter scores'}</button>
@@ -4490,7 +4501,6 @@ VIEWS.board = () => {
   }).join('')), true);
   if (res.kb.length) { const low = E.kbLowest(res.kb); html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''))); }
   html += `<button class="btn quiet" data-act="results" data-rid="${sel}">Share results</button>`;
-  html += `<div class="foot"><button class="link" data-act="home">${esc(D.society())}</button><button class="link" data-act="org">Organiser</button></div>`;
   return { tabs: 'board', html };
 };
 
@@ -4691,7 +4701,7 @@ function askSources(list) {
 function askThread() {
   if (!UI.chat.length && !UI.chatBusy) {
     return `<div class="ask-intro"><p class="b">Say what happened.</p><p class="sub">${SPEECH ? 'Tap the microphone and speak, or type.' : 'Tap the box, then the microphone on your keyboard to speak.'} You get a ruling you can read out, checked against the official rules.</p></div>
-      <div class="ask-ideas">${ASK_IDEAS.map(q => `<button class="idea" data-act="ask-idea" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
+      <div class="ask-ideas">${ASK_IDEAS.slice(0, 4).map(q => `<button class="idea" data-act="ask-idea" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
   }
   return UI.chat.map((m, i) => m.role === 'user'
     ? `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>`
