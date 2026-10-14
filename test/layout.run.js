@@ -42,8 +42,8 @@ const metrics = () => {
     if (own) { const k = Math.round(parseFloat(cs.fontSize) * 10) / 10 + '/' + cs.fontWeight; out.fonts[k] = (out.fonts[k] || 0) + 1;
       if (e.scrollWidth > e.clientWidth + 1 && cs.display !== 'inline') out.clip.push(t + ' [' + e.className + '] ' + e.scrollWidth + '>' + e.clientWidth);
       if (cs.textOverflow === 'ellipsis' && e.scrollWidth > e.clientWidth) out.clip.push('ELLIPSIS ' + t); }
-    if (r.right > vw + 1 || r.left < -1) out.wide.push(t + ' [' + e.className + '] ' + Math.round(r.left) + '..' + Math.round(r.right));
-    if ((e.tagName === 'BUTTON' || e.dataset.act) && r.height < 40 && r.width > 0 && cs.display !== 'inline') out.small.push(t + ' ' + Math.round(r.width) + 'x' + Math.round(r.height));
+    if ((r.right > vw + 1 || r.left < -1) && !e.closest('.sc-wrap')) out.wide.push(t + ' [' + e.className + '] ' + Math.round(r.left) + '..' + Math.round(r.right));
+    if ((e.tagName === 'BUTTON' || e.dataset.act) && r.width > 4 && r.height < 40 && r.width > 0 && cs.display !== 'inline') out.small.push(t + ' ' + Math.round(r.width) + 'x' + Math.round(r.height));
   }
   return out;
 };

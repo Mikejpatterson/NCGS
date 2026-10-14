@@ -122,7 +122,7 @@ VIEWS.home = () => {
     ${tripTile}
     ${tile('rounds', ICON.history, 'Past rounds', played.length ? `${played.length} played` : 'None played yet', 'plain')}
     ${tile('stats', ICON.bars, 'Stats', 'KBs, birdies, averages', 'leaf')}
-    ${tile('players', ICON.users, 'Players', plural(D.regulars().length, 'golfer'), 'plain', avStack(D.regulars().slice(0, 4).map(m => m.id)))}
+    ${tile('players', ICON.users, 'Players', plural(D.regulars().length, 'golfer'), 'plain', avStack(D.regulars().slice(0, 3).map(m => m.id)))}
   </div>`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
@@ -506,7 +506,7 @@ VIEWS.card = p => {
   const sub = [r.date ? fmtDate(r.date, true) : roundWhenShort(r), tee ? `${tee.name} · Par ${tee.par}` : '', `Playing hcp ${pl.ph}`].filter(Boolean).join(' · ');
   const html = `<header class="hero s">${navBack('Back')}
     <div class="head"><h1 class="title">${esc(pl.name)}</h1>${me && r.status === 'final' ? `<span class="sub">${posWord(me.posLabel)}</span>` : ''}</div>
-    <p class="sub"><button class="link inline" data-act="round" data-rid="${r.id}">${esc(roundName(r))}</button> · ${esc(sub)}</p>
+    <p class="sub"><button class="link inline cardlink" data-act="round" data-rid="${r.id}">${esc(roundName(r))}</button> · ${esc(sub)}</p>
     ${isDemo(r) ? '<div class="note"><span class="pill w">Demo scores</span></div>' : ''}
     <div class="tiles"><div class="tile flag"><span class="cap">Points</span><span class="bignum">${pl.total}</span></div><div class="tile"><span class="cap">Out</span><span class="bignum">${F.pts}</span></div><div class="tile"><span class="cap">In</span><span class="bignum">${B.pts}</span></div></div></header>
     <div class="card sc-wrap">${table}</div>`;

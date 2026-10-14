@@ -290,7 +290,7 @@ function withPlayerChanged(r, pid, newPid) {
 /* ----- Members ----- */
 ORG.members = () => {
   const all = D.members();
-  const row = m => `<button class="hrow" data-act="org-go" data-v="member" data-pid="${m.id}"><span class="nm">${esc(m.name)}</span><span></span><span class="r b num">${fmtIndex(m.index)}</span>${chev}</button>`;
+  const row = m => `<button class="hrow" data-act="org-go" data-v="member" data-pid="${m.id}"><span class="nm lname">${avBadge(m.id)}<span class="ln"><span class="n">${esc(m.name)}</span></span></span><span></span><span class="r b num">${fmtIndex(m.index)}</span>${chev}</button>`;
   const former = all.filter(m => m.active === false && !isGuest(m));
   return {
     html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Members</h1></div></header>

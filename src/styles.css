@@ -1236,3 +1236,49 @@ body { font-variant-numeric: tabular-nums; }
 .lrow .ln, .lname > .ln { overflow: visible; }
 .lname .ln .cap { white-space: normal; }
 .grow .b.num { white-space: nowrap; min-width: 4.6ch; }
+
+/* ===== Polish: feel ===== */
+/* Screens ease in when you move between them (not on every refresh of the data) */
+@keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+#app.enter > * { animation: rise .24s ease-out both; }
+#app.enter > *:nth-child(2) { animation-delay: .03s; }
+#app.enter > *:nth-child(3) { animation-delay: .06s; }
+#app.enter > *:nth-child(n+4) { animation-delay: .09s; }
+/* Everything tappable answers the thumb */
+.btn, .lnk, .feat, .row, .lrow, .idea, .seg button, .tile, .entback, .undochip { transition: transform .12s ease, background-color .15s ease, box-shadow .15s ease; }
+.btn:active, .lnk:active, .feat:active, .idea:active { transform: scale(.985); }
+.row:active, .lrow:active { background-color: var(--fill); }
+@media (prefers-reduced-motion: reduce) { #app.enter > * { animation: none; } .btn:active, .lnk:active, .feat:active, .idea:active { transform: none; } }
+
+/* Primary buttons are green everywhere. Yellow is only for the scoring save, on the hole screen. */
+.savebar .btn:not(.quiet) { background: var(--green); color: #fff; }
+.entry .savebar .btn:not(.quiet), .entry + .savebar .btn:not(.quiet) { background: var(--flag); color: #0B3D2C; }
+
+/* Scorecard page header */
+.cardlink { color: var(--pine); font-weight: 700; text-decoration: none; }
+.hero.s .note { margin: 8px 0 0; }
+.hero.s .note .pill.w { background: #fff; color: var(--sub); box-shadow: inset 0 0 0 1.5px rgba(20, 35, 27, .18); }
+.hero.s .tiles { margin-top: 14px; }
+
+/* Scorecard marks: colour as well as shape, rounded */
+.mk { width: 30px; height: 30px; font-weight: 700; }
+.mk.birdie { background: var(--green); color: #fff; border: 0; border-radius: 50%; outline: 0; }
+.mk.eagle { background: var(--flag); color: var(--pine); border: 0; border-radius: 50%; outline: 2px solid var(--flag); outline-offset: 2px; font-weight: 800; }
+.mk.bogey { background: #FBE9E7; color: #8F1D1D; border: 0; border-radius: 9px; outline: 0; }
+.mk.double { background: #F3C9C4; color: #7A1410; border: 0; border-radius: 9px; outline: 0; }
+.cardlink, .hero.s .link.inline.cardlink { text-decoration: none !important; }
+.mk.bogey { background: #EEF0EA; color: var(--text); }
+.mk.double { background: #DDE3DE; color: var(--text); }
+
+/* Large text: long lines wrap instead of being cut; the two-nine scorecard scrolls sideways inside its card */
+.logrow .sub { white-space: normal; overflow-wrap: anywhere; }
+.hole-row.cols .cap { white-space: normal; overflow: visible; }
+.hole-row { grid-template-columns: minmax(2.4ch, .6fr) 1fr 1fr 1fr; }
+.sc-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.cardlink { display: inline-block; padding: 12px 0; margin: -12px 0; }
+
+/* Home tiles: one yellow highlight (the trip), the rest calm white cards with a green icon chip */
+.lnk.leaf { background: #fff; box-shadow: var(--ring); }
+.lnk.leaf .lnk-ic { background: #E3EFE6; }
+.feat::after { right: -38px; top: -52px; width: 140px; height: 140px; background: rgba(247, 197, 22, .16); }
+.ft-p b { position: relative; z-index: 2; }

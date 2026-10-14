@@ -474,7 +474,7 @@ function render() {
     if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
   });
   if (UI.scrollCur) { UI.scrollCur = false; const c = document.getElementById('cur'); if (c) c.scrollIntoView({ block: 'center' }); else scroller().scrollTop = 0; }
-  else if (UI.scrollTop) { UI.scrollTop = false; scroller().scrollTop = 0; }
+  else if (UI.scrollTop) { UI.scrollTop = false; scroller().scrollTop = 0; app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter'); }
   renderToast();
   syncHistory();
 }
