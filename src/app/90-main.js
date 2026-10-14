@@ -53,8 +53,9 @@ const ACT = {
   'ask-cancel': () => askCancel(),
   'ask-idea': el => askQuestion(el.dataset.q),
   'ask-read': el => askRead(Number(el.dataset.i)),
+  'ask-info': el => askInfo(Number(el.dataset.i)),
   'ask-more': () => askKeyboard(),
-  'ask-clear': () => { UI.chat = []; UI.chatBusy = false; UI.askDraft = ''; render(); },
+  'ask-clear': () => { UI.chat = []; UI.chatInfo = {}; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'contest-open': () => { UI.contestSheet = true; render(); },
   'contest-close': () => { UI.contestSheet = false; render(); },
   'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },
@@ -466,6 +467,7 @@ function render() {
   const showTabs = !UI.org && !!out.tabs;
   app.classList.toggle('no-tabs', !showTabs);
   tabs.hidden = !showTabs;
+  tabs.classList.toggle('under', !!app.querySelector('.scrim, .full'));
   if (showTabs) document.documentElement.style.setProperty('--tabh', (tabs.offsetHeight + parseFloat(getComputedStyle(tabs).bottom || 0) || tabs.offsetHeight) + 'px');
   sizeAsk();
   tabs.querySelectorAll('.tab').forEach(b => {
@@ -474,7 +476,7 @@ function render() {
     if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
   });
   if (UI.scrollCur) { UI.scrollCur = false; const c = document.getElementById('cur'); if (c) c.scrollIntoView({ block: 'center' }); else scroller().scrollTop = 0; }
-  else if (UI.scrollTop) { UI.scrollTop = false; scroller().scrollTop = 0; app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter'); }
+  else if (UI.scrollTop) { UI.scrollTop = false; scroller().scrollTop = 0; }
   renderToast();
   syncHistory();
 }
@@ -637,4 +639,4 @@ if (window.claude && typeof window.claude.use === 'function') {
   sync().then(() => flush());
 })();
 if ('serviceWorker' in navigator && BOOT.mode === 'live' && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
-window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, fmtDate, daysFromToday, todayIso, send, holeOf, computeR, myGroup, liveRid };
+window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, fmtDate, daysFromToday, todayIso, send, holeOf, computeR, myGroup, liveRid, refreshThread };

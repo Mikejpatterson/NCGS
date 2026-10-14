@@ -371,3 +371,12 @@ test('a finished round can carry its course card in results without disturbing a
     assert.equal(r.status, 'final', kind);
   }
 });
+
+test('rules checker: keeps the official wording ("quote") on a ruling, trimmed, and drops it when it is missing', () => {
+  const say = text => () => ({ status: 200, json: { content: [{ type: 'text', text }] } });
+  const ask = text => askServer({ secrets: { ANTHROPIC_KEY: 'k' }, reply: say(text) }).s.api({ op: 'ask', question: 'Ball moved' });
+  const r = ask('{"type":"ruling","rule":"Rule 9.4","verdict":"1 penalty shot","quote":"  If a player lifts or deliberately touches their ball in play,   they get one penalty stroke.  "}');
+  assert.equal(r.card.quote, 'If a player lifts or deliberately touches their ball in play, they get one penalty stroke.');
+  assert.equal(ask('{"type":"ruling","verdict":"No penalty"}').card.quote, '');
+  assert.equal(ask('{"type":"ruling","verdict":"No penalty","quote":' + JSON.stringify('x'.repeat(900)) + '}').card.quote.length, 700, 'long quotes are cut, never passed on whole');
+});

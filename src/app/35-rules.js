@@ -27,7 +27,8 @@ function askRuling(t) {
 
 // A card from the checker: either one quick question with big tap answers, or the ruling itself.
 const boldBits = x => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-function askCardHtml(c, i, live) {
+function askCardHtml(c, i, live, sources) {
+  const hasInfo = c.type === 'ruling' && !!(c.quote || (sources || []).some(x => x && /^https:\/\//.test(x.url))), open = !!(UI.chatInfo && UI.chatInfo[i]);
   if (c.type === 'ask') {
     return `<div class="qcard"><div class="qtext">${esc(c.question)}</div><div class="qopts">${c.options.map(o =>
       `<button class="qopt${o.tag ? ' t-' + o.tag : ''}${/^not sure/i.test(o.label) ? ' dim' : ''}" data-act="ask-idea" data-q="${esc(o.label)}"${live ? '' : ' disabled'}>${o.tag ? `<span class="qtag">${o.tag === 'red' ? 'Red' : 'Yellow'}</span>` : ''}<span>${esc(o.label)}</span></button>`).join('')}</div></div>`;
@@ -36,7 +37,8 @@ function askCardHtml(c, i, live) {
   return `<div class="rcard">${top ? `<div class="rtop">${esc(top)}</div>` : ''}<div class="rverdict">${boldBits(c.verdict)}</div>${c.intro ? `<div class="rintro">${boldBits(c.intro)}</div>` : ''}
     ${c.steps.length ? `<ol class="rsteps">${c.steps.map((x, n) => `<li><span class="rn">${n + 1}</span><span>${boldBits(x)}</span></li>`).join('')}</ol>` : ''}
     ${c.note ? `<div class="rnote">${boldBits(c.note)}</div>` : ''}
-    <div class="ract"><button class="rbtn" data-act="ask-read" data-i="${i}">${ICON.speak}<span>Read out</span></button><button class="rbtn" data-act="ask-more">Ask more</button></div></div>`;
+    <div class="ract"><button class="rbtn" data-act="ask-read" data-i="${i}">${ICON.speak}<span>Read out</span></button><button class="rbtn" data-act="ask-more">Ask more</button>${hasInfo ? `<button class="rbtn rinfo" data-act="ask-info" data-i="${i}" aria-expanded="${open}" aria-label="The official rule wording">i</button>` : ''}</div>
+    ${hasInfo && open ? `<div class="rquote"><div class="rqh">${esc(c.rule || 'The rule')} · official wording</div>${c.quote ? `<blockquote>${esc(c.quote)}</blockquote>` : '<p class="rqn">No exact wording came back this time. Open the official rule to read it.</p>'}${askSources(sources)}<p class="rqn">Check it against the link. It is the official rule that counts.</p></div>` : ''}</div>`;
 }
 function askSpoken(c) { return [c.verdict, c.intro, ...c.steps.map((x, n) => 'Option ' + (n + 1) + '. ' + x), c.note].filter(Boolean).join('. ').replace(/\*\*/g, ''); }
 function askRead(i) {
@@ -61,7 +63,7 @@ function askThread() {
   }
   return UI.chat.map((m, i) => m.role === 'user'
     ? `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>`
-    : m.card ? `<div class="msg ai card">${askCardHtml(m.card, i, i === UI.chat.length - 1 && !UI.chatBusy)}${m.card.type === 'ruling' ? askSources(m.sources) : ''}</div>`
+    : m.card ? `<div class="msg ai card">${askCardHtml(m.card, i, i === UI.chat.length - 1 && !UI.chatBusy, m.sources)}</div>`
     : `<div class="msg ai"><div class="bub${m.error ? ' err' : ''}">${m.error ? esc(m.text) : askRuling(m.text) + askSources(m.sources)}</div></div>`).join('')
     + (UI.chatBusy ? '<div class="msg ai"><div class="bub wait" aria-label="Checking the rules"><i></i><i></i><i></i></div></div>' : '')
     + `<p class="cap ask-note">Checked against the official Rules of Golf (R&amp;A and USGA). For anything close, play a second ball and ask the organiser.</p>`;
@@ -203,15 +205,23 @@ VIEWS.rules = () => ({
     </form>`
 });
 
-function refreshThread() {
+function refreshThread(mode) {
   const el = document.getElementById('thread');
   if (!el) return;
   el.innerHTML = askThread();
   const bar = document.querySelector('.hero .hrow2');
   if (bar && !bar.querySelector('[data-act="ask-clear"]') && UI.chat.length) bar.insertAdjacentHTML('beforeend', '<button class="link" data-act="ask-clear">New question</button>');
   if (bar && !UI.chat.length) { const b = bar.querySelector('[data-act="ask-clear"]'); if (b) b.remove(); }
-  { const s = scroller(); s.scrollTop = s.scrollHeight; }
+  const s = scroller();
+  if (mode === 'keep') return;
+  if (mode === 'answer') {
+    // Start at the top of the answer so it reads from the first line
+    const msgs = el.querySelectorAll('.msg.ai'), last = msgs[msgs.length - 1];
+    if (last) { s.scrollTop += last.getBoundingClientRect().top - s.getBoundingClientRect().top - 12; return; }
+  }
+  s.scrollTop = s.scrollHeight;
 }
+function askInfo(i) { UI.chatInfo = UI.chatInfo || {}; UI.chatInfo[i] = !UI.chatInfo[i]; refreshThread('keep'); }
 
 function askQuestion(q) {
   q = String(q || '').trim();
@@ -223,7 +233,7 @@ function askQuestion(q) {
   if (input) { input.value = ''; input.style.height = ''; sizeAsk(); }
   if (!navigator.onLine) {
     UI.chat.push({ role: 'ai', text: 'No signal right now. Try again when you have some.', error: true });
-    refreshThread();
+    refreshThread("answer");
     return;
   }
   UI.chatBusy = true;
@@ -233,11 +243,11 @@ function askQuestion(q) {
     UI.chatBusy = false;
     if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer, card: res.card || null, sources: res.sources || [] });
     else UI.chat.push({ role: 'ai', text: (res && res.error === 'bad' && /Unknown request/.test(res.message || '')) ? 'The rules checker is not switched on yet. The organiser needs to finish setting it up.' : ((res && res.message) || 'The rules checker could not answer just now.'), error: true });
-    refreshThread();
+    refreshThread("answer");
   }).catch(e => {
     UI.chatBusy = false;
     const slow = e && e.name === 'AbortError';
     UI.chat.push({ role: 'ai', text: !navigator.onLine ? 'No signal right now. Try again when you have some.' : slow ? 'The rules checker took too long to answer. Tap New question and try again.' : 'The rules checker did not answer just now' + (e && e.message ? ' (' + e.message + ')' : '') + '. Try again in a moment.', error: true });
-    refreshThread();
+    refreshThread("answer");
   });
 }

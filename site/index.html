@@ -1325,9 +1325,47 @@ body { font-variant-numeric: tabular-nums; }
 }
 .tab.on svg { filter: drop-shadow(0 0 3px rgba(255, 255, 255, .9)); }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .tabs { background: rgba(255, 255, 255, .92); } }
+
+/* Fixes 3: no bounce between tabs; sheets sit above the glass bar; classic score shapes with a key */
+#app.enter > * { animation: none !important; }
+.tabs.under { visibility: hidden; }
+.sc-wrap { overflow: hidden; }
+.sc { width: 100%; table-layout: fixed; }
+.sc th:nth-child(1), .sc td:nth-child(1), .sc th:nth-child(6), .sc td:nth-child(6) { width: 19%; white-space: nowrap; }
+.sc th:nth-child(2), .sc td:nth-child(2), .sc th:nth-child(7), .sc td:nth-child(7) { width: 9%; text-align: center; }
+.sc th:nth-child(3), .sc td:nth-child(3), .sc th:nth-child(8), .sc td:nth-child(8) { width: 12%; text-align: center; padding-inline: 0; }
+.sc th:nth-child(4), .sc td:nth-child(4), .sc th:nth-child(9), .sc td:nth-child(9) { width: 9%; text-align: center; padding-inline: 0; font-variant-numeric: tabular-nums; }
+.sc th.gap, .sc td.gap { width: 6px; padding: 0; }
+.sc td:last-child, .sc th:last-child { padding-right: 4px; }
+.sc td:first-child, .sc th:first-child { padding-left: 8px; }
+.sc th:nth-child(6), .sc td:nth-child(6) { padding-left: 6px; }
+.sc th:nth-child(3), .sc th:nth-child(7) { padding-inline: 0; }
+.sc .sd { letter-spacing: 1px; margin-left: 2px; }
+.mk { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; font-weight: 700; font-variant-numeric: tabular-nums; border: 1.5px solid transparent; box-sizing: border-box; background: none; outline: 0; box-shadow: none; color: var(--text); }
+.mk.birdie { background: #E3EFE6; border: 1.5px solid var(--pine); border-radius: 50%; color: var(--pine); }
+.mk.eagle { background: var(--flag); border: 1.5px solid var(--pine); border-radius: 50%; color: var(--pine); box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var(--pine); }
+.mk.bogey { background: #EEF0EA; border: 1.5px solid var(--pine); border-radius: 5px; }
+.mk.double { background: #DDE3DE; border: 1.5px solid var(--pine); border-radius: 5px; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var(--pine); }
+.sckey { display: flex; flex-wrap: wrap; gap: 12px 18px; margin: 14px 4px 4px; align-items: center; }
+.ski { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--sub); }
+.ski .mk { width: 24px; height: 24px; font-size: .8rem; margin: 3px; }
+.ski .sd { color: var(--text); font-size: 10px; }
+.sc thead th, .sc thead th.hn { text-transform: none; letter-spacing: 0; font-size: .75rem; padding-inline: 0; }
+.sc thead th.hn { padding-left: 8px; }
+.sc thead th:nth-child(6) { padding-left: 6px; }
+.sc thead th, .sc thead th.hn { font-size: .66rem; }
+
+/* Ruling: the "i" button and the official wording panel */
+.rbtn.rinfo { flex: none; width: 56px; min-width: 56px; padding: 0; font-family: Georgia, "Times New Roman", serif; font-style: italic; font-size: 1.4rem; background: #fff; box-shadow: inset 0 0 0 1.5px var(--pine); color: var(--pine); }
+.rbtn.rinfo[aria-expanded="true"] { background: var(--pine); color: #fff; }
+.rquote { margin: 12px 2px 4px; padding: 14px 16px; border-radius: 18px; background: #fff; box-shadow: var(--ring); }
+.rqh { font-size: .75rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--sub); margin-bottom: 8px; }
+.rquote blockquote { margin: 0; padding-left: 12px; border-left: 3px solid var(--flag); font-size: .95rem; line-height: 1.45; color: var(--text); overflow-wrap: anywhere; }
+.rqn { margin: 10px 0 0; font-size: .85rem; color: var(--sub); line-height: 1.35; }
+.rquote .srcs { margin-top: 10px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141654","server":"5b0c6166"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610141706","server":"562d6962"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2035,7 +2073,7 @@ var NCGS = (function () {
   var PLAYER_TABLES = { checks: 1, cards: 1, log: 1 };
   var DEFAULT_PIN = '1234';
   // Stamped by build.js with a fingerprint of this file, so the app can tell whether the live server is the latest.
-  var BUILD = '5b0c6166';
+  var BUILD = '562d6962';
 
   function keyOf(table, row) {
     return SCHEMA[table].key.map(function (k) { return String(row[k]); }).join('|');
@@ -2232,11 +2270,11 @@ var NCGS = (function () {
   /* ---------- Rules checker ---------- */
   var ASK_SYSTEM = [
     'You are a golf rules referee. You answer questions about the Rules of Golf as published by the R&A and the USGA, and nothing else. If asked about anything that is not a golf rule, say you only cover the Rules of Golf.',
-    'The people asking are experienced club golfers standing on a course, speaking into a phone. Their question comes from voice dictation, so it may be rambling, loosely worded or slightly garbled. Work out the exact situation and answer that, not a generic version of it. If one fact would change the answer (for example whether the ball was in play, on the green, or in a bunker), give the answer for the most likely case and say in one short line what would change it.',
+    'The people asking are experienced club golfers standing on a course, speaking into a phone. Their question comes from voice dictation, so it may be rambling, loosely worded or slightly garbled. Work out the exact situation and answer that, not a generic version of it. If one fact would change the answer (for example whether the ball was putted or chipped onto the green, in play, or in a bunker), do not give both answers: ask the person that one thing first (Kind 1 below), then give one clear ruling.',
     'Before you answer, use the web search tool to read the current official Rules of Golf on randa.org or usga.org, so that you are not relying on memory. Check the exact rule, its wording and any penalty. Check whether the stroke play or match play version matters. Society days are stroke play or Stableford, which the Rules treat as stroke play (Rule 21.1), unless the person says it was match play.',
     'How to answer: reply with ONE JSON object and nothing else (no text before or after it, no code fences). It is one of two kinds.',
-    'Kind 1, a question, only when one missing fact really changes the ruling and you cannot sensibly answer both ways: {"type":"ask","question":"Is the ball inside red or yellow stakes?","options":[{"label":"Red stakes or line","tag":"red"},{"label":"Yellow stakes or line","tag":"yellow"},{"label":"No stakes, just bushes"},{"label":"Not sure"}]}. 2 to 5 options, each a few words, the last one "Not sure" when that makes sense. "tag" is optional and only "red" or "yellow". Ask at most one question, never when the situation is already clear, and never again once the person has answered one: then give the ruling.',
-    'Kind 2, the ruling: {"type":"ruling","topic":"Unplayable ball","rule":"Rule 19","verdict":"1 penalty shot","intro":"Mick picks one of these:","steps":["Drop within **2 club-lengths**, no nearer the hole","Go **back on a line** from the flag through the ball, as far as he likes","Play again from **where he last hit**"],"note":"Count the penalty in Mick\'s score for the hole."}. "verdict" is the answer in a few plain words that can be read out, for example "No penalty" or "1 penalty shot" or "Play it as it lies". "topic" is two or three words. "rule" is the rule number, for example "Rule 11.1". "intro" is one short line leading into the steps and may be left out. "steps" are the things the player does or may choose between, 0 to 4 of them, each one short sentence, with the key words in **bold**; leave "steps" out when the verdict says it all. "note" is one or two short sentences with the reason, the match play difference, or the one thing that would change the answer; it may be left out. Use the player\'s name if they gave one. Mention a Local Rule or Committee decision only if it could change the answer. Keep the whole thing under about 120 words.',
+    'Kind 1, a question, whenever one missing fact the person has not told you would change the ruling (for example "Did you putt the ball onto the green, or chip it on?" with options "Putted", "Chipped", "Not sure"): {"type":"ask","question":"Is the ball inside red or yellow stakes?","options":[{"label":"Red stakes or line","tag":"red"},{"label":"Yellow stakes or line","tag":"yellow"},{"label":"No stakes, just bushes"},{"label":"Not sure"}]}. 2 to 5 options, each a few words, the last one "Not sure" when that makes sense. "tag" is optional and only "red" or "yellow". Ask at most one question, never when the situation is already clear, and never again once the person has answered one: then give the ruling.',
+    'Kind 2, the ruling: {"type":"ruling","topic":"Unplayable ball","rule":"Rule 19","verdict":"1 penalty shot","intro":"Mick picks one of these:","steps":["Drop within **2 club-lengths**, no nearer the hole","Go **back on a line** from the flag through the ball, as far as he likes","Play again from **where he last hit**"],"note":"Count the penalty in Mick\'s score for the hole."}. "verdict" is the answer in a few plain words that can be read out, for example "No penalty" or "1 penalty shot" or "Play it as it lies". "topic" is two or three words. "rule" is the rule number, for example "Rule 11.1". "intro" is one short line leading into the steps and may be left out. "steps" are the things the player does or may choose between, 0 to 4 of them, each one short sentence, with the key words in **bold**; leave "steps" out when the verdict says it all. "note" is one or two short sentences with the reason, the match play difference, or the one thing that would change the answer; it may be left out. Use the player\'s name if they gave one. Mention a Local Rule or Committee decision only if it could change the answer. Keep the whole thing under about 120 words. "quote" is the official wording of that rule, copied word for word from the page you read, at most 600 characters and only the part that decides this case; leave "quote" out unless you copied it exactly from the official page, and never write it from memory.',
     'Never guess. If the rules do not clearly cover it, or you could not find the rule, say so plainly. Never invent a rule number. Treat the search result for the current edition as the authority over anything you remember.'
   ].join('\n');
 
@@ -2535,7 +2573,7 @@ var NCGS = (function () {
         var verdict = cleanStr(j.verdict, 120);
         if (!verdict) return null;
         return { type: 'ruling', topic: cleanStr(j.topic, 40), rule: cleanStr(j.rule, 30), verdict: verdict, intro: cleanStr(j.intro, 120),
-          steps: (Array.isArray(j.steps) ? j.steps : []).map(function (x) { return cleanStr(x, 220); }).filter(Boolean).slice(0, 4), note: cleanStr(j.note, 300) };
+          steps: (Array.isArray(j.steps) ? j.steps : []).map(function (x) { return cleanStr(x, 220); }).filter(Boolean).slice(0, 4), note: cleanStr(j.note, 300), quote: cleanStr(j.quote, 700) };
       }
       return null;
     }
@@ -3676,6 +3714,10 @@ function markCell(gross, par, shots) {
   if (gross === 'P') return `<span class="mk pu" title="Picked up">${E.pickupStrokes(par, shots || 0)}<sup>p</sup></span>`;
   return `<span class="mk ${E.scoreMark(gross, par)}">${gross}</span>`;
 }
+function markKey() {
+  const k = (c, t, l) => `<span class="ski"><span class="mk ${c}">${t}</span>${l}</span>`;
+  return `<div class="sckey" aria-label="Key to the marks">${k('birdie', '3', 'Birdie')}${k('eagle', '2', 'Eagle')}${k('bogey', '5', 'Bogey')}${k('double', '6', 'Double or worse')}<span class="ski"><span class="sd">●</span>You get a shot</span></div>`;
+}
 function cardParts(r, pl, fix, pid) {
   const holes = holesOf(r);
   const half = hs => {
@@ -3714,7 +3756,7 @@ VIEWS.card = p => {
     <p class="sub"><button class="link inline cardlink" data-act="round" data-rid="${r.id}">${esc(roundName(r))}</button> · ${esc(sub)}</p>
     ${isDemo(r) ? '<div class="note"><span class="pill w">Demo scores</span></div>' : ''}
     <div class="tiles"><div class="tile flag"><span class="cap">Points</span><span class="bignum">${pl.total}</span></div><div class="tile"><span class="cap">Out</span><span class="bignum">${F.pts}</span></div><div class="tile"><span class="cap">In</span><span class="bignum">${B.pts}</span></div></div></header>
-    <div class="card sc-wrap">${table}</div>`;
+    <div class="card sc-wrap">${table}</div>${markKey()}`;
   return { html };
 };
 
@@ -4617,7 +4659,8 @@ function askRuling(t) {
 
 // A card from the checker: either one quick question with big tap answers, or the ruling itself.
 const boldBits = x => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-function askCardHtml(c, i, live) {
+function askCardHtml(c, i, live, sources) {
+  const hasInfo = c.type === 'ruling' && !!(c.quote || (sources || []).some(x => x && /^https:\/\//.test(x.url))), open = !!(UI.chatInfo && UI.chatInfo[i]);
   if (c.type === 'ask') {
     return `<div class="qcard"><div class="qtext">${esc(c.question)}</div><div class="qopts">${c.options.map(o =>
       `<button class="qopt${o.tag ? ' t-' + o.tag : ''}${/^not sure/i.test(o.label) ? ' dim' : ''}" data-act="ask-idea" data-q="${esc(o.label)}"${live ? '' : ' disabled'}>${o.tag ? `<span class="qtag">${o.tag === 'red' ? 'Red' : 'Yellow'}</span>` : ''}<span>${esc(o.label)}</span></button>`).join('')}</div></div>`;
@@ -4626,7 +4669,8 @@ function askCardHtml(c, i, live) {
   return `<div class="rcard">${top ? `<div class="rtop">${esc(top)}</div>` : ''}<div class="rverdict">${boldBits(c.verdict)}</div>${c.intro ? `<div class="rintro">${boldBits(c.intro)}</div>` : ''}
     ${c.steps.length ? `<ol class="rsteps">${c.steps.map((x, n) => `<li><span class="rn">${n + 1}</span><span>${boldBits(x)}</span></li>`).join('')}</ol>` : ''}
     ${c.note ? `<div class="rnote">${boldBits(c.note)}</div>` : ''}
-    <div class="ract"><button class="rbtn" data-act="ask-read" data-i="${i}">${ICON.speak}<span>Read out</span></button><button class="rbtn" data-act="ask-more">Ask more</button></div></div>`;
+    <div class="ract"><button class="rbtn" data-act="ask-read" data-i="${i}">${ICON.speak}<span>Read out</span></button><button class="rbtn" data-act="ask-more">Ask more</button>${hasInfo ? `<button class="rbtn rinfo" data-act="ask-info" data-i="${i}" aria-expanded="${open}" aria-label="The official rule wording">i</button>` : ''}</div>
+    ${hasInfo && open ? `<div class="rquote"><div class="rqh">${esc(c.rule || 'The rule')} · official wording</div>${c.quote ? `<blockquote>${esc(c.quote)}</blockquote>` : '<p class="rqn">No exact wording came back this time. Open the official rule to read it.</p>'}${askSources(sources)}<p class="rqn">Check it against the link. It is the official rule that counts.</p></div>` : ''}</div>`;
 }
 function askSpoken(c) { return [c.verdict, c.intro, ...c.steps.map((x, n) => 'Option ' + (n + 1) + '. ' + x), c.note].filter(Boolean).join('. ').replace(/\*\*/g, ''); }
 function askRead(i) {
@@ -4651,7 +4695,7 @@ function askThread() {
   }
   return UI.chat.map((m, i) => m.role === 'user'
     ? `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>`
-    : m.card ? `<div class="msg ai card">${askCardHtml(m.card, i, i === UI.chat.length - 1 && !UI.chatBusy)}${m.card.type === 'ruling' ? askSources(m.sources) : ''}</div>`
+    : m.card ? `<div class="msg ai card">${askCardHtml(m.card, i, i === UI.chat.length - 1 && !UI.chatBusy, m.sources)}</div>`
     : `<div class="msg ai"><div class="bub${m.error ? ' err' : ''}">${m.error ? esc(m.text) : askRuling(m.text) + askSources(m.sources)}</div></div>`).join('')
     + (UI.chatBusy ? '<div class="msg ai"><div class="bub wait" aria-label="Checking the rules"><i></i><i></i><i></i></div></div>' : '')
     + `<p class="cap ask-note">Checked against the official Rules of Golf (R&amp;A and USGA). For anything close, play a second ball and ask the organiser.</p>`;
@@ -4793,15 +4837,23 @@ VIEWS.rules = () => ({
     </form>`
 });
 
-function refreshThread() {
+function refreshThread(mode) {
   const el = document.getElementById('thread');
   if (!el) return;
   el.innerHTML = askThread();
   const bar = document.querySelector('.hero .hrow2');
   if (bar && !bar.querySelector('[data-act="ask-clear"]') && UI.chat.length) bar.insertAdjacentHTML('beforeend', '<button class="link" data-act="ask-clear">New question</button>');
   if (bar && !UI.chat.length) { const b = bar.querySelector('[data-act="ask-clear"]'); if (b) b.remove(); }
-  { const s = scroller(); s.scrollTop = s.scrollHeight; }
+  const s = scroller();
+  if (mode === 'keep') return;
+  if (mode === 'answer') {
+    // Start at the top of the answer so it reads from the first line
+    const msgs = el.querySelectorAll('.msg.ai'), last = msgs[msgs.length - 1];
+    if (last) { s.scrollTop += last.getBoundingClientRect().top - s.getBoundingClientRect().top - 12; return; }
+  }
+  s.scrollTop = s.scrollHeight;
 }
+function askInfo(i) { UI.chatInfo = UI.chatInfo || {}; UI.chatInfo[i] = !UI.chatInfo[i]; refreshThread('keep'); }
 
 function askQuestion(q) {
   q = String(q || '').trim();
@@ -4813,7 +4865,7 @@ function askQuestion(q) {
   if (input) { input.value = ''; input.style.height = ''; sizeAsk(); }
   if (!navigator.onLine) {
     UI.chat.push({ role: 'ai', text: 'No signal right now. Try again when you have some.', error: true });
-    refreshThread();
+    refreshThread("answer");
     return;
   }
   UI.chatBusy = true;
@@ -4823,12 +4875,12 @@ function askQuestion(q) {
     UI.chatBusy = false;
     if (res && res.answer) UI.chat.push({ role: 'ai', text: res.answer, card: res.card || null, sources: res.sources || [] });
     else UI.chat.push({ role: 'ai', text: (res && res.error === 'bad' && /Unknown request/.test(res.message || '')) ? 'The rules checker is not switched on yet. The organiser needs to finish setting it up.' : ((res && res.message) || 'The rules checker could not answer just now.'), error: true });
-    refreshThread();
+    refreshThread("answer");
   }).catch(e => {
     UI.chatBusy = false;
     const slow = e && e.name === 'AbortError';
     UI.chat.push({ role: 'ai', text: !navigator.onLine ? 'No signal right now. Try again when you have some.' : slow ? 'The rules checker took too long to answer. Tap New question and try again.' : 'The rules checker did not answer just now' + (e && e.message ? ' (' + e.message + ')' : '') + '. Try again in a moment.', error: true });
-    refreshThread();
+    refreshThread("answer");
   });
 }
 
@@ -5313,8 +5365,9 @@ const ACT = {
   'ask-cancel': () => askCancel(),
   'ask-idea': el => askQuestion(el.dataset.q),
   'ask-read': el => askRead(Number(el.dataset.i)),
+  'ask-info': el => askInfo(Number(el.dataset.i)),
   'ask-more': () => askKeyboard(),
-  'ask-clear': () => { UI.chat = []; UI.chatBusy = false; UI.askDraft = ''; render(); },
+  'ask-clear': () => { UI.chat = []; UI.chatInfo = {}; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'contest-open': () => { UI.contestSheet = true; render(); },
   'contest-close': () => { UI.contestSheet = false; render(); },
   'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },
@@ -5726,6 +5779,7 @@ function render() {
   const showTabs = !UI.org && !!out.tabs;
   app.classList.toggle('no-tabs', !showTabs);
   tabs.hidden = !showTabs;
+  tabs.classList.toggle('under', !!app.querySelector('.scrim, .full'));
   if (showTabs) document.documentElement.style.setProperty('--tabh', (tabs.offsetHeight + parseFloat(getComputedStyle(tabs).bottom || 0) || tabs.offsetHeight) + 'px');
   sizeAsk();
   tabs.querySelectorAll('.tab').forEach(b => {
@@ -5734,7 +5788,7 @@ function render() {
     if (on) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current');
   });
   if (UI.scrollCur) { UI.scrollCur = false; const c = document.getElementById('cur'); if (c) c.scrollIntoView({ block: 'center' }); else scroller().scrollTop = 0; }
-  else if (UI.scrollTop) { UI.scrollTop = false; scroller().scrollTop = 0; app.classList.remove('enter'); void app.offsetWidth; app.classList.add('enter'); }
+  else if (UI.scrollTop) { UI.scrollTop = false; scroller().scrollTop = 0; }
   renderToast();
   syncHistory();
 }
@@ -5897,6 +5951,6 @@ if (window.claude && typeof window.claude.use === 'function') {
   sync().then(() => flush());
 })();
 if ('serviceWorker' in navigator && BOOT.mode === 'live' && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
-window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, fmtDate, daysFromToday, todayIso, send, holeOf, computeR, myGroup, liveRid };
+window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, fmtDate, daysFromToday, todayIso, send, holeOf, computeR, myGroup, liveRid, refreshThread };
 
 })();</script></body></html>

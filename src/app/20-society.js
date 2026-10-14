@@ -471,6 +471,10 @@ function markCell(gross, par, shots) {
   if (gross === 'P') return `<span class="mk pu" title="Picked up">${E.pickupStrokes(par, shots || 0)}<sup>p</sup></span>`;
   return `<span class="mk ${E.scoreMark(gross, par)}">${gross}</span>`;
 }
+function markKey() {
+  const k = (c, t, l) => `<span class="ski"><span class="mk ${c}">${t}</span>${l}</span>`;
+  return `<div class="sckey" aria-label="Key to the marks">${k('birdie', '3', 'Birdie')}${k('eagle', '2', 'Eagle')}${k('bogey', '5', 'Bogey')}${k('double', '6', 'Double or worse')}<span class="ski"><span class="sd">●</span>You get a shot</span></div>`;
+}
 function cardParts(r, pl, fix, pid) {
   const holes = holesOf(r);
   const half = hs => {
@@ -509,7 +513,7 @@ VIEWS.card = p => {
     <p class="sub"><button class="link inline cardlink" data-act="round" data-rid="${r.id}">${esc(roundName(r))}</button> · ${esc(sub)}</p>
     ${isDemo(r) ? '<div class="note"><span class="pill w">Demo scores</span></div>' : ''}
     <div class="tiles"><div class="tile flag"><span class="cap">Points</span><span class="bignum">${pl.total}</span></div><div class="tile"><span class="cap">Out</span><span class="bignum">${F.pts}</span></div><div class="tile"><span class="cap">In</span><span class="bignum">${B.pts}</span></div></div></header>
-    <div class="card sc-wrap">${table}</div>`;
+    <div class="card sc-wrap">${table}</div>${markKey()}`;
   return { html };
 };
 

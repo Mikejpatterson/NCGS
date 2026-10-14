@@ -1315,3 +1315,41 @@ body { font-variant-numeric: tabular-nums; }
 }
 .tab.on svg { filter: drop-shadow(0 0 3px rgba(255, 255, 255, .9)); }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .tabs { background: rgba(255, 255, 255, .92); } }
+
+/* Fixes 3: no bounce between tabs; sheets sit above the glass bar; classic score shapes with a key */
+#app.enter > * { animation: none !important; }
+.tabs.under { visibility: hidden; }
+.sc-wrap { overflow: hidden; }
+.sc { width: 100%; table-layout: fixed; }
+.sc th:nth-child(1), .sc td:nth-child(1), .sc th:nth-child(6), .sc td:nth-child(6) { width: 19%; white-space: nowrap; }
+.sc th:nth-child(2), .sc td:nth-child(2), .sc th:nth-child(7), .sc td:nth-child(7) { width: 9%; text-align: center; }
+.sc th:nth-child(3), .sc td:nth-child(3), .sc th:nth-child(8), .sc td:nth-child(8) { width: 12%; text-align: center; padding-inline: 0; }
+.sc th:nth-child(4), .sc td:nth-child(4), .sc th:nth-child(9), .sc td:nth-child(9) { width: 9%; text-align: center; padding-inline: 0; font-variant-numeric: tabular-nums; }
+.sc th.gap, .sc td.gap { width: 6px; padding: 0; }
+.sc td:last-child, .sc th:last-child { padding-right: 4px; }
+.sc td:first-child, .sc th:first-child { padding-left: 8px; }
+.sc th:nth-child(6), .sc td:nth-child(6) { padding-left: 6px; }
+.sc th:nth-child(3), .sc th:nth-child(7) { padding-inline: 0; }
+.sc .sd { letter-spacing: 1px; margin-left: 2px; }
+.mk { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; font-weight: 700; font-variant-numeric: tabular-nums; border: 1.5px solid transparent; box-sizing: border-box; background: none; outline: 0; box-shadow: none; color: var(--text); }
+.mk.birdie { background: #E3EFE6; border: 1.5px solid var(--pine); border-radius: 50%; color: var(--pine); }
+.mk.eagle { background: var(--flag); border: 1.5px solid var(--pine); border-radius: 50%; color: var(--pine); box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var(--pine); }
+.mk.bogey { background: #EEF0EA; border: 1.5px solid var(--pine); border-radius: 5px; }
+.mk.double { background: #DDE3DE; border: 1.5px solid var(--pine); border-radius: 5px; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var(--pine); }
+.sckey { display: flex; flex-wrap: wrap; gap: 12px 18px; margin: 14px 4px 4px; align-items: center; }
+.ski { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; color: var(--sub); }
+.ski .mk { width: 24px; height: 24px; font-size: .8rem; margin: 3px; }
+.ski .sd { color: var(--text); font-size: 10px; }
+.sc thead th, .sc thead th.hn { text-transform: none; letter-spacing: 0; font-size: .75rem; padding-inline: 0; }
+.sc thead th.hn { padding-left: 8px; }
+.sc thead th:nth-child(6) { padding-left: 6px; }
+.sc thead th, .sc thead th.hn { font-size: .66rem; }
+
+/* Ruling: the "i" button and the official wording panel */
+.rbtn.rinfo { flex: none; width: 56px; min-width: 56px; padding: 0; font-family: Georgia, "Times New Roman", serif; font-style: italic; font-size: 1.4rem; background: #fff; box-shadow: inset 0 0 0 1.5px var(--pine); color: var(--pine); }
+.rbtn.rinfo[aria-expanded="true"] { background: var(--pine); color: #fff; }
+.rquote { margin: 12px 2px 4px; padding: 14px 16px; border-radius: 18px; background: #fff; box-shadow: var(--ring); }
+.rqh { font-size: .75rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--sub); margin-bottom: 8px; }
+.rquote blockquote { margin: 0; padding-left: 12px; border-left: 3px solid var(--flag); font-size: .95rem; line-height: 1.45; color: var(--text); overflow-wrap: anywhere; }
+.rqn { margin: 10px 0 0; font-size: .85rem; color: var(--sub); line-height: 1.35; }
+.rquote .srcs { margin-top: 10px; }
