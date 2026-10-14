@@ -290,9 +290,8 @@ VIEWS.after = () => {
   } else next = `<button class="btn" data-act="to-finish">See the card</button>`;
   return {
     tabs: 'hole',
-    html: `<header class="hero c pine"><div class="hrow2"><h1 class="big"><small>Hole</small>${a.n}</h1><span class="saved">${sized(ICON.check, 20)} Saved</span><button class="link" data-act="undo">Undo</button></div></header>
-      <div class="res">${head}</div>
-      ${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}
+    html: `<header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
+      <div class="rescard"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>
       ${sec('', cardOf(rows))}
       ${next}${saveWarning()}`
   };

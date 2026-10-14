@@ -1101,3 +1101,26 @@ body::before { display: none; }
 .lrow[style*="repeat("] .av { width: 28px; height: 28px; font-size: .6rem; flex: none; }
 .lrow[style*="repeat("] .lname { gap: 8px; }
 .lrow[style*="repeat("] { column-gap: 6px; padding-inline: 12px; }
+
+/* After saving a hole */
+.entr .savedchip { display: inline-flex; align-items: center; gap: 4px; font-size: .95rem; font-weight: 700; color: #fff; justify-content: flex-end; }
+.entr .undochip { display: inline-block; margin-top: 8px; min-height: 36px; padding: 0 16px; border: 0; border-radius: 999px; background: rgba(255, 255, 255, .16); color: #fff; font: inherit; font-size: .9rem; font-weight: 700; }
+.hero.pine.entcard + .rescard { margin-top: 14px; }
+.rescard { background: #fff; border-radius: 24px; box-shadow: var(--ring); padding: 16px 18px; }
+.rescard .res { gap: 8px 10px; }
+.rescard .res-t { font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; }
+.rescard .res-sub { margin-top: 6px; }
+.pill.big { font-size: .95rem; padding: 6px 14px; }
+.row.chg .pill { font-size: .85rem; padding: 4px 12px; min-height: 0; }
+.row.chg .stat .cap.was { text-transform: none; letter-spacing: 0; font-size: .8rem; }
+.row.chg .stat { gap: 4px; }
+.pill.big { height: 32px; font-size: .95rem; padding: 0 14px; }
+.row.chg .pill { height: 26px; font-size: .85rem; padding: 0 12px; }
+
+/* Results selector: real pills, one row, no grey tray */
+.seg.pills, .seg.pills.four { display: flex; flex-wrap: nowrap; gap: 6px; background: none; padding: 0; border-radius: 0; margin: 14px 0 6px; }
+.seg.pills button, .seg.pills.four button { flex: 1 1 auto; width: auto; min-height: 44px; padding: 0 10px; border-radius: 999px; background: #fff; box-shadow: inset 0 0 0 1.5px rgba(20, 35, 27, .14); color: var(--text); font-size: .85rem; font-weight: 700; white-space: nowrap; overflow-wrap: normal; text-align: center; }
+.seg.pills button.on, .seg.pills.four button.on { background: var(--pine); color: #fff; box-shadow: none; font-weight: 800; }
+.entr .savedchip { display: flex; }
+.entr { display: flex; flex-direction: column; align-items: flex-end; }
+.seg.pills, .seg.pills.four { flex-wrap: wrap; }
