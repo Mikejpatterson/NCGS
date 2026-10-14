@@ -165,7 +165,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   // Rules checker
   await tap('.tab[data-tab="rules"]');
   t = await text();
-  check('rules tab: heading, ideas to tap and an ask bar', /Ruling/.test(t) && (await page.$$('.idea')).length >= 4 && !!(await page.$('#askin')) && await page.$eval('.tab.on, .tab[aria-current="page"]', e => e.dataset.tab) === 'rules');
+  check('rules tab: heading, ideas to tap and an ask bar', /What happened/.test(t) && (await page.$$('.sit')).length >= 4 && !!(await page.$('#askin')) && await page.$eval('.tab.on, .tab[aria-current="page"]', e => e.dataset.tab) === 'rules');
   await page.fill('#askin', 'Ball in the water?');
   await tap('.send');
   await page.waitForSelector('.bub.err');
@@ -181,7 +181,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   check('rules: the input is still there and empty for the next question', (await page.$eval('#askin', e => e.value)) === '');
   await shot('08c-rules', true);
   await tap('[data-act="ask-clear"]');
-  check('rules: New question clears the chat', (await page.$$('.idea')).length >= 4);
+  check('rules: New question clears the chat', (await page.$$('.sit')).length >= 4);
   await tap('.tab[data-tab="board"]');
   t = await text();
   await shot('09-board', true);

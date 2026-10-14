@@ -1,11 +1,11 @@
 /* ----- Rules checker: ask about the Rules of Golf, checked live against the official rules ----- */
 const SPEECH = window.SpeechRecognition || window.webkitSpeechRecognition;
+const SIT_SVG = d => `<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 const ASK_IDEAS = [
-  'My ball hit another ball on the green. What now?',
-  'Ball moved after I addressed it',
-  'Ball in a bunker footprint or plugged lie',
-  'Unplayable lie: what are my options?',
-  'Ball hit my buggy or a person'
+  { q: 'My ball hit another ball on the green. What now?', t: 'Ball hit a ball', s: 'On the green', i: SIT_SVG('<circle cx="8" cy="13" r="4.5"/><circle cx="17.5" cy="11" r="3.5"/><path d="M3 20h18"/>') },
+  { q: 'Ball moved after I addressed it', t: 'Ball moved', s: 'After you set up', i: SIT_SVG('<circle cx="8.5" cy="14" r="4.5"/><path d="M15 8h6m0 0-2.5-2.5M21 8l-2.5 2.5"/>') },
+  { q: 'Ball in a bunker footprint or plugged lie', t: 'Bunker trouble', s: 'Footprint or plugged', i: SIT_SVG('<path d="M2 19h20"/><path d="M4 19c1.5-6 5-9.5 9-9.5 3.2 0 5.3 2.4 7 9.5"/>') },
+  { q: 'Unplayable lie: what are my options?', t: 'Unplayable lie', s: 'Your options', i: SIT_SVG('<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>') }
 ];
 
 // Plain text from the answer: paragraphs, "- " bullets and **bold**, nothing else.
@@ -58,8 +58,9 @@ function askSources(list) {
 
 function askThread() {
   if (!UI.chat.length && !UI.chatBusy) {
-    return `<div class="ask-intro"><p class="b">Say what happened.</p><p class="sub">${SPEECH ? 'Tap the microphone and speak, or type.' : 'Tap the box, then the microphone on your keyboard to speak.'} You get a ruling you can read out, checked against the official rules.</p></div>
-      <div class="ask-ideas">${ASK_IDEAS.slice(0, 4).map(q => `<button class="idea" data-act="ask-idea" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div>`;
+    return `<section class="hero pine askhero"><div class="ah-txt"><small>RULING</small><b>What happened?</b><span>Speak or type it. You get a clear ruling, checked against the official rules.</span></div><button class="ah-mic" type="button" data-act="ask-mic" aria-label="Tap and speak your question">${ICON.mic}</button></section>
+      <div class="sitlab">Or pick a common one</div>
+      <div class="sits">${ASK_IDEAS.map(x => `<button class="sit" data-act="ask-idea" data-q="${esc(x.q)}"><span class="sit-i">${x.i}</span><span class="sit-t">${esc(x.t)}</span><span class="sit-s">${esc(x.s)}</span></button>`).join('')}</div>`;
   }
   return UI.chat.map((m, i) => m.role === 'user'
     ? `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>`
@@ -189,7 +190,7 @@ function askKeyboard(msg) { const i = document.getElementById('askin'); if (i) i
 
 VIEWS.rules = () => ({
   tabs: 'rules',
-  html: `<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">Ruling</h1>${UI.chat.length ? '<button class="link" data-act="ask-clear">New question</button>' : ''}</div></header>
+  html: `<header class="hero c rulehd${UI.chat.length || UI.chatBusy ? '' : ' empty'}"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">Ruling</h1>${UI.chat.length ? '<button class="link" data-act="ask-clear">New question</button>' : ''}</div></header>
     <div id="thread" class="thread">${askThread()}</div>
     <form class="askbar" data-form="ask" autocomplete="off">
       <div class="card">
@@ -209,6 +210,7 @@ function refreshThread(mode) {
   const el = document.getElementById('thread');
   if (!el) return;
   el.innerHTML = askThread();
+  const hd = document.querySelector('.rulehd'); if (hd) hd.classList.toggle('empty', !UI.chat.length && !UI.chatBusy);
   const bar = document.querySelector('.hero .hrow2');
   if (bar && !bar.querySelector('[data-act="ask-clear"]') && UI.chat.length) bar.insertAdjacentHTML('beforeend', '<button class="link" data-act="ask-clear">New question</button>');
   if (bar && !UI.chat.length) { const b = bar.querySelector('[data-act="ask-clear"]'); if (b) b.remove(); }
