@@ -385,11 +385,12 @@ VIEWS.round = p => {
   }
   const mine = myGroup(r.id);
   const hasKb = !!(r.kb && r.kb.length);
-  const tabsAvail = ['groups'].concat(hasKb ? ['kb'] : [], ['info']);
+  const tabsAvail = ['groups'].concat(hasKb ? ['kb'] : [], ['weather', 'course']);
   const rt = tabsAvail.includes(UI.rtab) ? UI.rtab : 'groups';
-  const tabName = { groups: 'Groups', kb: 'KBs', info: 'Weather and course' };
-  const pillsHtml = `<div class="seg pills rtabs" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${k === 'info' ? 'Course' : tabName[k]}</button>`).join('')}</div>`;
-  const roundBody = rt === 'groups' ? groupCards(r) : rt === 'kb' ? kbCards(r) : forecast(r) + (c && c.about ? sec(label('The course'), `<p class="prose">${esc(c.about)}</p>`) : '');
+  const tabName = { groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
+  const pillsHtml = `<div class="seg pills rtabs${tabsAvail.length > 3 ? ' four' : ''}" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${tabName[k]}</button>`).join('')}</div>`;
+  const courseBody = c && c.about ? `<p class="prose">${esc(c.about)}</p>` : '<p class="prose sub">No course notes yet.</p>';
+  const roundBody = rt === 'groups' ? groupCards(r) : rt === 'kb' ? kbCards(r) : rt === 'weather' ? (forecast(r) || sec('', cardOf('<div class="row"><span class="sub">No forecast yet. It appears in the 9 days before the round.</span></div>'), true)) : sec('', courseBody, true);
   const playable = canScore(r) && (r.status === 'live' || (r.status === 'upcoming' && (!r.date || daysFromToday(r.date) <= 0)));
   if (playable) {
     if (!DB.prefs.me || !mine) html += `<button class="btn" data-act="play" data-rid="${r.id}">Play now</button>`;
