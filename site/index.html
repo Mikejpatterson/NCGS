@@ -1541,9 +1541,23 @@ body { font-variant-numeric: tabular-nums; }
 .askrow.on .askdot { background: var(--green); border-color: var(--green); box-shadow: inset 0 0 0 5px #EAF3EC; }
 .ask .btn { background: var(--flag); color: var(--pine); }
 .ask .btn:disabled { opacity: .4; }
+
+/* ===== Finished round ===== */
+.fin .fincard { margin: 8px 0 0; border-radius: 26px; background: var(--pine); color: #fff; padding: 18px 20px 20px; }
+.fin .finrow { display: flex; justify-content: space-between; align-items: center; }
+.fin .fink { font-size: .8rem; font-weight: 800; letter-spacing: .14em; color: var(--flag); }
+.fin .finfinal { font-size: .9rem; font-weight: 700; color: #CFE0D6; }
+.fin .finwin { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; }
+.fin .finwho { min-width: 0; }
+.fin .finname { display: block; font-size: 2.2rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.05; overflow-wrap: anywhere; }
+.fin .finsub { margin: 4px 0 0; font-size: .95rem; font-weight: 400; letter-spacing: 0; color: #CFE0D6; }
+.fin .finpts { flex: none; font-size: 3.6rem; font-weight: 800; line-height: 1; color: var(--flag); font-variant-numeric: tabular-nums; min-width: 3ch; text-align: right; }
+.fin .finmore { justify-content: center; color: var(--green); font-weight: 700; }
+.fin > .btn { background: var(--flag); color: var(--pine); margin-top: 20px; }
+.fin .hero.s { padding-bottom: 0; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151241","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151308","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3849,6 +3863,46 @@ function kbCards(r) {
   const gOf = pid => (r.groups || []).find(g => g.teams.some(t => t.includes(pid)));
   return `<div class="kbs">${r.kb.map(pr => `<div class="kbcard">${avStack(pr)}<span class="kbn">${esc(pr.map(D.nameOf).join(' & '))}</span><span class="kbg">${pr.map(pid => { const g = gOf(pid); return g ? 'G' + g.n : ''; }).filter(Boolean).join(' · ')}</span></div>`).join('')}</div>`;
 }
+/* The page for a finished round: the winner first, then the table, then one small card for KBs and contests. */
+function finishedCard(r, res) {
+  const top = res.rows.filter(x => x.pos === 1);
+  const names = top.map(x => D.nameOf(x.id)).join(' & ');
+  const sub = [roundName(r), r.date ? fmtDate(r.date, true) : ''].filter(Boolean).join(' · ');
+  return `<div class="fincard"><div class="finrow"><span class="fink">${top.length > 1 ? 'WINNERS' : 'WINNER'}</span><span class="finfinal">Final</span></div>
+    <div class="finwin"><div class="finwho"><b class="finname">${esc(names)}</b><h1 class="finsub">${esc(sub)}</h1></div><b class="finpts">${top[0].total}</b></div></div>`;
+}
+function finishedBody(r, res) {
+  const app = res.source === 'app';
+  const all = !!UI.open['all-' + r.id], many = res.rows.length > 8;
+  const shown = all || !many ? res.rows : res.rows.slice(0, 8);
+  let html = sec(label('Stableford'), cardOf(shown.map(x => {
+    const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
+    return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
+  }).join('') + (many ? `<button class="row finmore" data-act="toggle" data-key="all-${r.id}" aria-expanded="${all}">${all ? 'Show fewer' : `Show all ${res.rows.length}`}</button>` : '')) +
+    ((all || !many) && res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : (all || !many) && res.source === 'sheet' ? '<p class="cap note">From the society sheet</p>' : ''));
+  const rows = [];
+  if (res.kb.length) {
+    const top = res.kb.filter(k => k.posLabel === res.kb[0].posLabel);
+    const open = !!UI.open['kb-' + r.id];
+    rows.push(`<button class="row" data-act="toggle" data-key="kb-${r.id}" aria-expanded="${open}"><span>KBs</span><span class="right"><b>${esc(top.map(k => k.name).join(', '))} · ${top[0].total}</b><span class="chev dn${open ? ' up' : ''}">${chev}</span></span></button>`);
+    if (open) rows.push(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''));
+  }
+  res.contests.filter(c => c.winner !== undefined).forEach(c => rows.push(`<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : '<span class="sub">Not awarded</span>'}</div>`));
+  if (rows.length) html += sec(label('KBs and contests'), cardOf(rows.join('')));
+  if (app && res.comp) {
+    const two = res.comp.groups.filter(g => g.teams.length === 2 && g.teams.every(t => t.length === 2));
+    if (two.length) html += sec(label('Buggy Wars'), two.map(gc => cardOf(
+      `<div class="row"><span class="sub">${esc(gc.labels[0].long)} v ${esc(gc.labels[1].long)}</span></div>` +
+      ['front', 'back', 'overall'].map(sg => `<div class="row"><span>${segName(sg)}</span>${statusPills(gc.matches[sg].status)}</div>`).join(''))).join('<div style="height:8px"></div>'));
+  }
+  if (r.groups && r.groups.length) {
+    const open = !!UI.open['grp-' + r.id];
+    html += sec('', cardOf(`<button class="row" data-act="toggle" data-key="grp-${r.id}" aria-expanded="${open}"><span>Groups</span><span class="chev dn${open ? ' up' : ''}">${chev}</span></button>`), true);
+    if (open) html += groupsBlock(r, false);
+  }
+  return html + `<button class="btn" data-act="results" data-rid="${r.id}">Share results</button>`;
+}
+
 VIEWS.round = p => {
   const r = D.round(p.rid);
   if (!r) return { html: `${navBack(D.society())}<div class="head"><h1 class="title">Round not found</h1></div>` };
@@ -3869,9 +3923,13 @@ VIEWS.round = p => {
   html += '</header>';
 
   if (r.status === 'final') {
+    const res = resultsOf(r.id);
+    if (res && res.rows.length) {
+      const back = html.slice(0, html.indexOf('<div class="head">')) + '</header>';
+      return { html: `<div class="fin">${back}${finishedCard(r, res)}${finishedBody(r, res)}</div>` };
+    }
     html += resultsBlock(r);
     if (r.groups && r.groups.length) html += groupsBlock(r, false);
-    if (r.source !== 'imported' || (resultsOf(r.id) || { rows: [] }).rows.length) html += `<button class="btn quiet" data-act="results" data-rid="${r.id}">Share results</button>`;
     return { html };
   }
   const mine = myGroup(r.id);

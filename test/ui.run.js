@@ -42,8 +42,12 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   // A past trip round (GameBook order, KBs, contests, groups)
   await tap('[data-act="round"][data-rid="2026-rio-real"]');
   t = await text();
+  check('finished round: the winner leads in a pine card, the table shows the top 8 with Show all 12', /WINNER/.test(t) && !!(await page.$('.fincard')) && (await page.$$('.fin .lrow')).length === 8 && /Show all 12/.test(t));
+  await tap('[data-key^="all-"]');
+  await tap('[data-key^="grp-"]');
+  t = await text();
   check('round: GameBook order kept (Mike F 10th ahead of Damien on 23)', /10[A-Za-z]{2,3}Mike F2311[A-Za-z]{2,3}Damien23/.test(t));
-  check('round: KBs and contests from the sheet', /Sean & Peadar67/.test(t) && /Nearest the pinPeadar/.test(t) && /Longest driveMike P/.test(t));
+  check('round: KBs and contests from the sheet', /Sean & Peadar · 67/.test(t) && /Nearest the pinPeadar/.test(t) && /Longest driveMike P/.test(t));
   check('round: buggies listed under groups', /Mike P & Dave/.test(t));
   await shot('02-round-rio-real', true);
   await tap('[data-act="player"][data-pid="mike-p"]');
