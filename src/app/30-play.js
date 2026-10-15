@@ -706,19 +706,19 @@ function statsOf(rid) {
     return any ? s : null;
   });
 }
-/* The round in numbers: one medal per stat, a two-tone icon inside a ring in the stat's colour. */
-const BADGE = (inner, ring) => `<span class="sbm" style="--ring:${ring}" aria-hidden="true"><svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="#1D3B30" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${inner}</svg></span>`;
+/* The round in numbers: one pine medal per stat with a flag-yellow line icon, drawn like the app's other icons. */
+const BADGE = inner => `<span class="sbm" aria-hidden="true"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${inner}</svg></span>`;
 const STAT_BADGE = {
-  birdie: ['#E3B21C', '<path d="M8 21V9"/><path d="M8 11h9l-2.2 2.8L17 16.6H8z" fill="#8FD1A8"/><path d="M5 21h6"/><path d="M3 6.8c0-2.6 2-4.6 4.6-4.6 1.5 0 2.7.6 3.5 1.7l2.5.5-2.1 1.3c-.3 2.3-2.2 4-4.5 4H3.5z" fill="#F0C63F"/><circle cx="9.2" cy="4.4" r=".7" fill="#1D3B30" stroke="none"/><path d="M4.8 7.4c1.3.2 2.7-.3 3.4-1.4"/>'],
-  streak: ['#E8692C', '<path d="M12 2c1.2 3.8 6 5.6 6 11.4a6 6 0 0 1-12 0c0-2.5 1.2-4 2.5-5 .3 1.7 1.2 2.6 2.4 2.6-1-3.4 0-6.2 1.1-9z" fill="#FFB27A"/><path d="M12 13c.6 1.6 2.5 2.4 2.5 4.6a2.5 2.5 0 0 1-5 0c0-1 .5-1.7 1-2.1" fill="#F0C63F"/>'],
-  nine: ['#1B7A43', '<path d="M7 21V3"/><path d="M7 3.5h11l-2.8 3.8L18 11H7z" fill="#8FD1A8"/><path d="M4 21h6"/>'],
-  comeback: ['#1B7A43', '<path d="M3 19l5.5-5.5 4 3L21 8v13H3z" fill="#8FD1A8" stroke="none" opacity=".55"/><path d="M3 19l5.5-5.5 4 3L21 8"/><path d="M15.5 8H21v5.5"/>'],
-  steady: ['#5E7A6D', '<path d="M12 5v14"/><path d="M8.5 20h7"/><path d="M4.5 7.5h15"/><circle cx="12" cy="5" r="1.2" fill="#1D3B30"/><path d="M4.5 7.5l-2.2 6M4.5 7.5l2.2 6M19.5 7.5l-2.2 6M19.5 7.5l2.2 6"/><path d="M2 13.5h5a2.5 2.5 0 0 1-5 0zM17 13.5h5a2.5 2.5 0 0 1-5 0z" fill="#DDF1E4"/>'],
-  fade: ['#8A7A6E', '<rect x="2.5" y="8" width="16.5" height="9" rx="2.2"/><path d="M21.5 11v3"/><rect x="4.5" y="10" width="3" height="5" rx="1" fill="#FFB27A" stroke="none"/>'],
-  big: ['#E8692C', '<path d="M3.2 9.8c-.6-2.2.9-4.3 3-4.5.6-2 2.5-3.3 4.6-3 1-.9 2.6-1 3.8-.2 2.1-.2 4 1.3 4.3 3.4 2 .4 3.2 2.4 2.6 4.4-.5 1.6-2 2.4-3.6 2.2-1 .9-2.4 1.2-3.7.8H10c-1.3.4-2.7.1-3.7-.8-1.5.2-2.7-.6-3.1-2.3z" fill="#FFB27A"/><path d="M10.4 13h3.2l.6 6h-4.4z" fill="#F0C63F" stroke="none"/><path d="M8.6 15.2c1-.7 2.1-1 3.4-1s2.4.3 3.4 1"/><path d="M10.6 12.8l-.6 6.2M13.4 12.8l.6 6.2"/><path d="M2.5 21.5c.4-1.9 2.6-2.8 4.6-2.6.9-.9 2.7-1.4 4.9-1.4s4 .5 4.9 1.4c2-.2 4.2.7 4.6 2.6z" fill="#FFB27A"/>'],
-  scratch: ['#8A7A6E', '<path d="M3 20h18"/><path d="M8.5 20c0-1.4 1.6-2 3.5-2s3.5.6 3.5 2" fill="#DDF1E4"/><circle cx="12" cy="7" r="3.2" fill="#fff"/><path d="M12 15.5v-3.8M10.2 13.3l1.8-1.7 1.8 1.7"/>'],
-  tough: ['#1D3B30', '<path d="M1.5 20l7.5-14 5 7.8 2.8-3.9 5.7 10.1z" fill="#AFC5BA"/><path d="M7.2 9.3L9 6l1.9 3"/>'],
-  easy: ['#E3B21C', '<path d="M2.5 19c0-2 4.3-3.2 9.5-3.2s9.5 1.2 9.5 3.2-4.3 2.5-9.5 2.5-9.5-.5-9.5-2.5z" fill="#8FD1A8"/><path d="M9 18.5V6.5"/><path d="M9 6.8h6l-1.6 2 1.6 2H9z" fill="#fff"/><circle cx="18" cy="5.5" r="2.4" fill="#F0C63F"/><path d="M18 1.8v.8M21.7 5.5h-.8M20.6 2.9l-.6.6"/>']
+  birdie: '<path d="M8 21V9"/><path d="M8 11h9l-2.2 2.8L17 16.6H8z"/><path d="M5 21h6"/><path d="M3 6.8c0-2.6 2-4.6 4.6-4.6 1.5 0 2.7.6 3.5 1.7l2.5.5-2.1 1.3c-.3 2.3-2.2 4-4.5 4H3.5z"/><circle cx="9.2" cy="4.4" r=".7" fill="currentColor" stroke="none"/><path d="M4.8 7.4c1.3.2 2.7-.3 3.4-1.4"/>',
+  streak: '<path d="M12 2c1.2 3.8 6 5.6 6 11.4a6 6 0 0 1-12 0c0-2.5 1.2-4 2.5-5 .3 1.7 1.2 2.6 2.4 2.6-1-3.4 0-6.2 1.1-9z"/><path d="M12 13c.6 1.6 2.5 2.4 2.5 4.6a2.5 2.5 0 0 1-5 0c0-1 .5-1.7 1-2.1"/>',
+  nine: '<path d="M7 21V3"/><path d="M7 3.5h11l-2.8 3.8L18 11H7z"/><path d="M4 21h6"/>',
+  comeback: '<path d="M3 19l5.5-5.5 4 3L21 8"/><path d="M15.5 8H21v5.5"/>',
+  steady: '<path d="M12 5v14"/><path d="M8.5 20h7"/><path d="M4.5 7.5h15"/><circle cx="12" cy="5" r="1.2" fill="currentColor"/><path d="M4.5 7.5l-2.2 6M4.5 7.5l2.2 6M19.5 7.5l-2.2 6M19.5 7.5l2.2 6"/><path d="M2 13.5h5a2.5 2.5 0 0 1-5 0zM17 13.5h5a2.5 2.5 0 0 1-5 0z"/>',
+  fade: '<rect x="2.5" y="8" width="16.5" height="9" rx="2.2"/><path d="M21.5 11v3"/><rect x="4.5" y="10" width="3" height="5" rx="1" stroke="none"/>',
+  big: '<path d="M3.2 9.8c-.6-2.2.9-4.3 3-4.5.6-2 2.5-3.3 4.6-3 1-.9 2.6-1 3.8-.2 2.1-.2 4 1.3 4.3 3.4 2 .4 3.2 2.4 2.6 4.4-.5 1.6-2 2.4-3.6 2.2-1 .9-2.4 1.2-3.7.8H10c-1.3.4-2.7.1-3.7-.8-1.5.2-2.7-.6-3.1-2.3z"/><path d="M8.6 15.2c1-.7 2.1-1 3.4-1s2.4.3 3.4 1"/><path d="M10.6 12.8l-.6 6.2M13.4 12.8l.6 6.2"/><path d="M2.5 21.5c.4-1.9 2.6-2.8 4.6-2.6.9-.9 2.7-1.4 4.9-1.4s4 .5 4.9 1.4c2-.2 4.2.7 4.6 2.6z"/>',
+  scratch: '<path d="M3 20h18"/><path d="M8.5 20c0-1.4 1.6-2 3.5-2s3.5.6 3.5 2"/><circle cx="12" cy="7" r="3.2"/><path d="M12 15.5v-3.8M10.2 13.3l1.8-1.7 1.8 1.7"/>',
+  tough: '<path d="M1.5 20l7.5-14 5 7.8 2.8-3.9 5.7 10.1z"/><path d="M7.2 9.3L9 6l1.9 3"/>',
+  easy: '<path d="M2.5 19c0-2 4.3-3.2 9.5-3.2s9.5 1.2 9.5 3.2-4.3 2.5-9.5 2.5-9.5-.5-9.5-2.5z"/><path d="M9 18.5V6.5"/><path d="M9 6.8h6l-1.6 2 1.6 2H9z"/><circle cx="18" cy="5.5" r="2.4"/><path d="M18 1.8v.8M21.7 5.5h-.8M20.6 2.9l-.6.6"/>'
 };
 function statsView(s) {
   /* Each player once, even when they qualify twice (two blow-up holes, say). */
@@ -726,7 +726,7 @@ function statsView(s) {
   const names = a => { const u = uniq(a); return u.length > 3 ? `${u.length} players tied` : u.map(x => esc(x.name)).join(' & '); };
   const holesTxt = a => `${a.length > 1 ? 'Holes' : 'Hole'} ${a.map(h => h.n).join(', ')}`;
   const pts1 = v => (Math.round(v * 10) / 10).toLocaleString('en-IE');
-  const badge = (key, title, who, note) => `<div class="sbd">${BADGE(STAT_BADGE[key][1], STAT_BADGE[key][0])}<span class="sbt">${title}</span><b class="sbw">${who}</b>${note ? `<span class="sbn">${note}</span>` : ''}</div>`;
+  const badge = (key, title, who, note) => `<div class="sbd">${BADGE(STAT_BADGE[key])}<span class="sbt">${title}</span><b class="sbw">${who}</b>${note ? `<span class="sbn">${note}</span>` : ''}</div>`;
   const t = [];
   if (s.birdies.length) t.push(badge('birdie', 'Most birdies', names(s.birdies), plural(s.birdies[0].count, 'birdie')));
   if (s.streak) t.push(badge('streak', 'Hot streak', esc(s.streak.name), `${s.streak.len} in a row, holes ${s.streak.from} to ${s.streak.to}`));
@@ -734,8 +734,8 @@ function statsView(s) {
   if (s.comeback.length) { const c = s.comeback[0]; t.push(badge('comeback', 'Comeback', names(s.comeback), `${c.front} out, ${c.back} back`)); }
   if (s.steady.length) { const c = s.steady[0]; t.push(badge('steady', 'Steady', names(s.steady), `${c.front} out, ${c.back} back`)); }
   if (s.fade.length) { const c = s.fade[0]; t.push(badge('fade', 'Ran out of steam', names(s.fade), `${c.front} out, ${c.back} back`)); }
-  if (s.blowup.length) { const w = s.blowup[0]; t.push(badge('big', 'Blow-up hole', names(s.blowup), `${w.gross} on the ${ordinal(w.n)}, a par ${w.gross - w.over}`)); }
-  if (s.scratches.length) t.push(badge('scratch', 'Most pick-ups', names(s.scratches), `${plural(s.scratches[0].count, 'hole')} picked up`));
+  if (s.blowup.length) { const w = s.blowup[0]; t.push(badge('big', 'Blow\u2011up hole', names(s.blowup), `${w.gross} on the ${ordinal(w.n)}, a par ${w.gross - w.over}`)); }
+  if (s.scratches.length) t.push(badge('scratch', 'Most pick\u2011ups', names(s.scratches), `${plural(s.scratches[0].count, 'hole')} picked up`));
   if (s.hardest.length) t.push(badge('tough', 'Toughest hole', holesTxt(s.hardest), `${pts1(s.hardest[0].avgPts)} points a player`));
   if (s.easiest.length) t.push(badge('easy', 'Friendliest', holesTxt(s.easiest), `${pts1(s.easiest[0].avgPts)} points a player`));
   return sec(label('The round in numbers'), `<div class="card sbadges">${t.join('')}</div>`, true);

@@ -1686,3 +1686,13 @@ body { font-variant-numeric: tabular-nums; }
 .rp-players .pl-row .b.num { font-size: 1.15rem; font-weight: 800; }
 .rp-players .av { width: 34px; height: 34px; font-size: .68rem; }
 .rp-players .chev svg { width: 14px; height: 14px; }
+
+/* Stats medals: pine with a flag-yellow line icon (the same drawing style as the tab bar) */
+.sbm { background: var(--pine) !important; color: var(--flag); box-shadow: none !important; }
+.sbt { word-break: keep-all; hyphens: none; }
+/* At large text sizes the medals go two across, so every label fits */
+.sbadges { grid-template-columns: repeat(auto-fill, minmax(max(30%, 6.2rem), 1fr)); }
+
+/* Ruling: mic A, a chunky mic filling the yellow circle, with a soft gold halo */
+.ah-mic { width: 92px !important; height: 92px !important; background: var(--flag); color: var(--pine); box-shadow: 0 0 0 6px rgba(240, 198, 63, .22), 0 0 0 12px rgba(240, 198, 63, .10) !important; }
+.ah-mic svg { width: 58px !important; height: 58px !important; }

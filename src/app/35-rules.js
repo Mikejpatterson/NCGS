@@ -58,7 +58,7 @@ function askSources(list) {
 
 function askThread() {
   if (!UI.chat.length && !UI.chatBusy) {
-    return `<section class="hero pine askhero"><div class="ah-txt"><small>RULING</small><b>What happened?</b><span>Speak or type it. You get a clear ruling, checked against the official rules.</span></div><button class="ah-mic" type="button" data-act="ask-mic" aria-label="Tap and speak your question">${ICON.mic}</button></section>
+    return `<section class="hero pine askhero"><div class="ah-txt"><small>RULING</small><b>What happened?</b><span>Speak or type it. You get a clear ruling, checked against the official rules.</span></div><button class="ah-mic" type="button" data-act="ask-mic" aria-label="Tap and speak your question"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="#fff"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0"/><path d="M12 17.5V21M8.5 21h7"/></svg></button></section>
       <div class="sitlab">Or pick a common one</div>
       <div class="sits">${ASK_IDEAS.map(x => `<button class="sit" data-act="ask-idea" data-q="${esc(x.q)}"><span class="sit-i">${x.i}</span><span class="sit-t">${esc(x.t)}</span><span class="sit-s">${esc(x.s)}</span></button>`).join('')}</div>`;
   }
