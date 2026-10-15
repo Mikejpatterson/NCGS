@@ -77,7 +77,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await tap('[data-act="pick"][data-id="mike-p"]');
   await page.waitForSelector('.entry .stepper');
   t = await text();
-  check('hole tab goes straight to entering scores: hole 15, par 3 with nearest the pin, buggies as blue and red tiles instead of pills', /Hole\s*15/i.test(t) && /Par\s*3\s*Index\s*14/.test(t) && /Nearest the pin/.test(t) && !/Buggy 1/.test(t) && (await page.$$('.tiles.b1 .ptile')).length === 2 && (await page.$$('.tiles.b2 .ptile')).length === 2);
+  check('hole tab goes straight to entering scores: hole 15, par 3 with nearest the pin, buggies as blue and red tiles instead of pills', /Hole\s*15/i.test(t) && /Par\s*3\s*Index\s*14/.test(t) && /Nearest the pin/.test(t) && !/Buggy 1/.test(t) && (await page.$$('.bugs.b1 .ptile')).length === 2 && (await page.$$('.bugs.b2 .ptile')).length === 2);
   check('hole 15 entry fits on one iPhone screen', await fits());
   await shot('05-tee');
   check('hole screen: no All groups or Enter scores step, the tab bar and a tappable hole number, no Home or Results pills on top', !(await page.$('.pillbtn')) && !(await page.$('.tee')) && !(await page.$('.entback')) && !!(await page.$('.tab.on[data-tab="hole"]')) && !!(await page.$('.holebtn')) && !!(await page.$('.entry .stepper')));
