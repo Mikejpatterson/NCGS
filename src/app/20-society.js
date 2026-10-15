@@ -83,11 +83,7 @@ function nowCard(r) {
       <span class="now-line">${esc(heroFacts(r))}</span>
     </button>
     ${live ? miniBoard(r) : ''}
-    <button class="now-link" data-act="round" data-rid="${r.id}"><span>Groups · KBs · Weather · Course</span>${chev}</button>
-    ${playable || live ? `<div class="now-acts${playable && live ? '' : ' one'}">
-      ${playable ? `<button class="go" data-act="play" data-rid="${r.id}">${playLabel(r)}</button>` : ''}
-      ${live ? `<button class="go${playable ? ' alt' : ''}" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>` : ''}
-    </div>` : ''}
+    <div class="now-acts one"><button class="go" data-act="round" data-rid="${r.id}" data-tab="players">Players · Groups · KBs</button></div>
   </div>`;
 }
 VIEWS.home = () => {
@@ -434,12 +430,13 @@ VIEWS.round = p => {
     <h1 class="rp-name">${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
   if (playable && me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
 
-  const tabsAvail = ['groups', 'kb', 'weather', 'course'];
-  const rt = tabsAvail.includes(UI.rtab) ? UI.rtab : 'groups';
-  const tabName = { groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
+  const tabsAvail = ['players', 'groups', 'kb', 'weather', 'course'];
+  const rt = tabsAvail.includes(UI.rtab) ? UI.rtab : 'players';
+  const tabName = { players: 'Players', groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
   html += `<div class="seg pills rtabs" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${tabName[k]}</button>`).join('')}</div>`;
   const quiet = t => cardOf(`<div class="row"><span class="sub">${t}</span></div>`);
-  if (rt === 'groups') html += roundGroups(r);
+  if (rt === 'players') html += roundPlayers(r);
+  else if (rt === 'groups') html += roundGroups(r);
   else if (rt === 'kb') html += r.kb && r.kb.length ? `<div class="card rp-kbs">${r.kb.map(pr => `<span class="pk${pr.includes(me) ? ' me' : ''}">${pairNames(pr)}</span>`).join('')}</div>` : quiet(E.kbOff(r) ? 'No KBs in this round' : 'KB pairs are not drawn yet');
   else if (rt === 'weather') html += forecast(r, true) || quiet(r.date ? 'The forecast appears in the 9 days before the round.' : 'The forecast appears once the round has a date.');
   else html += roundCourse(r, c, tee, holes);
@@ -469,6 +466,21 @@ function roundGroups(r) {
       ? g.teams.map((t, i) => `<span class="${i ? 'pr' : 'pb'}">${pairNames(t)}</span>`).join('')
       : `<span class="pk wide">${esc(g.teams.flat().map(D.nameOf).join(', '))}</span>`;
     return `<button class="rg${mine && mine.id === g.id ? ' me' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}" aria-label="Group ${g.n}${g.teeTime ? ', ' + esc(g.teeTime) : ''}"><span class="rg-t"><b>${esc(g.teeTime || 'G' + g.n)}</b>${prog ? `<small>${prog}</small>` : ''}</span>${pills}<span class="chev dn${open ? ' up' : ''}">${chev}</span></button>${open ? `<div class="rg-open">${cols}${prow(g)}</div>` : ''}`;
+  }).join('')}</div>`;
+}
+
+/* Players on the round page: everyone playing, with index and playing handicap for the day. Tap one for the working. */
+function roundPlayers(r) {
+  if (!r.groups || !r.groups.length) return cardOf('<div class="row"><span class="sub">Players are not drawn yet</span></div>');
+  const comp = computeR(r.id), tee = teeOf(r);
+  const phOf = pid => (r.ph && r.ph[pid] !== undefined ? r.ph[pid] : comp ? comp.players[pid].ph : tee && D.member(pid) ? E.playingHandicap(D.member(pid).index, tee, allowanceOf(r)) : null);
+  const ids = r.groups.flatMap(g => g.teams.flat().map(pid => ({ pid, g })));
+  ids.sort((a, b) => D.nameOf(a.pid).localeCompare(D.nameOf(b.pid)));
+  const cols = '<div class="pl-row cols"><span></span><span></span><span class="r cap">Index</span><span class="r cap">Playing</span><span></span></div>';
+  return `<div class="card rp-players">${cols}${ids.map(({ pid, g }) => {
+    const m = D.member(pid), ph = phOf(pid), can = tee && m;
+    const inner = `${avBadge(pid)}<span class="pl-n"><span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span><span class="cap">${esc(g.teeTime ? g.teeTime : 'Group ' + g.n)}</span></span><span class="r sub num">${m ? fmtIndex(m.index) : ''}</span><span class="r b num">${ph === null ? '' : ph}</span>${can ? chev : '<span></span>'}`;
+    return can ? `<button class="pl-row${pid === DB.prefs.me ? ' me' : ''}" data-act="hcp" data-pid="${pid}" data-rid="${r.id}">${inner}</button>` : `<div class="pl-row">${inner}</div>`;
   }).join('')}</div>`;
 }
 

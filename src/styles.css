@@ -1675,3 +1675,14 @@ body { font-variant-numeric: tabular-nums; }
 .now-link .chev { color: #CFE0D6; }
 .now-link:active { background: rgba(255, 255, 255, .18); }
 .now-link + .now-acts { margin-top: 12px; }
+
+/* Round page: Players tab */
+.rp-players .pl-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 3.2rem 3.4rem 14px; gap: 8px; align-items: center; width: 100%; min-height: 56px; padding: 6px 14px; text-align: left; font-variant-numeric: tabular-nums; }
+.rp-players .pl-row + .pl-row { border-top: .5px solid var(--line); }
+.rp-players .pl-row.cols { min-height: 30px; padding-top: 10px; padding-bottom: 0; }
+.rp-players .pl-row.me { background: #FFF3C4; }
+.rp-players .pl-n { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.rp-players .pl-row .r { text-align: right; }
+.rp-players .pl-row .b.num { font-size: 1.15rem; font-weight: 800; }
+.rp-players .av { width: 34px; height: 34px; font-size: .68rem; }
+.rp-players .chev svg { width: 14px; height: 14px; }

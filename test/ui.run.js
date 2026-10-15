@@ -170,13 +170,13 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await tap('[data-act="respill"][data-p="bw"]');
   t = await text();
   check('Buggy Wars board with front/back/overall', /Front nine/.test(t) && /Overall/.test(t));
-  check('Buggy Wars shows only my own group, no group pills', (await page.$$('[data-act="mgroup"]')).length === 0 && (await page.$$('.mrow')).length > 0);
+  check('Buggy Wars shows only my own group, no group pills', (await page.$$('[data-act="mgroup"]')).length === 0 && (await page.$$('.bw-row')).length === 3);
   check('Buggy Wars opens at the top, not scrolled to the current hole', await page.evaluate(() => window.scrollY) === 0);
   await shot('08-match', true);
   await tap('[data-act="respill"][data-p="ct"]');
   t = await text();
   check('Contests pill: nearest the pin and longest drive', /Nearest the pin/.test(t) && /Longest drive/.test(t));
-  check('Contests pill: answered contests say Confirmed, the one still to play says To be confirmed', /Confirmed/.test(t) && /To be confirmed/.test(t) && /John K/.test(t));
+  check('Contests pill: answered contests get the gold cup, the one still to play says To be confirmed', (await page.$$('.ct-won .cupw')).length > 0 && /To be confirmed/.test(t) && /John K/.test(t));
   check('Contests rows are tidy: hole under the name, winner on one line', /Hole\s*\d+/.test(t) && (await page.$$eval('.ct-r .b', els => els.every(e => e.getBoundingClientRect().height < 28))));
   await shot('08b-contests', true);
   await tap('[data-act="respill"][data-p="lb"]');
@@ -264,7 +264,8 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   // Groups and KB pairs go together: a round with groups and nothing saved for KBs still shows valid pairs
   await page.evaluate(() => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const base = n.D.round('demo-cabopino'); n.put('rounds', [Object.assign({}, base, { id: 'kb-none', name: 'KB none', status: 'upcoming', kb: null, date: '2026-12-01' })]); n.DB.prefs.me = 'mike-p'; n.UI.rtab = 'kb'; n.UI.stack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'kb-none' } }]; n.render(); });
   await page.waitForTimeout(250);
-  check('a round with groups always shows KB pairs, none left out', (await page.$$('.kbcard')).length === 6 && !/not drawn yet/.test(await text()));
+  await page.evaluate(() => { const n = window.__ncgs; n.UI.rtab = 'kb'; n.render(); }); await page.waitForTimeout(150);
+  check('a round with groups always shows KB pairs, none left out', (await page.$$('.rp-kbs .pk')).length === 6 && !/not drawn yet/.test(await text()));
   await page.evaluate(() => { const n = window.__ncgs; n.UI.rtab = 'groups'; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); });
 
   // Organiser

@@ -9,7 +9,7 @@ const fake = (date, code, rain, wind) => { const hours = { time: [], temperature
   await pg.goto(URL); await pg.evaluate(() => localStorage.clear()); await pg.reload(); await pg.waitForSelector('.brand');
   const date = await pg.evaluate(() => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const r = n.D.round('demo-cabopino'); n.put('rounds', [Object.assign({}, r, { date: n.todayIso() })]); return n.todayIso(); });
   await pg.waitForTimeout(400);
-  const show = () => pg.evaluate(() => { const n = window.__ncgs; n.UI.stack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'demo-cabopino' } }]; n.render(); return { skel: !!document.querySelector('.wx-skel'), card: !!document.querySelector('.wx:not(.wx-skel):not(.wx-fail)') }; });
+  const show = () => pg.evaluate(() => { const n = window.__ncgs; n.UI.rtab = 'weather'; n.UI.stack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'demo-cabopino' } }]; n.render(); return { skel: !!document.querySelector('.wx-skel'), card: !!document.querySelector('.wx:not(.wx-skel):not(.wx-fail)') }; });
   // 1. nothing remembered: a placeholder holds the space at once
   await pg.evaluate(() => { window.__ncgs.UI.wx = {}; localStorage.removeItem('ncgs-wx'); });
   const a = await show();

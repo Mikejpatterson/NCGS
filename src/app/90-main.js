@@ -3,7 +3,7 @@ const dataOf = el => el.dataset;
 const ACT = {
   back: () => back(),
   home: () => { UI.org = false; UI.stack = [{ v: 'home', p: {} }]; UI.scrollTop = true; render(); },
-  round: el => go('round', { rid: el.dataset.rid }),
+  round: el => { if (el.dataset.tab) UI.rtab = el.dataset.tab; go('round', { rid: el.dataset.rid }); },
   player: el => go('player', { pid: el.dataset.pid }),
   card: el => go('card', { rid: el.dataset.rid, pid: el.dataset.pid }),
   goy: () => go('goy'),

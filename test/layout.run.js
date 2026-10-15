@@ -11,8 +11,9 @@ const scenarios = [
   ['who', async p => { await clickAny(p, '[data-act="who"]'); }],
   ['rounds', async p => { await clickAny(p, '[data-act="rounds"]'); }],
   ['round-rio', async p => { await clickAny(p, '[data-act="rounds"]'); await clickAny(p, '[data-act="round"][data-rid="2026-rio-real"]'); }],
-  ['round-groups', async p => { await clickAny(p, '.now [data-act="round"]'); }],
-  ['round-group-open', async p => { await clickAny(p, '.now [data-act="round"]'); await clickAny(p, '.rg'); }],
+  ['round-players', async p => { await clickAny(p, '.now [data-act="round"]'); }],
+  ['round-groups', async p => { await clickAny(p, '.now [data-act="round"]'); await clickAny(p, '[data-act="rtab"][data-t="groups"]'); }],
+  ['round-group-open', async p => { await clickAny(p, '.now [data-act="round"]'); await clickAny(p, '[data-act="rtab"][data-t="groups"]'); await clickAny(p, '.rg'); }],
   ['round-kb', async p => { await clickAny(p, '.now [data-act="round"]'); await clickAny(p, '[data-act="rtab"][data-t="kb"]'); }],
   ['round-weather', async p => { await clickAny(p, '.now [data-act="round"]'); await clickAny(p, '[data-act="rtab"][data-t="weather"]'); }],
   ['round-course', async p => { await clickAny(p, '.now [data-act="round"]'); await clickAny(p, '[data-act="rtab"][data-t="course"]'); }],
@@ -26,15 +27,15 @@ const scenarios = [
   ['board-ct', async p => { await clickAny(p, '#tabs .tab:nth-child(3)'); await clickAny(p, '[data-act="respill"][data-p="ct"]'); }],
   ['board-st', async p => { await clickAny(p, '#tabs .tab:nth-child(3)'); await clickAny(p, '[data-act="respill"][data-p="st"]'); }],
   ['rules', async p => { await clickAny(p, '#tabs .tab:nth-child(4)'); }],
-  ['hole-pick', async p => { await clickAny(p, '[data-act="play"]'); }],
-  ['hole-intro', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]'); await p.waitForTimeout(200); }],
-  ['hole-tee', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); }],
-  ['entry', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); }],
-  ['entry-100', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); 
+  ['hole-pick', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); }],
+  ['hole-intro', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); await clickAny(p, '[data-act="pick"]'); await p.waitForTimeout(200); }],
+  ['hole-tee', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); }],
+  ['entry', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); }],
+  ['entry-100', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); 
      for (const pid of await p.$$eval('[data-act="set"][data-dir="up"]', e => e.map(x => x.dataset.pid))) { for (let i = 0; i < 6; i++) await p.click(`[data-act="set"][data-dir="up"][data-pid="${pid}"]`, { timeout: 2000 }).catch(() => {}); } await p.waitForTimeout(150); }],
-  ['ask', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); 
+  ['ask', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); 
      for (const pid of await p.$$eval('[data-act="set"][data-dir="up"]', e => e.map(x => x.dataset.pid))) await p.click(`[data-act="set"][data-dir="up"][data-pid="${pid}"]`); await clickAny(p, '[data-act="save"]'); await p.waitForTimeout(300); await clickAny(p, '.askrow:nth-child(2)'); await p.waitForTimeout(150); }],
-  ['after', async p => { await clickAny(p, '[data-act="play"]'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); 
+  ['after', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); 
      for (const pid of await p.$$eval('[data-act="set"][data-dir="up"]', e => e.map(x => x.dataset.pid))) await p.click(`[data-act="set"][data-dir="up"][data-pid="${pid}"]`); await clickAny(p, '[data-act="save"]'); await p.waitForTimeout(300); await clickAny(p, '.askrow:nth-child(2)'); await clickAny(p, '[data-act="ask-confirm"]'); await p.waitForTimeout(300); }],
 ];
 const metrics = () => {

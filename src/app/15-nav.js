@@ -5,7 +5,7 @@ const UI = {
   toast: null, flash: false, contestSheet: false, fix: null, after: null, open: {}, scrollCur: false, scrollTop: false,
   playRid: null, hole: null, holeSheet: false, year: null, edit: false, matchGroup: null, board: null, res: 'lb', chat: [], chatBusy: false, askDraft: '',
   draft: null, sel: null, testSheet: null, photoFull: null, confirm: null, pinError: false, formError: null,
-  rtab: 'groups', wx: {}, shareImg: null, checkSeg: null, photos: {}
+  rtab: 'players', wx: {}, shareImg: null, checkSeg: null, photos: {}
 };
 const cur = () => (UI.org ? UI.orgStack : UI.stack)[(UI.org ? UI.orgStack : UI.stack).length - 1];
 const stackOf = () => (UI.org ? UI.orgStack : UI.stack);

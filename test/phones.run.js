@@ -18,7 +18,7 @@ async function phone(pid, sw) {
   await pg.evaluate(p => { window.__ncgs.DB.prefs.me = p; window.__ncgs.render(); }, pid);
   const ph = { ctx, pg, pid };
   ph.sync = () => pg.evaluate(() => window.__ncgs.flush().then(() => window.__ncgs.sync()));
-  ph.go = async () => { await pg.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); }); await pg.waitForTimeout(150); await pg.click('[data-act="play"]', { timeout: 4000 }).catch(() => {}); await pg.waitForTimeout(250); };
+  ph.go = async () => { await pg.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); }); await pg.waitForTimeout(150); await pg.click('#tabs .tab:nth-child(2)', { timeout: 4000 }).catch(() => {}); await pg.waitForTimeout(250); };
   ph.score = async (vals, save = true) => { // vals: { pid: strokes }
     if (!(await pg.$('[data-act="save"]'))) { await pg.click('[data-act="enter"]'); await pg.waitForTimeout(150); }
     for (const [p, v] of Object.entries(vals)) {

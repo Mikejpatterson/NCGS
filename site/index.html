@@ -1685,9 +1685,20 @@ body { font-variant-numeric: tabular-nums; }
 .now-link .chev { color: #CFE0D6; }
 .now-link:active { background: rgba(255, 255, 255, .18); }
 .now-link + .now-acts { margin-top: 12px; }
+
+/* Round page: Players tab */
+.rp-players .pl-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 3.2rem 3.4rem 14px; gap: 8px; align-items: center; width: 100%; min-height: 56px; padding: 6px 14px; text-align: left; font-variant-numeric: tabular-nums; }
+.rp-players .pl-row + .pl-row { border-top: .5px solid var(--line); }
+.rp-players .pl-row.cols { min-height: 30px; padding-top: 10px; padding-bottom: 0; }
+.rp-players .pl-row.me { background: #FFF3C4; }
+.rp-players .pl-n { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.rp-players .pl-row .r { text-align: right; }
+.rp-players .pl-row .b.num { font-size: 1.15rem; font-weight: 800; }
+.rp-players .av { width: 34px; height: 34px; font-size: .68rem; }
+.rp-players .chev svg { width: 14px; height: 14px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151912","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151941","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3600,7 +3611,7 @@ const UI = {
   toast: null, flash: false, contestSheet: false, fix: null, after: null, open: {}, scrollCur: false, scrollTop: false,
   playRid: null, hole: null, holeSheet: false, year: null, edit: false, matchGroup: null, board: null, res: 'lb', chat: [], chatBusy: false, askDraft: '',
   draft: null, sel: null, testSheet: null, photoFull: null, confirm: null, pinError: false, formError: null,
-  rtab: 'groups', wx: {}, shareImg: null, checkSeg: null, photos: {}
+  rtab: 'players', wx: {}, shareImg: null, checkSeg: null, photos: {}
 };
 const cur = () => (UI.org ? UI.orgStack : UI.stack)[(UI.org ? UI.orgStack : UI.stack).length - 1];
 const stackOf = () => (UI.org ? UI.orgStack : UI.stack);
@@ -3720,11 +3731,7 @@ function nowCard(r) {
       <span class="now-line">${esc(heroFacts(r))}</span>
     </button>
     ${live ? miniBoard(r) : ''}
-    <button class="now-link" data-act="round" data-rid="${r.id}"><span>Groups · KBs · Weather · Course</span>${chev}</button>
-    ${playable || live ? `<div class="now-acts${playable && live ? '' : ' one'}">
-      ${playable ? `<button class="go" data-act="play" data-rid="${r.id}">${playLabel(r)}</button>` : ''}
-      ${live ? `<button class="go${playable ? ' alt' : ''}" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>` : ''}
-    </div>` : ''}
+    <div class="now-acts one"><button class="go" data-act="round" data-rid="${r.id}" data-tab="players">Players · Groups · KBs</button></div>
   </div>`;
 }
 VIEWS.home = () => {
@@ -4071,12 +4078,13 @@ VIEWS.round = p => {
     <h1 class="rp-name">${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
   if (playable && me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
 
-  const tabsAvail = ['groups', 'kb', 'weather', 'course'];
-  const rt = tabsAvail.includes(UI.rtab) ? UI.rtab : 'groups';
-  const tabName = { groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
+  const tabsAvail = ['players', 'groups', 'kb', 'weather', 'course'];
+  const rt = tabsAvail.includes(UI.rtab) ? UI.rtab : 'players';
+  const tabName = { players: 'Players', groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
   html += `<div class="seg pills rtabs" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${tabName[k]}</button>`).join('')}</div>`;
   const quiet = t => cardOf(`<div class="row"><span class="sub">${t}</span></div>`);
-  if (rt === 'groups') html += roundGroups(r);
+  if (rt === 'players') html += roundPlayers(r);
+  else if (rt === 'groups') html += roundGroups(r);
   else if (rt === 'kb') html += r.kb && r.kb.length ? `<div class="card rp-kbs">${r.kb.map(pr => `<span class="pk${pr.includes(me) ? ' me' : ''}">${pairNames(pr)}</span>`).join('')}</div>` : quiet(E.kbOff(r) ? 'No KBs in this round' : 'KB pairs are not drawn yet');
   else if (rt === 'weather') html += forecast(r, true) || quiet(r.date ? 'The forecast appears in the 9 days before the round.' : 'The forecast appears once the round has a date.');
   else html += roundCourse(r, c, tee, holes);
@@ -4106,6 +4114,21 @@ function roundGroups(r) {
       ? g.teams.map((t, i) => `<span class="${i ? 'pr' : 'pb'}">${pairNames(t)}</span>`).join('')
       : `<span class="pk wide">${esc(g.teams.flat().map(D.nameOf).join(', '))}</span>`;
     return `<button class="rg${mine && mine.id === g.id ? ' me' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}" aria-label="Group ${g.n}${g.teeTime ? ', ' + esc(g.teeTime) : ''}"><span class="rg-t"><b>${esc(g.teeTime || 'G' + g.n)}</b>${prog ? `<small>${prog}</small>` : ''}</span>${pills}<span class="chev dn${open ? ' up' : ''}">${chev}</span></button>${open ? `<div class="rg-open">${cols}${prow(g)}</div>` : ''}`;
+  }).join('')}</div>`;
+}
+
+/* Players on the round page: everyone playing, with index and playing handicap for the day. Tap one for the working. */
+function roundPlayers(r) {
+  if (!r.groups || !r.groups.length) return cardOf('<div class="row"><span class="sub">Players are not drawn yet</span></div>');
+  const comp = computeR(r.id), tee = teeOf(r);
+  const phOf = pid => (r.ph && r.ph[pid] !== undefined ? r.ph[pid] : comp ? comp.players[pid].ph : tee && D.member(pid) ? E.playingHandicap(D.member(pid).index, tee, allowanceOf(r)) : null);
+  const ids = r.groups.flatMap(g => g.teams.flat().map(pid => ({ pid, g })));
+  ids.sort((a, b) => D.nameOf(a.pid).localeCompare(D.nameOf(b.pid)));
+  const cols = '<div class="pl-row cols"><span></span><span></span><span class="r cap">Index</span><span class="r cap">Playing</span><span></span></div>';
+  return `<div class="card rp-players">${cols}${ids.map(({ pid, g }) => {
+    const m = D.member(pid), ph = phOf(pid), can = tee && m;
+    const inner = `${avBadge(pid)}<span class="pl-n"><span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span><span class="cap">${esc(g.teeTime ? g.teeTime : 'Group ' + g.n)}</span></span><span class="r sub num">${m ? fmtIndex(m.index) : ''}</span><span class="r b num">${ph === null ? '' : ph}</span>${can ? chev : '<span></span>'}`;
+    return can ? `<button class="pl-row${pid === DB.prefs.me ? ' me' : ''}" data-act="hcp" data-pid="${pid}" data-rid="${r.id}">${inner}</button>` : `<div class="pl-row">${inner}</div>`;
   }).join('')}</div>`;
 }
 
@@ -5906,7 +5929,7 @@ const dataOf = el => el.dataset;
 const ACT = {
   back: () => back(),
   home: () => { UI.org = false; UI.stack = [{ v: 'home', p: {} }]; UI.scrollTop = true; render(); },
-  round: el => go('round', { rid: el.dataset.rid }),
+  round: el => { if (el.dataset.tab) UI.rtab = el.dataset.tab; go('round', { rid: el.dataset.rid }); },
   player: el => go('player', { pid: el.dataset.pid }),
   card: el => go('card', { rid: el.dataset.rid, pid: el.dataset.pid }),
   goy: () => go('goy'),
