@@ -97,11 +97,9 @@ VIEWS.home = () => {
   const feature = live[0] || next[0] || null;
   const more = [...live.slice(1), ...next.slice(live[0] ? 0 : 1)];
   const me = DB.prefs.me ? D.member(DB.prefs.me) : null;
-  const myRow = me ? goy(season).find(x => x.id === me.id) : null;
-  const standLine = myRow ? `<button class="hsub me-line" data-act="player" data-pid="${me.id}">${posWord(myRow.posLabel)} in Golfer of the Year${sized(ICON.chev, 14)}</button>` : '';
   const hr = new Date().getHours();
   const dateLine = new Date().toLocaleDateString('en-IE', { weekday: 'long', day: 'numeric', month: 'long' }) + (me ? ` · ${hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening'}, ${esc(me.name.split(' ')[0])}` : '');
-  let html = `<header class="hero home"><div class="brand"><span class="badge">${FLAG_SVG}</span><span class="two"><span class="wordmark">${esc(D.society())}</span>${standLine}</span>
+  let html = `<header class="hero home"><div class="brand"><span class="badge">${FLAG_SVG}</span><span class="two"><span class="wordmark">${esc(D.society())}</span></span>
     <button class="who-chip" data-act="who" aria-label="${me ? 'You are ' + esc(me.name) + '. Change' : 'Who are you?'}">${me ? esc(me.name) + `<span class="who-av">${esc(initialsOf(me))}</span>` : 'Who are you?'}</button></div>
     <p class="greet">${dateLine}</p><h1 class="vh">${esc(homeHeadline(feature))}</h1>
     ${feature ? nowCard(feature) : '<div class="now"><div class="now-main"><span class="now-name">No round booked</span><span class="now-line">The organiser adds the next one.</span></div></div>'}</header>`;
