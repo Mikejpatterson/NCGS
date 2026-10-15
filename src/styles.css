@@ -1635,3 +1635,8 @@ body { font-variant-numeric: tabular-nums; }
 .bw-row .chev.dn, .rg .chev.dn { transform: rotate(90deg); transition: transform .2s; }
 .bw-row[aria-expanded="true"] .chev.dn, .rg[aria-expanded="true"] .chev.dn { transform: rotate(-90deg); }
 .seg.pills button, .seg.pills.four button { font-size: min(.86rem, 15px); padding: 0 8px; }
+.bw-l { display: inline-flex; align-items: center; gap: 6px; }
+.bw-cup { display: inline-flex; }
+.bw-cup svg { stroke-width: 2.2; }
+.bw-cup.a { color: #0A60C9; }
+.bw-cup.b { color: #C62828; }

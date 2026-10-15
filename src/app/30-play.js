@@ -679,10 +679,12 @@ function buggyView(rid) {
   const openDefault = live && gc.nextHole ? segOf(gc.nextHole) : null;
   const row = seg => {
     const m = gc.matches[seg];
-    if (seg === 'overall') return `<div class="bw-row"><span class="bw-l">${segName(seg)}</span>${pillOf(m)}<span></span></div>`;
+    /* A trophy beside a match once it is won. */
+    const name = `${segName(seg)}${m.status.state === 'won' ? `<span class="bw-cup ${m.status.leader === 'B' ? 'b' : 'a'}" aria-label="won">${sized(ICON.trophy, 18)}</span>` : ''}`;
+    if (seg === 'overall') return `<div class="bw-row"><span class="bw-l">${name}</span>${pillOf(m)}<span></span></div>`;
     const key = `bw-${rid}-${gid}-${seg}`;
     const open = UI.open[key] === undefined ? openDefault === seg : !!UI.open[key];
-    return `<button class="bw-row" data-act="bwseg" data-key="${key}" data-open="${open ? 1 : 0}" aria-expanded="${open}"><span class="bw-l">${segName(seg)}</span>${pillOf(m)}<span class="chev dn${open ? ' up' : ''}">${chev}</span></button>${open ? board(seg) : ''}`;
+    return `<button class="bw-row" data-act="bwseg" data-key="${key}" data-open="${open ? 1 : 0}" aria-expanded="${open}"><span class="bw-l">${name}</span>${pillOf(m)}<span class="chev dn${open ? ' up' : ''}">${chev}</span></button>${open ? board(seg) : ''}`;
   };
   return {
     html: `      ${!inMatch && groups.length > 1 ? `<div class="seg pills grp">${groups.map(g => `<button class="${g.id === gid ? 'on' : ''}" data-act="mgroup" data-gid="${g.id}" aria-pressed="${g.id === gid}">Group ${g.n}</button>`).join('')}</div>` : ''}

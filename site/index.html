@@ -1645,9 +1645,14 @@ body { font-variant-numeric: tabular-nums; }
 .bw-row .chev.dn, .rg .chev.dn { transform: rotate(90deg); transition: transform .2s; }
 .bw-row[aria-expanded="true"] .chev.dn, .rg[aria-expanded="true"] .chev.dn { transform: rotate(-90deg); }
 .seg.pills button, .seg.pills.four button { font-size: min(.86rem, 15px); padding: 0 8px; }
+.bw-l { display: inline-flex; align-items: center; gap: 6px; }
+.bw-cup { display: inline-flex; }
+.bw-cup svg { stroke-width: 2.2; }
+.bw-cup.a { color: #0A60C9; }
+.bw-cup.b { color: #C62828; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151650","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151715","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -4920,10 +4925,12 @@ function buggyView(rid) {
   const openDefault = live && gc.nextHole ? segOf(gc.nextHole) : null;
   const row = seg => {
     const m = gc.matches[seg];
-    if (seg === 'overall') return `<div class="bw-row"><span class="bw-l">${segName(seg)}</span>${pillOf(m)}<span></span></div>`;
+    /* A trophy beside a match once it is won. */
+    const name = `${segName(seg)}${m.status.state === 'won' ? `<span class="bw-cup ${m.status.leader === 'B' ? 'b' : 'a'}" aria-label="won">${sized(ICON.trophy, 18)}</span>` : ''}`;
+    if (seg === 'overall') return `<div class="bw-row"><span class="bw-l">${name}</span>${pillOf(m)}<span></span></div>`;
     const key = `bw-${rid}-${gid}-${seg}`;
     const open = UI.open[key] === undefined ? openDefault === seg : !!UI.open[key];
-    return `<button class="bw-row" data-act="bwseg" data-key="${key}" data-open="${open ? 1 : 0}" aria-expanded="${open}"><span class="bw-l">${segName(seg)}</span>${pillOf(m)}<span class="chev dn${open ? ' up' : ''}">${chev}</span></button>${open ? board(seg) : ''}`;
+    return `<button class="bw-row" data-act="bwseg" data-key="${key}" data-open="${open ? 1 : 0}" aria-expanded="${open}"><span class="bw-l">${name}</span>${pillOf(m)}<span class="chev dn${open ? ' up' : ''}">${chev}</span></button>${open ? board(seg) : ''}`;
   };
   return {
     html: `      ${!inMatch && groups.length > 1 ? `<div class="seg pills grp">${groups.map(g => `<button class="${g.id === gid ? 'on' : ''}" data-act="mgroup" data-gid="${g.id}" aria-pressed="${g.id === gid}">Group ${g.n}</button>`).join('')}</div>` : ''}
