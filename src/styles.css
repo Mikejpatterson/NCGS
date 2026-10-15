@@ -1478,3 +1478,6 @@ body { font-variant-numeric: tabular-nums; }
   .entry .bugs .pr-top .pu, .entry .bugs .pr-top .pu.on { justify-self: end; padding: 0 8px; }
   .entry .bugs .pr-top .pu.on { padding: 0 12px; }
 }
+
+/* Every pill is a true pill, whatever its height (the big Buggy 1 pill had squarer corners than the small ones) */
+.pill, .pill.big { border-radius: 999px; }

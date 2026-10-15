@@ -1488,9 +1488,12 @@ body { font-variant-numeric: tabular-nums; }
   .entry .bugs .pr-top .pu, .entry .bugs .pr-top .pu.on { justify-self: end; padding: 0 8px; }
   .entry .bugs .pr-top .pu.on { padding: 0 12px; }
 }
+
+/* Every pill is a true pill, whatever its height (the big Buggy 1 pill had squarer corners than the small ones) */
+.pill, .pill.big { border-radius: 999px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610150826","server":"562d6962"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151022","server":"562d6962"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
