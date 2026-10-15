@@ -148,3 +148,13 @@ The group still keeps a paper card. The app checks the two against each other at
 
 - **Course:** Cabopino Golf Marbella, yellow tees. Par, stroke index and distances come from published scorecards. The distances are metres, shown as yards, and Golfshot readings on holes 1 to 3 agree with them.
 - **Players and scores:** demo data, clearly labelled, until the real data is provided.
+
+## Contest icons (chosen 15 October 2026, not built yet)
+
+Two-tone medal style, the same as the Stats tab badges (white medal, coloured ring, pine outline, soft fills).
+
+- **Longest drive: "Ball on fire"** (option E), green ring #1B7A43. SVG (24 grid, stroke #1D3B30, width 1.6):
+  `<path d="M14.5 7.6C11 6 7.5 6.6 2.5 4.5c1.6 2.6 3.4 3.6 5.2 4.1-2.2.4-4 .2-5.7-.2 1.9 2.4 4.4 3.4 7 3.7-1.8 1-3.6 1.6-5.6 1.7 3 1.8 7 2 11.3.4z" fill="#FFB27A"/><path d="M14.5 9.2C12 8.4 9.8 8.6 7 8c1.3 1.4 2.8 2.1 4.3 2.4-1.4.6-2.6.9-4 1 2.4.9 4.7.9 7.2.1z" fill="#F0C63F" stroke="none"/><circle cx="17" cy="10.5" r="4.5" fill="#fff"/><path d="M15 8.7a2.8 2.8 0 0 1 2.4-1" stroke-width="1.3"/>`
+- **Nearest the pin: "Ball by the pin"** (option A), gold ring #E3B21C. SVG:
+  `<path d="M2.5 18.5c0-2 4.3-3.2 9.5-3.2s9.5 1.2 9.5 3.2-4.3 2.5-9.5 2.5-9.5-.5-9.5-2.5z" fill="#8FD1A8"/><path d="M12 18.2V3.5"/><path d="M12 3.8h6.5l-2 2.5 2 2.5H12z" fill="#F0C63F"/><ellipse cx="12" cy="18.2" rx="1.8" ry=".7" fill="#1D3B30"/><circle cx="16.8" cy="17.6" r="1.3" fill="#fff"/>`
+- Use them next to each contest on the Contests tab and on the hole screen's contest tag.
