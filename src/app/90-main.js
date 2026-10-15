@@ -58,10 +58,21 @@ const ACT = {
   'ask-info': el => askInfo(Number(el.dataset.i)),
   'ask-more': () => askKeyboard(),
   'ask-clear': () => { UI.chat = []; UI.chatInfo = {}; UI.chatBusy = false; UI.askDraft = ''; render(); },
-  'contest-open': () => { UI.contestSheet = true; render(); },
-  'contest-close': () => { UI.contestSheet = false; render(); },
-  'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },
-  claim: el => { const ctx = entryCtx(); ensureDraft(ctx)._claim = el.dataset.pid || null; UI.contestSheet = false; savePrefs(); render(); },
+  'ask-pick': el => { UI.askPick = { key: el.dataset.key, v: el.dataset.v }; render(); },
+  'ask-confirm': () => {
+    const rid = playRid(), g = myGroup(rid), comp = computeR(rid);
+    if (!g || !comp) return;
+    const gc = comp.groups.find(x => x.id === g.id), c = askPending(rid, gc, g.id);
+    const key = c && contestKey(rid, g.id, c.hole);
+    if (!c || !UI.askPick || UI.askPick.key !== key) return;
+    // A separate small save, so an answer can never hold up a score. The local note keeps the question closed even if the server has not been updated yet.
+    send({ op: 'saveHole', round: rid, grp: g.id, hole: c.hole, scores: {}, claim: UI.askPick.v, by: byMe(), label: `${roundName(D.round(rid))} · Group ${gc.n} · ${CONTEST[c.type]}` });
+    (DB.prefs.askDone = DB.prefs.askDone || {})[key] = true;
+    UI.askPick = null;
+    savePrefs(); tick(); render();
+  },
+  'intro-go': el => { const rid = playRid(), g = myGroup(rid); (DB.prefs.intro = DB.prefs.intro || {})[contestKey(rid, g.id, Number(el.dataset.n))] = true; savePrefs(); render(); },
+  'intro-scrim': () => {},
   save: () => saveHole(),
   'entry-back': () => {
     const ctx = entryCtx(), d = (draftsFor(ctx) || {})[ctx.n];

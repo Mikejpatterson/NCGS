@@ -301,7 +301,7 @@ function myGroup(rid) {
 function groupNo(rid, gid) { const r = D.round(rid); const g = r && r.groups ? r.groups.find(x => x.id === gid) : null; return g ? g.n : '?'; }
 function contestOn(rid, n) { const r = D.round(rid); return ((r && r.contests) || []).find(c => c.hole === n) || null; }
 function claimLeader(rid, n, exceptGid) {
-  const list = (D.claims(rid)[n] || []).filter(c => c.gid !== exceptGid);
+  const list = (D.claims(rid)[n] || []).filter(c => c.gid !== exceptGid && c.pid !== E.NOBODY);
   return list.length ? list[list.length - 1] : null;
 }
 
@@ -328,7 +328,7 @@ function resultsOf(rid) {
     const rows = final ? E.finalOrder(comp) : comp.leaderboard;
     const kb = r.kb && r.kb.length ? E.kbStandings(comp, r.kb) : [];
     const wins = D.winners(rid);
-    const contests = (r.contests || []).map(c => ({ type: c.type, hole: c.hole, winner: wins[c.hole] || null, lead: wins[c.hole] ? null : claimLeader(rid, c.hole, null) }));
+    const contests = (r.contests || []).map(c => ({ type: c.type, hole: c.hole, winner: wins[c.hole] || null, lead: wins[c.hole] ? null : claimLeader(rid, c.hole, null), status: E.contestStatus(D.claims(rid)[c.hole], (r.groups || []).map(g => g.id), wins[c.hole]) }));
     return { rows, kb, contests, comp, source: 'app' };
   });
 }

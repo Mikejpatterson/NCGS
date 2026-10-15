@@ -10,7 +10,65 @@ function playHomeView(rid) {
   const g = myGroup(rid);
   const comp = computeR(rid);
   if (!g || !comp) return 'round';
-  return comp.groups.find(x => x.id === g.id).nextHole ? 'tee' : 'finish';
+  const gc = comp.groups.find(x => x.id === g.id);
+  return gc.nextHole || askPending(rid, gc, g.id) ? 'tee' : 'finish';
+}
+
+/* ----- Contests: nearest the pin and longest drive -----
+   Once a group has scored a contest hole it must say who got it, or Nobody, before it can play on. */
+const contestKey = (rid, gid, n) => `${rid}|${gid}|${n}`;
+function askPending(rid, gc, gid) {
+  const r = D.round(rid);
+  if (!r || r.status !== 'live' || !gc) return null;
+  const done = DB.prefs.askDone || {};
+  for (const c of (r.contests || []).slice().sort((a, b) => a.hole - b.hole)) {
+    if (!gc.holes[c.hole] || !gc.holes[c.hole].complete) continue;
+    if ((D.claims(rid)[c.hole] || []).some(x => x.gid === gid) || done[contestKey(rid, gid, c.hole)]) continue;
+    return c;
+  }
+  return null;
+}
+const contestVerb = c => (c.type === 'ld' ? 'drive further than' : 'get closer than');
+function contestBoardLine(rid, c, gid) {
+  const lead = claimLeader(rid, c.hole, gid);
+  return lead ? `${D.nameOf(lead.pid)} from Group ${groupNo(rid, lead.gid)} is on the board.` : 'Nobody is on the board yet.';
+}
+VIEWS.ask = (rid, gc, c) => {
+  const lead = claimLeader(rid, c.hole, gc.id);
+  const key = contestKey(rid, gc.id, c.hole);
+  const pick = UI.askPick && UI.askPick.key === key ? UI.askPick.v : null;
+  const q = lead ? `Did anyone ${contestVerb(c)} ${esc(D.nameOf(lead.pid))}?` : c.type === 'ld' ? 'Who hit the longest drive?' : 'Who got closest?';
+  const opts = gc.teams.flat().map(pid => [pid, D.nameOf(pid)]).concat([[E.NOBODY, 'Nobody']]);
+  return {
+    tabs: 'hole',
+    html: `<div class="after ask"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${c.hole}</b></div><div class="entr"><span class="savedchip">${sized(ICON.check, 18)} Scores saved</span></div></div></header>
+      <p class="askkind">${CONTEST[c.type].toUpperCase()}</p>
+      <h2 class="askq">${q}</h2>
+      <p class="sub asksub">${lead ? `${esc(contestBoardLine(rid, c, gc.id))} Pick who in your group ${c.type === 'ld' ? 'went further' : 'beat it'}, or Nobody.` : 'Pick who in your group got it, or Nobody.'}</p>
+      <div class="askrows" role="radiogroup" aria-label="${CONTEST[c.type]}">${opts.map(([v, nm]) => `<button class="askrow${pick === v ? ' on' : ''}" role="radio" aria-checked="${pick === v}" data-act="ask-pick" data-v="${esc(v)}" data-key="${esc(key)}"><span>${esc(nm)}</span><i class="askdot"></i></button>`).join('')}</div>
+      <button class="btn" data-act="ask-confirm" data-n="${c.hole}"${pick ? '' : ' disabled'}>Confirm</button>${saveWarning()}</div>`
+  };
+};
+function contestTag(rid, gc, n) {
+  const c = contestOn(rid, n);
+  if (!c) return '';
+  const done = (D.claims(rid)[n] || []).some(x => x.gid === gc.id);
+  return `<span class="hs-tag${done ? ' ok' : ''}">${c.type === 'ld' ? 'Drive' : 'Pin'}${done ? ' ✓' : ''}</span>`;
+}
+function contestIntro(rid, gc, n) {
+  const c = contestOn(rid, n);
+  const seen = DB.prefs.intro || {};
+  if (!c || seen[contestKey(rid, gc.id, n)]) return '';
+  const h = holeOf(rid, n);
+  const ld = c.type === 'ld';
+  const lead = claimLeader(rid, n, gc.id);
+  return `<div class="scrim intro" data-act="intro-scrim"><div class="sheet introcard" role="dialog" aria-label="${CONTEST[c.type]}, hole ${n}">
+    <span class="introflag">${sized(ICON.flagpin, 34)}</span>
+    <div class="introkind">${CONTEST[c.type].toUpperCase()}</div>
+    <div class="introhole">Hole ${n}</div>
+    <p class="introrule">Par ${h.par}${h.yards ? ` · ${h.yards} yds` : ''}. ${ld ? 'Longest drive wins.' : 'Closest to the pin wins.'}</p>
+    <p class="introboard">${lead ? `${esc(contestBoardLine(rid, c, gc.id))}<br>${ld ? 'Go further to take it.' : 'Get closer to take it.'}` : 'Nobody is on the board yet.<br>Be the first.'}</p>
+    <button class="btn" data-act="intro-go" data-n="${n}">Let's play</button></div></div>`;
 }
 function myConflicts(rid, gid) { return DB.conflicts.filter(c => c.round === rid && c.grp === gid); }
 
@@ -22,6 +80,8 @@ VIEWS.tee = () => {
   const g = myGroup(rid);
   if (!comp || !g) return VIEWS.round({ rid });
   const gc = comp.groups.find(x => x.id === g.id);
+  const ask0 = askPending(rid, gc, g.id);
+  if (ask0) return VIEWS.ask(rid, gc, ask0);
   if (!gc.nextHole) return VIEWS.finish();
   // Stay on the hole being scored while this phone is still working on it, even if another phone saved it meanwhile
   const t = UI.teeHole, dr = ((DB.prefs.drafts[rid] || {})[g.id] || {})[t];
@@ -44,12 +104,12 @@ function holesSheet(rid, gc, here) {
   if (!UI.holeSheet) return '';
   const seg = (name, list) => `<div class="hs-lab">${name}</div><div class="hs-grid">${list.map(n => {
     const hr = gc.holes[n], next = n === gc.nextHole;
-    return `<button class="hs${hr.complete ? ' done' : ''}${next ? ' nxt' : ''}${n === here ? ' here' : ''}" data-act="goto-hole" data-n="${n}" aria-label="Hole ${n}${hr.complete ? ', scored. Tap to change it' : next ? ', next to play' : ''}">${n}</button>`;
+    return `<button class="hs${hr.complete ? ' done' : ''}${next ? ' nxt' : ''}${n === here ? ' here' : ''}" data-act="goto-hole" data-n="${n}" aria-label="Hole ${n}${contestOn(rid, n) ? ', ' + CONTEST[contestOn(rid, n).type].toLowerCase() : ''}${hr.complete ? ', scored. Tap to change it' : next ? ', next to play' : ''}">${n}${contestTag(rid, gc, n)}</button>`;
   }).join('')}</div>`;
   return `<div class="scrim" data-act="holes-scrim"><div class="sheet hs-sheet" role="dialog" aria-label="Go to a hole">
     <div class="nav"><span class="b">Go to hole</span><button class="link" data-act="holes-close">Done</button></div>
     ${seg('Front nine', E.SEGMENTS.front)}${seg('Back nine', E.SEGMENTS.back)}
-    <div class="cap hs-key"><span class="hs-ki"><i class="hs-k done"></i>Scored</span><span class="hs-ki"><i class="hs-k nxt"></i>Next to play</span><span class="hs-tip">Tap a scored hole to change it.</span></div></div></div>`;
+    <div class="cap hs-key"><span class="hs-ki"><i class="hs-k done"></i>Scored</span><span class="hs-ki"><i class="hs-k nxt"></i>Next to play</span>${(D.round(rid).contests || []).length ? '<span class="hs-ki"><b class="hs-tag">Pin</b><b class="hs-tag">Drive</b>Contest hole</span>' : ''}<span class="hs-tip">Tap a scored hole to change it.</span></div></div></div>`;
 }
 function saveWarning() {
   if (!DB.saveOk) return '<p class="err" style="text-align:center">This phone is not saving. Keep this screen open.</p>';
@@ -79,8 +139,6 @@ function ensureDraft(ctx) {
         if (E.isEntered(v)) d[pid] = v;
       });
     }
-    const mine = (D.claims(ctx.rid)[ctx.n] || []).find(c => c.gid === ctx.gid);
-    if (mine) d._claim = mine.pid;
     d._base = Object.fromEntries(gc.teams.flat().map(pid => { const v = (D.scores(ctx.rid)[pid] || {})[ctx.n]; return [pid, v === undefined ? null : v]; }));
     byGroup[ctx.n] = d;
   }
@@ -125,6 +183,7 @@ VIEWS.entry = () => {
   const h = holeOf(ctx.rid, ctx.n);
   const d = ensureDraft(ctx);
   const pids = gc.teams.flat();
+  if (ctx.mode === 'player' && !ctx.edit) { const ask = askPending(ctx.rid, gc, ctx.gid); if (ask) return VIEWS.ask(ctx.rid, gc, ask); }
   const missing = pids.filter(pid => !E.isEntered(d[pid]));
   const final = D.round(ctx.rid).status === 'final';
   const buggies = gc.teams.length === 2;
@@ -140,27 +199,12 @@ VIEWS.entry = () => {
     const rows = t.map(pid => entryRow(pid, d[pid], comp.players[pid].holes[ctx.n].shots, h.par, ctx.rid));
     return `<div class="bugs ${buggies ? 'b' + (i + 1) : 'b0'}"${buggies ? ` role="group" aria-label="Buggy ${i + 1}"` : ''}>${rows.map(r => r.tile + r.drop).join('')}</div>`;
   }).join('');
-  const contest = contestOn(ctx.rid, ctx.n);
-  if (contest) {
-    const lead = claimLeader(ctx.rid, ctx.n, ctx.gid);
-    const right = d._claim ? `<span class="b">${esc(D.nameOf(d._claim))}</span>` : `<span class="sub">${lead ? `${esc(D.nameOf(lead.pid))} leads` : 'Add'}</span>`;
-    html += sec('', `<button class="card row" data-act="contest-open"><span>${CONTEST[contest.type]}</span><span class="right">${right}${chev}</span></button>`);
-  }
   if (ctx.mode === 'player' && !ctx.edit) html += needsAttention(ctx.rid, gc, ctx.gid);
   const who = missing.length && missing.length <= 2 ? ' · ' + missing.map(D.nameOf).join(', ') : '';
   const lbl = missing.length ? `${plural(missing.length, 'score')} to go${esc(who)}` : ctx.mode === 'org' ? 'Save correction' : ctx.edit ? 'Save changes' : `Save hole ${ctx.n}`;
   html += `<div class="savebar"><button class="btn ${missing.length ? 'quiet' : ''}" data-act="save">${lbl}</button></div></div>`;
-  if (UI.contestSheet && contest) {
-    const lead = claimLeader(ctx.rid, ctx.n, ctx.gid);
-    const tickMark = `<span class="c-g">${sized(ICON.check, 20)}</span>`;
-    html += `<div class="scrim" data-act="contest-scrim"><div class="sheet" role="dialog" aria-label="${CONTEST[contest.type]}">
-      <div class="nav"><span class="b">${CONTEST[contest.type]}</span><button class="link" data-act="contest-close">Done</button></div>
-      ${lead ? `<p class="sub" style="margin-bottom:8px">${esc(D.nameOf(lead.pid))} (group ${groupNo(ctx.rid, lead.gid)}) leads</p>` : ''}
-      ${cardOf(pids.map(pid => `<button class="row" data-act="claim" data-pid="${pid}"><span>${esc(D.nameOf(pid))}</span>${d._claim === pid ? tickMark : ''}</button>`).join('') +
-        `<button class="row" data-act="claim" data-pid=""><span>${lead ? 'Nobody closer' : 'Nobody'}</span>${!d._claim ? tickMark : ''}</button>`)}
-    </div></div>`;
-  }
   if (ctx.mode === 'player') html += holesSheet(ctx.rid, gc, ctx.n);
+  if (ctx.mode === 'player' && !ctx.edit && !UI.holeSheet && !gc.holes[ctx.n].complete && D.round(ctx.rid).status === 'live') html += contestIntro(ctx.rid, gc, ctx.n);
   return ctx.mode === 'player' ? { html, tabs: 'hole' } : { html };
 };
 
@@ -204,13 +248,11 @@ function saveHole() {
     const seen = d._base && pid in d._base ? d._base[pid] : prev[pid];
     scores[pid] = { v: d[pid], base: clash ? clash.server : seen };
   });
-  const claimsBefore = (D.claims(ctx.rid)[ctx.n] || []).find(c => c.gid === ctx.gid);
   const req = {
     op: 'saveHole', round: ctx.rid, grp: ctx.gid, hole: ctx.n, scores, by: ctx.mode === 'org' ? 'Organiser' : byMe(),
     names: Object.fromEntries(pids.map(pid => [pid, D.nameOf(pid)])), label: `${roundName(r)} · Group ${gc.n} · Hole ${ctx.n}`
   };
   if (ctx.mode === 'org') req.pin = ORGPIN.pin;
-  if (contestOn(ctx.rid, ctx.n)) req.claim = d._claim || null;
   DB.conflicts = DB.conflicts.filter(c => !(c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n));
   const draftCopy = clone(d);
   clearDraft(ctx);
@@ -225,7 +267,7 @@ function saveHole() {
     toast(`Hole ${ctx.n} changed`);
     return;
   }
-  UI.after = { rid: ctx.rid, gid: ctx.gid, n: ctx.n, before, prev, claimBefore: claimsBefore ? claimsBefore.pid : null, hadClaim: req.claim !== undefined, draft: draftCopy, wasEdit: ctx.edit };
+  UI.after = { rid: ctx.rid, gid: ctx.gid, n: ctx.n, before, prev, draft: draftCopy, wasEdit: ctx.edit };
   UI.edit = false;
   replaceTop('after', { rid: ctx.rid });
 }
@@ -236,7 +278,6 @@ function undoSave() {
   const scores = {};
   Object.keys(a.prev).forEach(pid => { scores[pid] = { v: a.prev[pid], base: a.draft[pid] }; });
   const req = { op: 'saveHole', round: a.rid, grp: a.gid, hole: a.n, scores, by: byMe(), names: Object.fromEntries(Object.keys(a.prev).map(pid => [pid, D.nameOf(pid)])), label: `Undo · Hole ${a.n}` };
-  if (a.hadClaim) req.claim = a.claimBefore;
   send(req);
   const byRound = DB.prefs.drafts[a.rid] || (DB.prefs.drafts[a.rid] = {});
   (byRound[a.gid] || (byRound[a.gid] = {}))[a.n] = a.draft;
@@ -252,6 +293,8 @@ VIEWS.after = () => {
   if (!a) return VIEWS[playHomeView(playRid())]({ rid: playRid() });
   const comp = computeR(a.rid);
   const gc = comp.groups.find(x => x.id === a.gid);
+  const ask1 = askPending(a.rid, gc, a.gid);
+  if (ask1) return VIEWS.ask(a.rid, gc, ask1);
   const hr = gc.holes[a.n];
   const L = gc.labels;
   const who = list => list.map(D.nameOf).join(' and ');
@@ -698,7 +741,9 @@ VIEWS.board = () => {
   const comp = res.comp;
   if (pillSel === 'ct') {
     html += sec(label('Contests'), cardOf(res.contests.map(c => {
-      const right = c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : c.lead ? `<span class="b">${esc(D.nameOf(c.lead.pid))}</span><span class="pill n">To confirm</span>` : '<span class="sub">Not yet claimed</span>';
+      const st = c.status, tag = !st ? '' : st.confirmed ? '<span class="pill g">Confirmed</span>' : '<span class="pill n">To be confirmed</span>';
+      const who = c.winner || (c.lead && c.lead.pid);
+      const right = who ? `<span class="b">${esc(D.nameOf(who))}</span>${tag}` : st && st.confirmed ? `<span class="sub">Nobody</span>${tag}` : `<span class="sub">${st && st.answered ? 'Nobody yet' : 'Not yet played'}</span>${tag}`;
       return `<div class="row crow"><span class="ct-l"><span>${CONTEST[c.type]}</span>${c.hole ? `<span class="sub">Hole ${c.hole}</span>` : ''}</span><span class="ct-r">${right}</span></div>`;
     }).join('')));
     return { tabs: 'board', html };
@@ -759,7 +804,7 @@ VIEWS.results = p => {
     moneyRows = Object.keys(money).sort((a, b) => money[b] - money[a]).map(k => `<div class="ln"><span>${esc(k)}</span><span class="b">€${money[k]}</span></div>`).join('');
   }
   const minThru = res.comp ? Math.min(...res.comp.groups.map(g => g.holesDone)) : 18;
-  const contests = res.contests.map(c => `<div class="ln"><span class="sub">${CONTEST[c.type]}${c.hole ? ' ' + c.hole : ''}</span><span>${c.winner ? esc(D.nameOf(c.winner)) : c.lead ? `${esc(D.nameOf(c.lead.pid))} <span class="sub">to confirm</span>` : '–'}</span></div>`).join('');
+  const contests = res.contests.map(c => `<div class="ln"><span class="sub">${CONTEST[c.type]}${c.hole ? ' ' + c.hole : ''}</span><span>${c.winner ? esc(D.nameOf(c.winner)) : c.lead ? `${esc(D.nameOf(c.lead.pid))} <span class="sub">${c.status && c.status.confirmed ? 'confirmed' : 'to be confirmed'}</span>` : c.status && c.status.confirmed ? 'Nobody' : '–'}</span></div>`).join('');
   const kb = E.kbLowest(res.kb).length ? `<div class="blk"><div class="cap">KBs</div>${E.kbLowest(res.kb).map(k => `<div class="ln"><span>${esc(k.name)}</span><span class="b">${k.total}</span></div>`).join('')}</div>` : '';
   const card = `<div class="rcard" id="rcard">
     <div class="top"><div class="cap">${esc(D.society())} · ${esc(roundName(r))}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''} · ${final ? 'Final' : `Thru ${minThru}`}</div><div class="title">${esc(headline)}</div></div>

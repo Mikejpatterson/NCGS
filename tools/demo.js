@@ -29,7 +29,7 @@ groups.forEach(g => {
       const d = x < 0.05 ? -2 : x < 0.22 ? -1 : x < 0.6 ? 0 : x < 0.85 ? 1 : x < 0.96 ? 2 : 3;
       scores[pid] = { v: x > 0.985 ? 'P' : Math.max(2, h.par + shots + d), base: null };
     });
-    holes.push({ op: 'saveHole', round: round.id, grp: g.id, hole: n, scores, by: 'Demo', claim: n === 7 && g.id === 'g1' ? 'john-k' : n === 12 && g.id === 'g2' ? 'sean' : undefined });
+    holes.push({ op: 'saveHole', round: round.id, grp: g.id, hole: n, scores, by: 'Demo', claim: n === 7 || n === 12 ? (n === 7 && g.id === 'g1' ? 'john-k' : n === 12 && g.id === 'g2' ? 'sean' : '_nobody') : undefined });
   }
 });
 holes.forEach(h => { if (h.claim === undefined) delete h.claim; });

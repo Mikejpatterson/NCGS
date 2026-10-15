@@ -709,8 +709,22 @@
     return last.pos !== undefined ? rows.filter(r => r.pos === last.pos) : [last];
   }
 
+  /* Contests (nearest the pin, longest drive). Each group answers with a player, or NOBODY.
+     A contest is confirmed once every group has answered, or the organiser has named a winner. */
+  const NOBODY = '_nobody';
+  function contestStatus(claims, groupIds, winner) {
+    const by = {};
+    (claims || []).forEach(c => { by[c.gid] = c; });
+    const ids = groupIds || [];
+    const answered = ids.filter(g => by[g]).length;
+    const real = (claims || []).filter(c => c.pid !== NOBODY);
+    const leader = real.length ? real[real.length - 1] : null;
+    const closed = !!winner;
+    return { total: ids.length, answered, confirmed: closed || (ids.length > 0 && answered === ids.length), closed, leader };
+  }
+
   return {
-    SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
+    NOBODY, contestStatus, SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,

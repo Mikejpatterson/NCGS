@@ -397,3 +397,19 @@ test('KBs can be left out for one group or the whole round (late drop-outs: 3 gr
   r.groups[0].noKb = false;
   assert.equal(E.kbEffective(r, []), null, 'one group on its own cannot make KB pairs');
 });
+
+test('contest status: confirmed once every group has answered, or the organiser closes it', () => {
+  const cl = (gid, pid) => ({ gid, pid, at: gid });
+  const ids = ['g1', 'g2', 'g3'];
+  let s = E.contestStatus([cl('g1', 'a')], ids, null);
+  assert.equal(s.confirmed, false);
+  assert.equal(s.answered, 1);
+  assert.equal(s.leader.pid, 'a');
+  s = E.contestStatus([cl('g1', 'a'), cl('g2', E.NOBODY)], ids, null);
+  assert.equal(s.confirmed, false);
+  assert.equal(s.leader.pid, 'a', 'Nobody never takes the lead');
+  s = E.contestStatus([cl('g1', 'a'), cl('g2', E.NOBODY), cl('g3', E.NOBODY)], ids, null);
+  assert.equal(s.confirmed, true);
+  assert.equal(E.contestStatus([], ids, 'b').confirmed, true);
+  assert.equal(E.contestStatus([], [], null).confirmed, false);
+});

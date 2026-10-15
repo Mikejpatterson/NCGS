@@ -106,6 +106,19 @@ test('contest claims: one per group per hole; clearing a claim reaches other pho
   }
 });
 
+test('contest claims: "nobody" is a real answer, and a stranger is still refused', () => {
+  for (const [kind, s] of servers().list) {
+    s.api({ op: 'seed', data: { rounds: [ROUND] } });
+    s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 7, scores: {}, claim: '_nobody' });
+    assert.equal(s.api({ op: 'load' }).tables.claims[0].player, '_nobody', kind);
+    s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 7, scores: {}, claim: 'c' });
+    assert.equal(s.api({ op: 'load' }).tables.claims[0].player, 'c', kind);
+    const bad = s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 7, scores: {}, claim: 'zzz' });
+    assert.ok(bad.error || bad.ok === false, kind);
+    assert.equal(s.api({ op: 'load' }).tables.claims[0].player, 'c', kind);
+  }
+});
+
 test('deleting a round removes its scores too', () => {
   for (const [kind, s] of servers().list) {
     s.api({ op: 'seed', data: { rounds: [ROUND] } });

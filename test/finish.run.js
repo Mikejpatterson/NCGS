@@ -15,6 +15,8 @@ let ok = true; const check = (n, c, x) => { console.log((c ? 'PASS  ' : 'FAIL  '
   let holes = 0, seen = new Set();
   for (let guard = 0; guard < 60; guard++) {
     const t = await top(); seen.add(t);
+    if (await have('[data-act="intro-go"]')) { await tap('[data-act="intro-go"]'); continue; }
+    if (await have('.askrows')) { await tap('.askrow:last-child'); await tap('[data-act="ask-confirm"]'); continue; }
     if (t === 'tee' || t === 'entry') {
       // give every player in the group a score using the + button (first tap gives par-ish), then save
       const pids = await pg.$$eval('[data-act="set"][data-dir="up"]', els => els.map(e => e.dataset.pid));

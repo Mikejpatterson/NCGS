@@ -1505,3 +1505,29 @@ body { font-variant-numeric: tabular-nums; }
 .afst .afnote { margin-top: 2px; font-weight: 700; color: var(--pine); }
 .after .btn:not(.quiet) { margin-top: 14px; background: var(--flag); color: #0B3D2C; }
 .after .btn:not(.quiet) small { color: #0B3D2C; opacity: .75; }
+
+/* ===== Contests: picker tags, arrival pop-up, "Who got it?" ===== */
+.hs { position: relative; }
+.hs-tag { position: absolute; top: -9px; right: -3px; height: 20px; padding: 0 8px; border-radius: 10px; background: var(--flag); color: var(--pine); font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; line-height: 1; letter-spacing: 0; }
+.hs-tag.ok { background: #fff; color: var(--green); box-shadow: inset 0 0 0 1.5px var(--green); }
+.hs-key .hs-tag { position: static; margin-right: 4px; }
+.hs-key .hs-ki:has(.hs-tag) { gap: 0; }
+.scrim.intro { align-items: center; padding: 20px; }
+.introcard { width: 100%; max-width: 420px; border-radius: 32px; background: var(--pine); color: #fff; padding: 30px 24px 24px; text-align: center; box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+.introflag { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--flag); color: var(--pine); margin: 0 auto 18px; }
+.introkind { font-size: .8rem; font-weight: 800; letter-spacing: .16em; color: var(--flag); }
+.introhole { font-size: 3.4rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.05; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.introrule { font-size: 1.15rem; line-height: 1.35; margin: 10px 0 0; color: #E6EFE9; }
+.introboard { margin: 18px 0 0; border-radius: 18px; background: rgba(255,255,255,.1); padding: 12px 14px; font-size: 1rem; color: #E6EFE9; }
+.introcard .btn { margin-top: 22px; background: var(--flag); color: var(--pine); }
+.ask .askkind { margin: 18px 4px 0; font-size: .8rem; font-weight: 800; letter-spacing: .14em; color: #8A6A00; }
+.ask .askq { margin: 4px 4px 0; font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+.ask .asksub { margin: 6px 4px 0; }
+.askrows { margin: 14px 0 16px; border: 1px solid var(--line, #E6E2D8); border-radius: 22px; background: #fff; overflow: hidden; }
+.askrow { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 60px; padding: 0 18px; border: 0; border-top: 1px solid #EFEBE1; background: #fff; font: inherit; font-size: 1.2rem; font-weight: 700; color: var(--text); text-align: left; }
+.askrow:first-child { border-top: 0; }
+.askrow.on { background: #EAF3EC; }
+.askdot { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #CFCABB; box-sizing: border-box; display: block; }
+.askrow.on .askdot { background: var(--green); border-color: var(--green); box-shadow: inset 0 0 0 5px #EAF3EC; }
+.ask .btn { background: var(--flag); color: var(--pine); }
+.ask .btn:disabled { opacity: .4; }

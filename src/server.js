@@ -357,7 +357,7 @@ var NCGS = (function () {
         if (req.claim !== undefined) {
           var curClaim = find('claims', function (c) { return c.round === req.round && c.hole === hole && c.grp === req.grp; });
           var wantClaim = req.claim || null;
-          if (wantClaim && !inGroup[wantClaim]) throw err('bad', 'That player is not in this group.');
+          if (wantClaim && wantClaim !== '_nobody' && !inGroup[wantClaim]) throw err('bad', 'That player is not in this group.');
           if ((curClaim ? curClaim.player : null) !== wantClaim) {
             if (wantClaim) claimRows.push({ round: req.round, hole: hole, grp: req.grp, player: wantClaim, at: now() });
             else if (curClaim) claimRemove.push(keyOf('claims', curClaim));

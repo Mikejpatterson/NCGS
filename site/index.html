@@ -1515,9 +1515,35 @@ body { font-variant-numeric: tabular-nums; }
 .afst .afnote { margin-top: 2px; font-weight: 700; color: var(--pine); }
 .after .btn:not(.quiet) { margin-top: 14px; background: var(--flag); color: #0B3D2C; }
 .after .btn:not(.quiet) small { color: #0B3D2C; opacity: .75; }
+
+/* ===== Contests: picker tags, arrival pop-up, "Who got it?" ===== */
+.hs { position: relative; }
+.hs-tag { position: absolute; top: -9px; right: -3px; height: 20px; padding: 0 8px; border-radius: 10px; background: var(--flag); color: var(--pine); font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; line-height: 1; letter-spacing: 0; }
+.hs-tag.ok { background: #fff; color: var(--green); box-shadow: inset 0 0 0 1.5px var(--green); }
+.hs-key .hs-tag { position: static; margin-right: 4px; }
+.hs-key .hs-ki:has(.hs-tag) { gap: 0; }
+.scrim.intro { align-items: center; padding: 20px; }
+.introcard { width: 100%; max-width: 420px; border-radius: 32px; background: var(--pine); color: #fff; padding: 30px 24px 24px; text-align: center; box-shadow: 0 24px 60px rgba(0,0,0,.35); }
+.introflag { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--flag); color: var(--pine); margin: 0 auto 18px; }
+.introkind { font-size: .8rem; font-weight: 800; letter-spacing: .16em; color: var(--flag); }
+.introhole { font-size: 3.4rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.05; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.introrule { font-size: 1.15rem; line-height: 1.35; margin: 10px 0 0; color: #E6EFE9; }
+.introboard { margin: 18px 0 0; border-radius: 18px; background: rgba(255,255,255,.1); padding: 12px 14px; font-size: 1rem; color: #E6EFE9; }
+.introcard .btn { margin-top: 22px; background: var(--flag); color: var(--pine); }
+.ask .askkind { margin: 18px 4px 0; font-size: .8rem; font-weight: 800; letter-spacing: .14em; color: #8A6A00; }
+.ask .askq { margin: 4px 4px 0; font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.15; }
+.ask .asksub { margin: 6px 4px 0; }
+.askrows { margin: 14px 0 16px; border: 1px solid var(--line, #E6E2D8); border-radius: 22px; background: #fff; overflow: hidden; }
+.askrow { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 60px; padding: 0 18px; border: 0; border-top: 1px solid #EFEBE1; background: #fff; font: inherit; font-size: 1.2rem; font-weight: 700; color: var(--text); text-align: left; }
+.askrow:first-child { border-top: 0; }
+.askrow.on { background: #EAF3EC; }
+.askdot { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #CFCABB; box-sizing: border-box; display: block; }
+.askrow.on .askdot { background: var(--green); border-color: var(--green); box-shadow: inset 0 0 0 5px #EAF3EC; }
+.ask .btn { background: var(--flag); color: var(--pine); }
+.ask .btn:disabled { opacity: .4; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151217","server":"562d6962"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151241","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2230,8 +2256,22 @@ body { font-variant-numeric: tabular-nums; }
     return last.pos !== undefined ? rows.filter(r => r.pos === last.pos) : [last];
   }
 
+  /* Contests (nearest the pin, longest drive). Each group answers with a player, or NOBODY.
+     A contest is confirmed once every group has answered, or the organiser has named a winner. */
+  const NOBODY = '_nobody';
+  function contestStatus(claims, groupIds, winner) {
+    const by = {};
+    (claims || []).forEach(c => { by[c.gid] = c; });
+    const ids = groupIds || [];
+    const answered = ids.filter(g => by[g]).length;
+    const real = (claims || []).filter(c => c.pid !== NOBODY);
+    const leader = real.length ? real[real.length - 1] : null;
+    const closed = !!winner;
+    return { total: ids.length, answered, confirmed: closed || (ids.length > 0 && answered === ids.length), closed, leader };
+  }
+
   return {
-    SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
+    NOBODY, contestStatus, SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,
@@ -2272,7 +2312,7 @@ var NCGS = (function () {
   var PLAYER_TABLES = { checks: 1, cards: 1, log: 1 };
   var DEFAULT_PIN = '1234';
   // Stamped by build.js with a fingerprint of this file, so the app can tell whether the live server is the latest.
-  var BUILD = '562d6962';
+  var BUILD = 'e228da71';
 
   function keyOf(table, row) {
     return SCHEMA[table].key.map(function (k) { return String(row[k]); }).join('|');
@@ -2599,7 +2639,7 @@ var NCGS = (function () {
         if (req.claim !== undefined) {
           var curClaim = find('claims', function (c) { return c.round === req.round && c.hole === hole && c.grp === req.grp; });
           var wantClaim = req.claim || null;
-          if (wantClaim && !inGroup[wantClaim]) throw err('bad', 'That player is not in this group.');
+          if (wantClaim && wantClaim !== '_nobody' && !inGroup[wantClaim]) throw err('bad', 'That player is not in this group.');
           if ((curClaim ? curClaim.player : null) !== wantClaim) {
             if (wantClaim) claimRows.push({ round: req.round, hole: hole, grp: req.grp, player: wantClaim, at: now() });
             else if (curClaim) claimRemove.push(keyOf('claims', curClaim));
@@ -3327,7 +3367,7 @@ function myGroup(rid) {
 function groupNo(rid, gid) { const r = D.round(rid); const g = r && r.groups ? r.groups.find(x => x.id === gid) : null; return g ? g.n : '?'; }
 function contestOn(rid, n) { const r = D.round(rid); return ((r && r.contests) || []).find(c => c.hole === n) || null; }
 function claimLeader(rid, n, exceptGid) {
-  const list = (D.claims(rid)[n] || []).filter(c => c.gid !== exceptGid);
+  const list = (D.claims(rid)[n] || []).filter(c => c.gid !== exceptGid && c.pid !== E.NOBODY);
   return list.length ? list[list.length - 1] : null;
 }
 
@@ -3354,7 +3394,7 @@ function resultsOf(rid) {
     const rows = final ? E.finalOrder(comp) : comp.leaderboard;
     const kb = r.kb && r.kb.length ? E.kbStandings(comp, r.kb) : [];
     const wins = D.winners(rid);
-    const contests = (r.contests || []).map(c => ({ type: c.type, hole: c.hole, winner: wins[c.hole] || null, lead: wins[c.hole] ? null : claimLeader(rid, c.hole, null) }));
+    const contests = (r.contests || []).map(c => ({ type: c.type, hole: c.hole, winner: wins[c.hole] || null, lead: wins[c.hole] ? null : claimLeader(rid, c.hole, null), status: E.contestStatus(D.claims(rid)[c.hole], (r.groups || []).map(g => g.id), wins[c.hole]) }));
     return { rows, kb, contests, comp, source: 'app' };
   });
 }
@@ -4023,7 +4063,65 @@ function playHomeView(rid) {
   const g = myGroup(rid);
   const comp = computeR(rid);
   if (!g || !comp) return 'round';
-  return comp.groups.find(x => x.id === g.id).nextHole ? 'tee' : 'finish';
+  const gc = comp.groups.find(x => x.id === g.id);
+  return gc.nextHole || askPending(rid, gc, g.id) ? 'tee' : 'finish';
+}
+
+/* ----- Contests: nearest the pin and longest drive -----
+   Once a group has scored a contest hole it must say who got it, or Nobody, before it can play on. */
+const contestKey = (rid, gid, n) => `${rid}|${gid}|${n}`;
+function askPending(rid, gc, gid) {
+  const r = D.round(rid);
+  if (!r || r.status !== 'live' || !gc) return null;
+  const done = DB.prefs.askDone || {};
+  for (const c of (r.contests || []).slice().sort((a, b) => a.hole - b.hole)) {
+    if (!gc.holes[c.hole] || !gc.holes[c.hole].complete) continue;
+    if ((D.claims(rid)[c.hole] || []).some(x => x.gid === gid) || done[contestKey(rid, gid, c.hole)]) continue;
+    return c;
+  }
+  return null;
+}
+const contestVerb = c => (c.type === 'ld' ? 'drive further than' : 'get closer than');
+function contestBoardLine(rid, c, gid) {
+  const lead = claimLeader(rid, c.hole, gid);
+  return lead ? `${D.nameOf(lead.pid)} from Group ${groupNo(rid, lead.gid)} is on the board.` : 'Nobody is on the board yet.';
+}
+VIEWS.ask = (rid, gc, c) => {
+  const lead = claimLeader(rid, c.hole, gc.id);
+  const key = contestKey(rid, gc.id, c.hole);
+  const pick = UI.askPick && UI.askPick.key === key ? UI.askPick.v : null;
+  const q = lead ? `Did anyone ${contestVerb(c)} ${esc(D.nameOf(lead.pid))}?` : c.type === 'ld' ? 'Who hit the longest drive?' : 'Who got closest?';
+  const opts = gc.teams.flat().map(pid => [pid, D.nameOf(pid)]).concat([[E.NOBODY, 'Nobody']]);
+  return {
+    tabs: 'hole',
+    html: `<div class="after ask"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${c.hole}</b></div><div class="entr"><span class="savedchip">${sized(ICON.check, 18)} Scores saved</span></div></div></header>
+      <p class="askkind">${CONTEST[c.type].toUpperCase()}</p>
+      <h2 class="askq">${q}</h2>
+      <p class="sub asksub">${lead ? `${esc(contestBoardLine(rid, c, gc.id))} Pick who in your group ${c.type === 'ld' ? 'went further' : 'beat it'}, or Nobody.` : 'Pick who in your group got it, or Nobody.'}</p>
+      <div class="askrows" role="radiogroup" aria-label="${CONTEST[c.type]}">${opts.map(([v, nm]) => `<button class="askrow${pick === v ? ' on' : ''}" role="radio" aria-checked="${pick === v}" data-act="ask-pick" data-v="${esc(v)}" data-key="${esc(key)}"><span>${esc(nm)}</span><i class="askdot"></i></button>`).join('')}</div>
+      <button class="btn" data-act="ask-confirm" data-n="${c.hole}"${pick ? '' : ' disabled'}>Confirm</button>${saveWarning()}</div>`
+  };
+};
+function contestTag(rid, gc, n) {
+  const c = contestOn(rid, n);
+  if (!c) return '';
+  const done = (D.claims(rid)[n] || []).some(x => x.gid === gc.id);
+  return `<span class="hs-tag${done ? ' ok' : ''}">${c.type === 'ld' ? 'Drive' : 'Pin'}${done ? ' ✓' : ''}</span>`;
+}
+function contestIntro(rid, gc, n) {
+  const c = contestOn(rid, n);
+  const seen = DB.prefs.intro || {};
+  if (!c || seen[contestKey(rid, gc.id, n)]) return '';
+  const h = holeOf(rid, n);
+  const ld = c.type === 'ld';
+  const lead = claimLeader(rid, n, gc.id);
+  return `<div class="scrim intro" data-act="intro-scrim"><div class="sheet introcard" role="dialog" aria-label="${CONTEST[c.type]}, hole ${n}">
+    <span class="introflag">${sized(ICON.flagpin, 34)}</span>
+    <div class="introkind">${CONTEST[c.type].toUpperCase()}</div>
+    <div class="introhole">Hole ${n}</div>
+    <p class="introrule">Par ${h.par}${h.yards ? ` · ${h.yards} yds` : ''}. ${ld ? 'Longest drive wins.' : 'Closest to the pin wins.'}</p>
+    <p class="introboard">${lead ? `${esc(contestBoardLine(rid, c, gc.id))}<br>${ld ? 'Go further to take it.' : 'Get closer to take it.'}` : 'Nobody is on the board yet.<br>Be the first.'}</p>
+    <button class="btn" data-act="intro-go" data-n="${n}">Let's play</button></div></div>`;
 }
 function myConflicts(rid, gid) { return DB.conflicts.filter(c => c.round === rid && c.grp === gid); }
 
@@ -4035,6 +4133,8 @@ VIEWS.tee = () => {
   const g = myGroup(rid);
   if (!comp || !g) return VIEWS.round({ rid });
   const gc = comp.groups.find(x => x.id === g.id);
+  const ask0 = askPending(rid, gc, g.id);
+  if (ask0) return VIEWS.ask(rid, gc, ask0);
   if (!gc.nextHole) return VIEWS.finish();
   // Stay on the hole being scored while this phone is still working on it, even if another phone saved it meanwhile
   const t = UI.teeHole, dr = ((DB.prefs.drafts[rid] || {})[g.id] || {})[t];
@@ -4057,12 +4157,12 @@ function holesSheet(rid, gc, here) {
   if (!UI.holeSheet) return '';
   const seg = (name, list) => `<div class="hs-lab">${name}</div><div class="hs-grid">${list.map(n => {
     const hr = gc.holes[n], next = n === gc.nextHole;
-    return `<button class="hs${hr.complete ? ' done' : ''}${next ? ' nxt' : ''}${n === here ? ' here' : ''}" data-act="goto-hole" data-n="${n}" aria-label="Hole ${n}${hr.complete ? ', scored. Tap to change it' : next ? ', next to play' : ''}">${n}</button>`;
+    return `<button class="hs${hr.complete ? ' done' : ''}${next ? ' nxt' : ''}${n === here ? ' here' : ''}" data-act="goto-hole" data-n="${n}" aria-label="Hole ${n}${contestOn(rid, n) ? ', ' + CONTEST[contestOn(rid, n).type].toLowerCase() : ''}${hr.complete ? ', scored. Tap to change it' : next ? ', next to play' : ''}">${n}${contestTag(rid, gc, n)}</button>`;
   }).join('')}</div>`;
   return `<div class="scrim" data-act="holes-scrim"><div class="sheet hs-sheet" role="dialog" aria-label="Go to a hole">
     <div class="nav"><span class="b">Go to hole</span><button class="link" data-act="holes-close">Done</button></div>
     ${seg('Front nine', E.SEGMENTS.front)}${seg('Back nine', E.SEGMENTS.back)}
-    <div class="cap hs-key"><span class="hs-ki"><i class="hs-k done"></i>Scored</span><span class="hs-ki"><i class="hs-k nxt"></i>Next to play</span><span class="hs-tip">Tap a scored hole to change it.</span></div></div></div>`;
+    <div class="cap hs-key"><span class="hs-ki"><i class="hs-k done"></i>Scored</span><span class="hs-ki"><i class="hs-k nxt"></i>Next to play</span>${(D.round(rid).contests || []).length ? '<span class="hs-ki"><b class="hs-tag">Pin</b><b class="hs-tag">Drive</b>Contest hole</span>' : ''}<span class="hs-tip">Tap a scored hole to change it.</span></div></div></div>`;
 }
 function saveWarning() {
   if (!DB.saveOk) return '<p class="err" style="text-align:center">This phone is not saving. Keep this screen open.</p>';
@@ -4092,8 +4192,6 @@ function ensureDraft(ctx) {
         if (E.isEntered(v)) d[pid] = v;
       });
     }
-    const mine = (D.claims(ctx.rid)[ctx.n] || []).find(c => c.gid === ctx.gid);
-    if (mine) d._claim = mine.pid;
     d._base = Object.fromEntries(gc.teams.flat().map(pid => { const v = (D.scores(ctx.rid)[pid] || {})[ctx.n]; return [pid, v === undefined ? null : v]; }));
     byGroup[ctx.n] = d;
   }
@@ -4138,6 +4236,7 @@ VIEWS.entry = () => {
   const h = holeOf(ctx.rid, ctx.n);
   const d = ensureDraft(ctx);
   const pids = gc.teams.flat();
+  if (ctx.mode === 'player' && !ctx.edit) { const ask = askPending(ctx.rid, gc, ctx.gid); if (ask) return VIEWS.ask(ctx.rid, gc, ask); }
   const missing = pids.filter(pid => !E.isEntered(d[pid]));
   const final = D.round(ctx.rid).status === 'final';
   const buggies = gc.teams.length === 2;
@@ -4153,27 +4252,12 @@ VIEWS.entry = () => {
     const rows = t.map(pid => entryRow(pid, d[pid], comp.players[pid].holes[ctx.n].shots, h.par, ctx.rid));
     return `<div class="bugs ${buggies ? 'b' + (i + 1) : 'b0'}"${buggies ? ` role="group" aria-label="Buggy ${i + 1}"` : ''}>${rows.map(r => r.tile + r.drop).join('')}</div>`;
   }).join('');
-  const contest = contestOn(ctx.rid, ctx.n);
-  if (contest) {
-    const lead = claimLeader(ctx.rid, ctx.n, ctx.gid);
-    const right = d._claim ? `<span class="b">${esc(D.nameOf(d._claim))}</span>` : `<span class="sub">${lead ? `${esc(D.nameOf(lead.pid))} leads` : 'Add'}</span>`;
-    html += sec('', `<button class="card row" data-act="contest-open"><span>${CONTEST[contest.type]}</span><span class="right">${right}${chev}</span></button>`);
-  }
   if (ctx.mode === 'player' && !ctx.edit) html += needsAttention(ctx.rid, gc, ctx.gid);
   const who = missing.length && missing.length <= 2 ? ' · ' + missing.map(D.nameOf).join(', ') : '';
   const lbl = missing.length ? `${plural(missing.length, 'score')} to go${esc(who)}` : ctx.mode === 'org' ? 'Save correction' : ctx.edit ? 'Save changes' : `Save hole ${ctx.n}`;
   html += `<div class="savebar"><button class="btn ${missing.length ? 'quiet' : ''}" data-act="save">${lbl}</button></div></div>`;
-  if (UI.contestSheet && contest) {
-    const lead = claimLeader(ctx.rid, ctx.n, ctx.gid);
-    const tickMark = `<span class="c-g">${sized(ICON.check, 20)}</span>`;
-    html += `<div class="scrim" data-act="contest-scrim"><div class="sheet" role="dialog" aria-label="${CONTEST[contest.type]}">
-      <div class="nav"><span class="b">${CONTEST[contest.type]}</span><button class="link" data-act="contest-close">Done</button></div>
-      ${lead ? `<p class="sub" style="margin-bottom:8px">${esc(D.nameOf(lead.pid))} (group ${groupNo(ctx.rid, lead.gid)}) leads</p>` : ''}
-      ${cardOf(pids.map(pid => `<button class="row" data-act="claim" data-pid="${pid}"><span>${esc(D.nameOf(pid))}</span>${d._claim === pid ? tickMark : ''}</button>`).join('') +
-        `<button class="row" data-act="claim" data-pid=""><span>${lead ? 'Nobody closer' : 'Nobody'}</span>${!d._claim ? tickMark : ''}</button>`)}
-    </div></div>`;
-  }
   if (ctx.mode === 'player') html += holesSheet(ctx.rid, gc, ctx.n);
+  if (ctx.mode === 'player' && !ctx.edit && !UI.holeSheet && !gc.holes[ctx.n].complete && D.round(ctx.rid).status === 'live') html += contestIntro(ctx.rid, gc, ctx.n);
   return ctx.mode === 'player' ? { html, tabs: 'hole' } : { html };
 };
 
@@ -4217,13 +4301,11 @@ function saveHole() {
     const seen = d._base && pid in d._base ? d._base[pid] : prev[pid];
     scores[pid] = { v: d[pid], base: clash ? clash.server : seen };
   });
-  const claimsBefore = (D.claims(ctx.rid)[ctx.n] || []).find(c => c.gid === ctx.gid);
   const req = {
     op: 'saveHole', round: ctx.rid, grp: ctx.gid, hole: ctx.n, scores, by: ctx.mode === 'org' ? 'Organiser' : byMe(),
     names: Object.fromEntries(pids.map(pid => [pid, D.nameOf(pid)])), label: `${roundName(r)} · Group ${gc.n} · Hole ${ctx.n}`
   };
   if (ctx.mode === 'org') req.pin = ORGPIN.pin;
-  if (contestOn(ctx.rid, ctx.n)) req.claim = d._claim || null;
   DB.conflicts = DB.conflicts.filter(c => !(c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n));
   const draftCopy = clone(d);
   clearDraft(ctx);
@@ -4238,7 +4320,7 @@ function saveHole() {
     toast(`Hole ${ctx.n} changed`);
     return;
   }
-  UI.after = { rid: ctx.rid, gid: ctx.gid, n: ctx.n, before, prev, claimBefore: claimsBefore ? claimsBefore.pid : null, hadClaim: req.claim !== undefined, draft: draftCopy, wasEdit: ctx.edit };
+  UI.after = { rid: ctx.rid, gid: ctx.gid, n: ctx.n, before, prev, draft: draftCopy, wasEdit: ctx.edit };
   UI.edit = false;
   replaceTop('after', { rid: ctx.rid });
 }
@@ -4249,7 +4331,6 @@ function undoSave() {
   const scores = {};
   Object.keys(a.prev).forEach(pid => { scores[pid] = { v: a.prev[pid], base: a.draft[pid] }; });
   const req = { op: 'saveHole', round: a.rid, grp: a.gid, hole: a.n, scores, by: byMe(), names: Object.fromEntries(Object.keys(a.prev).map(pid => [pid, D.nameOf(pid)])), label: `Undo · Hole ${a.n}` };
-  if (a.hadClaim) req.claim = a.claimBefore;
   send(req);
   const byRound = DB.prefs.drafts[a.rid] || (DB.prefs.drafts[a.rid] = {});
   (byRound[a.gid] || (byRound[a.gid] = {}))[a.n] = a.draft;
@@ -4265,6 +4346,8 @@ VIEWS.after = () => {
   if (!a) return VIEWS[playHomeView(playRid())]({ rid: playRid() });
   const comp = computeR(a.rid);
   const gc = comp.groups.find(x => x.id === a.gid);
+  const ask1 = askPending(a.rid, gc, a.gid);
+  if (ask1) return VIEWS.ask(a.rid, gc, ask1);
   const hr = gc.holes[a.n];
   const L = gc.labels;
   const who = list => list.map(D.nameOf).join(' and ');
@@ -4711,7 +4794,9 @@ VIEWS.board = () => {
   const comp = res.comp;
   if (pillSel === 'ct') {
     html += sec(label('Contests'), cardOf(res.contests.map(c => {
-      const right = c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : c.lead ? `<span class="b">${esc(D.nameOf(c.lead.pid))}</span><span class="pill n">To confirm</span>` : '<span class="sub">Not yet claimed</span>';
+      const st = c.status, tag = !st ? '' : st.confirmed ? '<span class="pill g">Confirmed</span>' : '<span class="pill n">To be confirmed</span>';
+      const who = c.winner || (c.lead && c.lead.pid);
+      const right = who ? `<span class="b">${esc(D.nameOf(who))}</span>${tag}` : st && st.confirmed ? `<span class="sub">Nobody</span>${tag}` : `<span class="sub">${st && st.answered ? 'Nobody yet' : 'Not yet played'}</span>${tag}`;
       return `<div class="row crow"><span class="ct-l"><span>${CONTEST[c.type]}</span>${c.hole ? `<span class="sub">Hole ${c.hole}</span>` : ''}</span><span class="ct-r">${right}</span></div>`;
     }).join('')));
     return { tabs: 'board', html };
@@ -4772,7 +4857,7 @@ VIEWS.results = p => {
     moneyRows = Object.keys(money).sort((a, b) => money[b] - money[a]).map(k => `<div class="ln"><span>${esc(k)}</span><span class="b">€${money[k]}</span></div>`).join('');
   }
   const minThru = res.comp ? Math.min(...res.comp.groups.map(g => g.holesDone)) : 18;
-  const contests = res.contests.map(c => `<div class="ln"><span class="sub">${CONTEST[c.type]}${c.hole ? ' ' + c.hole : ''}</span><span>${c.winner ? esc(D.nameOf(c.winner)) : c.lead ? `${esc(D.nameOf(c.lead.pid))} <span class="sub">to confirm</span>` : '–'}</span></div>`).join('');
+  const contests = res.contests.map(c => `<div class="ln"><span class="sub">${CONTEST[c.type]}${c.hole ? ' ' + c.hole : ''}</span><span>${c.winner ? esc(D.nameOf(c.winner)) : c.lead ? `${esc(D.nameOf(c.lead.pid))} <span class="sub">${c.status && c.status.confirmed ? 'confirmed' : 'to be confirmed'}</span>` : c.status && c.status.confirmed ? 'Nobody' : '–'}</span></div>`).join('');
   const kb = E.kbLowest(res.kb).length ? `<div class="blk"><div class="cap">KBs</div>${E.kbLowest(res.kb).map(k => `<div class="ln"><span>${esc(k.name)}</span><span class="b">${k.total}</span></div>`).join('')}</div>` : '';
   const card = `<div class="rcard" id="rcard">
     <div class="top"><div class="cap">${esc(D.society())} · ${esc(roundName(r))}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''} · ${final ? 'Final' : `Thru ${minThru}`}</div><div class="title">${esc(headline)}</div></div>
@@ -5618,10 +5703,21 @@ const ACT = {
   'ask-info': el => askInfo(Number(el.dataset.i)),
   'ask-more': () => askKeyboard(),
   'ask-clear': () => { UI.chat = []; UI.chatInfo = {}; UI.chatBusy = false; UI.askDraft = ''; render(); },
-  'contest-open': () => { UI.contestSheet = true; render(); },
-  'contest-close': () => { UI.contestSheet = false; render(); },
-  'contest-scrim': (el, e) => { if (e.target !== el) return; UI.contestSheet = false; render(); },
-  claim: el => { const ctx = entryCtx(); ensureDraft(ctx)._claim = el.dataset.pid || null; UI.contestSheet = false; savePrefs(); render(); },
+  'ask-pick': el => { UI.askPick = { key: el.dataset.key, v: el.dataset.v }; render(); },
+  'ask-confirm': () => {
+    const rid = playRid(), g = myGroup(rid), comp = computeR(rid);
+    if (!g || !comp) return;
+    const gc = comp.groups.find(x => x.id === g.id), c = askPending(rid, gc, g.id);
+    const key = c && contestKey(rid, g.id, c.hole);
+    if (!c || !UI.askPick || UI.askPick.key !== key) return;
+    // A separate small save, so an answer can never hold up a score. The local note keeps the question closed even if the server has not been updated yet.
+    send({ op: 'saveHole', round: rid, grp: g.id, hole: c.hole, scores: {}, claim: UI.askPick.v, by: byMe(), label: `${roundName(D.round(rid))} · Group ${gc.n} · ${CONTEST[c.type]}` });
+    (DB.prefs.askDone = DB.prefs.askDone || {})[key] = true;
+    UI.askPick = null;
+    savePrefs(); tick(); render();
+  },
+  'intro-go': el => { const rid = playRid(), g = myGroup(rid); (DB.prefs.intro = DB.prefs.intro || {})[contestKey(rid, g.id, Number(el.dataset.n))] = true; savePrefs(); render(); },
+  'intro-scrim': () => {},
   save: () => saveHole(),
   'entry-back': () => {
     const ctx = entryCtx(), d = (draftsFor(ctx) || {})[ctx.n];
