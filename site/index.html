@@ -1450,9 +1450,38 @@ body { font-variant-numeric: tabular-nums; }
 .kbcard .stack .av { margin-left: 0; flex: none; }
 .mgt { flex-wrap: wrap; gap: 4px 12px; }
 .mgk { white-space: nowrap; }
+
+/* ----- Hole screen v2: score tiles on colour washes. Two across, blue buggy then red buggy, no Buggy pills. ----- */
+.entry .tiles { --tc: var(--pine); --tw: #fff; --tt: var(--sub); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 14px; align-items: stretch; }
+.entry .tiles + .tiles { margin-top: 10px; }
+.entry .tiles.b1 { --tc: #2457D6; --tw: #E3EBFC; --tt: #3F4F7A; }
+.entry .tiles.b2 { --tc: #C73A2E; --tw: #FBE4E1; --tt: #7A3F3A; }
+.entry .tiles > .pr.ptile { box-shadow: none; gap: 0; display: flex; flex-direction: column; align-items: stretch; min-width: 0; min-height: 0; margin: 0; box-sizing: border-box; border: 2px solid var(--tc); border-radius: 22px; background: var(--tw); padding: 2px 10px 10px; }
+.entry .tiles.b0 > .pr.ptile { border: 1px solid rgba(20, 35, 27, .14); }
+.entry .tiles .pr-top { align-self: stretch; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; column-gap: 4px; min-height: 44px; margin: 0; }
+.entry .tiles .pr-top .nm { flex: 1 1 76px; min-width: 0; min-height: 44px; padding: 4px 0; font-size: 1.15rem; font-weight: 800; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; gap: 2px; }
+.entry .tiles .nmrow { display: flex; align-items: center; gap: 4px; min-width: 0; line-height: 1.15; }
+.entry .tiles .pr-top .nm .chev { color: var(--tc); }
+.entry .tiles .pr-top .pu, .entry .tiles .pr-top .pu.on { flex: none; width: auto; height: 44px; min-height: 44px; padding: 0 2px; margin: 0 -2px 0 0; border: 0; border-radius: 22px; background: none; color: var(--tt); font-size: .8rem; font-weight: 700; white-space: nowrap; }
+.entry .tiles .pr-top .pu.on { background: var(--green); color: #fff; padding: 0 12px; margin-right: 0; }
+.entry .tiles .pr-dots { display: flex; justify-content: flex-start; align-items: center; min-height: 12px; margin: 0; padding: 0; grid-area: auto; }
+.entry .tiles .pr-dots .dots { margin: 0; justify-content: flex-start; }
+.entry .tiles .stepper { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; grid-template-areas: "sc sc" "dn up"; row-gap: 8px; margin-top: 4px; }
+.entry .tiles .stv, .entry .tiles button.stv, .entry .tiles div.stv { grid-area: sc; width: 100%; height: 76px; justify-content: center; }
+.entry .tiles .stv b { font-size: 3.1rem; }
+.entry .tiles .stv b sup { color: var(--tc); font-size: 1.3rem; }
+.entry .tiles .stv small { color: var(--tt); font-size: .75rem; }
+.entry .tiles .stv.out b { color: var(--faint); }
+.entry .tiles .st { width: 64px; height: 44px; border-radius: 22px; font-size: 1.7rem; font-weight: 800; }
+.entry .tiles .st[data-dir="down"] { grid-area: dn; justify-self: start; background: #fff; color: var(--tc); border: 2px solid var(--tc); }
+.entry .tiles .st[data-dir="up"] { grid-area: up; justify-self: end; background: var(--tc); color: #fff; border: 0; }
+.entry .tiles .st:disabled { opacity: .3; }
+.entry .tiles > .dropcard.in { grid-column: 1 / -1; margin: 0; padding: 0 0 8px; background: #fff; border: 1px solid var(--line); border-radius: 18px; }
+.entry .tiles .dropwho { font-weight: 800; padding: 10px 12px 0; }
+.entry .tiles .pr-top .nm .dots.s { display: flex; margin: 0; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610142057","server":"562d6962"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610150811","server":"562d6962"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -4054,16 +4083,16 @@ function entryRow(pid, val, shots, par, rid) {
   const mid = base === null
     ? `<div class="stv none" data-pid="${pid}" data-n="" aria-live="polite">Par ${par}</div>`
     : `<button class="stv${scratch ? ' out' : ''}" data-act="clear" data-pid="${pid}" data-n="${base}" aria-label="${name}: ${base} strokes. Tap to clear and start again from par"><b>${base}<sup>${pts}</sup></b><small>${word}</small></button>`;
-  return `<div class="pr${flash}">
-    <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dpl ? dropChev : ''}</button></div>
-    <div class="pr-dots" aria-label="${shots} ${shots === 1 ? 'shot' : 'shots'}">${dots(shots, true)}</div>
-    ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
+  const drop = dopen && dpl ? `<div class="dropcard in"><p class="cap dropwho">${name}</p>${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : '';
+  const tile = `<div class="pr ptile${flash}">
+    <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span class="nmrow"><span>${name}</span>${dpl ? dropChev : ''}</span><span class="pr-dots" role="img" aria-label="${shots} ${shots === 1 ? 'shot' : 'shots'}">${dots(shots, true)}</span></button>
+      <button class="pu ${scratch ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="P" aria-pressed="${scratch}">Pick up</button></div>
     <div class="stepper" role="group" aria-label="Strokes for ${name}">
-      <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
       ${mid}
+      <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
       <button class="st" data-act="set" data-dir="up" data-pid="${pid}" data-v="${up}" aria-label="One more stroke for ${name}"${scratch ? ' disabled' : ''}>+</button>
-      <button class="pu ${scratch ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="P" aria-pressed="${scratch}">Pick up</button>
     </div></div>`;
+  return { tile, drop };
 }
 
 VIEWS.entry = () => {
@@ -4084,7 +4113,10 @@ VIEWS.entry = () => {
   if (final) html += `<div class="banner" style="margin-top:12px">This round is final.</div>${ctx.mode === 'org' ? '<button class="btn quiet" data-act="reopen">Reopen round</button>' : ''}`;
   const clash = DB.conflicts.filter(c => c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n);
   if (clash.length) html += `<div class="banner" style="margin-top:12px">Another phone saved ${clash.map(c => `${esc(D.nameOf(c.player))} ${fmtGross(c.server)}`).join(', ')}</div>`;
-  html += gc.teams.map((t, i) => sec(buggies ? pill(i) : '', cardOf(t.map(pid => entryRow(pid, d[pid], comp.players[pid].holes[ctx.n].shots, h.par, ctx.rid)).join('')))).join('');
+  html += gc.teams.map((t, i) => {
+    const rows = t.map(pid => entryRow(pid, d[pid], comp.players[pid].holes[ctx.n].shots, h.par, ctx.rid));
+    return `<div class="tiles ${buggies ? 'b' + (i + 1) : 'b0'}"${buggies ? ` role="group" aria-label="Buggy ${i + 1}"` : ''}>${rows.map(r => r.tile).join('')}${rows.map(r => r.drop).join('')}</div>`;
+  }).join('');
   const contest = contestOn(ctx.rid, ctx.n);
   if (contest) {
     const lead = claimLeader(ctx.rid, ctx.n, ctx.gid);

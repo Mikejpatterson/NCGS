@@ -106,16 +106,16 @@ function entryRow(pid, val, shots, par, rid) {
   const mid = base === null
     ? `<div class="stv none" data-pid="${pid}" data-n="" aria-live="polite">Par ${par}</div>`
     : `<button class="stv${scratch ? ' out' : ''}" data-act="clear" data-pid="${pid}" data-n="${base}" aria-label="${name}: ${base} strokes. Tap to clear and start again from par"><b>${base}<sup>${pts}</sup></b><small>${word}</small></button>`;
-  return `<div class="pr${flash}">
-    <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span>${name}</span>${dpl ? dropChev : ''}</button></div>
-    <div class="pr-dots" aria-label="${shots} ${shots === 1 ? 'shot' : 'shots'}">${dots(shots, true)}</div>
-    ${dopen && dpl ? `<div class="dropcard in">${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : ''}
+  const drop = dopen && dpl ? `<div class="dropcard in"><p class="cap dropwho">${name}</p>${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : '';
+  const tile = `<div class="pr ptile${flash}">
+    <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span class="nmrow"><span>${name}</span>${dpl ? dropChev : ''}</span><span class="pr-dots" role="img" aria-label="${shots} ${shots === 1 ? 'shot' : 'shots'}">${dots(shots, true)}</span></button>
+      <button class="pu ${scratch ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="P" aria-pressed="${scratch}">Pick up</button></div>
     <div class="stepper" role="group" aria-label="Strokes for ${name}">
-      <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
       ${mid}
+      <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
       <button class="st" data-act="set" data-dir="up" data-pid="${pid}" data-v="${up}" aria-label="One more stroke for ${name}"${scratch ? ' disabled' : ''}>+</button>
-      <button class="pu ${scratch ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="P" aria-pressed="${scratch}">Pick up</button>
     </div></div>`;
+  return { tile, drop };
 }
 
 VIEWS.entry = () => {
@@ -136,7 +136,10 @@ VIEWS.entry = () => {
   if (final) html += `<div class="banner" style="margin-top:12px">This round is final.</div>${ctx.mode === 'org' ? '<button class="btn quiet" data-act="reopen">Reopen round</button>' : ''}`;
   const clash = DB.conflicts.filter(c => c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n);
   if (clash.length) html += `<div class="banner" style="margin-top:12px">Another phone saved ${clash.map(c => `${esc(D.nameOf(c.player))} ${fmtGross(c.server)}`).join(', ')}</div>`;
-  html += gc.teams.map((t, i) => sec(buggies ? pill(i) : '', cardOf(t.map(pid => entryRow(pid, d[pid], comp.players[pid].holes[ctx.n].shots, h.par, ctx.rid)).join('')))).join('');
+  html += gc.teams.map((t, i) => {
+    const rows = t.map(pid => entryRow(pid, d[pid], comp.players[pid].holes[ctx.n].shots, h.par, ctx.rid));
+    return `<div class="tiles ${buggies ? 'b' + (i + 1) : 'b0'}"${buggies ? ` role="group" aria-label="Buggy ${i + 1}"` : ''}>${rows.map(r => r.tile).join('')}${rows.map(r => r.drop).join('')}</div>`;
+  }).join('');
   const contest = contestOn(ctx.rid, ctx.n);
   if (contest) {
     const lead = claimLeader(ctx.rid, ctx.n, ctx.gid);
