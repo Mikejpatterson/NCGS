@@ -1572,9 +1572,47 @@ body { font-variant-numeric: tabular-nums; }
 .hero.home .greet { margin-bottom: 4px; }
 /* Organiser: one calm tint for the menu icons */
 .row .ic { background: #E3EFE6 !important; color: var(--pine) !important; }
+
+/* ===== Round page (coming up or live): this player's day in the pine card, then four tabs ===== */
+.hero.pine.rp-card { padding: 18px 20px 20px; }
+.rp-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.rp-kind { font-size: .8rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--flag); }
+.rp-fmt { font-size: .9rem; font-weight: 700; color: #CFE0D6; }
+.rp-name { margin: 8px 0 0; font-size: 2rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.08; color: #fff; overflow-wrap: anywhere; }
+.rp-line { margin: 6px 0 0; font-size: .9rem; color: #CFE0D6; }
+.rp-you { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, .16); }
+.rp-time { display: flex; flex-direction: column; }
+.rp-time b { font-size: min(2.6rem, 44px); font-weight: 800; line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--flag); }
+.rp-time span { font-size: .78rem; color: #9FC0AE; margin-top: 4px; }
+.rp-you dl { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 10px; font-size: .9rem; }
+.rp-you dt { color: #9FC0AE; }
+.rp-you dd { margin: 0; font-weight: 700; color: #fff; }
+.rp-go { display: grid; margin-top: 18px; }
+.rp-go .go { background: var(--flag); color: var(--pine); font-size: 1.15rem; font-weight: 800; border-radius: 28px; min-height: 56px; }
+/* Tabs: separate pills in one row, the chosen one filled pine */
+.seg.pills, .seg.pills.four { display: flex; flex-wrap: nowrap; gap: 6px; background: none; padding: 0; border-radius: 0; margin: 16px 0 12px; }
+.seg.pills button, .seg.pills.four button { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 0 2px; border-radius: 22px; background: #fff; box-shadow: inset 0 0 0 1px #E6E2D8; color: var(--text); font-size: .86rem; font-weight: 700; white-space: normal; overflow-wrap: normal; line-height: 1.1; }
+.seg.pills button.on, .seg.pills.four button.on { background: var(--pine); color: #fff; box-shadow: none; font-weight: 800; }
+/* Groups: one row per tee time, equal blue and red pills */
+.rp-groups .rg { display: grid; grid-template-columns: 2.9rem minmax(0, 1fr) minmax(0, 1fr) 14px; gap: 8px; align-items: center; width: 100%; min-height: 56px; padding: 8px 12px; text-align: left; }
+.rp-groups .rg + .rg, .rp-groups .rg-open + .rg { border-top: .5px solid var(--line); }
+.rp-groups .rg.me { background: #FFF3C4; }
+.rg-t { display: flex; flex-direction: column; font-variant-numeric: tabular-nums; min-width: 0; }
+.rg-t b { font-size: .9rem; font-weight: 800; }
+.rg-t small { font-size: .68rem; color: var(--sub); white-space: nowrap; }
+.rg .chev svg { width: 14px; height: 14px; }
+.rg-open { border-top: .5px solid var(--line); background: var(--bg); }
+.pb, .pr, .pk { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 36px; padding: 3px 8px; border-radius: 18px; border: 2px solid; font-size: .82rem; font-weight: 600; line-height: 1.15; background: #fff; min-width: 0; color: var(--text); }
+.pb { border-color: #0A60C9; }
+.pr { border-color: #C62828; }
+.pk { border-color: #C9D2CC; }
+.pk.me { background: #FFF3C4; border-color: #E2B92F; }
+.pk.wide { grid-column: span 2; }
+.rp-kbs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 12px; }
+.rp-about { white-space: pre-line; line-height: 1.45; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151542","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151604","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3736,7 +3774,8 @@ function wxFetch(c, attempt) {
     render();
   }).catch(fail);
 }
-function forecast(r) {
+function forecast(r, bare) {
+  const wrap = body => (bare ? body : sec(label('Forecast'), body));
   const c = courseOf(r);
   const away = daysFromToday(r.date);
   if (!c || c.lat === null || c.lon === null || c.lat === undefined || away === null || away < 0 || away > 9) return '';
@@ -3748,8 +3787,8 @@ function forecast(r) {
     else { UI.wx[c.id] = { state: 'loading' }; wxFetch(c, 1); }
   }
   const st = UI.wx[c.id];
-  if (st.state === 'loading') return sec(label('Forecast'), '<div class="wx wx-skel" aria-busy="true"><div class="wx-top"><span class="sk sk-ic"></span><div class="wx-main"><span class="sk sk-a"></span><span class="sk sk-b"></span></div></div><p class="wx-line">Getting the forecast…</p></div>');
-  if (st.state === 'failed') return sec(label('Forecast'), `<button class="wx wx-fail" data-act="wx-retry" data-cid="${c.id}"><span class="wx-name">Forecast not available right now</span><span class="wx-line">Tap to try again</span></button>`);
+  if (st.state === 'loading') return wrap('<div class="wx wx-skel" aria-busy="true"><div class="wx-top"><span class="sk sk-ic"></span><div class="wx-main"><span class="sk sk-a"></span><span class="sk sk-b"></span></div></div><p class="wx-line">Getting the forecast…</p></div>');
+  if (st.state === 'failed') return wrap(`<button class="wx wx-fail" data-act="wx-retry" data-cid="${c.id}"><span class="wx-name">Forecast not available right now</span><span class="wx-line">Tap to try again</span></button>`);
   if (st.state !== 'done' || !st.data || !st.data.days) return '';
   const d = st.data.days;
   const i = d.time.indexOf(r.date);
@@ -3771,7 +3810,7 @@ function forecast(r) {
     }
     if (cells.length) hours = `<div class="wx-hours" aria-label="Hour by hour from the first tee time">${cells.join('')}</div>`;
   }
-  return sec(label('Forecast'), `<div class="wx wx-${kind}">
+  return wrap(`<div class="wx wx-${kind}">
     <div class="wx-top">${wxIcon(kind, 72)}<div class="wx-main"><div class="wx-name">${WX[d.weather_code[i]] || 'Mixed'}</div><div class="wx-temp">${Math.round(d.temperature_2m_max[i])}°<span> ${Math.round(d.temperature_2m_min[i])}°</span></div></div></div>
     <div class="wx-chips"><span class="wx-chip"><b>${rain}%</b> chance of rain</span><span class="wx-chip"><b>${wind}</b> km/h wind</span></div>
     <p class="wx-line">${wxLine(kind, rain, wind)}</p>${hours}</div>`);
@@ -3849,35 +3888,6 @@ function resultsBlock(r) {
   return html;
 }
 
-/* ----- The page for a round that is coming up or live: Groups first, KBs next, then weather and course ----- */
-function groupCards(r) {
-  if (!r.groups || !r.groups.length) return sec('', '<div class="card"><div class="row"><span class="sub">Groups are not drawn yet</span></div></div>', true);
-  const comp = computeR(r.id), tee = teeOf(r);
-  const phOf = pid => (r.ph && r.ph[pid] !== undefined ? r.ph[pid] : comp ? comp.players[pid].ph : tee && D.member(pid) ? E.playingHandicap(D.member(pid).index, tee, allowanceOf(r)) : null);
-  const mine = myGroup(r.id);
-  const live = r.status === 'live' ? comp : null;
-  const status = g => { const gc = live ? live.groups.find(x => x.id === g.id) : null; return gc ? (gc.complete ? 'Finished' : gc.holesDone ? 'Thru ' + gc.holesDone : '') : ''; };
-  const pl = (g, pid, i) => {
-    const m = D.member(pid), ph = phOf(pid), can = tee && m;
-    return `<${can ? 'button' : 'div'} class="mgp"${can ? ` data-act="hcp" data-pid="${pid}" data-rid="${r.id}"` : ''}>${avBadge(pid)}<span class="mgn">${g.teams.length > 1 ? dot(i) : ''}<span>${esc(D.nameOf(pid))}</span></span>${ph === null ? '' : `<span class="mgh"><small>PLAYS OFF</small><b>${ph}</b></span>`}</${can ? 'button' : 'div'}>`;
-  };
-  let html = '';
-  if (mine) {
-    html += `<section class="hero pine mygroup"><div class="mgt"><span class="mgtime">${esc(mine.teeTime || r.first_tee || '')}</span><span class="mgk">YOUR GROUP · ${mine.n}</span></div>${mine.teams.map((t, i) => t.map(pid => pl(mine, pid, i)).join('')).join('')}</section>`;
-  }
-  const others = r.groups.filter(g => !mine || g.id !== mine.id);
-  if (others.length) html += `<div class="gl">${mine ? 'Other groups' : 'Groups'}</div>` + others.map(g => {
-    const key = r.id + g.id, open = !!UI.open[key], st = status(g);
-    return `<div class="gcard${open ? ' open' : ''}"><button class="gch" data-act="toggle" data-key="${key}" aria-expanded="${open}"><span class="gctime">${esc(g.teeTime || '')}</span><span class="gcn">Group ${g.n}</span>${st ? `<span class="pill w2 gcs">${esc(st)}</span>` : ''}<span class="gchev">${chev}</span></button>
-      <div class="gcp">${g.teams.map((t, i) => t.map(pid => `<span class="gcpl">${avBadge(pid, 'sm')}${g.teams.length > 1 ? dot(i) : ''}<span>${esc(D.nameOf(pid))}</span></span>`).join('')).join('')}</div>${open ? `<div class="gcx">${g.teams.map((t, i) => t.map(pid => pl(g, pid, i)).join('')).join('')}</div>` : ''}</div>`;
-  }).join('');
-  if (tee && mine) html += `<p class="cap note">${esc(tee.name)} tees · Slope ${tee.slope} · Rating ${tee.rating} · Par ${tee.par} · ${Math.round(allowanceOf(r) * 100)}%</p>`;
-  return html;
-}
-function kbCards(r) {
-  const gOf = pid => (r.groups || []).find(g => g.teams.some(t => t.includes(pid)));
-  return `<div class="kbs">${r.kb.map(pr => `<div class="kbcard">${avStack(pr)}<span class="kbn">${esc(pr.map(D.nameOf).join(' & '))}</span><span class="kbg">${pr.map(pid => { const g = gOf(pid); return g ? 'G' + g.n : ''; }).filter(Boolean).join(' · ')}</span></div>`).join('')}</div>`;
-}
 /* The page for a finished round: the winner first, then the table, then one small card for KBs and contests. */
 function finishedCard(r, res) {
   const top = res.rows.filter(x => x.pos === 1);
@@ -3947,27 +3957,97 @@ VIEWS.round = p => {
     if (r.groups && r.groups.length) html += groupsBlock(r, false);
     return { html };
   }
+  /* Coming up or live: a pine card with this player's day first, then Groups, KBs, Weather and Course. */
+  const live = r.status === 'live';
+  const days = r.date ? daysFromToday(r.date) : null;
+  const kind = live ? 'Live' : days === 0 ? 'Today' : days === 1 ? 'Tomorrow' : days > 1 ? `In ${plural(days, 'day')}` : 'Next round';
+  const line = [r.date ? fmtDate(r.date, true) : 'Date to be confirmed', tee ? `${tee.name} tees` : '', tee ? `Par ${tee.par}` : ''].filter(Boolean).join(' · ');
+  const me = DB.prefs.me;
   const mine = myGroup(r.id);
-  const hasKb = !!(r.kb && r.kb.length);
+  let you = '';
+  if (mine) {
+    const myTeam = mine.teams.find(t => t.includes(me)) || [];
+    const other = mine.teams.length > 1 ? mine.teams.find(t => t !== myTeam) : null;
+    const partner = myTeam.filter(pid => pid !== me);
+    const kbPair = (r.kb || []).find(pr => pr.includes(me));
+    const kbWith = kbPair ? kbPair.filter(pid => pid !== me) : [];
+    const names = pairNames;
+    const dl = [
+      partner.length ? `<dt>With</dt><dd>${names(partner)}</dd>` : '',
+      other ? `<dt>Against</dt><dd>${names(other)}</dd>` : (!partner.length ? `<dt>With</dt><dd>${names(mine.teams.flat().filter(pid => pid !== me))}</dd>` : ''),
+      kbWith.length ? `<dt>KB with</dt><dd>${names(kbWith)}</dd>` : ''
+    ].join('');
+    const t = mine.teeTime || r.first_tee || '';
+    you = `<div class="rp-you"><div class="rp-time">${t ? `<b>${esc(t)}</b><span>${live ? 'Tee time' : 'You’re off'}</span>` : `<b>${mine.n}</b><span>Group</span>`}</div><dl>${dl}</dl></div>`;
+  }
+  const playable = canScore(r) && (live || (r.status === 'upcoming' && (!r.date || daysFromToday(r.date) <= 0)));
+  let go = '';
+  if (playable) {
+    let lbl = 'Play now';
+    if (me && mine) { const gc = computeR(r.id).groups.find(g => g.id === mine.id); lbl = inPlay || gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now'; }
+    go = `<button class="go" data-act="play" data-rid="${r.id}">${lbl}</button>`;
+  } else if (live) go = `<button class="go" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>`;
+  const backLink = html.slice(html.indexOf('<header class="hero s">') + '<header class="hero s">'.length, html.indexOf('<div class="head">'));
+  html = `${backLink}<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">Stableford</span></div>
+    <h1 class="rp-name">${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
+  if (playable && me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
+
   const tabsAvail = ['groups', 'kb', 'weather', 'course'];
   const rt = tabsAvail.includes(UI.rtab) ? UI.rtab : 'groups';
   const tabName = { groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
-  const pillsHtml = `<div class="seg pills rtabs${tabsAvail.length > 3 ? ' four' : ''}" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${tabName[k]}</button>`).join('')}</div>`;
-  const courseBody = c && c.about ? `<p class="prose">${esc(c.about)}</p>` : '<p class="prose sub">No course notes yet.</p>';
-  const roundBody = rt === 'groups' ? groupCards(r) : rt === 'kb' ? (hasKb ? kbCards(r) : sec('', cardOf(`<div class="row"><span class="sub">${E.kbOff(r) ? 'No KBs in this round' : 'KB pairs are not drawn yet'}</span></div>`), true)) : rt === 'weather' ? (forecast(r) || sec('', cardOf('<div class="row"><span class="sub">No forecast yet. It appears in the 9 days before the round.</span></div>'), true)) : sec('', courseBody, true);
-  const playable = canScore(r) && (r.status === 'live' || (r.status === 'upcoming' && (!r.date || daysFromToday(r.date) <= 0)));
-  if (playable) {
-    if (!DB.prefs.me || !mine) html += `<button class="btn" data-act="play" data-rid="${r.id}">Play now</button>`;
-    else {
-      const gc = computeR(r.id).groups.find(g => g.id === mine.id);
-      html += `<button class="btn" data-act="play" data-rid="${r.id}">${inPlay || gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now'}</button>`;
-    }
-    if (DB.prefs.me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(DB.prefs.me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
-  }
-  html += pillsHtml + roundBody;
-  if (r.status === 'live') html += `<button class="btn quiet" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>`;
+  html += `<div class="seg pills rtabs" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${tabName[k]}</button>`).join('')}</div>`;
+  const quiet = t => cardOf(`<div class="row"><span class="sub">${t}</span></div>`);
+  if (rt === 'groups') html += roundGroups(r);
+  else if (rt === 'kb') html += r.kb && r.kb.length ? `<div class="card rp-kbs">${r.kb.map(pr => `<span class="pk${pr.includes(me) ? ' me' : ''}">${pairNames(pr)}</span>`).join('')}</div>` : quiet(E.kbOff(r) ? 'No KBs in this round' : 'KB pairs are not drawn yet');
+  else if (rt === 'weather') html += forecast(r, true) || quiet(r.date ? 'The forecast appears in the 9 days before the round.' : 'The forecast appears once the round has a date.');
+  else html += roundCourse(r, c, tee, holes);
   return { html };
 };
+
+/* Names joined so a line only breaks after the "&", never inside a name. */
+const pairNames = list => list.map(pid => esc(D.nameOf(pid)).replace(/ /g, '\u00a0')).join('\u00a0& ');
+
+/* Groups on the round page: one row per tee time, the two buggies in equal blue and red pills. A row opens to the handicaps. */
+function roundGroups(r) {
+  if (!r.groups || !r.groups.length) return cardOf('<div class="row"><span class="sub">Groups are not drawn yet</span></div>');
+  const comp = computeR(r.id), tee = teeOf(r);
+  const live = r.status === 'live' ? comp : null;
+  const phOf = pid => (r.ph && r.ph[pid] !== undefined ? r.ph[pid] : comp ? comp.players[pid].ph : tee && D.member(pid) ? E.playingHandicap(D.member(pid).index, tee, allowanceOf(r)) : null);
+  const cols = '<div class="hrow cols"><span></span><span class="r cap">Index</span><span class="r cap">Playing</span><span></span></div>';
+  const prow = g => g.teams.map((t, i) => t.map(pid => {
+    const ph = phOf(pid), m = D.member(pid), can = tee && m;
+    return `<${can ? 'button' : 'div'} class="hrow"${can ? ` data-act="hcp" data-pid="${pid}" data-rid="${r.id}"` : ''}><span class="nm">${g.teams.length > 1 ? dot(i) : ''}<span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span></span><span class="r sub">${m ? fmtIndex(m.index) : ''}</span><span class="r b">${ph === null ? '' : ph}</span>${can ? chev : '<span></span>'}</${can ? 'button' : 'div'}>`;
+  }).join('')).join('');
+  const mine = myGroup(r.id);
+  return `<div class="card rp-groups">${r.groups.map(g => {
+    const key = 'rg' + r.id + g.id, open = !!UI.open[key];
+    const gc = live ? live.groups.find(x => x.id === g.id) : null;
+    const prog = gc ? (gc.complete ? 'Finished' : gc.holesDone ? 'Thru ' + gc.holesDone : '') : '';
+    const pills = g.teams.length === 2
+      ? g.teams.map((t, i) => `<span class="${i ? 'pr' : 'pb'}">${pairNames(t)}</span>`).join('')
+      : `<span class="pk wide">${esc(g.teams.flat().map(D.nameOf).join(', '))}</span>`;
+    return `<button class="rg${mine && mine.id === g.id ? ' me' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}" aria-label="Group ${g.n}${g.teeTime ? ', ' + esc(g.teeTime) : ''}"><span class="rg-t"><b>${esc(g.teeTime || 'G' + g.n)}</b>${prog ? `<small>${prog}</small>` : ''}</span>${pills}<span class="chev dn${open ? ' up' : ''}">${chev}</span></button>${open ? `<div class="rg-open">${cols}${prow(g)}</div>` : ''}`;
+  }).join('')}</div>`;
+}
+
+/* Course on the round page: the numbers, then the organiser's write-up. */
+function roundCourse(r, c, tee, holes) {
+  if (!c) return cardOf('<div class="row"><span class="sub">No course set for this round</span></div>');
+  const row = (k, v) => (v === '' || v === null || v === undefined ? '' : `<div class="row"><span>${k}</span><span class="b num">${esc(String(v))}</span></div>`);
+  const len = holes && holes.every(h => h.m) ? `${holes.reduce((s, h) => s + h.m, 0).toLocaleString('en-IE')} m` : '';
+  const p3 = holes ? holes.filter(h => h.par === 3).length : 0, p5 = holes ? holes.filter(h => h.par === 5).length : 0;
+  let html = cardOf([
+    row('Tees', tee ? tee.name : ''),
+    row('Par', tee ? tee.par : ''),
+    row('Slope', tee ? tee.slope : ''),
+    row('Course rating', tee ? tee.rating : ''),
+    row('Length', len),
+    holes ? row('Par 3s and par 5s', `${p3} and ${p5}`) : '',
+    row('Handicap allowance', `${Math.round(allowanceOf(r) * 100)}%`)
+  ].join(''));
+  html += sec('', c.about ? `<p class="prose rp-about">${esc(c.about)}</p>` : '<p class="prose sub">No course notes yet.</p>', true);
+  return html;
+}
 
 /* ----- A player ----- */
 
