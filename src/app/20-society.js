@@ -113,7 +113,10 @@ VIEWS.home = () => {
     ? qrow('goy', 'Golfer of the Year', `<span class="b">${esc(lead.name)}</span><span class="sub"><span class="num">${lead.total}</span> pts</span>`)
     : qrow('goy', 'Golfer of the Year', `<span class="sub">Best ${D.goyBest()} scores count</span>`);
   const goyHidden = lead ? `<span class="vh">Golfer of the Year ${esc(lead.name)} leads on ${lead.total}</span>` : '';
+  const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
+  const lastRound = pastAll.find(r => !isDemo(r));
   html += `${goyHidden}${sec('', cardOf([
+    !inPlay && lastRound ? qrow('round', 'Last round', `<span class="sub">${esc(roundName(lastRound))}</span>`, lastRound.id) : '',
     goyRowHome,
     tripList.length > 1 ? qrow('trip', 'Trip standings', `<span class="sub">${esc(tripFor.trip)}</span>`, tripFor.id) : '',
     qrow('rounds', 'Past rounds', `<span class="sub">${played.length ? `${played.length} played` : 'None played yet'}</span>`),

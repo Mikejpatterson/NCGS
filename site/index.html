@@ -1666,7 +1666,7 @@ body { font-variant-numeric: tabular-nums; }
 .savebar .btn.quiet { background: rgba(255, 255, 255, .72); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); box-shadow: 0 8px 28px rgba(20, 35, 27, .16), 0 0 0 1px rgba(20, 35, 27, .08); color: var(--pine); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151851","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151904","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3729,7 +3729,10 @@ VIEWS.home = () => {
     ? qrow('goy', 'Golfer of the Year', `<span class="b">${esc(lead.name)}</span><span class="sub"><span class="num">${lead.total}</span> pts</span>`)
     : qrow('goy', 'Golfer of the Year', `<span class="sub">Best ${D.goyBest()} scores count</span>`);
   const goyHidden = lead ? `<span class="vh">Golfer of the Year ${esc(lead.name)} leads on ${lead.total}</span>` : '';
+  const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
+  const lastRound = pastAll.find(r => !isDemo(r));
   html += `${goyHidden}${sec('', cardOf([
+    !inPlay && lastRound ? qrow('round', 'Last round', `<span class="sub">${esc(roundName(lastRound))}</span>`, lastRound.id) : '',
     goyRowHome,
     tripList.length > 1 ? qrow('trip', 'Trip standings', `<span class="sub">${esc(tripFor.trip)}</span>`, tripFor.id) : '',
     qrow('rounds', 'Past rounds', `<span class="sub">${played.length ? `${played.length} played` : 'None played yet'}</span>`),
@@ -6366,7 +6369,9 @@ function render() {
   const keepFocus = active && active.id && app.contains(active) && /INPUT|TEXTAREA|SELECT/.test(active.tagName) ? active.id : null;
   app.innerHTML = out.html + overlay;
   if (keepFocus) { const el = document.getElementById(keepFocus); if (el) el.focus(); }
-  const showTabs = !UI.org && !!out.tabs;
+  /* The tab bar only shows while a round is in play (live, or booked for today). The rest of the time Home is the hub. */
+  const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
+  const showTabs = !UI.org && !!out.tabs && inPlay;
   app.classList.toggle('no-tabs', !showTabs);
   tabs.hidden = !showTabs;
   tabs.classList.toggle('under', !!app.querySelector('.scrim, .full'));

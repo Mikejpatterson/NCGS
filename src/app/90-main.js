@@ -488,7 +488,9 @@ function render() {
   const keepFocus = active && active.id && app.contains(active) && /INPUT|TEXTAREA|SELECT/.test(active.tagName) ? active.id : null;
   app.innerHTML = out.html + overlay;
   if (keepFocus) { const el = document.getElementById(keepFocus); if (el) el.focus(); }
-  const showTabs = !UI.org && !!out.tabs;
+  /* The tab bar only shows while a round is in play (live, or booked for today). The rest of the time Home is the hub. */
+  const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
+  const showTabs = !UI.org && !!out.tabs && inPlay;
   app.classList.toggle('no-tabs', !showTabs);
   tabs.hidden = !showTabs;
   tabs.classList.toggle('under', !!app.querySelector('.scrim, .full'));
