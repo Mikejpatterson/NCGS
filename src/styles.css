@@ -1654,3 +1654,9 @@ body { font-variant-numeric: tabular-nums; }
 /* Score entry: the "scores to go" pill floats on glass, like the tab bar */
 #app .entry .savebar, .entry + .savebar { background: none; box-shadow: none; }
 .savebar .btn.quiet { background: rgba(255, 255, 255, .72); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); box-shadow: 0 8px 28px rgba(20, 35, 27, .16), 0 0 0 1px rgba(20, 35, 27, .08); color: var(--pine); }
+
+/* Home round card: a row that says where tapping the round goes */
+.now-link { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 48px; margin-top: 14px; padding: 0 14px; border-radius: 14px; background: rgba(255, 255, 255, .1); color: #fff; font-size: .9rem; font-weight: 600; text-align: left; position: relative; z-index: 1; }
+.now-link .chev { color: #CFE0D6; }
+.now-link:active { background: rgba(255, 255, 255, .18); }
+.now-link + .now-acts { margin-top: 12px; }

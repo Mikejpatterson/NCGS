@@ -83,10 +83,11 @@ function nowCard(r) {
       <span class="now-line">${esc(heroFacts(r))}</span>
     </button>
     ${live ? miniBoard(r) : ''}
-    <div class="now-acts${playable || live ? '' : ' one'}">
-      ${playable ? `<button class="go" data-act="play" data-rid="${r.id}">${playLabel(r)}</button>` : `<button class="go" data-act="round" data-rid="${r.id}">Course, groups and forecast</button>`}
-      ${live ? `<button class="go alt" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>` : playable ? `<button class="go alt" data-act="round" data-rid="${r.id}">Groups</button>` : ''}
-    </div>
+    <button class="now-link" data-act="round" data-rid="${r.id}"><span>Groups · KBs · Weather · Course</span>${chev}</button>
+    ${playable || live ? `<div class="now-acts${playable && live ? '' : ' one'}">
+      ${playable ? `<button class="go" data-act="play" data-rid="${r.id}">${playLabel(r)}</button>` : ''}
+      ${live ? `<button class="go${playable ? ' alt' : ''}" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>` : ''}
+    </div>` : ''}
   </div>`;
 }
 VIEWS.home = () => {

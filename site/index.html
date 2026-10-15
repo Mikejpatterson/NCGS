@@ -1664,9 +1664,15 @@ body { font-variant-numeric: tabular-nums; }
 /* Score entry: the "scores to go" pill floats on glass, like the tab bar */
 #app .entry .savebar, .entry + .savebar { background: none; box-shadow: none; }
 .savebar .btn.quiet { background: rgba(255, 255, 255, .72); -webkit-backdrop-filter: blur(20px) saturate(1.6); backdrop-filter: blur(20px) saturate(1.6); box-shadow: 0 8px 28px rgba(20, 35, 27, .16), 0 0 0 1px rgba(20, 35, 27, .08); color: var(--pine); }
+
+/* Home round card: a row that says where tapping the round goes */
+.now-link { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 48px; margin-top: 14px; padding: 0 14px; border-radius: 14px; background: rgba(255, 255, 255, .1); color: #fff; font-size: .9rem; font-weight: 600; text-align: left; position: relative; z-index: 1; }
+.now-link .chev { color: #CFE0D6; }
+.now-link:active { background: rgba(255, 255, 255, .18); }
+.now-link + .now-acts { margin-top: 12px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151904","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151908","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3699,10 +3705,11 @@ function nowCard(r) {
       <span class="now-line">${esc(heroFacts(r))}</span>
     </button>
     ${live ? miniBoard(r) : ''}
-    <div class="now-acts${playable || live ? '' : ' one'}">
-      ${playable ? `<button class="go" data-act="play" data-rid="${r.id}">${playLabel(r)}</button>` : `<button class="go" data-act="round" data-rid="${r.id}">Course, groups and forecast</button>`}
-      ${live ? `<button class="go alt" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>` : playable ? `<button class="go alt" data-act="round" data-rid="${r.id}">Groups</button>` : ''}
-    </div>
+    <button class="now-link" data-act="round" data-rid="${r.id}"><span>Groups · KBs · Weather · Course</span>${chev}</button>
+    ${playable || live ? `<div class="now-acts${playable && live ? '' : ' one'}">
+      ${playable ? `<button class="go" data-act="play" data-rid="${r.id}">${playLabel(r)}</button>` : ''}
+      ${live ? `<button class="go${playable ? ' alt' : ''}" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>` : ''}
+    </div>` : ''}
   </div>`;
 }
 VIEWS.home = () => {
