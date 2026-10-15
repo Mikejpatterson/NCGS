@@ -1545,3 +1545,20 @@ body { font-variant-numeric: tabular-nums; }
 .fin .finmore { justify-content: center; color: var(--green); font-weight: 700; }
 .fin > .btn { background: var(--flag); color: var(--pine); margin-top: 20px; }
 .fin .hero.s { padding-bottom: 0; }
+
+/* ===== Calm pass: Home, round page, leaderboard, Ruling ===== */
+/* One quiet row of tabs instead of big filled pills */
+.seg.pills, .seg.pills.four { display: flex; flex-wrap: nowrap; gap: 2px; background: var(--press); padding: 3px; border-radius: 999px; margin: 14px 0 8px; }
+.seg.pills button, .seg.pills.four button { flex: 1 1 0; min-width: 0; width: auto; min-height: 44px; padding: 0 4px; border-radius: 999px; background: none; box-shadow: none; color: var(--sub); font-size: .86rem; font-weight: 700; white-space: normal; line-height: 1.1; overflow-wrap: normal; }
+.seg.pills button.on, .seg.pills.four button.on { background: #fff; color: var(--pine); font-weight: 800; box-shadow: 0 1px 3px rgba(20, 35, 27, .16); }
+/* The big moment only: no decorative circles */
+.hero.pine::after, .hero.home .now::after, .feat::after { display: none; }
+/* One yellow action on the round page */
+.hero.s ~ .btn:not(.quiet) { background: var(--flag); color: var(--pine); }
+/* Ruling: the mic is just the mic, and the situations share one calm tint */
+.ah-mic { box-shadow: none; }
+.sit:nth-child(n) .sit-i { background: #E3EFE6; }
+/* Home: quiet rows */
+.hero.home .greet { margin-bottom: 4px; }
+/* Organiser: one calm tint for the menu icons */
+.row .ic { background: #E3EFE6 !important; color: var(--pine) !important; }

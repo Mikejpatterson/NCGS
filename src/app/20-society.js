@@ -103,27 +103,25 @@ VIEWS.home = () => {
   const dateLine = new Date().toLocaleDateString('en-IE', { weekday: 'long', day: 'numeric', month: 'long' }) + (me ? ` · ${hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening'}, ${esc(me.name.split(' ')[0])}` : '');
   let html = `<header class="hero home"><div class="brand"><span class="badge">${FLAG_SVG}</span><span class="two"><span class="wordmark">${esc(D.society())}</span>${standLine}</span>
     <button class="who-chip" data-act="who" aria-label="${me ? 'You are ' + esc(me.name) + '. Change' : 'Who are you?'}">${me ? esc(me.name) + `<span class="who-av">${esc(initialsOf(me))}</span>` : 'Who are you?'}</button></div>
-    <p class="greet">${dateLine}</p><h1 class="headline">${esc(homeHeadline(feature))}</h1>
+    <p class="greet">${dateLine}</p><h1 class="vh">${esc(homeHeadline(feature))}</h1>
     ${feature ? nowCard(feature) : '<div class="now"><div class="now-main"><span class="now-name">No round booked</span><span class="now-line">The organiser adds the next one.</span></div></div>'}</header>`;
   const table = goy(season);
   const lead = table[0];
   const pastAll = D.rounds().filter(r => r.status === 'final').reverse();
-  const tile = (act, icon, t, s2, cls, extra, rid) => `<button class="lnk${cls ? ' ' + cls : ''}" data-act="${act}"${rid ? ` data-rid="${rid}"` : ''}><span class="lnk-ic">${sized(icon, 24)}</span>${extra || ''}<span class="lnk-t">${t}</span><span class="lnk-s">${s2}</span></button>`;
   const tripFor = feature && feature.trip ? feature : (D.rounds().filter(r => r.trip).slice(-1)[0] || null);
   const tripList = tripFor ? tripRounds(tripFor) : [];
-  const tripTile = tripList.length > 1 ? tile('trip', ICON.flagpin, 'Trip standings', esc(tripFor.trip), 'sun', '', tripFor.id) : '';
-  const top3 = table.slice(0, 3);
-  const myPos = me && myRow ? `<span class="ft-me">You are ${posWord(myRow.posLabel)}</span>` : '';
-  const goyFeat = lead
-    ? `<button class="feat" data-act="goy"><span class="ft-k">${sized(ICON.medal, 16)}GOLFER OF THE YEAR</span><span class="ft-row"><span class="ft-n">${esc(lead.name)}</span><span class="ft-p"><b>${lead.total}</b> pts</span></span><span class="ft-foot">${avStack(top3.map(x => x.id))}<span class="ft-t">Best ${D.goyBest()} scores count</span>${myPos}</span></button>`
-    : tile('goy', ICON.medal, 'Golfer of the Year', 'Best ' + D.goyBest() + ' scores count');
+  const qrow = (act, t, right, rid) => `<button class="row" data-act="${act}"${rid ? ` data-rid="${rid}"` : ''}><span>${t}</span><span class="right">${right}${chev}</span></button>`;
+  const goyRowHome = lead
+    ? qrow('goy', 'Golfer of the Year', `<span class="b">${esc(lead.name)}</span><span class="sub"><span class="num">${lead.total}</span> pts</span>`)
+    : qrow('goy', 'Golfer of the Year', `<span class="sub">Best ${D.goyBest()} scores count</span>`);
   const goyHidden = lead ? `<span class="vh">Golfer of the Year ${esc(lead.name)} leads on ${lead.total}</span>` : '';
-  html += `${goyFeat}${goyHidden}<div class="links">
-    ${tripTile}
-    ${tile('rounds', ICON.history, 'Past rounds', played.length ? `${played.length} played` : 'None played yet', 'plain')}
-    ${tile('stats', ICON.bars, 'Stats', 'KBs, birdies, averages', 'leaf')}
-    ${tile('players', ICON.users, 'Players', plural(D.regulars().length, 'golfer'), 'plain', avStack(D.regulars().slice(0, 3).map(m => m.id)))}
-  </div>`;
+  html += `${goyHidden}${sec('', cardOf([
+    goyRowHome,
+    tripList.length > 1 ? qrow('trip', 'Trip standings', `<span class="sub">${esc(tripFor.trip)}</span>`, tripFor.id) : '',
+    qrow('rounds', 'Past rounds', `<span class="sub">${played.length ? `${played.length} played` : 'None played yet'}</span>`),
+    qrow('stats', 'Stats', '<span class="sub">KBs, birdies, averages</span>'),
+    qrow('players', 'Players', `<span class="sub">${plural(D.regulars().length, 'golfer')}</span>`)
+  ].join('')), true)}`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
   return { html, tabs: 'home' };
