@@ -31,6 +31,7 @@ const ACT = {
   'wx-retry': el => { delete UI.wx[el.dataset.cid]; render(); },
   trip: el => go('trip', { rid: el.dataset.rid }),
   rtab: el => { UI.rtab = el.dataset.t; render(); },
+  bwseg: el => { UI.open[el.dataset.key] = el.dataset.open !== '1'; render(); },
   respill: el => { UI.res = el.dataset.p; UI.scrollTop = true; render(); },
   toggle: el => { UI.open[el.dataset.key] = !UI.open[el.dataset.key]; render(); },
   hcp: el => go('hcp', { pid: el.dataset.pid, rid: el.dataset.rid }),

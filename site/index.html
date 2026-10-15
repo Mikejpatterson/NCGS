@@ -1610,9 +1610,44 @@ body { font-variant-numeric: tabular-nums; }
 .pk.wide { grid-column: span 2; }
 .rp-kbs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 12px; }
 .rp-about { white-space: pre-line; line-height: 1.45; }
+
+/* ===== Buggy Wars: the two pairs, three result rows, front and back open to their holes ===== */
+.bw-vs { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 4px 0 12px; }
+.bw-pair { display: inline-flex; gap: 4px; }
+.bw-bd { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: .7rem; font-weight: 800; letter-spacing: .02em; }
+.bw-bd.a { background: #0A60C9; }
+.bw-bd.b { background: #C62828; }
+.bw-card .bw-row { display: grid; grid-template-columns: minmax(0, 1fr) min(10.5rem, 168px) 16px; gap: 10px; align-items: center; width: 100%; min-height: 56px; padding: 8px 16px; text-align: left; }
+.bw-card .bw-row + .bw-row, .bw-card .bw-board + .bw-row { border-top: .5px solid var(--line); }
+.bw-l { font-size: var(--t-body); font-weight: 600; }
+.bw-res { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 34px; padding: 2px 10px; border-radius: 17px; color: #fff; font-size: .9rem; font-weight: 800; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.bw-res.a { background: #0A60C9; }
+.bw-res.b { background: #C62828; }
+.bw-res.n { background: var(--press); color: var(--text); }
+.bw-row .chev svg { width: 16px; height: 16px; }
+.bw-board { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)) minmax(2.6rem, auto); gap: 3px; padding: 2px 12px 12px; }
+.bw-col { display: flex; flex-direction: column; gap: 3px; align-items: stretch; min-width: 0; padding: 0; }
+.bw-n { height: 18px; display: flex; align-items: center; justify-content: center; font-size: .66rem; font-weight: 700; color: var(--sub); font-variant-numeric: tabular-nums; border-radius: 5px; }
+.bw-n.cur { background: #FFF3C4; color: var(--pine); }
+.bw-c, .bw-t { height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.bw-c { background: #F1F3F1; color: var(--sub); }
+.bw-c.wa { background: #0A60C9; color: #fff; font-weight: 800; }
+.bw-c.wb { background: #C62828; color: #fff; font-weight: 800; }
+.bw-c.e { background: none; box-shadow: inset 0 0 0 1px var(--line); }
+.bw-t { background: #fff; font-weight: 800; font-size: .88rem; }
+.bw-t.a { color: #0A60C9; box-shadow: inset 0 0 0 2px #0A60C9; }
+.bw-t.b { color: #C62828; box-shadow: inset 0 0 0 2px #C62828; }
+.bw-tot .bw-n { font-size: .62rem; }
+/* Tabs size to their words, so "Buggy Wars" stays on one line; with very large text they move onto a second row */
+.seg.pills, .seg.pills.four { flex-wrap: wrap; }
+.seg.pills button, .seg.pills.four button { flex: 1 1 auto; white-space: nowrap; padding: 0 10px; }
+/* Drop-down arrows point down when closed and up when open */
+.bw-row .chev.dn, .rg .chev.dn { transform: rotate(90deg); transition: transform .2s; }
+.bw-row[aria-expanded="true"] .chev.dn, .rg[aria-expanded="true"] .chev.dn { transform: rotate(-90deg); }
+.seg.pills button, .seg.pills.four button { font-size: min(.86rem, 15px); padding: 0 8px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151604","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151650","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -4845,36 +4880,55 @@ function buggyView(rid) {
   const inMatch = !!(mine && groups.find(g => g.id === mine.id));
   const gid = inMatch ? mine.id : (UI.matchGroup && groups.find(g => g.id === UI.matchGroup) ? UI.matchGroup : groups[0].id);
   const gc = comp.groups.find(g => g.id === gid);
-  const L = gc.labels;
   const canEdit = mine && mine.id === gid && r.status === 'live';
-  const summary = ['front', 'back', 'overall'].map(s => `<div class="row"><span>${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('');
-  let rows = '';
-  gc.order.forEach((n, idx) => {
-    const hr = gc.holes[n];
-    const isNow = n === gc.nextHole && r.status === 'live';
-    let a = '', b = '', m = '';
-    if (hr.complete) {
-      const [pa, pb] = hr.best;
-      a = `<span class="ppts ${hr.result === 'A' ? 'a' : hr.result === 'B' ? 'lose' : ''}">${pa}</span>`;
-      b = `<span class="ppts ${hr.result === 'B' ? 'b' : hr.result === 'A' ? 'lose' : ''}">${pb}</span>`;
-      const lead = hr.segLead;
-      m = lead === 0 ? '<span class="pill n">AS</span>' : `<span class="pill ${lead > 0 ? 'a' : 'b'} soft">${Math.abs(lead)} up</span>`;
-    } else if (isNow) m = '<span class="b c-g">Now</span>';
-    const tag = canEdit && hr.complete ? 'button' : 'div';
-    const attrs = tag === 'button' ? ` data-act="edit-hole" data-n="${n}" aria-label="Change hole ${n}"` : '';
-    rows += `<${tag} class="mrow${isNow ? ' now' : ''}${!hr.complete && !isNow ? ' later' : ''}"${isNow ? ' id="cur"' : ''}${attrs}><span class="b">${n}</span><span class="p">${a}</span><span class="p">${b}</span><span class="m">${m}</span></${tag}>`;
-    const nextN = gc.order[idx + 1];
-    if (nextN !== undefined && (nextN <= 9) !== (n <= 9)) {
-      const seg = n <= 9 ? 'front' : 'back';
-      rows += `<div class="row" style="background:var(--bg)"><span class="sub">${segName(seg)}</span>${statusPills(gc.matches[seg].status)}</div>`;
-    }
-  });
+  const live = r.status === 'live';
+  /* The two pairs as initials badges, blue v red. */
+  const badges = (t, i) => `<span class="bw-pair">${t.map(pid => `<span class="bw-bd ${i ? 'b' : 'a'}" aria-label="${esc(D.nameOf(pid))}">${esc(initialsOf(D.member(pid)) || D.nameOf(pid).slice(0, 2))}</span>`).join('')}</span>`;
+  /* One result pill per match: the leader's colour, golf wording, "3 up, 4 to play" while it is being played. */
+  const pillOf = m => {
+    const st = m.status;
+    let txt;
+    if (st.state === 'pending') txt = 'Not started';
+    else if (st.state === 'halved') txt = 'Halved';
+    else if (st.state === 'won') txt = m.closed && m.closed.toPlay > 0 ? `Won ${m.closed.up}&${m.closed.toPlay}` : `Won ${Math.abs(m.lead)} up`;
+    else txt = `${m.lead === 0 ? 'AS' : Math.abs(m.lead) + ' up'}, ${st.toPlay} to play`;
+    const cls = st.leader === 'A' ? 'a' : st.leader === 'B' ? 'b' : 'n';
+    const who = st.leader ? `${gc.labels[st.leader === 'A' ? 0 : 1].long} ` : '';
+    return `<span class="bw-res ${cls}" aria-label="${esc(who + txt)}">${txt}</span>`;
+  };
+  /* A nine's holes: each hole is one column, the winner's best points filled in their colour, then holes won. */
+  const board = seg => {
+    const order = gc.matches[seg].order;
+    let wa = 0, wb = 0;
+    const cols = order.map(n => {
+      const hr = gc.holes[n];
+      const isNow = n === gc.nextHole && live;
+      let a = '<span class="bw-c e"></span>', b = '<span class="bw-c e"></span>';
+      if (hr.complete) {
+        const [pa, pb] = hr.best;
+        if (hr.result === 'A') wa++; else if (hr.result === 'B') wb++;
+        a = `<span class="bw-c${hr.result === 'A' ? ' wa' : ''}">${pa}</span>`;
+        b = `<span class="bw-c${hr.result === 'B' ? ' wb' : ''}">${pb}</span>`;
+      }
+      const inner = `<span class="bw-n${isNow ? ' cur' : ''}">${n}</span>${a}${b}`;
+      return canEdit && hr.complete ? `<button class="bw-col" data-act="edit-hole" data-n="${n}" aria-label="Change hole ${n}">${inner}</button>` : `<div class="bw-col">${inner}</div>`;
+    }).join('');
+    return `<div class="bw-board">${cols}<div class="bw-col bw-tot"><span class="bw-n">Holes</span><span class="bw-t a">${wa}</span><span class="bw-t b">${wb}</span></div></div>`;
+  };
+  /* Front and back open to their holes. The nine being played starts open. */
+  const segOf = n => (gc.matches.front.order.includes(n) ? 'front' : 'back');
+  const openDefault = live && gc.nextHole ? segOf(gc.nextHole) : null;
+  const row = seg => {
+    const m = gc.matches[seg];
+    if (seg === 'overall') return `<div class="bw-row"><span class="bw-l">${segName(seg)}</span>${pillOf(m)}<span></span></div>`;
+    const key = `bw-${rid}-${gid}-${seg}`;
+    const open = UI.open[key] === undefined ? openDefault === seg : !!UI.open[key];
+    return `<button class="bw-row" data-act="bwseg" data-key="${key}" data-open="${open ? 1 : 0}" aria-expanded="${open}"><span class="bw-l">${segName(seg)}</span>${pillOf(m)}<span class="chev dn${open ? ' up' : ''}">${chev}</span></button>${open ? board(seg) : ''}`;
+  };
   return {
     html: `      ${!inMatch && groups.length > 1 ? `<div class="seg pills grp">${groups.map(g => `<button class="${g.id === gid ? 'on' : ''}" data-act="mgroup" data-gid="${g.id}" aria-pressed="${g.id === gid}">Group ${g.n}</button>`).join('')}</div>` : ''}
-      ${sec(`${pill(0)}<span class="sub" style="flex:1">${esc(L[0].long)}</span>`, '', true)}
-      <div class="sec-label" style="margin-top:-4px">${pill(1)}<span class="sub" style="flex:1">${esc(L[1].long)}</span></div>
-      ${cardOf(summary)}
-      ${sec('', cardOf(`<div class="mrow cols"><span class="cap">Hole</span><span class="p">${pill(0)}</span><span class="p">${pill(1)}</span><span></span></div>${rows}`), true)}`
+      <div class="bw-vs">${badges(gc.teams[0], 0)}<span class="sub">v</span>${badges(gc.teams[1], 1)}</div>
+      <div class="card bw-card">${['front', 'back', 'overall'].map(row).join('')}</div>`
   };
 }
 
@@ -5829,6 +5883,7 @@ const ACT = {
   'wx-retry': el => { delete UI.wx[el.dataset.cid]; render(); },
   trip: el => go('trip', { rid: el.dataset.rid }),
   rtab: el => { UI.rtab = el.dataset.t; render(); },
+  bwseg: el => { UI.open[el.dataset.key] = el.dataset.open !== '1'; render(); },
   respill: el => { UI.res = el.dataset.p; UI.scrollTop = true; render(); },
   toggle: el => { UI.open[el.dataset.key] = !UI.open[el.dataset.key]; render(); },
   hcp: el => go('hcp', { pid: el.dataset.pid, rid: el.dataset.rid }),

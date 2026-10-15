@@ -639,36 +639,55 @@ function buggyView(rid) {
   const inMatch = !!(mine && groups.find(g => g.id === mine.id));
   const gid = inMatch ? mine.id : (UI.matchGroup && groups.find(g => g.id === UI.matchGroup) ? UI.matchGroup : groups[0].id);
   const gc = comp.groups.find(g => g.id === gid);
-  const L = gc.labels;
   const canEdit = mine && mine.id === gid && r.status === 'live';
-  const summary = ['front', 'back', 'overall'].map(s => `<div class="row"><span>${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('');
-  let rows = '';
-  gc.order.forEach((n, idx) => {
-    const hr = gc.holes[n];
-    const isNow = n === gc.nextHole && r.status === 'live';
-    let a = '', b = '', m = '';
-    if (hr.complete) {
-      const [pa, pb] = hr.best;
-      a = `<span class="ppts ${hr.result === 'A' ? 'a' : hr.result === 'B' ? 'lose' : ''}">${pa}</span>`;
-      b = `<span class="ppts ${hr.result === 'B' ? 'b' : hr.result === 'A' ? 'lose' : ''}">${pb}</span>`;
-      const lead = hr.segLead;
-      m = lead === 0 ? '<span class="pill n">AS</span>' : `<span class="pill ${lead > 0 ? 'a' : 'b'} soft">${Math.abs(lead)} up</span>`;
-    } else if (isNow) m = '<span class="b c-g">Now</span>';
-    const tag = canEdit && hr.complete ? 'button' : 'div';
-    const attrs = tag === 'button' ? ` data-act="edit-hole" data-n="${n}" aria-label="Change hole ${n}"` : '';
-    rows += `<${tag} class="mrow${isNow ? ' now' : ''}${!hr.complete && !isNow ? ' later' : ''}"${isNow ? ' id="cur"' : ''}${attrs}><span class="b">${n}</span><span class="p">${a}</span><span class="p">${b}</span><span class="m">${m}</span></${tag}>`;
-    const nextN = gc.order[idx + 1];
-    if (nextN !== undefined && (nextN <= 9) !== (n <= 9)) {
-      const seg = n <= 9 ? 'front' : 'back';
-      rows += `<div class="row" style="background:var(--bg)"><span class="sub">${segName(seg)}</span>${statusPills(gc.matches[seg].status)}</div>`;
-    }
-  });
+  const live = r.status === 'live';
+  /* The two pairs as initials badges, blue v red. */
+  const badges = (t, i) => `<span class="bw-pair">${t.map(pid => `<span class="bw-bd ${i ? 'b' : 'a'}" aria-label="${esc(D.nameOf(pid))}">${esc(initialsOf(D.member(pid)) || D.nameOf(pid).slice(0, 2))}</span>`).join('')}</span>`;
+  /* One result pill per match: the leader's colour, golf wording, "3 up, 4 to play" while it is being played. */
+  const pillOf = m => {
+    const st = m.status;
+    let txt;
+    if (st.state === 'pending') txt = 'Not started';
+    else if (st.state === 'halved') txt = 'Halved';
+    else if (st.state === 'won') txt = m.closed && m.closed.toPlay > 0 ? `Won ${m.closed.up}&${m.closed.toPlay}` : `Won ${Math.abs(m.lead)} up`;
+    else txt = `${m.lead === 0 ? 'AS' : Math.abs(m.lead) + ' up'}, ${st.toPlay} to play`;
+    const cls = st.leader === 'A' ? 'a' : st.leader === 'B' ? 'b' : 'n';
+    const who = st.leader ? `${gc.labels[st.leader === 'A' ? 0 : 1].long} ` : '';
+    return `<span class="bw-res ${cls}" aria-label="${esc(who + txt)}">${txt}</span>`;
+  };
+  /* A nine's holes: each hole is one column, the winner's best points filled in their colour, then holes won. */
+  const board = seg => {
+    const order = gc.matches[seg].order;
+    let wa = 0, wb = 0;
+    const cols = order.map(n => {
+      const hr = gc.holes[n];
+      const isNow = n === gc.nextHole && live;
+      let a = '<span class="bw-c e"></span>', b = '<span class="bw-c e"></span>';
+      if (hr.complete) {
+        const [pa, pb] = hr.best;
+        if (hr.result === 'A') wa++; else if (hr.result === 'B') wb++;
+        a = `<span class="bw-c${hr.result === 'A' ? ' wa' : ''}">${pa}</span>`;
+        b = `<span class="bw-c${hr.result === 'B' ? ' wb' : ''}">${pb}</span>`;
+      }
+      const inner = `<span class="bw-n${isNow ? ' cur' : ''}">${n}</span>${a}${b}`;
+      return canEdit && hr.complete ? `<button class="bw-col" data-act="edit-hole" data-n="${n}" aria-label="Change hole ${n}">${inner}</button>` : `<div class="bw-col">${inner}</div>`;
+    }).join('');
+    return `<div class="bw-board">${cols}<div class="bw-col bw-tot"><span class="bw-n">Holes</span><span class="bw-t a">${wa}</span><span class="bw-t b">${wb}</span></div></div>`;
+  };
+  /* Front and back open to their holes. The nine being played starts open. */
+  const segOf = n => (gc.matches.front.order.includes(n) ? 'front' : 'back');
+  const openDefault = live && gc.nextHole ? segOf(gc.nextHole) : null;
+  const row = seg => {
+    const m = gc.matches[seg];
+    if (seg === 'overall') return `<div class="bw-row"><span class="bw-l">${segName(seg)}</span>${pillOf(m)}<span></span></div>`;
+    const key = `bw-${rid}-${gid}-${seg}`;
+    const open = UI.open[key] === undefined ? openDefault === seg : !!UI.open[key];
+    return `<button class="bw-row" data-act="bwseg" data-key="${key}" data-open="${open ? 1 : 0}" aria-expanded="${open}"><span class="bw-l">${segName(seg)}</span>${pillOf(m)}<span class="chev dn${open ? ' up' : ''}">${chev}</span></button>${open ? board(seg) : ''}`;
+  };
   return {
     html: `      ${!inMatch && groups.length > 1 ? `<div class="seg pills grp">${groups.map(g => `<button class="${g.id === gid ? 'on' : ''}" data-act="mgroup" data-gid="${g.id}" aria-pressed="${g.id === gid}">Group ${g.n}</button>`).join('')}</div>` : ''}
-      ${sec(`${pill(0)}<span class="sub" style="flex:1">${esc(L[0].long)}</span>`, '', true)}
-      <div class="sec-label" style="margin-top:-4px">${pill(1)}<span class="sub" style="flex:1">${esc(L[1].long)}</span></div>
-      ${cardOf(summary)}
-      ${sec('', cardOf(`<div class="mrow cols"><span class="cap">Hole</span><span class="p">${pill(0)}</span><span class="p">${pill(1)}</span><span></span></div>${rows}`), true)}`
+      <div class="bw-vs">${badges(gc.teams[0], 0)}<span class="sub">v</span>${badges(gc.teams[1], 1)}</div>
+      <div class="card bw-card">${['front', 'back', 'overall'].map(row).join('')}</div>`
   };
 }
 
