@@ -1481,3 +1481,27 @@ body { font-variant-numeric: tabular-nums; }
 
 /* Every pill is a true pill, whatever its height (the big Buggy 1 pill had squarer corners than the small ones) */
 .pill, .pill.big { border-radius: 999px; }
+
+/* ----- After Save: one quiet card. Result, then one line per match. ----- */
+.after .hero.pine.entcard { padding: 10px 16px 12px; }
+.after .entn { font-size: 3rem; }
+.after .entr { flex-direction: row; align-items: center; gap: 4px; padding-bottom: 2px; }
+.after .savedchip { font-size: 1rem; }
+.after .entr .undochip { margin: 0; min-height: 44px; padding: 0 10px; background: none; color: #BFD6C8; text-decoration: underline; font-size: .95rem; }
+.aftercard { margin-top: 14px; background: #fff; border: 1px solid #E6E2D8; border-radius: 22px; overflow: hidden; box-shadow: none; }
+.afhead { padding: 16px 18px 14px; }
+.afhead .res { gap: 10px; flex-wrap: nowrap; }
+.afhead .res-t { font-size: 1.45rem; font-weight: 800; letter-spacing: -.02em; }
+.afhead .res-sub { margin: 4px 0 0 24px; font-size: 1rem; color: var(--sub); }
+.afdot { display: inline-block; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--faint); margin-right: 8px; }
+.afhead .afdot { width: 14px; height: 14px; margin: 0; }
+.afdot.a { background: #2457D6; }
+.afdot.b { background: #C73A2E; }
+.afrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 18px; border-top: 1px solid #EFEBE1; }
+.afrow b { display: block; font-size: 1.05rem; font-weight: 700; }
+.afrow small { display: block; font-size: .8rem; color: var(--sub); }
+.afst { text-align: right; }
+.afst .b { display: inline-flex; align-items: center; font-size: 1.05rem; font-weight: 800; }
+.afst .afnote { margin-top: 2px; font-weight: 700; color: var(--pine); }
+.after .btn:not(.quiet) { margin-top: 14px; background: var(--flag); color: #0B3D2C; }
+.after .btn:not(.quiet) small { color: #0B3D2C; opacity: .75; }

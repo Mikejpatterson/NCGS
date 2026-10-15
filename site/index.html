@@ -1491,9 +1491,33 @@ body { font-variant-numeric: tabular-nums; }
 
 /* Every pill is a true pill, whatever its height (the big Buggy 1 pill had squarer corners than the small ones) */
 .pill, .pill.big { border-radius: 999px; }
+
+/* ----- After Save: one quiet card. Result, then one line per match. ----- */
+.after .hero.pine.entcard { padding: 10px 16px 12px; }
+.after .entn { font-size: 3rem; }
+.after .entr { flex-direction: row; align-items: center; gap: 4px; padding-bottom: 2px; }
+.after .savedchip { font-size: 1rem; }
+.after .entr .undochip { margin: 0; min-height: 44px; padding: 0 10px; background: none; color: #BFD6C8; text-decoration: underline; font-size: .95rem; }
+.aftercard { margin-top: 14px; background: #fff; border: 1px solid #E6E2D8; border-radius: 22px; overflow: hidden; box-shadow: none; }
+.afhead { padding: 16px 18px 14px; }
+.afhead .res { gap: 10px; flex-wrap: nowrap; }
+.afhead .res-t { font-size: 1.45rem; font-weight: 800; letter-spacing: -.02em; }
+.afhead .res-sub { margin: 4px 0 0 24px; font-size: 1rem; color: var(--sub); }
+.afdot { display: inline-block; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--faint); margin-right: 8px; }
+.afhead .afdot { width: 14px; height: 14px; margin: 0; }
+.afdot.a { background: #2457D6; }
+.afdot.b { background: #C73A2E; }
+.afrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 18px; border-top: 1px solid #EFEBE1; }
+.afrow b { display: block; font-size: 1.05rem; font-weight: 700; }
+.afrow small { display: block; font-size: .8rem; color: var(--sub); }
+.afst { text-align: right; }
+.afst .b { display: inline-flex; align-items: center; font-size: 1.05rem; font-weight: 800; }
+.afst .afnote { margin-top: 2px; font-weight: 700; color: var(--pine); }
+.after .btn:not(.quiet) { margin-top: 14px; background: var(--flag); color: #0B3D2C; }
+.after .btn:not(.quiet) small { color: #0B3D2C; opacity: .75; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151022","server":"562d6962"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151217","server":"562d6962"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -4247,19 +4271,22 @@ VIEWS.after = () => {
   const buggies = gc.teams.length === 2;
   let head, sub = '';
   if (!buggies) head = `<span class="res-t">Hole ${a.n} saved</span>`;
-  else if (hr.result === 'H') { head = `<span class="pill n big">Halved</span>`; sub = `Both buggies scored ${plural(hr.best[0], 'point')}`; }
+  else if (hr.result === 'H') { head = `<i class="afdot n"></i><span class="res-t">Halved</span>`; sub = `Both buggies scored ${plural(hr.best[0], 'point')}`; }
   else {
     const w = hr.result === 'A' ? 0 : 1;
-    head = `<span class="pill ${w ? 'b' : 'a'} big">Buggy ${w + 1}</span><span class="res-t">won the hole</span>`;
+    head = `<i class="afdot ${w ? 'b' : 'a'}"></i><span class="res-t">Buggy ${w + 1} won the hole</span>`;
     sub = `${who(hr.counting[w])}'s ${plural(hr.best[w], 'point')} beat ${hr.best[1 - w]}`;
   }
+  // One line per match. A note only when something changed hands: someone takes the lead, or it comes back to all square.
   const rows = buggies ? [a.n <= 9 ? 'front' : 'back', 'overall'].map(s => {
     const m = gc.matches[s];
     const was = a.before[s];
-    const changedNow = was.text !== m.status.text && was.text !== 'Not started';
-    return `<div class="row tall chg"><span><div>${segName(s)}</div><div class="cap">${m.remaining ? `${m.remaining} to play` : 'Finished'}</div></span>
-      <span class="stat">${statusPills(m.status)}${changedNow ? `<span class="cap was">Was ${esc(statusShort(was))}</span>` : ''}</span></div>`;
-  }).join('') : gc.teams.flat().map(pid => `<div class="row"><span>${esc(D.nameOf(pid))}</span><span class="b num">${comp.players[pid].total}</span></div>`).join('');
+    const turned = was.text !== 'Not started' && was.leader !== m.status.leader;
+    const note = !turned ? '' : m.status.leader ? `Buggy ${m.status.leader === 'A' ? 1 : 2} ${was.leader ? 'take the lead' : 'go ahead'}` : 'Back to all square';
+    const st = m.status.leader ? `<i class="afdot ${m.status.leader === 'A' ? 'a' : 'b'}"></i>${esc(statusShort(m.status))}` : esc(m.status.text);
+    return `<div class="afrow"><span><b>${segName(s)}</b><small>${m.remaining ? `${m.remaining} to play` : 'Finished'}</small></span>
+      <span class="afst"><span class="b">${st}</span>${note ? `<small class="afnote">${esc(note)}</small>` : ''}</span></div>`;
+  }).join('') : gc.teams.flat().map(pid => `<div class="afrow"><span><b>${esc(D.nameOf(pid))}</b></span><span class="afst"><span class="b num">${comp.players[pid].total}</span></span></div>`).join('');
   let next;
   const nine = a.n <= 9 ? 'front' : 'back';
   if (D.round(a.rid).status === 'live' && nineComplete(gc, nine) && !D.check(a.rid, a.gid, nine)) {
@@ -4270,10 +4297,9 @@ VIEWS.after = () => {
   } else next = `<button class="btn" data-act="to-finish">See the card</button>`;
   return {
     tabs: 'hole',
-    html: `<header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
-      <div class="rescard"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>
-      ${sec('', cardOf(rows))}
-      ${next}${saveWarning()}`
+    html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
+      <div class="aftercard"><div class="afhead"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>${rows}</div>
+      ${next}${saveWarning()}</div>`
   };
 };
 

@@ -130,6 +130,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await page.waitForSelector('[data-act="undo"]');
   t = await text();
   check('after: result and next hole', /Saved/.test(t) && /Hole 16/.test(t));
+  check('after save: one card with the result and one line per match, no Was lines, no pills', (await page.$$('.aftercard .afrow')).length === 2 && !/Was /.test(t) && !(await page.$('.aftercard .pill')));
   await shot('07-after');
   await tap('[data-act="undo"]');
   check('undo returns to the entry with the scores kept', /Save hole 15/.test(await text()));

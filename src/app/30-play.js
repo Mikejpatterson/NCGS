@@ -258,19 +258,22 @@ VIEWS.after = () => {
   const buggies = gc.teams.length === 2;
   let head, sub = '';
   if (!buggies) head = `<span class="res-t">Hole ${a.n} saved</span>`;
-  else if (hr.result === 'H') { head = `<span class="pill n big">Halved</span>`; sub = `Both buggies scored ${plural(hr.best[0], 'point')}`; }
+  else if (hr.result === 'H') { head = `<i class="afdot n"></i><span class="res-t">Halved</span>`; sub = `Both buggies scored ${plural(hr.best[0], 'point')}`; }
   else {
     const w = hr.result === 'A' ? 0 : 1;
-    head = `<span class="pill ${w ? 'b' : 'a'} big">Buggy ${w + 1}</span><span class="res-t">won the hole</span>`;
+    head = `<i class="afdot ${w ? 'b' : 'a'}"></i><span class="res-t">Buggy ${w + 1} won the hole</span>`;
     sub = `${who(hr.counting[w])}'s ${plural(hr.best[w], 'point')} beat ${hr.best[1 - w]}`;
   }
+  // One line per match. A note only when something changed hands: someone takes the lead, or it comes back to all square.
   const rows = buggies ? [a.n <= 9 ? 'front' : 'back', 'overall'].map(s => {
     const m = gc.matches[s];
     const was = a.before[s];
-    const changedNow = was.text !== m.status.text && was.text !== 'Not started';
-    return `<div class="row tall chg"><span><div>${segName(s)}</div><div class="cap">${m.remaining ? `${m.remaining} to play` : 'Finished'}</div></span>
-      <span class="stat">${statusPills(m.status)}${changedNow ? `<span class="cap was">Was ${esc(statusShort(was))}</span>` : ''}</span></div>`;
-  }).join('') : gc.teams.flat().map(pid => `<div class="row"><span>${esc(D.nameOf(pid))}</span><span class="b num">${comp.players[pid].total}</span></div>`).join('');
+    const turned = was.text !== 'Not started' && was.leader !== m.status.leader;
+    const note = !turned ? '' : m.status.leader ? `Buggy ${m.status.leader === 'A' ? 1 : 2} ${was.leader ? 'take the lead' : 'go ahead'}` : 'Back to all square';
+    const st = m.status.leader ? `<i class="afdot ${m.status.leader === 'A' ? 'a' : 'b'}"></i>${esc(statusShort(m.status))}` : esc(m.status.text);
+    return `<div class="afrow"><span><b>${segName(s)}</b><small>${m.remaining ? `${m.remaining} to play` : 'Finished'}</small></span>
+      <span class="afst"><span class="b">${st}</span>${note ? `<small class="afnote">${esc(note)}</small>` : ''}</span></div>`;
+  }).join('') : gc.teams.flat().map(pid => `<div class="afrow"><span><b>${esc(D.nameOf(pid))}</b></span><span class="afst"><span class="b num">${comp.players[pid].total}</span></span></div>`).join('');
   let next;
   const nine = a.n <= 9 ? 'front' : 'back';
   if (D.round(a.rid).status === 'live' && nineComplete(gc, nine) && !D.check(a.rid, a.gid, nine)) {
@@ -281,10 +284,9 @@ VIEWS.after = () => {
   } else next = `<button class="btn" data-act="to-finish">See the card</button>`;
   return {
     tabs: 'hole',
-    html: `<header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
-      <div class="rescard"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>
-      ${sec('', cardOf(rows))}
-      ${next}${saveWarning()}`
+    html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
+      <div class="aftercard"><div class="afhead"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>${rows}</div>
+      ${next}${saveWarning()}</div>`
   };
 };
 
