@@ -1646,13 +1646,15 @@ body { font-variant-numeric: tabular-nums; }
 .bw-row[aria-expanded="true"] .chev.dn, .rg[aria-expanded="true"] .chev.dn { transform: rotate(-90deg); }
 .seg.pills button, .seg.pills.four button { font-size: min(.86rem, 15px); padding: 0 8px; }
 .bw-l { display: inline-flex; align-items: center; gap: 6px; }
-.bw-cup { display: inline-flex; }
-.bw-cup svg { stroke-width: 2.2; }
-.bw-cup.a { color: #0A60C9; }
-.bw-cup.b { color: #C62828; }
+/* The gold cup beside anything won */
+.cupw { display: inline-flex; vertical-align: -3px; margin-left: 6px; flex: none; }
+.bw-l .cupw { margin-left: 0; }
+.ct-won { display: inline-flex; align-items: center; }
+.fin .finname .cupw svg { width: 26px; height: 26px; }
+.fin .finname .cupw { vertical-align: -2px; margin-left: 8px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151715","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610151724","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3090,6 +3092,8 @@ const ICON = {
   plus: svg('<path d="M12 5v14M5 12h14"/>'),
   share: svg('<path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>')
 };
+/* The gold cup: shown beside anything won and decided (a buggy match, a contest, the round). Never for "leading". */
+const CUP = `<span class="cupw" role="img" aria-label="Won"><svg class="cup" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7.5 3.5h9v5.5a4.5 4.5 0 0 1-9 0z" fill="#F0C63F" stroke="#8A6400" stroke-width="1.6" stroke-linejoin="round"/><path d="M7.5 5.5H5v1.5a3 3 0 0 0 3 3M16.5 5.5H19v1.5a3 3 0 0 1-3 3" fill="none" stroke="#8A6400" stroke-width="1.6" stroke-linecap="round"/><path d="M12 13.5v3.8" stroke="#8A6400" stroke-width="1.8"/><path d="M8.5 20.5h7v-2a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1z" fill="#F0C63F" stroke="#8A6400" stroke-width="1.6" stroke-linejoin="round"/></svg></span>`;
 const sized = (icon, n) => icon.replace('<svg', `<svg width="${n}" height="${n}"`);
 const TABICON = {
   home: svg('<path d="M4 11l8-7 8 7v9H4z"/>'),
@@ -3923,7 +3927,7 @@ function resultsBlock(r) {
   }
   const contests = res.contests.filter(c => c.winner !== undefined);
   if (contests.length) {
-    html += sec(label('Contests'), cardOf(contests.map(c => `<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : '<span class="sub">Not awarded</span>'}</div>`).join('')));
+    html += sec(label('Contests'), cardOf(contests.map(c => `<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${c.winner ? `<span class="b ct-won">${esc(D.nameOf(c.winner))}${CUP}</span>` : '<span class="sub">Not awarded</span>'}</div>`).join('')));
   }
   return html;
 }
@@ -3934,7 +3938,7 @@ function finishedCard(r, res) {
   const names = top.map(x => D.nameOf(x.id)).join(' & ');
   const sub = [roundName(r), r.date ? fmtDate(r.date, true) : ''].filter(Boolean).join(' · ');
   return `<div class="fincard"><div class="finrow"><span class="fink">${top.length > 1 ? 'WINNERS' : 'WINNER'}</span><span class="finfinal">Final</span></div>
-    <div class="finwin"><div class="finwho"><b class="finname">${esc(names)}</b><h1 class="finsub">${esc(sub)}</h1></div><b class="finpts">${top[0].total}</b></div></div>`;
+    <div class="finwin"><div class="finwho"><b class="finname">${esc(names)}${CUP}</b><h1 class="finsub">${esc(sub)}</h1></div><b class="finpts">${top[0].total}</b></div></div>`;
 }
 function finishedBody(r, res) {
   const app = res.source === 'app';
@@ -3952,7 +3956,7 @@ function finishedBody(r, res) {
     rows.push(`<button class="row" data-act="toggle" data-key="kb-${r.id}" aria-expanded="${open}"><span>KBs</span><span class="right"><b>${esc(top.map(k => k.name).join(', '))} · ${top[0].total}</b><span class="chev dn${open ? ' up' : ''}">${chev}</span></span></button>`);
     if (open) rows.push(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''));
   }
-  res.contests.filter(c => c.winner !== undefined).forEach(c => rows.push(`<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : '<span class="sub">Not awarded</span>'}</div>`));
+  res.contests.filter(c => c.winner !== undefined).forEach(c => rows.push(`<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${c.winner ? `<span class="b ct-won">${esc(D.nameOf(c.winner))}${CUP}</span>` : '<span class="sub">Not awarded</span>'}</div>`));
   if (rows.length) html += sec(label('KBs and contests'), cardOf(rows.join('')));
   if (app && res.comp) {
     const two = res.comp.groups.filter(g => g.teams.length === 2 && g.teams.every(t => t.length === 2));
@@ -4926,7 +4930,7 @@ function buggyView(rid) {
   const row = seg => {
     const m = gc.matches[seg];
     /* A trophy beside a match once it is won. */
-    const name = `${segName(seg)}${m.status.state === 'won' ? `<span class="bw-cup ${m.status.leader === 'B' ? 'b' : 'a'}" aria-label="won">${sized(ICON.trophy, 18)}</span>` : ''}`;
+    const name = `${segName(seg)}${m.status.state === 'won' ? CUP : ''}`;
     if (seg === 'overall') return `<div class="bw-row"><span class="bw-l">${name}</span>${pillOf(m)}<span></span></div>`;
     const key = `bw-${rid}-${gid}-${seg}`;
     const open = UI.open[key] === undefined ? openDefault === seg : !!UI.open[key];
@@ -5010,7 +5014,7 @@ VIEWS.board = () => {
     html += sec(label('Contests'), cardOf(res.contests.map(c => {
       const st = c.status, tag = !st ? '' : st.confirmed ? '<span class="pill g">Confirmed</span>' : '<span class="pill n">To be confirmed</span>';
       const who = c.winner || (c.lead && c.lead.pid);
-      const right = who ? `<span class="b">${esc(D.nameOf(who))}</span>${tag}` : st && st.confirmed ? `<span class="sub">Nobody</span>${tag}` : `<span class="sub">${st && st.answered ? 'Nobody yet' : 'Not yet played'}</span>${tag}`;
+      const right = who ? (st && st.confirmed ? `<span class="b ct-won">${esc(D.nameOf(who))}${CUP}</span>` : `<span class="b">${esc(D.nameOf(who))}</span>${tag}`) : st && st.confirmed ? `<span class="sub">Nobody</span>${tag}` : `<span class="sub">${st && st.answered ? 'Nobody yet' : 'Not yet played'}</span>${tag}`;
       return `<div class="row crow"><span class="ct-l"><span>${CONTEST[c.type]}</span>${c.hole ? `<span class="sub">Hole ${c.hole}</span>` : ''}</span><span class="ct-r">${right}</span></div>`;
     }).join('')));
     return { tabs: 'board', html };
@@ -5071,7 +5075,7 @@ VIEWS.results = p => {
     moneyRows = Object.keys(money).sort((a, b) => money[b] - money[a]).map(k => `<div class="ln"><span>${esc(k)}</span><span class="b">€${money[k]}</span></div>`).join('');
   }
   const minThru = res.comp ? Math.min(...res.comp.groups.map(g => g.holesDone)) : 18;
-  const contests = res.contests.map(c => `<div class="ln"><span class="sub">${CONTEST[c.type]}${c.hole ? ' ' + c.hole : ''}</span><span>${c.winner ? esc(D.nameOf(c.winner)) : c.lead ? `${esc(D.nameOf(c.lead.pid))} <span class="sub">${c.status && c.status.confirmed ? 'confirmed' : 'to be confirmed'}</span>` : c.status && c.status.confirmed ? 'Nobody' : '–'}</span></div>`).join('');
+  const contests = res.contests.map(c => `<div class="ln"><span class="sub">${CONTEST[c.type]}${c.hole ? ' ' + c.hole : ''}</span><span>${c.winner ? esc(D.nameOf(c.winner)) + ' ' + CUP : c.lead ? `${esc(D.nameOf(c.lead.pid))} <span class="sub">${c.status && c.status.confirmed ? 'confirmed' : 'to be confirmed'}</span>` : c.status && c.status.confirmed ? 'Nobody' : '–'}</span></div>`).join('');
   const kb = E.kbLowest(res.kb).length ? `<div class="blk"><div class="cap">KBs</div>${E.kbLowest(res.kb).map(k => `<div class="ln"><span>${esc(k.name)}</span><span class="b">${k.total}</span></div>`).join('')}</div>` : '';
   const card = `<div class="rcard" id="rcard">
     <div class="top"><div class="cap">${esc(D.society())} · ${esc(roundName(r))}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''} · ${final ? 'Final' : `Thru ${minThru}`}</div><div class="title">${esc(headline)}</div></div>

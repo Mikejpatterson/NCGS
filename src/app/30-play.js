@@ -680,7 +680,7 @@ function buggyView(rid) {
   const row = seg => {
     const m = gc.matches[seg];
     /* A trophy beside a match once it is won. */
-    const name = `${segName(seg)}${m.status.state === 'won' ? `<span class="bw-cup ${m.status.leader === 'B' ? 'b' : 'a'}" aria-label="won">${sized(ICON.trophy, 18)}</span>` : ''}`;
+    const name = `${segName(seg)}${m.status.state === 'won' ? CUP : ''}`;
     if (seg === 'overall') return `<div class="bw-row"><span class="bw-l">${name}</span>${pillOf(m)}<span></span></div>`;
     const key = `bw-${rid}-${gid}-${seg}`;
     const open = UI.open[key] === undefined ? openDefault === seg : !!UI.open[key];
@@ -764,7 +764,7 @@ VIEWS.board = () => {
     html += sec(label('Contests'), cardOf(res.contests.map(c => {
       const st = c.status, tag = !st ? '' : st.confirmed ? '<span class="pill g">Confirmed</span>' : '<span class="pill n">To be confirmed</span>';
       const who = c.winner || (c.lead && c.lead.pid);
-      const right = who ? `<span class="b">${esc(D.nameOf(who))}</span>${tag}` : st && st.confirmed ? `<span class="sub">Nobody</span>${tag}` : `<span class="sub">${st && st.answered ? 'Nobody yet' : 'Not yet played'}</span>${tag}`;
+      const right = who ? (st && st.confirmed ? `<span class="b ct-won">${esc(D.nameOf(who))}${CUP}</span>` : `<span class="b">${esc(D.nameOf(who))}</span>${tag}`) : st && st.confirmed ? `<span class="sub">Nobody</span>${tag}` : `<span class="sub">${st && st.answered ? 'Nobody yet' : 'Not yet played'}</span>${tag}`;
       return `<div class="row crow"><span class="ct-l"><span>${CONTEST[c.type]}</span>${c.hole ? `<span class="sub">Hole ${c.hole}</span>` : ''}</span><span class="ct-r">${right}</span></div>`;
     }).join('')));
     return { tabs: 'board', html };
@@ -825,7 +825,7 @@ VIEWS.results = p => {
     moneyRows = Object.keys(money).sort((a, b) => money[b] - money[a]).map(k => `<div class="ln"><span>${esc(k)}</span><span class="b">€${money[k]}</span></div>`).join('');
   }
   const minThru = res.comp ? Math.min(...res.comp.groups.map(g => g.holesDone)) : 18;
-  const contests = res.contests.map(c => `<div class="ln"><span class="sub">${CONTEST[c.type]}${c.hole ? ' ' + c.hole : ''}</span><span>${c.winner ? esc(D.nameOf(c.winner)) : c.lead ? `${esc(D.nameOf(c.lead.pid))} <span class="sub">${c.status && c.status.confirmed ? 'confirmed' : 'to be confirmed'}</span>` : c.status && c.status.confirmed ? 'Nobody' : '–'}</span></div>`).join('');
+  const contests = res.contests.map(c => `<div class="ln"><span class="sub">${CONTEST[c.type]}${c.hole ? ' ' + c.hole : ''}</span><span>${c.winner ? esc(D.nameOf(c.winner)) + ' ' + CUP : c.lead ? `${esc(D.nameOf(c.lead.pid))} <span class="sub">${c.status && c.status.confirmed ? 'confirmed' : 'to be confirmed'}</span>` : c.status && c.status.confirmed ? 'Nobody' : '–'}</span></div>`).join('');
   const kb = E.kbLowest(res.kb).length ? `<div class="blk"><div class="cap">KBs</div>${E.kbLowest(res.kb).map(k => `<div class="ln"><span>${esc(k.name)}</span><span class="b">${k.total}</span></div>`).join('')}</div>` : '';
   const card = `<div class="rcard" id="rcard">
     <div class="top"><div class="cap">${esc(D.society())} · ${esc(roundName(r))}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''} · ${final ? 'Final' : `Thru ${minThru}`}</div><div class="title">${esc(headline)}</div></div>

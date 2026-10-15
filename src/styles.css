@@ -1636,7 +1636,9 @@ body { font-variant-numeric: tabular-nums; }
 .bw-row[aria-expanded="true"] .chev.dn, .rg[aria-expanded="true"] .chev.dn { transform: rotate(-90deg); }
 .seg.pills button, .seg.pills.four button { font-size: min(.86rem, 15px); padding: 0 8px; }
 .bw-l { display: inline-flex; align-items: center; gap: 6px; }
-.bw-cup { display: inline-flex; }
-.bw-cup svg { stroke-width: 2.2; }
-.bw-cup.a { color: #0A60C9; }
-.bw-cup.b { color: #C62828; }
+/* The gold cup beside anything won */
+.cupw { display: inline-flex; vertical-align: -3px; margin-left: 6px; flex: none; }
+.bw-l .cupw { margin-left: 0; }
+.ct-won { display: inline-flex; align-items: center; }
+.fin .finname .cupw svg { width: 26px; height: 26px; }
+.fin .finname .cupw { vertical-align: -2px; margin-left: 8px; }

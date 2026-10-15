@@ -323,7 +323,7 @@ function resultsBlock(r) {
   }
   const contests = res.contests.filter(c => c.winner !== undefined);
   if (contests.length) {
-    html += sec(label('Contests'), cardOf(contests.map(c => `<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : '<span class="sub">Not awarded</span>'}</div>`).join('')));
+    html += sec(label('Contests'), cardOf(contests.map(c => `<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${c.winner ? `<span class="b ct-won">${esc(D.nameOf(c.winner))}${CUP}</span>` : '<span class="sub">Not awarded</span>'}</div>`).join('')));
   }
   return html;
 }
@@ -334,7 +334,7 @@ function finishedCard(r, res) {
   const names = top.map(x => D.nameOf(x.id)).join(' & ');
   const sub = [roundName(r), r.date ? fmtDate(r.date, true) : ''].filter(Boolean).join(' · ');
   return `<div class="fincard"><div class="finrow"><span class="fink">${top.length > 1 ? 'WINNERS' : 'WINNER'}</span><span class="finfinal">Final</span></div>
-    <div class="finwin"><div class="finwho"><b class="finname">${esc(names)}</b><h1 class="finsub">${esc(sub)}</h1></div><b class="finpts">${top[0].total}</b></div></div>`;
+    <div class="finwin"><div class="finwho"><b class="finname">${esc(names)}${CUP}</b><h1 class="finsub">${esc(sub)}</h1></div><b class="finpts">${top[0].total}</b></div></div>`;
 }
 function finishedBody(r, res) {
   const app = res.source === 'app';
@@ -352,7 +352,7 @@ function finishedBody(r, res) {
     rows.push(`<button class="row" data-act="toggle" data-key="kb-${r.id}" aria-expanded="${open}"><span>KBs</span><span class="right"><b>${esc(top.map(k => k.name).join(', '))} · ${top[0].total}</b><span class="chev dn${open ? ' up' : ''}">${chev}</span></span></button>`);
     if (open) rows.push(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''));
   }
-  res.contests.filter(c => c.winner !== undefined).forEach(c => rows.push(`<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${c.winner ? `<span class="b">${esc(D.nameOf(c.winner))}</span>` : '<span class="sub">Not awarded</span>'}</div>`));
+  res.contests.filter(c => c.winner !== undefined).forEach(c => rows.push(`<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${c.winner ? `<span class="b ct-won">${esc(D.nameOf(c.winner))}${CUP}</span>` : '<span class="sub">Not awarded</span>'}</div>`));
   if (rows.length) html += sec(label('KBs and contests'), cardOf(rows.join('')));
   if (app && res.comp) {
     const two = res.comp.groups.filter(g => g.teams.length === 2 && g.teams.every(t => t.length === 2));

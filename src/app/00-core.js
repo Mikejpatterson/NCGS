@@ -31,6 +31,8 @@ const ICON = {
   plus: svg('<path d="M12 5v14M5 12h14"/>'),
   share: svg('<path d="M12 3v12"/><path d="M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>')
 };
+/* The gold cup: shown beside anything won and decided (a buggy match, a contest, the round). Never for "leading". */
+const CUP = `<span class="cupw" role="img" aria-label="Won"><svg class="cup" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7.5 3.5h9v5.5a4.5 4.5 0 0 1-9 0z" fill="#F0C63F" stroke="#8A6400" stroke-width="1.6" stroke-linejoin="round"/><path d="M7.5 5.5H5v1.5a3 3 0 0 0 3 3M16.5 5.5H19v1.5a3 3 0 0 1-3 3" fill="none" stroke="#8A6400" stroke-width="1.6" stroke-linecap="round"/><path d="M12 13.5v3.8" stroke="#8A6400" stroke-width="1.8"/><path d="M8.5 20.5h7v-2a1 1 0 0 0-1-1h-5a1 1 0 0 0-1 1z" fill="#F0C63F" stroke="#8A6400" stroke-width="1.6" stroke-linejoin="round"/></svg></span>`;
 const sized = (icon, n) => icon.replace('<svg', `<svg width="${n}" height="${n}"`);
 const TABICON = {
   home: svg('<path d="M4 11l8-7 8 7v9H4z"/>'),
