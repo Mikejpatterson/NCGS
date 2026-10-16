@@ -62,7 +62,9 @@ function contestIntro(rid, gc, n) {
   const h = holeOf(rid, n);
   const ld = c.type === 'ld';
   const lead = claimLeader(rid, n, gc.id);
-  return `<div class="scrim intro" data-act="intro-scrim"><div class="sheet introcard" role="dialog" aria-label="${CONTEST[c.type]}, hole ${n}">
+  /* Fade in once. Later redraws (a sync from another phone) must not replay the fade, or the card flickers. */
+  const key = contestKey(rid, gc.id, n), first = UI.introShown !== key; UI.introShown = key;
+  return `<div class="scrim intro${first ? '' : ' still'}" data-act="intro-scrim"><div class="sheet introcard${first ? '' : ' still'}" role="dialog" aria-label="${CONTEST[c.type]}, hole ${n}">
     <span class="introflag">${sized(ICON.flagpin, 34)}</span>
     <div class="introkind">${CONTEST[c.type].toUpperCase()}</div>
     <div class="introhole">Hole ${n}</div>

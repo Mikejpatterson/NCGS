@@ -425,8 +425,7 @@ VIEWS.round = p => {
     if (me && mine) { const gc = computeR(r.id).groups.find(g => g.id === mine.id); lbl = inPlay || gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now'; }
     go = `<button class="go" data-act="play" data-rid="${r.id}">${lbl}</button>`;
   } else if (live) go = `<button class="go" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>`;
-  const backLink = html.slice(html.indexOf('<header class="hero s">') + '<header class="hero s">'.length, html.indexOf('<div class="head">'));
-  html = `${backLink}<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">Stableford</span></div>
+  html = `<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">Stableford</span></div>
     <h1 class="rp-name">${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
   if (playable && me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
 
@@ -440,7 +439,7 @@ VIEWS.round = p => {
   else if (rt === 'kb') html += r.kb && r.kb.length ? `<div class="card rp-kbs">${r.kb.map(pr => `<span class="pk${pr.includes(me) ? ' me' : ''}">${pairNames(pr)}</span>`).join('')}</div>` : quiet(E.kbOff(r) ? 'No KBs in this round' : 'KB pairs are not drawn yet');
   else if (rt === 'weather') html += forecast(r, true) || quiet(r.date ? 'The forecast appears in the 9 days before the round.' : 'The forecast appears once the round has a date.');
   else html += roundCourse(r, c, tee, holes);
-  return { html };
+  return { html, tabs: 'home' };
 };
 
 /* Names joined so a line only breaks after the "&", never inside a name. */

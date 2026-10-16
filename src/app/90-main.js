@@ -496,6 +496,17 @@ function render() {
   tabs.classList.toggle('under', !!app.querySelector('.scrim, .full'));
   if (showTabs) document.documentElement.style.setProperty('--tabh', (tabs.offsetHeight + parseFloat(getComputedStyle(tabs).bottom || 0) || tabs.offsetHeight) + 'px');
   sizeAsk();
+  /* The Hole tab names the hole this player's group is on: "Hole 3", or "Card" once all 18 are in. */
+  if (showTabs) {
+    let lbl = 'Hole';
+    try {
+      const rid = playRid() || liveRid(), mine = rid && myGroup(rid), comp = mine && computeR(rid);
+      const gc = comp && comp.groups.find(g => g.id === mine.id);
+      if (gc) lbl = gc.nextHole ? `Hole ${gc.nextHole}` : 'Card';
+    } catch (e) { /* keep "Hole" */ }
+    const span = tabs.querySelector('.tab[data-tab="hole"] span');
+    if (span && span.textContent !== lbl) span.textContent = lbl;
+  }
   tabs.querySelectorAll('.tab').forEach(b => {
     const on = b.dataset.tab === out.tabs;
     b.classList.toggle('on', on);
