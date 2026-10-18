@@ -1,0 +1,38 @@
+name: NCGS Claude Design Task
+
+# Explicit manual dispatch only. Workflow stays on the design branch,
+# avoiding comment-driven triggers or unreviewed production writes.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+  id-token: write
+  actions: read
+
+jobs:
+  design:
+    if: github.ref_name == 'design/crest-editorial-prototype'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout design branch
+        uses: actions/checkout@v4
+        with:
+          ref: design/crest-editorial-prototype
+          fetch-depth: 0
+
+      - name: Claude Code implementation
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            Implement the next small, testable iteration of the approved NCGS three-screen visual redesign.
+            Read CLAUDE.md and docs/EDITORIAL-PROTOTYPE.md. Do not touch main or deploy.
+            Start by auditing the real DOM and styles. Focus on Home, Score Entry pine-green header balance,
+            and Buggy Wars. Keep all scoring behaviour intact. Run available tests and build,
+            report evidence and risks. Commit changes only to the existing design branch.
+          claude_args: |
+            --max-turns 18
