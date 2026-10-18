@@ -1,6 +1,10 @@
 name: NCGS Two-Agent Handoff Test
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/two-agent-handoff-test.yml'
 
 permissions:
   contents: read
