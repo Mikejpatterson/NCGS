@@ -1,0 +1,25 @@
+name: NCGS Independent OpenAI Review
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  review:
+    if: github.ref_name == 'design/crest-editorial-prototype'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout design branch
+        uses: actions/checkout@v4
+        with:
+          ref: design/crest-editorial-prototype
+          persist-credentials: false
+      - name: Generate independent bounded review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          OPENAI_REVIEW_MODEL: gpt-5-mini
+        run: python3 tools/openai_design_review.py
