@@ -14,7 +14,7 @@ const NAMES = {
   'mike-f': 'Ivor', derek: 'Jarlath', brian: 'Kevin', kieran: 'Lorcan'
 };
 const ids = Object.keys(NAMES);
-const members = ids.map((id, i) => ({ id, name: NAMES[id], full: NAMES[id] + ' Fixture', index: +(4.2 + i * 2.3).toFixed(1), active: true }));
+const members = ids.map((id, i) => ({ id, name: NAMES[id], full: NAMES[id] + ' Fixture', index: +(12 + i * 1.5).toFixed(1), active: true }));
 members.push({ id: 'guest-x', name: 'Ultan', full: 'Ultan Fixture', index: 18.4, active: false });
 
 const c = CFG.course;
