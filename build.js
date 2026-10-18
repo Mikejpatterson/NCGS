@@ -18,7 +18,7 @@ const version = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
 
 const appFiles = fs.readdirSync(path.join(__dirname, 'src/app')).filter(f => f.endsWith('.js')).sort();
 const appJs = `(function () {\n'use strict';\n${appFiles.map(f => `/* ---- ${f} ---- */\n${read('src/app/' + f)}`).join('\n')}\n})();`;
-const css = read('src/styles.css');
+const css = read('src/styles.css') + (process.env.NCGS_DESIGN === 'editorial' ? '\n/* NCGS editorial prototype */\n' + read('src/editorial-prototype.css') : '');
 const engine = read('src/engine.js');
 const serverBuild = require('crypto').createHash('sha1').update(read('src/server.js')).digest('hex').slice(0, 8);
 const server = read('src/server.js').replace(/__BUILD__/g, serverBuild);
