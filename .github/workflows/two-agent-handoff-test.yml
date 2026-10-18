@@ -38,6 +38,10 @@ jobs:
         with:
           ref: design/crest-editorial-prototype
           persist-credentials: false
+      - name: Check Anthropic model API
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python3 tools/anthropic-api-smoke.py
       - name: Claude responds to latest OpenAI review
         uses: anthropics/claude-code-action@v1
         with:
