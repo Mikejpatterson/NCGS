@@ -1706,9 +1706,13 @@ body { font-variant-numeric: tabular-nums; }
 /* Ruling: mic A, a chunky mic filling the yellow circle, with a soft gold halo */
 .ah-mic { width: 92px !important; height: 92px !important; background: var(--flag); color: var(--pine); box-shadow: 0 0 0 6px rgba(240, 198, 63, .22), 0 0 0 12px rgba(240, 198, 63, .10) !important; }
 .ah-mic svg { width: 58px !important; height: 58px !important; }
+
+/* "scores to go": a solid white pill on a plain strip, so scores never show through it or scroll into the gap above the tab bar */
+#app:not(.no-tabs) .entry .savebar { box-shadow: 0 40px 0 0 var(--bg), 0 80px 0 0 var(--bg), 0 120px 0 0 var(--bg), 0 160px 0 0 var(--bg) !important; background: linear-gradient(to top, var(--bg) 78%, rgba(250, 249, 244, 0)) !important; }
+.savebar .btn.quiet { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; text-shadow: none; box-shadow: 0 0 0 1px rgba(20, 35, 27, .12); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610160549","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610180846","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
