@@ -17,7 +17,13 @@
   --green: #167A41;
   --green-soft: #DDF1E4;
   --flag: #F6C515;
-  --blue: #0B5FD0;
+  /* Team colours: Buggy 1 and Buggy 2 everywhere (pills, dots, hole cards, Buggy Wars). Red for errors stays --red. */
+  --team-a: #0A60C9;
+  --team-b: #C62828;
+  --team-a-soft: rgba(10, 96, 201, .13);
+  --team-b-soft: rgba(198, 40, 40, .13);
+  /* Display type for the brand and a few big titles (the editorial trial swaps this for a serif) */
+  --font-display: var(--font);
   --red: #CF2A2A;
   --amber-soft: #FFEFC2;
   --amber: #7A4300;
@@ -49,8 +55,8 @@ h1, h2, p { margin: 0; }
 .cap { font-size: var(--t-cap); color: var(--sub); }
 .b { font-weight: 600; }
 .tab-num, .num { font-variant-numeric: tabular-nums; }
-.c-a { color: var(--blue); }
-.c-b { color: var(--red); }
+.c-a { color: var(--team-a); }
+.c-b { color: var(--team-b); }
 .c-g { color: var(--green); }
 
 /* Header */
@@ -77,14 +83,14 @@ button.row:active, button.mrow:active, button.lrow:active { background: var(--fi
 
 /* The one pill */
 .pill { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 12px; font-size: var(--t-cap); font-weight: 600; line-height: 1; white-space: nowrap; }
-.pill.a { background: var(--blue); color: #fff; }
-.pill.b { background: var(--red); color: #fff; }
+.pill.a { background: var(--team-a); color: #fff; }
+.pill.b { background: var(--team-b); color: #fff; }
 .pill.n { background: var(--fill); color: var(--text); }
 .pill.w { background: var(--amber-soft); color: var(--amber); }
 .pill.g { background: var(--green-soft); color: #155C2D; }
 .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
-.dot.a { background: var(--blue); }
-.dot.b { background: var(--red); }
+.dot.a { background: var(--team-a); }
+.dot.b { background: var(--team-b); }
 
 /* Shot dots: counted, not colour-coded */
 .dots { display: inline-flex; gap: 5px; align-items: center; }
@@ -160,8 +166,8 @@ button.row:active, button.mrow:active, button.lrow:active { background: var(--fi
 .mrow.now { background: var(--green-soft); }
 .mrow.later { color: var(--faint); }
 .ppts { display: inline-flex; align-items: center; justify-content: center; min-width: 32px; height: 28px; border-radius: 14px; }
-.ppts.a { background: var(--blue); color: #fff; font-weight: 600; }
-.ppts.b { background: var(--red); color: #fff; font-weight: 600; }
+.ppts.a { background: var(--team-a); color: #fff; font-weight: 600; }
+.ppts.b { background: var(--team-b); color: #fff; font-weight: 600; }
 .ppts.lose { color: var(--sub); }
 
 /* Leaderboard */
@@ -556,8 +562,8 @@ html, body { background: var(--bg); }
 .ct-l { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ct-r { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; white-space: nowrap; }
 body { min-height: 100vh; }
-.pill.a.soft { background: rgba(11, 95, 208, .13); color: var(--blue); }
-.pill.b.soft { background: rgba(207, 42, 42, .13); color: var(--red); }
+.pill.a.soft { background: var(--team-a-soft); color: var(--team-a); }
+.pill.b.soft { background: var(--team-b-soft); color: var(--team-b); }
 .row .right { display: flex; align-items: center; gap: 6px; }
 .tee .sec { margin-top: 12px; } .tee .sec-label { min-height: 22px; margin-bottom: 4px; } .tee .row, .tee .drop { min-height: 42px; }
 
@@ -1447,8 +1453,8 @@ body { font-variant-numeric: tabular-nums; }
 .entcard .prog { margin-top: 8px; }
 .entry .bugs { --tc: rgba(20, 35, 27, .14); container-type: inline-size; margin-top: 12px; background: #fff; border: 2px solid var(--tc); border-radius: 22px; overflow: hidden; }
 .entry .bugs.b0 { border-width: 1px; }
-.entry .bugs.b1 { --tc: #2457D6; }
-.entry .bugs.b2 { --tc: #C73A2E; }
+.entry .bugs.b1 { --tc: var(--team-a); }
+.entry .bugs.b2 { --tc: var(--team-b); }
 .entry .bugs + .tiles { margin-top: 10px; }
 .entry .bugs .pr.ptile { display: grid; grid-template-columns: minmax(0, 1fr) 48px 64px 48px; grid-template-areas: "nm dn sc up" "pu dn sc up"; align-items: center; column-gap: 6px; row-gap: 0; min-height: 0; margin: 0; padding: 6px 10px 6px 14px; border: 0; border-radius: 0; background: none; box-shadow: none; }
 .entry .bugs .ptile ~ .ptile { border-top: 1px solid rgba(20, 35, 27, .08); }
@@ -1495,8 +1501,8 @@ body { font-variant-numeric: tabular-nums; }
 .afhead .res-sub { margin: 4px 0 0 24px; font-size: 1rem; color: var(--sub); }
 .afdot { display: inline-block; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--faint); margin-right: 8px; }
 .afhead .afdot { width: 14px; height: 14px; margin: 0; }
-.afdot.a { background: #2457D6; }
-.afdot.b { background: #C73A2E; }
+.afdot.a { background: var(--team-a); }
+.afdot.b { background: var(--team-b); }
 .afrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 18px; border-top: 1px solid #EFEBE1; }
 .afrow b { display: block; font-size: 1.05rem; font-weight: 700; }
 .afrow small { display: block; font-size: .8rem; color: var(--sub); }
@@ -1593,8 +1599,8 @@ body { font-variant-numeric: tabular-nums; }
 .rg .chev svg { width: 14px; height: 14px; }
 .rg-open { border-top: .5px solid var(--line); background: var(--bg); }
 .pb, .pr, .pk { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 36px; padding: 3px 8px; border-radius: 18px; border: 2px solid; font-size: .82rem; font-weight: 600; line-height: 1.15; background: #fff; min-width: 0; color: var(--text); }
-.pb { border-color: #0A60C9; }
-.pr { border-color: #C62828; }
+.pb { border-color: var(--team-a); }
+.pr { border-color: var(--team-b); }
 .pk { border-color: #C9D2CC; }
 .pk.me { background: #FFF3C4; border-color: #E2B92F; }
 .pk.wide { grid-column: span 2; }
@@ -1605,14 +1611,14 @@ body { font-variant-numeric: tabular-nums; }
 .bw-vs { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 4px 0 12px; }
 .bw-pair { display: inline-flex; gap: 4px; }
 .bw-bd { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: .7rem; font-weight: 800; letter-spacing: .02em; }
-.bw-bd.a { background: #0A60C9; }
-.bw-bd.b { background: #C62828; }
+.bw-bd.a { background: var(--team-a); }
+.bw-bd.b { background: var(--team-b); }
 .bw-card .bw-row { display: grid; grid-template-columns: minmax(0, 1fr) min(10.5rem, 168px) 16px; gap: 10px; align-items: center; width: 100%; min-height: 56px; padding: 8px 16px; text-align: left; }
 .bw-card .bw-row + .bw-row, .bw-card .bw-board + .bw-row { border-top: .5px solid var(--line); }
 .bw-l { font-size: var(--t-body); font-weight: 600; }
 .bw-res { display: flex; align-items: center; justify-content: center; text-align: center; min-height: 34px; padding: 2px 10px; border-radius: 17px; color: #fff; font-size: .9rem; font-weight: 800; line-height: 1.15; font-variant-numeric: tabular-nums; }
-.bw-res.a { background: #0A60C9; }
-.bw-res.b { background: #C62828; }
+.bw-res.a { background: var(--team-a); }
+.bw-res.b { background: var(--team-b); }
 .bw-res.n { background: var(--press); color: var(--text); }
 .bw-row .chev svg { width: 16px; height: 16px; }
 .bw-board { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)) minmax(2.6rem, auto); gap: 3px; padding: 2px 12px 12px; }
@@ -1621,12 +1627,12 @@ body { font-variant-numeric: tabular-nums; }
 .bw-n.cur { background: #FFF3C4; color: var(--pine); }
 .bw-c, .bw-t { height: 28px; border-radius: 7px; display: flex; align-items: center; justify-content: center; font-size: .8rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .bw-c { background: #F1F3F1; color: var(--sub); }
-.bw-c.wa { background: #0A60C9; color: #fff; font-weight: 800; }
-.bw-c.wb { background: #C62828; color: #fff; font-weight: 800; }
+.bw-c.wa { background: var(--team-a); color: #fff; font-weight: 800; }
+.bw-c.wb { background: var(--team-b); color: #fff; font-weight: 800; }
 .bw-c.e { background: none; box-shadow: inset 0 0 0 1px var(--line); }
 .bw-t { background: #fff; font-weight: 800; font-size: .88rem; }
-.bw-t.a { color: #0A60C9; box-shadow: inset 0 0 0 2px #0A60C9; }
-.bw-t.b { color: #C62828; box-shadow: inset 0 0 0 2px #C62828; }
+.bw-t.a { color: var(--team-a); box-shadow: inset 0 0 0 2px var(--team-a); }
+.bw-t.b { color: var(--team-b); box-shadow: inset 0 0 0 2px var(--team-b); }
 .bw-tot .bw-n { font-size: .62rem; }
 /* Tabs size to their words, so "Buggy Wars" stays on one line; with very large text they move onto a second row */
 .seg.pills, .seg.pills.four { flex-wrap: wrap; }
@@ -1696,3 +1702,6 @@ body { font-variant-numeric: tabular-nums; }
 /* Ruling: mic A, a chunky mic filling the yellow circle, with a soft gold halo */
 .ah-mic { width: 92px !important; height: 92px !important; background: var(--flag); color: var(--pine); box-shadow: 0 0 0 6px rgba(240, 198, 63, .22), 0 0 0 12px rgba(240, 198, 63, .10) !important; }
 .ah-mic svg { width: 58px !important; height: 58px !important; }
+
+/* Display type: only the brand name, the Home round name and the round page title. Names, numbers and controls stay in the system font. */
+.hero.home .wordmark, .hero.home .now-name, .rp-name { font-family: var(--font-display); }
