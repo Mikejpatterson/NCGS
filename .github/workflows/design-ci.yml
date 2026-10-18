@@ -1,0 +1,52 @@
+name: Design branch checks
+# Tests and screenshots for the editorial design trial. No secrets, no deploy, read-only.
+on:
+  push:
+    branches: [design/crest-editorial-prototype]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: design-ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  checks:
+    if: github.ref_name == 'design/crest-editorial-prototype'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Guard - no scoring, storage, sync, data or published-site changes
+        run: sh tools/guard.sh origin/main
+      - name: Engine and server tests
+        run: node --test test/engine.test.js test/server.test.js test/fuzz.engine.test.js test/fuzz.server.test.js
+      - name: Fixture data is invented and up to date
+        run: node tools/make-fixture.js && git diff --exit-code data/fixture-seed.json
+      - name: Install browser
+        run: npm install --no-save --no-package-lock playwright@1.56.1 && npx playwright install --with-deps chromium
+      - name: Build the standard and editorial previews from fixture data
+        run: |
+          NCGS_FIXTURE=1 node build.js && cp dist/preview.html dist/standard.html
+          NCGS_FIXTURE=1 NCGS_DESIGN=editorial node build.js && cp dist/preview.html dist/editorial.html
+          test ! -e dist/site && test ! -e dist/server.js
+      - name: Layout - standard and editorial at 360, 390 and 135% text
+        run: |
+          python3 -m http.server 8765 -d dist > /dev/null 2>&1 &
+          sleep 1
+          cp dist/standard.html dist/preview.html && node test/layout.run.js
+          cp dist/editorial.html dist/preview.html && node test/layout.run.js
+      - name: Same controls and words in both looks; screenshots
+        run: node test/design.run.js dist/standard.html dist/editorial.html test/shots/design
+      - name: Keep the screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: design-screenshots
+          path: test/shots/design
+          retention-days: 14

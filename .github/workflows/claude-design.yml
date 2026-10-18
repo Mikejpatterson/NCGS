@@ -2,6 +2,7 @@ name: NCGS Claude Design Task
 
 # Explicit manual dispatch only. Workflow stays on the design branch,
 # avoiding comment-driven triggers or unreviewed production writes.
+# (No push trigger: editing this file or the design notes must not start an unattended run.)
 on:
   workflow_dispatch:
 
