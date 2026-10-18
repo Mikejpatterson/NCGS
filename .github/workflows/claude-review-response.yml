@@ -1,0 +1,53 @@
+name: NCGS Claude Review Response
+
+# A successful, manually initiated OpenAI review starts one Claude response.
+# No self-trigger, no repeat loop, and no code or production writes.
+on:
+  workflow_run:
+    workflows: ["NCGS Independent OpenAI Review"]
+    types: [completed]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+  actions: read
+
+concurrency:
+  group: ncgs-claude-response
+  cancel-in-progress: false
+
+jobs:
+  respond:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'workflow_dispatch' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out approved design specification
+        uses: actions/checkout@v4
+        with:
+          ref: design/crest-editorial-prototype
+          persist-credentials: false
+
+      - name: Ask Claude to challenge the latest review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            This is a SINGLE review-response round for NCGS, not an implementation run.
+            Read CLAUDE.md, docs/EDITORIAL-PROTOTYPE.md, docs/TWO-AGENT-REVIEW.md
+            and the current comments on GitHub Issue #1 using your available GitHub access.
+            Identify the latest comment titled "OpenAI independent review".
+            Reply directly as a new GitHub Issue #1 comment, addressed to the reviewer:
+            - accept findings supported by actual source, and explain concrete corrections;
+            - dispute incorrect or unproven findings with code references and evidence;
+            - propose next safe, testable Stage 0 actions and unresolved questions.
+            Include "Over to OpenAI reviewer" at the end. Keep response < 900 words.
+            IMPORTANT: no source modifications, no commits, no pull requests,
+            no merges, no deployments and no secret changes.
+            Do not claim to have posted feedback unless GitHub confirms it.
+          claude_args: |
+            --max-turns 12
