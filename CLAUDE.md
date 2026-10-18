@@ -16,3 +16,19 @@
 - When asking them to do something by hand (Google Drive, Apps Script, GitHub and so on), give ONE step at a time, say exactly what they should see on screen, and wait for their reply before the next step. Ask for a screenshot when that is quicker than describing.
 - Do not guess facts about their situation (which round is real, what is live). Check, or ask.
 - Keep replies short and plain. Own mistakes briefly and carry on.
+
+
+# Approved editorial-design project (design branch only)
+
+Read `docs/EDITORIAL-PROTOTYPE.md` and `docs/AI-COLLABORATION.md`. The existing functional and data-safety rules above take precedence.
+
+- Scope: Home, Hole/Score Entry and Buggy Wars aesthetics, **not** rules, storage or gameplay.
+- Palette: forest/pine green #0B3D2E, warm ivory #FAF8F3, extremely limited flat champagne gold #D4B483 in crest only or award accents, Buggy Wars deep navy #244A78 and crimson #9B3443.
+- Use contemporary serif selectively for brand and editorial display titles; system sans for interaction, navigation, player names and scoring. Preserve floating Liquid Glass pill navigation and generous phone touch targets.
+- No golf-course photos, decorative ornamental motifs, fake metallic shine or luxury-brand effects.
+- Approved crest: ivory serif NCGS and underline, double thin champagne-gold ring on pine green. **Do not** improvise a new production crest from a mockup; mark blocked pending accurate vector artwork if necessary.
+- Known design defect: Hole screen pine-green header overloaded on left and underuses right side; redistribute hole/par/SI hierarchy intentionally, without centring everything arbitrarily.
+- Only work on `design/crest-editorial-prototype`. Do not commit to `main`, merge, deploy, or alter production integrations, data or secrets.
+- Keep optional `NCGS_DESIGN=editorial` prototype isolated. Audit selectors: first-pass CSS needs checking against actual DOM.
+- Test with `node --test test/engine.test.js test/server.test.js`, layout suite if available, standard build and opt-in design build. Include truthful pass/fail evidence and screenshots if available.
+- Stop for the owner's approval before any production merge.
