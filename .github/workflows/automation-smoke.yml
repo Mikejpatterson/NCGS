@@ -1,0 +1,29 @@
+name: NCGS Automation Smoke Test
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify both API credentials are present
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          test -n "$OPENAI_API_KEY" && test -n "$ANTHROPIC_API_KEY"
+          echo "Both credentials are configured; no credentials printed"
+      - name: Record smoke test in joint issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api repos/${{ github.repository }}/issues/1/comments -f body="## Automation health check
+          
+          **Status:** GitHub Actions workflow execution and credential presence verified.
+          **Note:** This does not verify successful model calls or autonomous review round trips.
+          **Next:** orchestrator integration test; no production files changed."
