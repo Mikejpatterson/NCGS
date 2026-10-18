@@ -1,0 +1,62 @@
+/* NCGS editorial prototype — opt-in visual study, not part of main.
+   Core UI behaviours, tab geometry and scoring layout stay unchanged. */
+:root {
+  --brand-pine: #0B3D2E;
+  --brand-ivory: #FAF8F3;
+  --brand-gold: #D4B483;
+  --buggy-navy: #244A78;
+  --buggy-crimson: #9B3443;
+  --editorial: Georgia, "Iowan Old Style", "Baskerville", "Times New Roman", serif;
+  --ring: 0 0 0 1px rgba(20,35,27,.085);
+  --lift: 0 1px 3px rgba(20,35,27,.07);
+}
+body { background:var(--brand-ivory); }
+.hero.home .wordmark,
+.hero.s .title,
+.rp-name,
+.now-name,
+.fin .finname { font-family: var(--editorial); font-weight: 600; letter-spacing: -.025em; }
+.hero.home .wordmark { font-size: 1.58rem; }
+.hero.home .now-name { font-size: 2.03rem; line-height: 1.12; }
+.hero.s .title { font-weight: 600; line-height: 1.12; }
+.rp-name { font-weight: 600; }
+.hero.home .now, .hero.pine { background:var(--brand-pine); }
+.card,.tile,.gcard,.kbcard,.aftercard { border-radius:18px; box-shadow:var(--ring); }
+.now, .hero.pine { border-radius:22px; }
+.go,.btn,.rp-go .go,.after .btn:not(.quiet) {
+  background: var(--brand-pine);
+  color:#fff;
+  border-radius:15px;
+  box-shadow:none;
+  font-weight:650;
+}
+.hero.pine .go,.hero.pine .btn,.hero.home .go {
+  background: #FFFFFF;
+  color: var(--brand-pine);
+}
+.hero.home .now-kind,.rp-kind,.hero.pine .fact b {
+  color:#F1DEB6;
+}
+.entry .bugs { border-radius:18px; }
+.entry .bugs.b1 { --tc:var(--buggy-navy); }
+.entry .bugs.b2 { --tc:var(--buggy-crimson); }
+.entry .bugs .pr-top .nm { font-weight:700; }
+.entry .bugs .stv b { font-weight:750; }
+.entry .bugs .st[data-dir="up"] { background:var(--brand-pine); }
+.bw-bd.a,.bw-res.a,.bw-c.wa { background:var(--buggy-navy); }
+.bw-bd.b,.bw-res.b,.bw-c.wb { background:var(--buggy-crimson); }
+.bw-t.a { color:var(--buggy-navy);box-shadow: inset 0 0 0 2px var(--buggy-navy); }
+.bw-t.b { color:var(--buggy-crimson);box-shadow: inset 0 0 0 2px var(--buggy-crimson); }
+.pill.a { background:var(--buggy-navy); }
+.pill.b { background:var(--buggy-crimson); }
+.ppts.a { background:var(--buggy-navy); }
+.ppts.b { background:var(--buggy-crimson); }
+.dot.a { background:var(--buggy-navy); }
+.dot.b { background:var(--buggy-crimson); }
+.after .afdot.a { background:var(--buggy-navy); }
+.after .afdot.b { background:var(--buggy-crimson); }
+.hero.home .now-acts .go { background:#FFFFFF;color:var(--brand-pine); }
+.rp-go .go { background:#FFFFFF;color:var(--brand-pine); }
+.after .btn:not(.quiet) { background:var(--brand-pine);color:#FFFFFF; }
+.after .btn:not(.quiet) small {color:#E5EEE8;}
+/* The existing floating glass capsule navigation is intentionally preserved. */
