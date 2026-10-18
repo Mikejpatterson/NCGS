@@ -4,12 +4,6 @@ name: NCGS Claude Design Task
 # avoiding comment-driven triggers or unreviewed production writes.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - design/crest-editorial-prototype
-    paths:
-      - '.github/workflows/claude-design.yml'
-      - 'docs/EDITORIAL-PROTOTYPE.md'
 
 permissions:
   contents: write
