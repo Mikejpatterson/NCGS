@@ -10,7 +10,7 @@ const scenarios = [
   ['home', async p => {}],
   ['who', async p => { await clickAny(p, '[data-act="who"]'); }],
   ['rounds', async p => { await clickAny(p, '[data-act="rounds"]'); }],
-  ['round-rio', async p => { await clickAny(p, '[data-act="rounds"]'); await clickAny(p, '[data-act="round"][data-rid="2026-rio-real"]'); }],
+  ['round-past', async p => { await clickAny(p, '[data-act="rounds"]'); await clickAny(p, '[data-act="round"][data-rid]'); }],
   ['round-players', async p => { await clickAny(p, '.now [data-act="round"]'); }],
   ['round-groups', async p => { await clickAny(p, '.now [data-act="round"]'); await clickAny(p, '[data-act="rtab"][data-t="groups"]'); }],
   ['round-group-open', async p => { await clickAny(p, '.now [data-act="round"]'); await clickAny(p, '[data-act="rtab"][data-t="groups"]'); await clickAny(p, '.rg'); }],
