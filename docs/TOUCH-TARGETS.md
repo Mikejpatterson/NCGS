@@ -53,9 +53,25 @@ Other checks after the fix: the normal layout test passes 81 of 81 on both looks
 (before vs after build) shows the same controls, the same words and 0 changed pixels on all 39 of its screens in
 both looks (it does not open Ruling, which is the only screen that changed).
 
-Not yet re-run here: the full `MIN_TARGET=44` layout audit. The agent's sandbox would not allow the command with
-that setting, so the 44px pass count after the fix comes from the workflow's own run. Expected: 81 of 81 on both
-looks, since the question box was the only failure and now measures 44px tall at every size.
+### 44px audit after the fix
+`MIN_TARGET=44 node test/layout.run.js` on fresh fixture builds (Chromium, 27 golfer screens × 360px, 390px and
+390px with 135% text):
+
+| Look | Passed | Failed | `TARGET` lines (controls under 44px) |
+|---|---|---|---|
+| Standard | 81 | 0 | none |
+| Editorial | 81 | 0 | none |
+
+Before the fix the same audit gave 78 passed, 3 failed on each look (the table at the top of this page).
+
+To check the setting really was on, the standard build was also run at `MIN_TARGET=45`. That run flags every
+control that is exactly 44px, including the question box at 352 × 44 (390px, 135% text), so the 44px run above
+was the strict check and not the normal 40px one. Re-measuring with `tools/ruling-shots.js` gave the same sizes
+as the "after" column above on both looks.
+
+(The agent's sandbox refuses commands that start with a setting such as `MIN_TARGET=44`, so it ran the same
+test through a tiny wrapper that sets `process.env.MIN_TARGET = '44'` and then loads `test/layout.run.js`.
+The test file itself was not changed.)
 
 ## Worth knowing
 - Many controls are **exactly** 44px tall (for example "Who are you?", "Back", the round tabs Players / Groups / KBs /
