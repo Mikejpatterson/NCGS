@@ -25,6 +25,38 @@ Standard look: 78 of 81 screen checks pass. Editorial look: the same 78 of 81. B
 
 Every other control on the 27 screens is at least 44 × 44px in both looks, including the tab bar.
 
+## Fix: Ruling question box (issue #1, after the audit above)
+One CSS value changed in `src/styles.css`: the question box's smallest height went from 28px to 44px
+(`.askbar textarea { … min-height: 44px; … }`). It still grows as you type, because the height the app sets while
+you type is only ever larger. Nothing else changed: same text, focus, typing, send button and place on the page.
+
+Measured with `node tools/ruling-shots.js <build> <tag> docs/ruling-shots` (fixture builds, Chromium, no animation):
+
+| Look | Size | Before (empty box) | After (empty box) | Long question, before → after |
+|---|---|---|---|---|
+| Standard | 360px | 322 × 36 | 322 × 44 | 82 → 82 tall |
+| Standard | 390px | 352 × 36 | 352 × 44 | 82 → 82 tall |
+| Standard | 390px, 135% text | 352 × 42 | 352 × 44 | 100 → 100 tall |
+| Editorial | 360px | 322 × 36 | 322 × 44 | 82 → 82 tall |
+| Editorial | 390px | 352 × 36 | 352 × 44 | 82 → 82 tall |
+| Editorial | 390px, 135% text | 352 × 42 | 352 × 44 | 100 → 100 tall |
+
+Screenshots (empty Ruling screen), before / after:
+- Standard 360: [before](ruling-shots/ruling-std-before-360.png) / [after](ruling-shots/ruling-std-after-360.png)
+- Standard 390: [before](ruling-shots/ruling-std-before-390.png) / [after](ruling-shots/ruling-std-after-390.png)
+- Standard 390 at 135%: [before](ruling-shots/ruling-std-before-390-135.png) / [after](ruling-shots/ruling-std-after-390-135.png)
+- Editorial 360: [before](ruling-shots/ruling-ed-before-360.png) / [after](ruling-shots/ruling-ed-after-360.png)
+- Editorial 390: [before](ruling-shots/ruling-ed-before-390.png) / [after](ruling-shots/ruling-ed-after-390.png)
+- Editorial 390 at 135%: [before](ruling-shots/ruling-ed-before-390-135.png) / [after](ruling-shots/ruling-ed-after-390-135.png)
+
+Other checks after the fix: the normal layout test passes 81 of 81 on both looks, and the design comparison
+(before vs after build) shows the same controls, the same words and 0 changed pixels on all 39 of its screens in
+both looks (it does not open Ruling, which is the only screen that changed).
+
+Not yet re-run here: the full `MIN_TARGET=44` layout audit. The agent's sandbox would not allow the command with
+that setting, so the 44px pass count after the fix comes from the workflow's own run. Expected: 81 of 81 on both
+looks, since the question box was the only failure and now measures 44px tall at every size.
+
 ## Worth knowing
 - Many controls are **exactly** 44px tall (for example "Who are you?", "Back", the round tabs Players / Groups / KBs /
   Weather / Course). They pass, but with no margin: a later style change that trims a pixel would make them fail.
