@@ -125,7 +125,12 @@ English sentence the owner (not a developer) can understand: what you did and wh
     return p
 
 
+UNFINISHED = False   # set when Claude stopped because of the time or turn limit (not a crash)
+
+
 def run_claude(rnd, review, gates, report):
+    global UNFINISHED
+    UNFINISHED = False
     env = {k: v for k, v in E.items() if k not in ("GITHUB_TOKEN", "GH_TOKEN", "OPENAI_API_KEY", "ACTIONS_RUNTIME_TOKEN", "ACTIONS_ID_TOKEN_REQUEST_TOKEN")}
     cmd = ["claude", "-p", claude_prompt(rnd, review, gates, report), "--output-format", "json", "--max-turns", E.get("CLAUDE_MAX_TURNS", "40"),
            "--permission-mode", "acceptEdits", "--allowedTools", CLAUDE_TOOLS, "--disallowedTools", CLAUDE_DENY]
@@ -134,11 +139,13 @@ def run_claude(rnd, review, gates, report):
     try:
         r = sh(cmd, env=env, timeout=int(E.get("CLAUDE_TIMEOUT", "1800")))
     except subprocess.TimeoutExpired:
+        UNFINISHED = True
         return "## Report\nThe coding agent ran out of time this round.", False
     (OUT / f"claude-{rnd}.json").write_text(r.stdout or r.stderr)
     try:
         res = json.loads(r.stdout)
         text = res.get("result") or ""
+        UNFINISHED = res.get("subtype") == "error_max_turns"
         ok = r.returncode == 0 and not res.get("is_error")
     except Exception:
         text, ok = (r.stdout or r.stderr)[-6000:], False
@@ -267,6 +274,18 @@ def main():
     review_data, gates, report, status, changed = None, {}, "", "error", False
     for rnd in range(1, MAX_ROUNDS + 1):
         report, ok = run_claude(rnd, review_data, gates, report)
+        if not ok and UNFINISHED and rnd < MAX_ROUNDS:
+            # Ran out of time or turns: keep what it did, no review or approval this round, carry on next round.
+            sh(["git", "add", "-A"])
+            if sh(["git", "diff", "--cached", "--quiet"]).returncode:
+                git("commit", "-q", "-m", f"Agent round {rnd} (unfinished): {TASK.splitlines()[0][:50]}\n\nAutomated agent cycle, run {RUN_URL}")
+                changed = True
+            comment(f"## Agent cycle · round {rnd} of {MAX_ROUNDS}: unfinished\n\nClaude hit its time or turn limit before finishing. "
+                    f"Its work so far is kept and it carries on in round {rnd + 1}; nothing is reviewed or approved from an unfinished round. [run]({RUN_URL})")
+            review_data = {"verdict": "revise", "summary": "Round not finished.", "owner_question": "",
+                           "findings": [{"id": "T1", "severity": "ACTIONABLE", "file": "(workflow)", "claim": "You ran out of time or turns last round. Continue from where you stopped; keep your own checks short.",
+                                         "evidence": "time or turn limit reached", "demonstrated": True, "reply_to_claude": "Finish the task."}]}
+            continue
         sh(["git", "add", "-A"])
         if sh(["git", "diff", "--cached", "--quiet"]).returncode:
             git("commit", "-q", "-m", f"Agent round {rnd}: {TASK.splitlines()[0][:60]}\n\nAutomated agent cycle, run {RUN_URL}")
