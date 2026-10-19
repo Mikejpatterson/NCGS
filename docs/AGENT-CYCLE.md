@@ -43,3 +43,16 @@ with the run for 14 days.
 - Optional variables `OPENAI_REVIEW_MODEL` and `AGENT_CLAUDE_MODEL`.
 - This file and the workflow must be on `main` for issue comments to start runs. That is the one change to
   `main`, made through a pull request the owner approves.
+
+## How the agents work with the owner (the owner's standing instruction, 19 October 2026)
+The owner wants Claude and the OpenAI reviewer (and ChatGPT as design lead) to work together the way a good
+colleague does, and to come to the owner only for real input or approval.
+- **Keep the owner informed without asking anything.** Every post says, in plain words, what is happening now,
+  roughly how long it will take, whether it runs in the background, and what comes next.
+- **Fix it yourselves.** Failing commands, wrong paths, broken tests, disagreements between agents and workflow
+  bugs are the agents' job to sort out, with evidence, on the issue.
+- **Only come to the owner for:** a product or design decision not already DECIDED; approval of anything that
+  would change the live app (`main`); a setting, secret or account only the owner can change; spending beyond
+  what was agreed; or a problem the agents have tried and failed to solve twice.
+- **When you do ask:** mention @Mikejpatterson, ask one plain-English question, give a recommendation, and if
+  they must do something by hand, give one step at a time with what they should see on screen.

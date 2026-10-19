@@ -68,6 +68,7 @@ jobs:
         run: |
           npm install -g @anthropic-ai/claude-code@2.1.296 playwright@1.56.1
           npx -y playwright@1.56.1 install --with-deps chromium
+          echo "NODE_PATH=$(npm root -g)" >> "$GITHUB_ENV"   # so the tests (and Claude) can find playwright
       - name: The task
         env:
           COMMENT: ${{ github.event.comment.body }}

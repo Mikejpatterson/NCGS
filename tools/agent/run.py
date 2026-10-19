@@ -105,7 +105,11 @@ YOUR REPORT FROM LAST ROUND:
 {report[:6000]}
 """
     p += """
-Finish with exactly this section (it is posted to the issue and given to the reviewer):
+Fix problems yourself where you can (a failing command, a wrong path, a test you can run). Only NEEDS OWNER for a
+real product/design decision, an approval for anything production, or a setting only the owner can change.
+
+Finish with exactly this section (it is posted to the issue and given to the reviewer). Its first line is one plain
+English sentence the owner (not a developer) can understand: what you did and whether it worked.
 ## Report
 - Changed: files and what changed
 - Ran: each command and its result (pass/fail counts)
@@ -180,7 +184,10 @@ workflow's hard-gate results (those results are produced by the workflow, not by
   "escalate" if a product/design decision is needed from the owner (put one plain-English question in
   owner_question), the task cannot be done without touching protected files, or the round limit makes further
   revision pointless. Otherwise "revise".
-- Never ask for anything to be merged to main, deployed or published. That is only ever the owner's decision."""
+- Never ask for anything to be merged to main, deployed or published. That is only ever the owner's decision.
+- Start "summary" with one plain-English sentence the owner (not a developer) can follow.
+- Only put a question in owner_question if it truly needs the owner: a product/design decision, approval of a
+  production change, or a setting only the owner can change. Everything else the agents settle between them."""
 
 
 def review(rnd, gates, report, prev):
