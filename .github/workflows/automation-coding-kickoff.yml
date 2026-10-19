@@ -1,0 +1,23 @@
+name: NCGS Autonomous Coding Kickoff
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/automation-coding-kickoff.yml'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  launch-one-safe-coding-task:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Dispatch isolated Claude coding job
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run claude-design.yml --repo "${{ github.repository }}" --ref design/crest-editorial-prototype
+          echo "Requested one isolated coding task on design/crest-editorial-prototype"
