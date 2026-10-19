@@ -73,3 +73,17 @@ Make the Ruling question box at least 44px tall at 360, 390 and 135% text in bot
   `AGENT_DAILY_LIMIT` automatic tasks in a day (default 5). This keeps spending bounded.
 - To carry on after any stop, comment `/agent-continue` on issue #1. That runs the next waiting task.
 - A one-off task started with `/agent-task` does not advance the list.
+
+## Speed: quick checks every round, full checks once (owner's instruction, 19 October)
+- **Each round** runs only what the change touches: protected files and engine/server tests always; and if app code
+  changed, both previews, the layout test on both looks side by side, and a 390px screenshot comparison. About 4 minutes.
+  A documents-only change needs about 1 minute.
+- **Once, after the reviewer approves**, the slow checks run, and only if app code changed: the full screenshot comparison
+  at 360/390/135% on both looks, and the several-phones, whole-round and start-hole scoring tests. If they fail, the
+  work goes back to Claude as a BLOCKER.
+- The reviewer only sends work back for real defects or unmet requirements. Wording, documentation style and
+  "consider also" ideas are notes, not reasons for another round.
+- **Combine small related tasks into one list item.** Each task has a fixed start-up cost of a few minutes.
+- For quick tweaks while the owner is around, the owner can ask Claude directly (the fast lane). The same checks
+  apply, and the result goes into the design branch.
+
