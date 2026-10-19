@@ -22,6 +22,31 @@ Before every push: `node --test test/engine.test.js test/server.test.js`.
 | Ruling screen | A question with tap answers, then the ruling card; Read out; Ask more; plain-text fallback | `ruling.run.js` |
 | Features | Testing mode, start hole, stats and player stats, backup/restore, organiser actions, guests, late changes, course snapshot, speech | the other `*.run.js` files |
 
+## Design branch checks
+
+These are for the editorial design work on `design/crest-editorial-prototype`. The redesign changes looks only.
+
+**The guard: `sh tools/guard.sh [base]`** (default base: `origin/main`). Fails if the branch has changed scoring, storage or sync code, real data or the published site since `base`: `src/engine.js`, `src/server.js`, `src/app/00-core.js`, `src/app/10-data.js`, anything in `site/` or `data/`, or `deploy.json`. The one file allowed in `data/` is `data/fixture-seed.json` (the invented data). It looks at committed changes only, so commit first, then run it.
+
+**Previews from invented data.** The real data is never in this repository, so preview builds use the made-up members in `data/fixture-seed.json` (remake it with `node tools/make-fixture.js`; same file every time).
+- `NCGS_FIXTURE=1 node build.js`: the standard look.
+- `NCGS_FIXTURE=1 NCGS_DESIGN=editorial node build.js`: the same, plus the editorial trial styles (`src/editorial-prototype.css`).
+
+With `NCGS_FIXTURE=1` only `dist/preview.html` and `dist/golf-trip.html` are built, never the live app (`dist/site/`) or the server. Both builds write to `dist/preview.html`, so copy each one away before the next:
+
+```sh
+NCGS_FIXTURE=1 node build.js && cp dist/preview.html dist/standard.html
+NCGS_FIXTURE=1 NCGS_DESIGN=editorial node build.js && cp dist/preview.html dist/editorial.html
+```
+
+**The comparison: `node test/design.run.js <a.html> <b.html> [outdir] [--same-pixels]`**, for example
+`node test/design.run.js dist/standard.html dist/editorial.html test/shots/design`. Needs Playwright. Opens both builds at 360 px, 390 px and 390 px with 135% text, on 13 screens (home, rounds, a past round, the current round, tee, hole entry empty, partly filled, complete and high scores, after saving, results, Buggy Wars and its second group). On each it compares:
+- the controls (what a person can press, with their labels and whether they are switched off),
+- the words and numbers on screen,
+- how many pixels differ (reported, not a failure on its own).
+
+It fails if the controls or the words differ, a screen cannot be opened or the page shows a script error. With `--same-pixels` it also fails if more than 0.01% of pixels differ (for changes that must not change the look; the glass tab bar differs by a few pixels from run to run). Screenshots and `report.json` go to the output folder (default `test/shots/design`).
+
 ## Manual, on a real phone (cannot be tested here)
 1. Install to the home screen on iPhone and Android; open in aeroplane mode: the app should still open.
 2. Score a hole with no signal, walk into signal, check it reaches the other phones.
