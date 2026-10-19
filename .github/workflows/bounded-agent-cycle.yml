@@ -1,0 +1,85 @@
+name: NCGS Bounded Agent Cycle
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: ncgs-bounded-agent-cycle
+  cancel-in-progress: false
+
+jobs:
+  claude-implementation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    outputs:
+      commit_sha: ${{ steps.commit.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: design/crest-editorial-prototype
+          persist-credentials: false
+      - name: Preflight
+        run: |
+          test "$(git branch --show-current)" = 'design/crest-editorial-prototype'
+          test ! -e docs/AGENT-CYCLE-TEST.md
+      - name: Install Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Claude creates one isolated document
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CI: 'true'
+        run: |
+          claude -p 'Read CLAUDE.md and docs/AI-COLLABORATION.md. Create only docs/AGENT-CYCLE-TEST.md with an accurate short proposal for a safe NCGS two-agent handoff. Do not modify any other files. Do not run shell commands, git, tests or deploy. Stop after writing the one file.' --permission-mode acceptEdits --allowedTools 'Read,Write,Edit' --max-turns 12
+      - name: Enforce file-only output
+        run: |
+          test -s docs/AGENT-CYCLE-TEST.md
+          test -z "$(git diff --name-only)"
+          unexpected="$(git ls-files --others --exclude-standard | grep -v '^docs/AGENT-CYCLE-TEST.md$' || true)"
+          test -z "$unexpected"
+      - name: Test scoring and server
+        run: node --test test/engine.test.js test/server.test.js
+      - name: Commit only isolated document
+        id: commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/AGENT-CYCLE-TEST.md
+          git commit -m 'Document bounded Claude agent handoff test'
+          git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push origin HEAD:design/crest-editorial-prototype
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  openai-review:
+    needs: claude-implementation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: design/crest-editorial-prototype
+          persist-credentials: false
+      - name: Independent OpenAI review posted to Issue 1
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          OPENAI_REVIEW_MODEL: gpt-5-mini
+        run: python3 tools/openai_design_review.py
+
+  claude-response:
+    needs: openai-review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Claude reads and responds to OpenAI review in Issue 1
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/claude_api_review.py
