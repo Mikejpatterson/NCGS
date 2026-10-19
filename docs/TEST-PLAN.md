@@ -40,7 +40,8 @@ NCGS_FIXTURE=1 NCGS_DESIGN=editorial node build.js && cp dist/preview.html dist/
 ```
 
 **The comparison: `node test/design.run.js <a.html> <b.html> [outdir] [--same-pixels]`**, for example
-`node test/design.run.js dist/standard.html dist/editorial.html test/shots/design`. Needs Playwright. Opens both builds at 360 px, 390 px and 390 px with 135% text, on 13 screens (home, rounds, a past round, the current round, tee, hole entry empty, partly filled, complete and high scores, after saving, results, Buggy Wars and its second group). On each it compares:
+`node test/design.run.js dist/standard.html dist/editorial.html test/shots/design`. Needs Playwright and its Chromium browser. There is no `package.json`. Use a global install (found through `NODE_PATH`), or install both the way the design workflow does:
+`npm install --no-save --no-package-lock playwright@1.56.1 && npx playwright install --with-deps chromium`. It opens both builds at 360 px, 390 px and 390 px with 135% text, on 13 screens (home, rounds, a past round, the current round, tee, hole entry empty, partly filled, complete and high scores, after saving, results, Buggy Wars and its second group). On each it compares:
 - the controls (what a person can press, with their labels and whether they are switched off),
 - the words and numbers on screen,
 - how many pixels differ (reported, not a failure on its own).
