@@ -3,7 +3,7 @@
      "## [ ] id" waits, "## [x] id" is done, "(pause)" = stop for the owner to look after approval.
      Preserve task ids and completed state when integrating a queue review. Never restart an active task. -->
 
-## [ ] ruling-target
+## [x] ruling-target
 Fix the measured 44px touch-target failure before cosmetic work. `docs/TOUCH-TARGETS.md` reports the Ruling
 question box at 36px high (42px at 135% text). Make its visible width and height at least 44px in both looks,
 with the smallest CSS change. Preserve its text growth, focus, input, submit behaviour and position in the flow.
