@@ -20,7 +20,7 @@
 
 # Approved editorial-design project (design branch only)
 
-Read `docs/EDITORIAL-PROTOTYPE.md` and `docs/AI-COLLABORATION.md`. The existing functional and data-safety rules above take precedence.
+Read `docs/EDITORIAL-PROTOTYPE.md`, `docs/AI-COLLABORATION.md` and `docs/CLAUDE-HANDOVER.md` (current state, decisions, commands and pitfalls from earlier Claude sessions). The existing functional and data-safety rules above take precedence.
 
 - Scope: Home, Hole/Score Entry and Buggy Wars aesthetics, **not** rules, storage or gameplay.
 - Palette: forest/pine green #0B3D2E, warm ivory #FAF8F3, extremely limited flat champagne gold #D4B483 in crest only or award accents, Buggy Wars deep navy #244A78 and crimson #9B3443.
