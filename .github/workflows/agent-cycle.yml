@@ -1,0 +1,104 @@
+name: NCGS agent cycle
+# Claude codes -> hard gates -> independent OpenAI review -> Claude revises (at most 3 rounds), all in ONE run.
+# Starts from:
+#   - a comment on an issue that begins "/agent-task", written by the repository owner's account
+#     (the owner, or ChatGPT posting through the owner's GitHub connection). Bot comments never start it.
+#   - Actions > NCGS agent cycle > Run workflow (once this file is on main)
+#   - a push that changes .github/agent-selftest.md on the automation branch (self-test before approval)
+# Work happens on agent/run-<id>, cut from the design branch. main is never checked out for writing,
+# never pushed to, never merged into. A run never starts another run.
+on:
+  issue_comment:
+    types: [created]
+  workflow_dispatch:
+    inputs:
+      task:
+        description: What should the agents do?
+        required: true
+      mode:
+        description: "merge = fast-forward the design branch when approved; pr = always open a draft pull request"
+        default: merge
+        type: choice
+        options: [merge, pr]
+  push:
+    branches: [automation/agent-cycle]
+    paths: [.github/agent-selftest.md]
+
+permissions: {}
+
+concurrency:
+  group: ncgs-agent-cycle
+  cancel-in-progress: false
+
+jobs:
+  cycle:
+    if: >-
+      github.event_name != 'issue_comment' || (
+        startsWith(github.event.comment.body, '/agent-task') &&
+        github.event.comment.author_association == 'OWNER' &&
+        github.event.comment.user.type == 'User')
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write        # push agent/run-* and, when approved, the design branch (never main)
+      issues: write          # progress comments on the issue
+      pull-requests: write   # draft pull requests into the design branch
+    env:
+      BASE: design/crest-editorial-prototype
+      MAX_ROUNDS: '3'
+      OPENAI_REVIEW_MODEL: ${{ vars.OPENAI_REVIEW_MODEL || 'gpt-5-mini' }}
+      CLAUDE_MODEL: ${{ vars.AGENT_CLAUDE_MODEL || '' }}
+    steps:
+      - name: Control files (trusted; the agent cannot change these)
+        uses: actions/checkout@v4
+        with:
+          path: ctl
+          persist-credentials: false
+      - name: Work checkout (design branch)
+        uses: actions/checkout@v4
+        with:
+          ref: design/crest-editorial-prototype
+          path: work
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tools (pinned)
+        run: |
+          npm install -g @anthropic-ai/claude-code@2.1.296 playwright@1.56.1
+          npx -y playwright@1.56.1 install --with-deps chromium
+      - name: The task
+        env:
+          COMMENT: ${{ github.event.comment.body }}
+          INPUT_TASK: ${{ github.event.inputs.task }}
+          INPUT_MODE: ${{ github.event.inputs.mode }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          case "$EVENT" in
+            issue_comment) printf '%s\n' "$COMMENT" | sed '1s/^\/agent-task[: ]*//' > task.md; echo "MODE=merge" >> "$GITHUB_ENV"
+                           printf '%s' "$COMMENT" | grep -qiE '^mode: *pr' && echo "MODE=pr" >> "$GITHUB_ENV" || true ;;
+            workflow_dispatch) printf '%s\n' "$INPUT_TASK" > task.md; echo "MODE=${INPUT_MODE:-merge}" >> "$GITHUB_ENV" ;;
+            push) cp ctl/.github/agent-selftest.md task.md; echo "MODE=pr" >> "$GITHUB_ENV" ;;
+          esac
+          sed -i '/^mode: *\(pr\|merge\) *$/Id' task.md
+          test -s task.md
+          echo "ISSUE=${{ github.event.issue.number || 1 }}" >> "$GITHUB_ENV"
+          cat task.md
+      - name: Run the cycle
+        env:
+          CTL: ctl
+          WORK: work
+          OUT: agent-out
+          TASK_FILE: task.md
+          GITHUB_TOKEN: ${{ github.token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: python3 ctl/tools/agent/run.py
+      - name: Keep logs, reviews and screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-cycle-${{ github.run_id }}
+          path: agent-out
+          retention-days: 14
