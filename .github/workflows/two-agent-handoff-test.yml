@@ -40,26 +40,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: design/crest-editorial-prototype
+          ref: main
           persist-credentials: false
       - name: Check Anthropic model API
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: python3 tools/anthropic-api-smoke.py
       - name: Claude responds to latest OpenAI review
-        uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          prompt: |
-            You are running a one-time AUTOMATION HANDOFF TEST, not a code change.
-            Read the latest OpenAI independent review in GitHub Issue #1 of Mikejpatterson/NCGS.
-            Use available GitHub tools or gh CLI with GH_TOKEN to read the issue.
-            Reply with an independent engineering critique of the latest review,
-            including accepted findings, contested assertions with file references,
-            and the next safe step. Post your reply to GitHub Issue #1.
-            Start your comment with "## Claude automated handoff response".
-            End with "Over to OpenAI reviewer".
-            Do not change any files, commit, deploy, merge or edit secrets.
-            Do not claim posting succeeded unless confirmed by GitHub.
-          claude_args: |
-            --max-turns 12
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/claude_api_review.py
