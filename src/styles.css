@@ -24,6 +24,9 @@
   --team-b-soft: rgba(198, 40, 40, .13);
   /* Display type for the brand and a few big titles (the editorial trial swaps this for a serif) */
   --font-display: var(--font);
+  /* Display titles always use lining figures, so a date or "Round 3" sits on the line. --display-tracking is unset here
+     (each title keeps its own letter-spacing); the editorial trial sets it. */
+  --display-nums: tabular-nums lining-nums;
   --red: #CF2A2A;
   --amber-soft: #FFEFC2;
   --amber: #7A4300;
@@ -1704,4 +1707,6 @@ body { font-variant-numeric: tabular-nums; }
 .ah-mic svg { width: 58px !important; height: 58px !important; }
 
 /* Display type: only the brand name, the Home round name and the round page title. Names, numbers and controls stay in the system font. */
-.hero.home .wordmark, .hero.home .now-name, .rp-name { font-family: var(--font-display); }
+.hero.home .wordmark, .hero.home .now-name, .rp-name { font-family: var(--font-display); font-variant-numeric: var(--display-nums); }
+.hero.home .wordmark { letter-spacing: var(--display-tracking, .01em); }
+.hero.home .now-name, .rp-name { letter-spacing: var(--display-tracking, -.02em); }

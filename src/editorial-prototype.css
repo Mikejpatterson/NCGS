@@ -12,6 +12,7 @@
   --team-b-soft: rgba(155, 52, 67, .13);
   /* iPhone: New York (Apple's system serif). Android and others: Georgia or the phone's serif. */
   --font-display: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
+  /* Serif display titles: lining figures (a date or "Round 3" does not dip below the line) and slightly tighter letters. */
+  --display-nums: lining-nums;
+  --display-tracking: -.01em;
 }
-/* Serif display titles keep lining figures, so "Round 3" or a date does not dip below the line. */
-.hero.home .wordmark, .hero.home .now-name, .rp-name { font-variant-numeric: lining-nums; letter-spacing: -.01em; }
