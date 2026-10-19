@@ -12,7 +12,19 @@ let elapsed=r=>{if(!r)return'No active run';let start=r.run_started_at||r.create
 el('tasktitle').textContent=executing?executing.name:'No task running in GitHub Actions';
 el('tasksource').innerHTML=executing?'<a href="'+esc(executing.html_url)+'" target="_blank" rel="noopener">Workflow #'+esc(executing.run_number)+' · view jobs ↗</a>':'Proposed next: approve and activate draft PR #2; no task queued by that PR';
 el('taskowner').textContent=agentFor(executing);
-el('taskduration').textContent=elapsed(executing)+(executing?' · Started '+new Date(executing.run_started_at||executing.created_at).toLocaleString('en-IE'):'');
+if(executing){
+  try{
+    const jobData=await get('/actions/runs/'+executing.id+'/jobs?per_page=30');
+    const activeJob=(jobData.jobs||[]).find(j=>j.status==='in_progress')||(jobData.jobs||[]).find(j=>j.status==='queued');
+    if(activeJob){
+      el('tasktitle').textContent=executing.name+' / '+activeJob.name;
+      el('taskowner').textContent=/claude/i.test(activeJob.name)?'Claude coding agent':/openai/i.test(activeJob.name)?'OpenAI reviewer':agentFor(executing);
+      el('taskduration').textContent=(activeJob.started_at?'Started '+new Date(activeJob.started_at).toLocaleString('en-IE'):'Queued')+' · GitHub job';
+    }
+  }catch(e){el('tasksource').textContent='GitHub run identified; job detail unavailable';}
+}
+el('tasksource').insertAdjacentText('beforeend',executing?' · queued by '+(executing.triggering_actor?.login||executing.actor?.login||'unknown'):'');
+if(!executing||!el('taskduration').textContent.includes('GitHub job'))el('taskduration').textContent=elapsed(executing)+(executing?' · Started '+new Date(executing.run_started_at||executing.created_at).toLocaleString('en-IE'):'');
 el('waitingon').textContent=executing?'GitHub job completion':'Owner decision';
 el('waitingwhy').textContent=executing?'The workflow must finish before a verified next handoff.':'Draft PR #2 is awaiting explicit review/approval to activate. ChatGPT and Claude web sessions cannot be inferred to be running.';
 const exchanges=comments.filter(c=>/Claude|ChatGPT|OpenAI|handoff|over to/i.test((c.body||'').slice(0,4500))).slice(-6).reverse();
