@@ -27,6 +27,12 @@ To redo them: build both previews (commands above), copy each `dist/preview.html
 `node tools/hole-header-shots.js <file> std|ed <outdir>` (add `1` at the end for the mock). It prints the measurements
 used in the table below.
 
+Tests run for this review (nothing in the app changed, so these only confirm that):
+- `node --test test/engine.test.js test/server.test.js`: the two files CLAUDE.md lists (53 tests).
+- `node --test test/engine.test.js test/server.test.js test/fuzz.engine.test.js test/fuzz.server.test.js`: the same plus
+  the random-input tests, as the workflow runs them (`.github/workflows/design-ci.yml`), 78 tests.
+- `sh tools/guard.sh 7e0fac6e51f22f6bc6a95b108c7e4a80bffdd7ae`: no protected files changed.
+
 ## What the real header does now (both looks are identical here; only team colours differ further down)
 | Size | Card height | Left: hole number | Right block | Par line | Index · yards line |
 |---|---|---|---|---|---|
