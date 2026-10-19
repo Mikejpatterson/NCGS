@@ -5,7 +5,7 @@ Runs inside .github/workflows/agent-cycle.yml. It comes from the trusted control
 cannot edit it, the gates or the reviewer. Rules it enforces:
 - work happens on a fresh branch agent/run-<id> cut from BASE (the design branch); never on main
 - the coding agent gets only the Anthropic key: no GitHub token, no OpenAI key; the workflow commits and pushes
-- at most MAX_ROUNDS coding rounds; a run never starts another run; bot comments start nothing
+- at most MAX_ROUNDS coding rounds; only an approved queue task may request the next run; bot comments start nothing
 - approved (all hard gates pass, reviewer has no BLOCKER/ACTIONABLE) -> fast-forward into BASE when MODE=merge,
   otherwise a draft pull request into BASE; anything else -> draft pull request + owner mention, labelled
 - production (main) is never touched: that only happens through a pull request the owner approves
@@ -137,7 +137,7 @@ def run_claude(rnd, review, gates, report):
     try:
         res = json.loads(r.stdout)
         text = res.get("result") or ""
-        ok = not res.get("is_error")
+        ok = r.returncode == 0 and not res.get("is_error")
     except Exception:
         text, ok = (r.stdout or r.stderr)[-6000:], False
     m = text.find("## Report")
@@ -247,6 +247,8 @@ def findings_list(rv):
 
 def main():
     global BASE_SHA
+    if BASE != "design/crest-editorial-prototype":
+        raise RuntimeError("The agent cycle may only target the approved design branch")
     git("checkout", "-q", "-b", BRANCH)
     BASE_SHA = git("rev-parse", "HEAD")
     git("config", "user.name", "github-actions[bot]")
@@ -267,7 +269,7 @@ def main():
         comment(f"## Agent cycle · round {rnd} of {MAX_ROUNDS}\n\n**Commit:** `{head[:12]}` · **Reviewer verdict:** **{review_data['verdict'].upper()}** · [run]({RUN_URL})\n\n"
                 f"### Hard gates (run by the workflow)\n{gates_table(gates)}\n\n### Claude (coding)\n{report[:12000]}\n\n"
                 f"### OpenAI (independent review)\n{review_data['summary']}\n\n{findings_list(review_data)}")
-        if not ok and not changed:
+        if not ok:
             status = "error"; break
         if review_data["verdict"] == "approve":
             status = "approved"; break
@@ -278,6 +280,10 @@ def main():
 
 
 def push(ref):
+    if BASE != "design/crest-editorial-prototype" or ref not in (
+        f"HEAD:refs/heads/{BRANCH}", f"HEAD:refs/heads/{BASE}"
+    ):
+        raise RuntimeError("Refusing a push outside this run's branch and the approved design branch")
     tok = base64.b64encode(f"x-access-token:{E['GITHUB_TOKEN']}".encode()).decode()
     return sh(["git", "-c", f"http.extraheader=AUTHORIZATION: basic {tok}", "push", "origin", ref])
 
@@ -312,7 +318,7 @@ def chain(status, merged):
         return f"@{OWNER} daily limit reached ({DAILY_LIMIT} automatic tasks). Next up is `{nxt.stdout.strip()}`; reply `/agent-continue` to carry on now, or it waits for you."
     try:
         http(f"{API}/actions/workflows/agent-cycle.yml/dispatches", GH, {"ref": E.get("CONTROL_REF", "main"), "inputs": {"task_id": nxt.stdout.strip(), "mode": "merge"}})
-        return f"Started the next task on the to-do list: `{nxt.stdout.strip()}` (it will post here)."
+        return f"Requested the next task on the to-do list: `{nxt.stdout.strip()}`. Dispatch was accepted; execution is not yet verified. Check GitHub Actions for the new run."
     except Exception as e:
         return f"@{OWNER} could not start the next task `{nxt.stdout.strip()}` ({str(e)[:120]}). Reply `/agent-continue` to try again."
 
@@ -321,7 +327,8 @@ def finish(status, rv, gates, report, changed):
     head = git("rev-parse", "HEAD")
     where, pr_url, pr_failed, merged = "", "", False, False
     if changed:
-        push(f"HEAD:refs/heads/{BRANCH}")
+        if push(f"HEAD:refs/heads/{BRANCH}").returncode:
+            raise RuntimeError(f"Could not push `{BRANCH}`; no pull request or queue advancement was attempted")
         if status == "approved" and MODE == "merge":
             r = push(f"HEAD:refs/heads/{BASE}")      # fast-forward only: refused if the base moved meanwhile
             merged = r.returncode == 0
@@ -340,7 +347,7 @@ def finish(status, rv, gates, report, changed):
     needs = {"approved": "nothing: done", "escalated": f"@{OWNER} a decision is needed", "out-of-rounds": f"@{OWNER} or the design lead: the agents did not converge in {MAX_ROUNDS} rounds",
              "error": f"@{OWNER} the run failed; see the run log"}[status]
     if pr_failed:
-        needs = f"@{OWNER} one setting: Settings → Actions → General → tick \"Allow GitHub Actions to create and approve pull requests\". Until then the work waits on branch `{BRANCH}`."
+        needs = f"Automation must investigate the pull request creation error in the result above. Work is retained on `{BRANCH}`. An owner-only setting has not been established as the cause."
     q = rv.get("owner_question") if rv else ""
     if status == "approved" and not changed:
         merged = True                            # nothing to merge (e.g. a "no change needed" conclusion) counts as done
