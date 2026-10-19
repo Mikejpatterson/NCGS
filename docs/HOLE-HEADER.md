@@ -12,6 +12,21 @@ block costs more than it gains.
 - The PAR | SI proposal was tried **in the screenshots only**, by replacing the right-hand block in the browser. It was never
   added to the app.
 
+## Screenshots (in `docs/hole-header-shots/`, invented fixture data, Chromium on Linux)
+There are no "after" shots, because the app was not changed. `before-*` is the real app; `mock-*` is the proposal,
+patched into the page in the browser only.
+
+| Size | Standard, now | Editorial, now | Standard, proposal | Editorial, proposal |
+|---|---|---|---|---|
+| 360px | [before-standard-360](hole-header-shots/before-standard-360.png) | [before-editorial-360](hole-header-shots/before-editorial-360.png) | [mock-standard-360](hole-header-shots/mock-standard-360.png) | [mock-editorial-360](hole-header-shots/mock-editorial-360.png) |
+| 390px | [before-standard-390](hole-header-shots/before-standard-390.png) | [before-editorial-390](hole-header-shots/before-editorial-390.png) | [mock-standard-390](hole-header-shots/mock-standard-390.png) | [mock-editorial-390](hole-header-shots/mock-editorial-390.png) |
+| 390px, 135% | [before-standard-390-135](hole-header-shots/before-standard-390-135.png) | [before-editorial-390-135](hole-header-shots/before-editorial-390-135.png) | [mock-standard-390-135](hole-header-shots/mock-standard-390-135.png) | [mock-editorial-390-135](hole-header-shots/mock-editorial-390-135.png) |
+| 360px, 135% | [before-standard-360-135](hole-header-shots/before-standard-360-135.png) | [before-editorial-360-135](hole-header-shots/before-editorial-360-135.png) | [mock-standard-360-135](hole-header-shots/mock-standard-360-135.png) | [mock-editorial-360-135](hole-header-shots/mock-editorial-360-135.png) |
+
+To redo them: build both previews (commands above), copy each `dist/preview.html` somewhere, then run
+`node tools/hole-header-shots.js <file> std|ed <outdir>` (add `1` at the end for the mock). It prints the measurements
+used in the table below.
+
 ## What the real header does now (both looks are identical here; only team colours differ further down)
 | Size | Card height | Left: hole number | Right block | Par line | Index · yards line |
 |---|---|---|---|---|---|
