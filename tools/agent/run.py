@@ -281,7 +281,7 @@ def push(ref):
 
 def finish(status, rv, gates, report, changed):
     head = git("rev-parse", "HEAD")
-    where, pr_url = "", ""
+    where, pr_url, pr_failed = "", "", False
     if changed:
         push(f"HEAD:refs/heads/{BRANCH}")
         merged = False
@@ -296,11 +296,14 @@ def finish(status, rv, gates, report, changed):
                 pr_url = pr.get("html_url", "")
                 where = (where + "; " if where else "") + f"draft pull request {pr_url}"
             except Exception as e:
-                where = (where + "; " if where else "") + f"branch `{BRANCH}` pushed (pull request not created: {str(e)[:120]}; check that Actions may create pull requests)"
+                where = (where + "; " if where else "") + f"branch `{BRANCH}` pushed (pull request not created: {str(e)[:120]})"
+                pr_failed = True
     else:
         where = "no file changes"
     needs = {"approved": "nothing: done", "escalated": f"@{OWNER} a decision is needed", "out-of-rounds": f"@{OWNER} or the design lead: the agents did not converge in {MAX_ROUNDS} rounds",
              "error": f"@{OWNER} the run failed; see the run log"}[status]
+    if pr_failed:
+        needs = f"@{OWNER} one setting: Settings → Actions → General → tick \"Allow GitHub Actions to create and approve pull requests\". Until then the work waits on branch `{BRANCH}`."
     q = rv.get("owner_question") if rv else ""
     comment(f"## Agent cycle finished · {status.upper()}\n\n**STATUS:** {'ready' if status == 'approved' else 'review needed'} · **Tested commit:** `{head[:12]}` · [run]({RUN_URL})\n\n"
             f"**Result:** {where}\n\n**Needs:** {needs}" + (f"\n\n**Question for the owner:** {q}" if q and status != "approved" else "")
