@@ -30,10 +30,14 @@ jobs:
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
-            Implement the next small, testable iteration of the approved NCGS three-screen visual redesign.
-            Read CLAUDE.md and docs/EDITORIAL-PROTOTYPE.md. Do not touch main or deploy.
-            Start by auditing the real DOM and styles. Focus on Home, Score Entry pine-green header balance,
-            and Buggy Wars. Keep all scoring behaviour intact. Run available tests and build,
-            report evidence and risks. Commit changes only to the existing design branch.
+            AUTOMATION INTEGRATION TEST ONLY. Read CLAUDE.md and docs/AI-COLLABORATION.md.
+            Work solely in design/crest-editorial-prototype; never touch main or deploy.
+            Create only docs/AGENT-AUTOMATION-CHECK.md as a small factual report of
+            repository guardrails, with the test timestamp in UTC and what was inspected.
+            Do NOT edit application code, workflows, production assets, private data, or secrets.
+            Run node --test test/engine.test.js test/server.test.js and report results.
+            Commit ONLY docs/AGENT-AUTOMATION-CHECK.md on this design branch.
+            Post the commit hash and tests to GitHub Issue #1 if possible.
+            Stop after this single commit. Do not start Stage 1 or further work.
           claude_args: |
             --max-turns 18
