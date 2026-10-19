@@ -1,9 +1,13 @@
 // Layout check: every golfer screen at small, normal and large-text phone sizes.
 // Fails on text that overflows or is cut off, anything off the edge of the screen, and touch targets under 40px.
 // Run: python3 -m http.server 8765 -d dist & NODE_PATH=/opt/npm-tools/node_modules node test/layout.run.js
+// Opt-in stricter audit: MIN_TARGET=44 node test/layout.run.js checks width and height against 44px, names controls
+// by aria-label, text or data-act, and prints every small control as a TARGET line. Without it nothing changes.
 const { chromium } = require('playwright');
 const sizes = [['small 360', 360, 740, 1], ['normal 390', 390, 844, 1], ['large text 390', 390, 844, 1.35]];
 const URL = 'http://localhost:8765/preview.html';
+const STRICT = !!process.env.MIN_TARGET; const MIN = STRICT ? Number(process.env.MIN_TARGET) : 40;
+if (STRICT && !(MIN > 0)) { console.log('MIN_TARGET must be a number of pixels, e.g. MIN_TARGET=44'); process.exit(2); }
 const home = async p => { await p.evaluate(() => { const n = window.__ncgs; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); }); await p.waitForTimeout(150); };
 const clickAny = async (p, sel) => { await p.click(sel, { timeout: 3000 }); await p.waitForTimeout(200); };
 const scenarios = [
@@ -38,7 +42,7 @@ const scenarios = [
   ['after', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); 
      for (const pid of await p.$$eval('[data-act="set"][data-dir="up"]', e => e.map(x => x.dataset.pid))) await p.click(`[data-act="set"][data-dir="up"][data-pid="${pid}"]`); await clickAny(p, '[data-act="save"]'); await p.waitForTimeout(300); await clickAny(p, '.askrow:nth-child(2)'); await clickAny(p, '[data-act="ask-confirm"]'); await p.waitForTimeout(300); }],
 ];
-const metrics = () => {
+const metrics = ({ min, strict }) => {
   const app = document.getElementById('app'); const out = { hover: [], clip: [], wide: [], small: [], fonts: {} };
   const vw = window.innerWidth;
   if (app.scrollWidth > app.clientWidth + 1) out.hover.push(app.scrollWidth + '>' + app.clientWidth);
@@ -52,7 +56,15 @@ const metrics = () => {
       if (e.scrollWidth > e.clientWidth + 1 && cs.display !== 'inline') out.clip.push(t + ' [' + e.className + '] ' + e.scrollWidth + '>' + e.clientWidth);
       if (cs.textOverflow === 'ellipsis' && e.scrollWidth > e.clientWidth) out.clip.push('ELLIPSIS ' + t); }
     if ((r.right > vw + 1 || r.left < -1) && !e.closest('.sc-wrap')) out.wide.push(t + ' [' + e.className + '] ' + Math.round(r.left) + '..' + Math.round(r.right));
-    if ((e.tagName === 'BUTTON' || e.dataset.act) && r.width > 4 && r.height < 40 && r.width > 0 && cs.display !== 'inline') out.small.push(t + ' ' + Math.round(r.width) + 'x' + Math.round(r.height));
+    if (!strict && (e.tagName === 'BUTTON' || e.dataset.act) && r.width > 4 && r.height < min && r.width > 0 && cs.display !== 'inline') out.small.push(t + ' ' + Math.round(r.width) + 'x' + Math.round(r.height));
+  }
+  // Strict audit: every visible control on the page (tab bar included, inline links too), width and height.
+  if (strict) for (const e of document.body.querySelectorAll('button,a[href],input:not([type=hidden]),select,textarea,[role=button],[role=tab],[data-act]')) {
+    const r = e.getBoundingClientRect(); if (r.width <= 4 || !r.height) continue;
+    const cs = getComputedStyle(e); if (cs.visibility === 'hidden' || e.closest('[hidden]')) continue;
+    if (r.height >= min && r.width >= min) continue;
+    const label = (e.getAttribute('aria-label') || '').trim() || (e.textContent || '').trim() || e.getAttribute('title') || e.getAttribute('placeholder') || '[data-act=' + (e.dataset.act || e.tagName.toLowerCase()) + ']';
+    out.small.push(label.replace(/\s+/g, ' ').slice(0, 40) + (cs.display === 'inline' ? ' (inline)' : '') + ' ' + Math.round(r.width) + 'x' + Math.round(r.height));
   }
   return out;
 };
@@ -66,7 +78,8 @@ const metrics = () => {
       if (scale !== 1) await p.addStyleTag({ content: `html{font-size:${scale * 100}% !important}` });
       try { await fn(p); } catch (e) { fails++; console.log('FAIL  ' + sn + ' / ' + name + ' could not be opened: ' + e.message.split('\n')[0]); continue; }
       await p.waitForTimeout(150);
-      const m = await p.evaluate(metrics);
+      const m = await p.evaluate(metrics, { min: MIN, strict: STRICT });
+      if (STRICT) m.small.forEach(x => console.log('TARGET  ' + sn + ' | ' + name + ' | ' + x));
       const bad = [...m.hover.map(x => 'page wider than screen ' + x), ...m.clip.filter(x => !/Pick up|\[vh\]/.test(x)).map(x => 'cut off: ' + x), ...m.wide.map(x => 'off screen: ' + x), ...m.small.filter(x => !/^\s*\d+x\d+$/.test(x)).map(x => 'small target: ' + x)];
       if (bad.length) { fails++; console.log('FAIL  ' + sn + ' / ' + name); bad.slice(0, 6).forEach(x => console.log('      ' + x)); }
       else console.log('PASS  ' + sn + ' / ' + name);
