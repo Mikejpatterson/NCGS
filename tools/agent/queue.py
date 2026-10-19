@@ -11,6 +11,7 @@ ChatGPT edit it; the workflow ticks tasks off.
 
     queue.py next <file> <task.md out>   prints the id of the next waiting task and writes its text (exit 3 if none)
     queue.py done <file> <id>            ticks the task off in place
+    queue.py get <file> <id> <task.md>   writes that waiting task's text (exit 3 if missing or done)
     queue.py info <file> <id>            prints "pause" or "go"
 """
 import re, sys
@@ -42,6 +43,13 @@ def main():
                 print(it["id"])
                 return
         sys.exit(3)
+    if cmd == "get":
+        it = next((i for i in items if i["id"] == sys.argv[3] and not i["done"]), None)
+        if not it:
+            sys.exit(3)
+        open(sys.argv[4], "w", encoding="utf-8").write(it["text"] + "\n")
+        print(it["id"])
+        return
     if cmd == "info":
         it = next((i for i in items if i["id"] == sys.argv[3]), None)
         print("pause" if it and it["pause"] else "go")
