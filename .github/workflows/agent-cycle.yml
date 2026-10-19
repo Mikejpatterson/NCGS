@@ -2,6 +2,7 @@ name: NCGS agent cycle
 # Claude codes -> hard gates -> independent OpenAI review -> Claude revises (at most 3 rounds), all in ONE run.
 # Starts from:
 #   - a comment on an issue that begins "/agent-task", written by the repository owner's account
+#     ("/agent-continue" instead runs the next task on the to-do list, .github/agent-queue.md on the design branch)
 #     (the owner, or ChatGPT posting through the owner's GitHub connection). Bot comments never start it.
 #   - Actions > NCGS agent cycle > Run workflow (once this file is on main)
 #   - a push that changes .github/agent-selftest.md on the automation branch (self-test before approval)
@@ -13,8 +14,11 @@ on:
   workflow_dispatch:
     inputs:
       task:
-        description: What should the agents do?
-        required: true
+        description: What should the agents do? (leave empty to run the next task on the to-do list)
+        required: false
+      task_id:
+        description: Run this task from the to-do list (set automatically when one task starts the next)
+        required: false
       mode:
         description: "merge = fast-forward the design branch when approved; pr = always open a draft pull request"
         default: merge
@@ -34,7 +38,7 @@ jobs:
   cycle:
     if: >-
       github.event_name != 'issue_comment' || (
-        startsWith(github.event.comment.body, '/agent-task') &&
+        (startsWith(github.event.comment.body, '/agent-task') || startsWith(github.event.comment.body, '/agent-continue')) &&
         github.event.comment.author_association == 'OWNER' &&
         github.event.comment.user.type == 'User')
     runs-on: ubuntu-latest
@@ -43,11 +47,14 @@ jobs:
       contents: write        # push agent/run-* and, when approved, the design branch (never main)
       issues: write          # progress comments on the issue
       pull-requests: write   # draft pull requests into the design branch
+      actions: write         # start the next task on the to-do list (one at a time, daily limit)
     env:
       BASE: design/crest-editorial-prototype
       MAX_ROUNDS: '3'
       OPENAI_REVIEW_MODEL: ${{ vars.OPENAI_REVIEW_MODEL || 'gpt-5-mini' }}
       CLAUDE_MODEL: ${{ vars.AGENT_CLAUDE_MODEL || '' }}
+      AGENT_DAILY_LIMIT: ${{ vars.AGENT_DAILY_LIMIT || '5' }}
+      CONTROL_REF: ${{ github.event_name == 'issue_comment' && 'main' || github.ref_name }}   # where the next task is started from
     steps:
       - name: Control files (trusted; the agent cannot change these)
         uses: actions/checkout@v4
@@ -74,19 +81,31 @@ jobs:
           COMMENT: ${{ github.event.comment.body }}
           INPUT_TASK: ${{ github.event.inputs.task }}
           INPUT_MODE: ${{ github.event.inputs.mode }}
+          INPUT_TASK_ID: ${{ github.event.inputs.task_id }}
+          GH_TOKEN: ${{ github.token }}
           EVENT: ${{ github.event_name }}
         run: |
+          Q=work/.github/agent-queue.md
+          from_list() {   # $1 = task id, or empty for the next waiting task
+            if [ ! -f "$Q" ]; then id=""; elif [ -n "$1" ]; then id=$(python3 ctl/tools/agent/queue.py get "$Q" "$1" task.md) || id=""; else id=$(python3 ctl/tools/agent/queue.py next "$Q" task.md) || id=""; fi
+            if [ -z "$id" ]; then
+              gh api "repos/$GITHUB_REPOSITORY/issues/${{ github.event.issue.number || 1 }}/comments" -f body="Nothing to run: the to-do list (.github/agent-queue.md on the design branch) has no waiting task $1" > /dev/null
+              echo "SKIP=1" >> "$GITHUB_ENV"; return
+            fi
+            echo "TASK_ID=$id" >> "$GITHUB_ENV"; echo "MODE=merge" >> "$GITHUB_ENV"
+          }
           case "$EVENT" in
-            issue_comment) printf '%s\n' "$COMMENT" | sed '1s/^\/agent-task[: ]*//' > task.md; echo "MODE=merge" >> "$GITHUB_ENV"
-                           printf '%s' "$COMMENT" | grep -qiE '^mode: *pr' && echo "MODE=pr" >> "$GITHUB_ENV" || true ;;
-            workflow_dispatch) printf '%s\n' "$INPUT_TASK" > task.md; echo "MODE=${INPUT_MODE:-merge}" >> "$GITHUB_ENV" ;;
+            issue_comment) if printf '%s' "$COMMENT" | grep -q '^/agent-continue'; then from_list ""; else printf '%s\n' "$COMMENT" | sed '1s/^\/agent-task[: ]*//' > task.md; echo "MODE=merge" >> "$GITHUB_ENV"
+                           printf '%s' "$COMMENT" | grep -qiE '^mode: *pr' && echo "MODE=pr" >> "$GITHUB_ENV" || true; fi ;;
+            workflow_dispatch) if [ -n "$INPUT_TASK" ]; then printf '%s\n' "$INPUT_TASK" > task.md; echo "MODE=${INPUT_MODE:-merge}" >> "$GITHUB_ENV"; else from_list "$INPUT_TASK_ID"; fi ;;
             push) cp ctl/.github/agent-selftest.md task.md; echo "MODE=pr" >> "$GITHUB_ENV" ;;
           esac
-          sed -i '/^mode: *\(pr\|merge\) *$/Id' task.md
-          test -s task.md
+          if [ -f task.md ]; then sed -i '/^mode: *\(pr\|merge\) *$/Id' task.md; fi
+          test -s task.md || grep -q '^SKIP=1' "$GITHUB_ENV"
           echo "ISSUE=${{ github.event.issue.number || 1 }}" >> "$GITHUB_ENV"
           cat task.md
       - name: Run the cycle
+        if: env.SKIP != '1'
         env:
           CTL: ctl
           WORK: work

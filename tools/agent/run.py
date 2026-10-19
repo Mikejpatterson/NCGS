@@ -26,6 +26,9 @@ MODE = E.get("MODE", "pr")                                   # "merge" or "pr"
 OWNER = REPO.split("/")[0]
 BRANCH = f"agent/run-{RUN_ID}"
 TASK = pathlib.Path(E["TASK_FILE"]).read_text().strip()
+TASK_ID = E.get("TASK_ID", "")                              # set when the task came from the to-do list
+QUEUE = ".github/agent-queue.md"
+DAILY_LIMIT = int(E.get("AGENT_DAILY_LIMIT") or "5")         # chained runs per day before pausing for the owner
 GH = {"Authorization": "Bearer " + E["GITHUB_TOKEN"], "Accept": "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28"}
 API = f"https://api.github.com/repos/{REPO}"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -279,12 +282,46 @@ def push(ref):
     return sh(["git", "-c", f"http.extraheader=AUTHORIZATION: basic {tok}", "push", "origin", ref])
 
 
+def chain(status, merged):
+    """After a run: tick the task off the to-do list and start the next one, or say why not. Returns text for the issue."""
+    if not TASK_ID:
+        return "This task was not from the to-do list, so the list was not advanced. Reply `/agent-continue` to start the next listed task."
+    if status != "approved" or not merged:
+        return f"To-do list paused at `{TASK_ID}`: it was not approved and merged, so nothing further starts on its own."
+    for attempt in range(2):                     # tick it off on the design branch (retry once if the branch just moved)
+        sh(["git", "fetch", "-q", "origin", BASE])
+        git("checkout", "-q", "-B", "queue-tick", f"origin/{BASE}")
+        if sh(["python3", str(CTL / "tools/agent/queue.py"), "done", QUEUE, TASK_ID]).returncode:
+            return f"Could not find `{TASK_ID}` in `{QUEUE}`; the to-do list was not advanced."
+        git("commit", "-q", "-am", f"To-do list: {TASK_ID} done (run {RUN_ID})")
+        if push(f"HEAD:refs/heads/{BASE}").returncode == 0:
+            break
+    else:
+        return f"Could not tick `{TASK_ID}` off the to-do list (the design branch kept moving). Paused."
+    if sh(["python3", str(CTL / "tools/agent/queue.py"), "info", QUEUE, TASK_ID]).stdout.strip() == "pause":
+        return f"@{OWNER} `{TASK_ID}` is marked for your review before the next task. Have a look; when you're happy, reply `/agent-continue` (or tell ChatGPT what to change)."
+    nxt = sh(["python3", str(CTL / "tools/agent/queue.py"), "next", QUEUE, str(OUT / "next-task.md")])
+    if nxt.returncode:
+        return f"@{OWNER} the to-do list is empty. Next: ask ChatGPT to add the next tasks to `{QUEUE}`."
+    today = time.strftime("%Y-%m-%d", time.gmtime())
+    try:
+        runs = http(f"{API}/actions/workflows/agent-cycle.yml/runs?event=workflow_dispatch&created=%3E%3D{today}&per_page=1", GH).get("total_count", 0)
+    except Exception:
+        runs = DAILY_LIMIT
+    if runs >= DAILY_LIMIT:
+        return f"@{OWNER} daily limit reached ({DAILY_LIMIT} automatic tasks). Next up is `{nxt.stdout.strip()}`; reply `/agent-continue` to carry on now, or it waits for you."
+    try:
+        http(f"{API}/actions/workflows/agent-cycle.yml/dispatches", GH, {"ref": E.get("CONTROL_REF", "main"), "inputs": {"task_id": nxt.stdout.strip(), "mode": "merge"}})
+        return f"Started the next task on the to-do list: `{nxt.stdout.strip()}` (it will post here)."
+    except Exception as e:
+        return f"@{OWNER} could not start the next task `{nxt.stdout.strip()}` ({str(e)[:120]}). Reply `/agent-continue` to try again."
+
+
 def finish(status, rv, gates, report, changed):
     head = git("rev-parse", "HEAD")
-    where, pr_url, pr_failed = "", "", False
+    where, pr_url, pr_failed, merged = "", "", False, False
     if changed:
         push(f"HEAD:refs/heads/{BRANCH}")
-        merged = False
         if status == "approved" and MODE == "merge":
             r = push(f"HEAD:refs/heads/{BASE}")      # fast-forward only: refused if the base moved meanwhile
             merged = r.returncode == 0
@@ -305,8 +342,15 @@ def finish(status, rv, gates, report, changed):
     if pr_failed:
         needs = f"@{OWNER} one setting: Settings → Actions → General → tick \"Allow GitHub Actions to create and approve pull requests\". Until then the work waits on branch `{BRANCH}`."
     q = rv.get("owner_question") if rv else ""
+    if status == "approved" and not changed:
+        merged = True                            # nothing to merge (e.g. a "no change needed" conclusion) counts as done
+    try:
+        nexts = chain(status, merged)
+    except Exception as e:
+        nexts = f"@{OWNER} the to-do list step failed ({str(e)[:150]}); nothing further started."
     comment(f"## Agent cycle finished · {status.upper()}\n\n**STATUS:** {'ready' if status == 'approved' else 'review needed'} · **Tested commit:** `{head[:12]}` · [run]({RUN_URL})\n\n"
             f"**Result:** {where}\n\n**Needs:** {needs}" + (f"\n\n**Question for the owner:** {q}" if q and status != "approved" else "")
+            + f"\n\n**To-do list:** {nexts}"
             + "\n\n`main` and the live app were not touched. Anything for production goes through a pull request the owner approves.")
     try:
         http(f"{API}/issues/{ISSUE}/labels", GH, {"labels": [f"agent:{status}"]})

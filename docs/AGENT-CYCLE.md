@@ -56,3 +56,20 @@ colleague does, and to come to the owner only for real input or approval.
   what was agreed; or a problem the agents have tried and failed to solve twice.
 - **When you do ask:** mention @Mikejpatterson, ask one plain-English question, give a recommendation, and if
   they must do something by hand, give one step at a time with what they should see on screen.
+
+## The to-do list: tasks run one after another without anyone
+The list is `.github/agent-queue.md` on the design branch. The owner and ChatGPT edit it. The coding agent cannot,
+because `.github/` is protected. Each task is a heading, with its instruction underneath:
+
+```
+## [ ] ruling-target
+Make the Ruling question box at least 44px tall at 360, 390 and 135% text in both looks. CSS only.
+## [ ] long-names (pause)
+...
+```
+- When a task from the list is approved and merged into the design branch, the workflow ticks it off (`[x]`) and starts the next one.
+- **(pause)** after a task's name means: when it's approved, stop and tag the owner to have a look before going on.
+- The chain also stops, and tags the owner, when a task is not approved, when the list is empty, or after
+  `AGENT_DAILY_LIMIT` automatic tasks in a day (default 5). This keeps spending bounded.
+- To carry on after any stop, comment `/agent-continue` on issue #1. That runs the next waiting task.
+- A one-off task started with `/agent-task` does not advance the list.
