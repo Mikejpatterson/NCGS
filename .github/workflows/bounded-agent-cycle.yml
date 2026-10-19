@@ -76,10 +76,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: main
+          ref: automation/bounded-agent-cycle
+          path: runner
           persist-credentials: false
-      - name: Claude reads and responds to OpenAI review in Issue 1
+      - uses: actions/checkout@v4
+        with:
+          ref: design/crest-editorial-prototype
+          path: context
+          persist-credentials: false
+      - name: Claude reviews with repository handover and recent issue discussion
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GH_TOKEN: ${{ github.token }}
-        run: python3 tools/claude_api_review.py
+          NCGS_CONTEXT_DIR: context
+        run: python3 runner/tools/claude_api_review.py
