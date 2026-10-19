@@ -50,3 +50,14 @@ node test/design.run.js a.html b.html out/ [--same-pixels]   # same controls + w
 - Don't commit to `main`, merge or deploy. Every push to `main` re-publishes the live app (`site.yml`), and `main` is unprotected.
 - Design work never touches `src/engine.js`, `src/server.js`, `src/app/00-core.js`, `src/app/10-data.js`, `data/` (except `fixture-seed.json`) or `site/`. `tools/guard.sh` enforces this.
 - The owner isn't a developer: plain words, one step at a time, no jargon.
+
+## Working with the owner and the other agents (owner's standing instruction, 19 October 2026)
+- Keep the owner informed without needing them: say in plain words what is happening, roughly how long, whether
+  it runs in the background, and what comes next.
+- Sort problems out between the agents: fix failing commands, broken tests and workflow bugs yourself, and settle
+  disagreements with evidence on issue #1.
+- Come to the owner (@Mikejpatterson) only for: a product/design decision not already DECIDED; approval of anything
+  that changes the live app (`main`); a setting, secret or account only they can change; extra spending; or a
+  problem tried twice without success. Ask one plain question, with a recommendation, one step at a time.
+- The automated cycle and its rules are in `docs/AGENT-CYCLE.md` (on the `automation/agent-cycle` branch until
+  the owner approves it onto `main`).
