@@ -72,6 +72,7 @@ CLAUDE_TOOLS = ",".join([
     "Bash(node:*)", "Bash(NCGS_FIXTURE=1 node:*)", "Bash(NCGS_FIXTURE=1 NCGS_DESIGN=editorial node:*)",
     "Bash(sh tools/guard.sh:*)", "Bash(git diff:*)", "Bash(git status:*)", "Bash(git log:*)", "Bash(git show:*)",
     "Bash(ls:*)", "Bash(grep:*)", "Bash(python3 -m http.server:*)",
+    "Bash(MIN_TARGET=44 node:*)", "Bash(DESIGN_SIZES=390 node:*)", "Bash(LAYOUT_URL=http://localhost:8765/preview.html node:*)",
 ])
 CLAUDE_DENY = "Bash(git push:*),Bash(git commit:*),Bash(git checkout:*),Bash(git reset:*),Bash(curl:*),Bash(wget:*),WebFetch,WebSearch"
 
@@ -297,6 +298,20 @@ def main():
     finish(status, review_data, gates, report, changed)
 
 
+def catch_up_base():
+    """The design branch moved during the run. If the new commits only touch the to-do list or documents
+    (someone edited the list, or a note), replay this run's commits on top so the result can still go in.
+    Anything else is a real overlap: leave it for a pull request."""
+    sh(["git", "fetch", "-q", "origin", BASE])
+    moved = git("diff", "--name-only", BASE_SHA, f"origin/{BASE}").splitlines()
+    if not moved or not all(re.match(r'^(\.github/agent-queue\.md|docs/)', f) for f in moved):
+        return False
+    if sh(["git", "rebase", "-q", f"origin/{BASE}"]).returncode:
+        sh(["git", "rebase", "--abort"])
+        return False
+    return True
+
+
 def push(ref):
     if BASE != "design/crest-editorial-prototype" or ref not in (
         f"HEAD:refs/heads/{BRANCH}", f"HEAD:refs/heads/{BASE}"
@@ -349,6 +364,9 @@ def finish(status, rv, gates, report, changed):
             raise RuntimeError(f"Could not push `{BRANCH}`; no pull request or queue advancement was attempted")
         if status == "approved" and MODE == "merge":
             r = push(f"HEAD:refs/heads/{BASE}")      # fast-forward only: refused if the base moved meanwhile
+            if r.returncode and catch_up_base():     # only the to-do list or documents moved: replay and try again
+                head = git("rev-parse", "HEAD")
+                r = push(f"HEAD:refs/heads/{BASE}")
             merged = r.returncode == 0
             where = f"fast-forwarded `{BASE}` to `{head[:12]}`" if merged else f"`{BASE}` moved during the run, so it was not updated"
         if not merged:
