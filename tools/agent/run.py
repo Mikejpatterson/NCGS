@@ -72,6 +72,7 @@ CLAUDE_TOOLS = ",".join([
     "Bash(node:*)", "Bash(NCGS_FIXTURE=1 node:*)", "Bash(NCGS_FIXTURE=1 NCGS_DESIGN=editorial node:*)",
     "Bash(sh tools/guard.sh:*)", "Bash(git diff:*)", "Bash(git status:*)", "Bash(git log:*)", "Bash(git show:*)",
     "Bash(ls:*)", "Bash(grep:*)", "Bash(python3 -m http.server:*)",
+    "Bash(MIN_TARGET=44 node:*)", "Bash(DESIGN_SIZES=390 node:*)", "Bash(LAYOUT_URL=http://localhost:8765/preview.html node:*)",
 ])
 CLAUDE_DENY = "Bash(git push:*),Bash(git commit:*),Bash(git checkout:*),Bash(git reset:*),Bash(curl:*),Bash(wget:*),WebFetch,WebSearch"
 
@@ -92,7 +93,8 @@ Rules:
   (except regenerating data/fixture-seed.json with node tools/make-fixture.js), site/ or deploy.json. Never create data/seed.json.
 - Do not commit, push or switch branches: the workflow commits your changes after the tests.
 - Before finishing run: node --test test/engine.test.js test/server.test.js   and   sh tools/guard.sh {BASE_SHA}
-  The workflow then runs the full hard gates (layout at 360/390/135%, several phones, whole round, design comparison).
+  The workflow then runs the layout test, the screenshot comparison and the several-phones tests itself, straight
+  after your turn: do not run those yourself (it only adds time). Take your own screenshots only if the task asks.
 - Do not weaken a test to make it pass. If a test is wrong, say so with evidence in your report and leave it.
 """
     if rnd > 1:
@@ -145,9 +147,9 @@ def run_claude(rnd, review, gates, report):
 
 
 # ---------------- hard gates ----------------
-def run_gates(rnd):
-    out = OUT / f"gates-{rnd}"
-    r = sh(["bash", str(CTL / "tools/agent/gates.sh"), str(WORK), BASE_SHA, str(out)], timeout=3600)
+def run_gates(rnd, level="quick"):
+    out = OUT / (f"gates-{rnd}" if level == "quick" else f"gates-{rnd}-full")
+    r = sh(["bash", str(CTL / "tools/agent/gates.sh"), str(WORK), BASE_SHA, str(out), level], timeout=3600)
     (out / "gates.txt").write_text(r.stdout + r.stderr)
     try:
         return json.loads((out / "gates.json").read_text())
@@ -179,7 +181,13 @@ workflow's hard-gate results (those results are produced by the workflow, not by
 - Ground every finding in the diff, a gate result or a named rule. Mark demonstrated=true only if the diff or a gate
   result shows it. Speculation is a NOTE at most. Do not repeat generic advice already handled in the handover.
 - BLOCKER: breaks a CLAUDE.md rule, a hard gate failed, scoring/sync/data risk, out of scope, or weakens a test.
-  ACTIONABLE: should be fixed within this task. QUESTION: you need an answer. NOTE: no action needed.
+  ACTIONABLE: a real defect in this task's result that the owner or a golfer would notice, or a task requirement not met.
+  QUESTION: you need an answer. NOTE: everything else.
+- Be economical: every revise costs a full round. Wording, documentation style, extra explanation, reconciling numbers
+  that the gate results already show, and "consider also" ideas are NOTEs, never ACTIONABLE. Approve with notes.
+- These are QUICK checks (only what the change touches). After you approve, the workflow runs the slow full checks
+  itself (whole screenshot comparison, several-phones scoring) and sends the work back if they fail, so do not
+  withhold approval waiting for them.
 - Keep ids stable across rounds (R1, R2, ...). If Claude answered DISAGREE with evidence, check it: either accept
   (drop the finding, say so in reply_to_claude) or keep it with stronger evidence. If the same disagreement is
   still unresolved after Claude's evidence, verdict "escalate" - do not loop.
@@ -263,10 +271,21 @@ def main():
         if sh(["git", "diff", "--cached", "--quiet"]).returncode:
             git("commit", "-q", "-m", f"Agent round {rnd}: {TASK.splitlines()[0][:60]}\n\nAutomated agent cycle, run {RUN_URL}")
             changed = True
-        gates = run_gates(rnd)
+        gates = run_gates(rnd, "quick")              # a few minutes: only what this change touches
         review_data = review(rnd, gates, report, review_data)
+        full_note = ""
+        if ok and review_data["verdict"] == "approve":
+            full = run_gates(rnd, "full")            # the slow checks, once, and only if app code changed
+            gates = {"level": "quick+full", "hard_ok": gates["hard_ok"] and full["hard_ok"], "checks": gates["checks"] + full["checks"]}
+            if not full["hard_ok"]:
+                failed = [c for c in full["checks"] if c["kind"] == "hard" and c["result"] != "ok"]
+                review_data = {"verdict": "revise", "owner_question": "", "summary": "The reviewer approved, but the full checks failed, so this round goes back to Claude.",
+                               "findings": [{"id": f"G{i + 1}", "severity": "BLOCKER", "file": "(workflow full checks)", "claim": f"{c['name']} failed: {c['detail']}",
+                                             "evidence": "full hard gates run by the workflow after approval", "demonstrated": True, "reply_to_claude": "Fix this; see the run's artefacts for the log."}
+                                            for i, c in enumerate(failed)]}
+            full_note = " · full checks " + ("passed" if full["hard_ok"] else "**failed**")
         head = git("rev-parse", "HEAD")
-        comment(f"## Agent cycle · round {rnd} of {MAX_ROUNDS}\n\n**Commit:** `{head[:12]}` · **Reviewer verdict:** **{review_data['verdict'].upper()}** · [run]({RUN_URL})\n\n"
+        comment(f"## Agent cycle · round {rnd} of {MAX_ROUNDS}\n\n**Commit:** `{head[:12]}` · **Reviewer verdict:** **{review_data['verdict'].upper()}**{full_note} · [run]({RUN_URL})\n\n"
                 f"### Hard gates (run by the workflow)\n{gates_table(gates)}\n\n### Claude (coding)\n{report[:12000]}\n\n"
                 f"### OpenAI (independent review)\n{review_data['summary']}\n\n{findings_list(review_data)}")
         if not ok:
@@ -277,6 +296,20 @@ def main():
             status = "escalated"; break
         status = "out-of-rounds"
     finish(status, review_data, gates, report, changed)
+
+
+def catch_up_base():
+    """The design branch moved during the run. If the new commits only touch the to-do list or documents
+    (someone edited the list, or a note), replay this run's commits on top so the result can still go in.
+    Anything else is a real overlap: leave it for a pull request."""
+    sh(["git", "fetch", "-q", "origin", BASE])
+    moved = git("diff", "--name-only", BASE_SHA, f"origin/{BASE}").splitlines()
+    if not moved or not all(re.match(r'^(\.github/agent-queue\.md|docs/)', f) for f in moved):
+        return False
+    if sh(["git", "rebase", "-q", f"origin/{BASE}"]).returncode:
+        sh(["git", "rebase", "--abort"])
+        return False
+    return True
 
 
 def push(ref):
@@ -331,6 +364,9 @@ def finish(status, rv, gates, report, changed):
             raise RuntimeError(f"Could not push `{BRANCH}`; no pull request or queue advancement was attempted")
         if status == "approved" and MODE == "merge":
             r = push(f"HEAD:refs/heads/{BASE}")      # fast-forward only: refused if the base moved meanwhile
+            if r.returncode and catch_up_base():     # only the to-do list or documents moved: replay and try again
+                head = git("rev-parse", "HEAD")
+                r = push(f"HEAD:refs/heads/{BASE}")
             merged = r.returncode == 0
             where = f"fast-forwarded `{BASE}` to `{head[:12]}`" if merged else f"`{BASE}` moved during the run, so it was not updated"
         if not merged:

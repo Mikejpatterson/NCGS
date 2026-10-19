@@ -14,6 +14,7 @@ Read these first, and follow them exactly as Claude does:
 - To start a task now, comment on issue #1 with a first line of `/agent-task`, followed by the instruction.
 - To queue tasks, add them to `.github/agent-queue.md` on `design/crest-editorial-prototype` (format in `docs/AGENT-CYCLE.md`). Mark a task `(pause)` if the owner should look before the next one starts.
 - To resume after a pause, comment `/agent-continue` on issue #1.
+- Keep it efficient: combine small related changes into one task, and send work back only for real defects. Each run has a fixed start-up cost, and every revision repeats the checks.
 - Please don't edit `design/crest-editorial-prototype` directly while a cycle is running, or two agents will collide. If you do code yourself, use your own branch and open a pull request into the design branch. The same checks apply: `sh tools/guard.sh`, `node --test test/engine.test.js test/server.test.js`, and the layout and design comparison tests described in `docs/CLAUDE-HANDOVER.md`.
 
 ## Hard limits
