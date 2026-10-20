@@ -1,0 +1,73 @@
+name: Claude review on request
+# Codex (or the owner) comments "/claude-review" on a pull request -> Claude reviews that exact commit and posts
+# a verdict there. Codex is asked the other way with "@codex review", which Codex already supports natively.
+# Only comments from the owner's account start it (Codex posts through the owner's GitHub connection); comments
+# from bots never do, so the two agents cannot set each other off in a loop. Read-only: nothing is pushed, merged
+# or deployed. Limits: one review per commit, at most 5 per pull request, 15 minutes, one at a time per PR.
+on:
+  issue_comment:
+    types: [created]
+  push:   # self-test before this file is on main
+    branches: [automation/claude-review]
+    paths: [.github/claude-review-selftest.md]
+
+permissions: {}
+
+concurrency:
+  group: claude-review-${{ github.event.issue.number || 'selftest' }}
+  cancel-in-progress: false
+
+jobs:
+  review:
+    if: >-
+      github.event_name == 'push' || (
+        github.event.issue.pull_request &&
+        startsWith(github.event.comment.body, '/claude-review') &&
+        github.event.comment.author_association == 'OWNER' &&
+        github.event.comment.user.type == 'User')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: write
+    steps:
+      - name: Control files (trusted)
+        uses: actions/checkout@v4
+        with:
+          path: ctl
+          persist-credentials: false
+      - name: Which pull request
+        env:
+          EVENT: ${{ github.event_name }}
+          NUM: ${{ github.event.issue.number }}
+        run: |
+          if [ "$EVENT" = push ]; then n=$(grep -oE '[0-9]+' ctl/.github/claude-review-selftest.md | head -1); else n="$NUM"; fi
+          test -n "$n" && echo "PR_NUMBER=$n" >> "$GITHUB_ENV"
+      - name: The pull request's code (read only)
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ env.PR_NUMBER }}/head
+          path: work
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Tests on that exact commit (no secrets in this step)
+        working-directory: work
+        run: |
+          {
+            node --test test/engine.test.js test/server.test.js 2>&1 | grep -E '^# (pass|fail)' | sed 's/^/engine+server: /'
+            if [ -f test/agent_cycle_test.py ]; then python3 test/agent_cycle_test.py 2>&1 | tail -1 | sed 's/^/agent controller: /'; fi
+          } > ../test-results.txt || true
+          cat ../test-results.txt
+      - name: Claude (pinned)
+        run: npm install -g @anthropic-ai/claude-code@2.1.296
+      - name: Review and post the verdict
+        env:
+          WORK: work
+          TEST_RESULTS: test-results.txt
+          GITHUB_TOKEN: ${{ github.token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python3 ctl/tools/agent/review_pr.py
