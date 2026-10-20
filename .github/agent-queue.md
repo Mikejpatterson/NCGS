@@ -56,3 +56,38 @@ colour-distance number as a universal accessibility pass. Capture both looks and
 If evidence demonstrates a problem, show the smallest measured alternative, with before/after comparisons and
 unchanged team semantics, before recommending adoption. Run normal hard gates for any CSS change. Record that
 simulations do not establish real-phone sunlight readability. Pause with linked evidence for the owner's phone review.
+
+## [ ] handover-current
+From docs/ROADMAP.md version 1 (owner-approved via #18, merge e8e5a63), task `handover-current`.
+
+Update the historical status sections of `docs/CLAUDE-HANDOVER.md`, `docs/AI-COLLABORATION.md` and the colour-audit
+summary to reflect the actual completed queue, the active controller location and the recorded colour-only
+exception. Keep the measured audit results and remaining real-phone limitations. Link evidence instead of
+reopening settled decisions. No application, workflow or queue edits by the coding agent.
+
+Acceptance: statements match current remote refs/runs and owner decisions; historical escalation remains visible;
+no claim that phone review, native Codex activation or production approval occurred. Normal documentation gates.
+
+## [ ] name-resize-check
+From docs/ROADMAP.md version 1 (owner-approved via #18, merge e8e5a63), task `name-resize-check`.
+
+Investigate the documented limitation in `docs/LONG-NAMES.md`: rows are remeasured on redraw/orientation change,
+but a live text-size change may wait for the next tap. Use fictional normal, borderline and long names on the
+same open entry screen, at 360/390px, both looks, before and after changing to 135% text. Record whether overlap
+actually occurs before the next tap. Preserve compact normal-name rows and controls. This task adds evidence,
+not a speculative app fix.
+
+Acceptance: reproducible command, actual dimensions/screenshots and pass/fail; distinguish browser simulation
+from iPhone behaviour. State no defect if none is reproduced. Existing app/layout evidence remains intact.
+
+## [ ] warning-token-audit
+From docs/ROADMAP.md version 1 (owner-approved via #18, merge e8e5a63), task `warning-token-audit`.
+
+Investigate the existing audit finding that `.c-b` is used for Delete round, Turn KBs off and Out of date as well
+as team identity. Inspect actual DOM and computed colours in both looks with fictional data. Document exact uses
+and whether the editorial theme changes warning meaning/readability. No general organiser redesign or copy change.
+
+Acceptance: selector/element map, contrast values and screenshots for demonstrated cases, smallest proposed
+remedy only if warranted. Colour distance alone is not an accessibility pass. Keep owner-approved team colours
+and the colour-only result-pill exception. A no-change conclusion is valid.
+
