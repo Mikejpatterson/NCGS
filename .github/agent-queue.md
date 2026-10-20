@@ -133,3 +133,30 @@ score logic or control attributes.
 
 Acceptance: linked before/after pairs, exact source SHAs and checks; intentional differences explained; no
 clipping or name/control overlap. Preserve behaviour and data invariants.
+
+## [ ] release-buggy-evidence
+From docs/ROADMAP.md version 1 (owner-approved via #18, merge `e8e5a63`), task
+`release-buggy-evidence`.
+
+Reuse the team-colour audit and capture missing candidate-SHA comparisons for open and decided nines, overall results
+and the no-buggies fixture state. Use 360px, 390px and 390px/135% text in both looks. Preserve the owner's
+20 October colour-only result-pill decision, pair ordering and initials elsewhere, and existing screen-reader labels;
+do not add visible leader words.
+
+Acceptance: labelled originals and relevant simulations, measured contrast, source SHAs and existing content/control
+parity results. Keep simulations separate from the outstanding real-phone sunlight check. Use no real member data,
+do not broaden the colour-only exception and do not present browser evidence as a real-iPhone result.
+
+## [ ] prelaunch-review-pack
+From docs/ROADMAP.md version 1 (owner-approved via #18, merge `e8e5a63`), task
+`prelaunch-review-pack`. Run after the Home, Hole and Buggy Wars evidence tasks.
+
+Create one release-review document linking the three evidence sets, change summary, known limits, test run ids,
+explicit owner decisions and a reproducible fictional-data phone-preview package. Include a real phone-preview link
+only after an authorized isolated hosting route has actually been published and verified. Its service-worker scope
+must not overlap the live app, and it must contain no real data, PINs, production endpoints or secrets. Packaging is
+authorized design work; publication or hosting is not inferred from this roadmap.
+
+Acceptance: one review page with complete traceable evidence and existing full gates at a named candidate SHA;
+include a verified preview link or an explicit pending state. Do not call the release ready while real-phone checks
+or mandatory evidence are absent. Do not push main, open a release merge, deploy, publish or invent crest artwork.
