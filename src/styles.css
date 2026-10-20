@@ -1709,3 +1709,26 @@ body { font-variant-numeric: tabular-nums; }
 
 /* Display type: only the brand name, the Home round name and the round page title. Names, numbers and controls stay in the system font. */
 .hero.home .wordmark, .hero.home .now-name, .rp-name { font-family: var(--font-display); }
+
+/* Long names: a name wraps onto another line instead of being cut off or running into a score, icon or button.
+   Text keeps its size and buttons keep their size. A single word too long for its space breaks inside the word. */
+.lname > span, .lrow .ln .n { overflow: visible; text-overflow: clip; white-space: normal; }
+.ln .n, .pl-n > span, .sn .n, .hrow .nm > span, .rg .pb, .rg .pr, .rg .pk, .rp-kbs .pk, .lc-n, .ct-r .b { overflow-wrap: anywhere; hyphens: auto; }
+.row > .chev, .row > .c-g { flex: none; }
+.lc-row { flex-wrap: wrap; }
+.lc-n { min-width: 0; }
+.lc-p { flex: none; margin-left: auto; white-space: nowrap; }
+.crow .ct-l { flex-shrink: 0; max-width: 55%; }
+.ct-r { min-width: 0; white-space: normal; text-align: right; }
+.ct-r .pill { white-space: nowrap; }
+/* Score entry: the name has the full width of its tile, with Pick up and the − score + buttons on the line below,
+   so even a short name and its arrow never run into Pick up. */
+.entry .bugs .pr.ptile { grid-template-areas: "nm nm nm nm" "pu dn sc up"; row-gap: 2px; }
+.entry .bugs .nmrow { white-space: normal; }
+.entry .bugs .nmrow > span { min-width: 0; overflow-wrap: anywhere; hyphens: auto; }
+.entry .bugs .nmrow > svg { flex: none; }
+@container (min-width: 19.5em) {
+  .entry .bugs .pr.ptile { grid-template-columns: minmax(0, 1fr) 44px 60px 44px; grid-template-areas: "nm nm nm nm" "pu dn sc up"; }
+  .entry .bugs .pr-top .pu, .entry .bugs .pr-top .pu.on { justify-self: start; padding: 0 2px; }
+  .entry .bugs .pr-top .pu.on { padding: 0 14px; }
+}
