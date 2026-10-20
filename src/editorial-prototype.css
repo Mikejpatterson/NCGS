@@ -12,6 +12,10 @@
   --team-b-soft: rgba(155, 52, 67, .13);
   /* iPhone: New York (Apple's system serif). Android and others: Georgia or the phone's serif. */
   --font-display: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
+  /* The serif is wider: cap the two round titles by screen width so a long name fits in two lines at 360px.
+     They still shrink on a small screen but no longer grow with the phone's larger text setting. */
+  --t-display-home: min(1.8rem, 6.8vw);
+  --t-display-round: min(2rem, 6.8vw);
 }
 /* Serif display titles keep lining figures, so "Round 3" or a date does not dip below the line. */
 .hero.home .wordmark, .hero.home .now-name, .rp-name { font-variant-numeric: lining-nums; letter-spacing: -.01em; }

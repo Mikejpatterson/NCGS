@@ -9,15 +9,15 @@
 // by aria-label, text or data-act, and prints every small control as a TARGET line. Without it nothing changes.
 const { chromium } = require('playwright');
 const sizes = [['small 360', 360, 740, 1], ['normal 390', 390, 844, 1], ['large text 390', 390, 844, 1.35]];
-const URL = 'http://localhost:8765/preview.html';
+const URL = process.env.LAYOUT_URL || 'http://localhost:8765/preview.html';
 const STRICT = !!process.env.MIN_TARGET; const MIN = STRICT ? Number(process.env.MIN_TARGET) : 40;
 if (STRICT && !(MIN > 0)) { console.log('MIN_TARGET must be a number of pixels, e.g. MIN_TARGET=44'); process.exit(2); }
 const home = async p => { await p.evaluate(() => { const n = window.__ncgs; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); }); await p.waitForTimeout(150); };
 // The fixture's long round title belongs to a finished round, which has no display title. Lend it, in memory only,
 // to the rounds not yet finished so the Home round card and the round page show it. The checked-in fixture is unchanged.
-// The whole title must show: no cut-off, no ellipsis, inside the screen. Line count is printed as TITLE lines; at most
-// two lines is enforced only with TITLE_LINES=2, because today's 2rem titles take 4 lines at 360px in both looks
-// (docs/TYPOGRAPHY.md) and making it fit needs a design decision.
+// The whole title must show: no cut-off, no ellipsis, inside the screen. Line count is printed as TITLE lines.
+// The editorial build must fit it in at most two lines (its titles are capped by screen width). The standard look is
+// kept as it is (3-4 lines at 360px), so there the count is only reported unless TITLE_LINES=2 is set. See docs/TYPOGRAPHY.md.
 const TITLE_MAX = Number(process.env.TITLE_LINES) || 0;
 const LONG = 'Cabopino, the long-named second day of the trip';
 const longTitle = async (p, v) => { const ok = await p.evaluate(({ v, long }) => { const n = window.__ncgs;
@@ -120,6 +120,7 @@ const fontsCheck = ({ display, glyph }) => {
 // The whole long round title: at most two lines, nothing hidden, no ellipsis, inside the screen.
 const titleCheck = ({ sel, want, max }) => {
   const e = document.querySelector(sel); if (!e) return { bad: ['no ' + sel] };
+  if (!max && [...document.querySelectorAll('style')].some(x => x.textContent.includes('NCGS editorial prototype'))) max = 2;
   const cs = getComputedStyle(e), bad = [];
   if (e.textContent.trim() !== want) bad.push('title text is "' + e.textContent.trim() + '"');
   const rg = document.createRange(); rg.selectNodeContents(e);
@@ -134,7 +135,7 @@ const titleCheck = ({ sel, want, max }) => {
     if (r.left < ar.left - 1 || r.right > ar.right + 1 || r.top < ar.top - 1 || r.bottom > ar.bottom + 1) bad.push('title clipped by [' + a.className + ']');
   }
   if (r.left < 0 || r.right > window.innerWidth) bad.push('title off screen ' + Math.round(r.left) + '..' + Math.round(r.right));
-  return { bad, lines: Math.max(tops.size, lines), font: cs.fontFamily.split(',')[0] };
+  return { bad, lines: Math.max(tops.size, lines), font: cs.fontFamily.split(',')[0], max };
 };
 (async () => {
   const b = await chromium.launch(); let fails = 0;
@@ -165,7 +166,7 @@ const titleCheck = ({ sel, want, max }) => {
     const t = await longTitle(p, v).then(() => p.evaluate(titleCheck, { sel, want: LONG, max: TITLE_MAX }), e => ({ bad: [e.message] }));
     if (t.bad.length) { fails++; console.log('FAIL  ' + sn + ' / long round title ' + sel); t.bad.forEach(x => console.log('      ' + x)); }
     else console.log('PASS  ' + sn + ' / long round title ' + sel + ' shows in full');
-    if (t.lines) console.log('TITLE  ' + sn + ' | ' + sel + ' | ' + t.lines + ' lines | ' + t.font + (TITLE_MAX ? '' : ' (two-line limit not enforced, see TITLE_LINES)'));
+    if (t.lines) console.log('TITLE  ' + sn + ' | ' + sel + ' | ' + t.lines + ' lines | ' + t.font + (t.max ? ' (limit ' + t.max + ')' : ' (standard look: limit not enforced, see TITLE_LINES)'));
     await ctx.close();
   }
   await b.close(); if (fails) { console.log('SOME FAILED'); process.exit(1); }
