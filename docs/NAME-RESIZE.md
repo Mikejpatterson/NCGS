@@ -55,3 +55,26 @@ then, on the same open screen with no tap, changes the text size: 100% to 135% (
   back without tapping, and look at the arrow beside Pick up.
 - Roadmap task 3 (`name-resize-fix`) was conditional on a demonstrated overlap; this is that evidence in Chromium.
   This tool is its reproduction: a fix should make all 24 states pass.
+
+## Fix (roadmap task `name-resize-fix`)
+`src/app/30-play.js` now watches an invisible box that is 1rem wide and 1em tall (one `ResizeObserver`, set up once
+when the app loads). When the text size changes, that box changes size and `fitNames()` measures the rows again at
+once, with no tap and no timer. `fitNames()` never changes the box, so it cannot set itself off again. If a browser
+has no `ResizeObserver`, nothing changes from before (the next tap still fixes the rows).
+
+Same tool, same commands, after the fix: **all 24 states pass in both looks** (`name-resize-shots/after/`,
+`check-std.txt` and `check-ed.txt`). Straight after the change, before any tap:
+
+| Width, change | Before the fix | After the fix |
+|---|---|---|
+| 360, 100% → 135% | FAIL (Fiachra Óg's arrow on −) | pass: Donnacha and Fiachra Óg move to their own line |
+| 360, 135% → 100% | pass, but two names stuck on two lines | pass: back to compact one-line rows |
+| 390, 100% → 135% | pass, but two names stuck on two lines | pass: one-line rows |
+| 390, 135% → 100% | FAIL (arrows on Pick up) | pass: Donnacha and Fiachra Óg move to their own line |
+
+Aidan (a normal name) stays a compact one-line row in every state (72px at 390/100%). Still 0 "resize" events, so
+the new watcher is what fixed it. Before/after pictures: `name-resize-shots/{std,ed}-*-b-changed.png` (before) and
+`name-resize-shots/after/{std,ed}-*-b-changed.png` (after).
+
+Still Chromium on Linux, not an iPhone. Whether an iPhone redraws an open screen when Text Size is changed in
+Control Centre, and whether the watcher sees it, needs the real-phone check described above.

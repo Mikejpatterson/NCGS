@@ -194,6 +194,20 @@ function fitNames() {
   tiles.filter(runsOver).forEach(t => t.classList.add('long'));
 }
 window.addEventListener('resize', fitNames);
+/* A text size change does not always send "resize" (docs/NAME-RESIZE.md), so an invisible 1rem × 1em box is watched
+   instead: when it changes size, the text size changed, and the rows are measured again at once. fitNames() never
+   changes this box, so it cannot loop. */
+if (window.ResizeObserver) {
+  const probe = document.createElement('span');
+  probe.setAttribute('aria-hidden', 'true');
+  probe.style.cssText = 'position:fixed;top:0;left:0;width:1rem;height:1em;visibility:hidden;pointer-events:none;';
+  document.body.appendChild(probe);
+  let last = '';
+  new ResizeObserver(() => {
+    const size = probe.offsetWidth + 'x' + probe.offsetHeight;
+    if (size !== last) { const first = !last; last = size; if (!first) fitNames(); }
+  }).observe(probe);
+}
 
 VIEWS.entry = () => {
   const ctx = entryCtx();
