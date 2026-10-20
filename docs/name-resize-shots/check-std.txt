@@ -1,0 +1,61 @@
+PASS  std-360-up  drawn at 100%
+      Aidan                          one-line row 100px  name ends at 103px, first control beside it starts at 160px
+      Donnacha                       one-line row 101px  name ends at 143px, first control beside it starts at 160px
+      Fiachra Óg                     one-line row 100px  name ends at 151px, first control beside it starts at 160px
+      Bartholomew Featherstonehaugh  long  row 132px  name ends at 329px, no control beside it
+FAIL  std-360-up  100% -> 135%, before any tap  (resize events: 0)
+      Aidan                          one-line row 100px  name ends at 118px, first control beside it starts at 160px
+      Donnacha                       one-line row 101px  name ends at 169px, first control beside it starts at 160px
+      Fiachra Óg                     one-line row 100px  name ends at 178px, first control beside it starts at 160px  <- name runs into -
+      Bartholomew Featherstonehaugh  long  row 144px  name ends at 331px, no control beside it
+PASS  std-360-up  135%, after the next tap
+      Aidan                          one-line row 100px  name ends at 118px, first control beside it starts at 160px
+      Donnacha                       long  row 119px  name ends at 169px, no control beside it
+      Fiachra Óg                     long  row 118px  name ends at 178px, no control beside it
+      Bartholomew Featherstonehaugh  long  row 144px  name ends at 331px, no control beside it
+PASS  std-360-down  drawn at 135%
+      Aidan                          one-line row 100px  name ends at 118px, first control beside it starts at 160px
+      Donnacha                       long  row 119px  name ends at 169px, no control beside it
+      Fiachra Óg                     long  row 118px  name ends at 178px, no control beside it
+      Bartholomew Featherstonehaugh  long  row 144px  name ends at 331px, no control beside it
+PASS  std-360-down  135% -> 100%, before any tap  (resize events: 0)
+      Aidan                          one-line row 100px  name ends at 103px, first control beside it starts at 160px
+      Donnacha                       long  row 119px  name ends at 143px, no control beside it
+      Fiachra Óg                     long  row 118px  name ends at 151px, no control beside it
+      Bartholomew Featherstonehaugh  long  row 132px  name ends at 329px, no control beside it
+PASS  std-360-down  100%, after the next tap
+      Aidan                          one-line row 100px  name ends at 103px, first control beside it starts at 160px
+      Donnacha                       one-line row 101px  name ends at 143px, first control beside it starts at 160px
+      Fiachra Óg                     one-line row 100px  name ends at 151px, first control beside it starts at 160px
+      Bartholomew Featherstonehaugh  long  row 132px  name ends at 329px, no control beside it
+PASS  std-390-up  drawn at 100%
+      Aidan                          one-line row  72px  name ends at 103px, first control beside it starts at 129px
+      Donnacha                       long  row 119px  name ends at 143px, no control beside it
+      Fiachra Óg                     long  row 118px  name ends at 151px, no control beside it
+      Bartholomew Featherstonehaugh  long  row 132px  name ends at 359px, no control beside it
+PASS  std-390-up  100% -> 135%, before any tap  (resize events: 0)
+      Aidan                          one-line row 100px  name ends at 118px, first control beside it starts at 190px
+      Donnacha                       long  row 119px  name ends at 169px, no control beside it
+      Fiachra Óg                     long  row 118px  name ends at 178px, no control beside it
+      Bartholomew Featherstonehaugh  long  row 144px  name ends at 360px, no control beside it
+PASS  std-390-up  135%, after the next tap
+      Aidan                          one-line row 100px  name ends at 118px, first control beside it starts at 190px
+      Donnacha                       one-line row 101px  name ends at 169px, first control beside it starts at 190px
+      Fiachra Óg                     one-line row 100px  name ends at 178px, first control beside it starts at 190px
+      Bartholomew Featherstonehaugh  long  row 144px  name ends at 360px, no control beside it
+PASS  std-390-down  drawn at 135%
+      Aidan                          one-line row 100px  name ends at 118px, first control beside it starts at 190px
+      Donnacha                       one-line row 101px  name ends at 169px, first control beside it starts at 190px
+      Fiachra Óg                     one-line row 100px  name ends at 178px, first control beside it starts at 190px
+      Bartholomew Featherstonehaugh  long  row 144px  name ends at 360px, no control beside it
+FAIL  std-390-down  135% -> 100%, before any tap  (resize events: 0)
+      Aidan                          one-line row  72px  name ends at 103px, first control beside it starts at 129px
+      Donnacha                       one-line row  73px  name ends at 143px, first control beside it starts at 129px  <- name runs into Pick up
+      Fiachra Óg                     one-line row  72px  name ends at 151px, first control beside it starts at 129px  <- name runs into Pick up
+      Bartholomew Featherstonehaugh  long  row 132px  name ends at 359px, no control beside it
+PASS  std-390-down  100%, after the next tap
+      Aidan                          one-line row  72px  name ends at 103px, first control beside it starts at 129px
+      Donnacha                       long  row 119px  name ends at 143px, no control beside it
+      Fiachra Óg                     long  row 118px  name ends at 151px, no control beside it
+      Bartholomew Featherstonehaugh  long  row 132px  name ends at 359px, no control beside it
+2 FAILED

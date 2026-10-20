@@ -49,4 +49,5 @@ Full output: `long-names-shots/check-{before,after}-{std,ed}-{long,normal}.txt`.
 - A row can change between one line and two while scoring: Pick up gets wider once it is switched on, so a name that
   just fitted beside it may move onto its own line.
 - Checked in Chromium only, not on a real iPhone. If the phone's text size is changed while the app is open, rows are
-  measured again on the next tap.
+  measured again on the next tap. Checked in `docs/NAME-RESIZE.md`: in Chromium, a borderline name's arrow does run
+  into Pick up or − until that tap.
