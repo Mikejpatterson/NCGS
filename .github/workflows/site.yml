@@ -3,14 +3,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-  schedule:
-    - cron: '*/15 * * * *'
 permissions:
   contents: read
   pages: write
   id-token: write
-  actions: read
-  issues: read
 concurrency:
   group: pages
   cancel-in-progress: true
@@ -31,10 +27,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
-      - name: Build authenticated dashboard status snapshot
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: python3 tools/dashboard_snapshot.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
