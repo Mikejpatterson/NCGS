@@ -1,7 +1,8 @@
 # Release evidence: Home (roadmap v1, task `release-home-evidence`)
 
 Evidence only: no application change. Invented fixture data only (`data/fixture-seed.json`; "you" is the fixture
-golfer Cathal; normal names such as Kevin, Bartley, Aidan). No real member data.
+golfer Cathal, whose internal id is `colin`, which is why `tools/release-home-shots.js` sets
+`prefs.me = 'colin'`: see the rename map in `tools/make-fixture.js`; normal names such as Kevin, Bartley, Aidan). No real member data.
 
 ## Source SHAs
 | | Commit | Why this one |
