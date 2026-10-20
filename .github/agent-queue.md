@@ -31,17 +31,17 @@ says. Long round names may take up to three lines at large text sizes, but must 
 Close the task with layout passing on both looks, and before/after screenshots of the long title at 360px with 135% text.
 
 ## [ ] long-names (pause)
-Fix the recorded player-name clipping and overlap as a separate usability task. Include the score-entry case
-where the arrow after Donnacha runs into Pick up, as well as the screens identified in the Stage 0 report.
-Use temporary browser-injected fictional names such as "Bartholomew Featherstonehaugh"; leave the committed
-fixture and its normal names unchanged. Prefer wrapping or allowing space; do not hide names with ellipsis,
-shrink functional text below its existing size, or reduce touch targets to fit.
+Finish the long-name fix, building on draft PR #15 (branch `origin/agent/run-39416700568`; bring its files across with
+`git show origin/agent/run-39416700568:<path>`). Keep everything from #15 except the score-entry layout.
 
-Acceptance: before/after screenshots and assertions on affected screens at 360px, 390px and 390px with 135% text,
-in both looks. Check text bounds and overlaps within cards/controls, not just page-wide overflow. Names must
-remain associated with the correct score controls, and Pick up, save and navigation must remain reachable.
-Show unchanged controls/words and normal-name layout outside the documented fix. Pass the 44px layout audit
-and the usual scoring, phone, whole-round and start-hole gates. Link the evidence for owner review at this pause.
+Score entry (owner's direction via Claude, 20 October): keep today's compact one-line row (name, Pick up, −, score, +)
+whenever the name fits. Only when a name does not fit, let Pick up / − / score / + drop onto a line below that name.
+Normal-length names must look exactly as they do today, and four players plus Save must still fit on one 390×844 screen
+at normal text size. This must also fix the recorded overlap of "Donnacha" and its arrow with Pick up.
+
+Acceptance: #15's long-name check passes on all 22 screens × 3 sizes in both looks, `normal-entry` screenshots match
+today's layout for normal names, and the missing "before" check log the reviewer asked for is added.
+Owner reviews the screenshots at this pause.
 
 ## [ ] team-colours-check (pause)
 Audit the editorial navy #244A78 and crimson #9B3443 on Buggy Wars, the hole screen and round-page groups,
