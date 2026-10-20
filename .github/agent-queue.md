@@ -57,7 +57,7 @@ If evidence demonstrates a problem, show the smallest measured alternative, with
 unchanged team semantics, before recommending adoption. Run normal hard gates for any CSS change. Record that
 simulations do not establish real-phone sunlight readability. Pause with linked evidence for the owner's phone review.
 
-## [ ] handover-current
+## [x] handover-current
 From docs/ROADMAP.md version 1 (owner-approved via #18, merge e8e5a63), task `handover-current`.
 
 Update the historical status sections of `docs/CLAUDE-HANDOVER.md`, `docs/AI-COLLABORATION.md` and the colour-audit
