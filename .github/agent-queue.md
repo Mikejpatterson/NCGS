@@ -80,7 +80,7 @@ not a speculative app fix.
 Acceptance: reproducible command, actual dimensions/screenshots and pass/fail; distinguish browser simulation
 from iPhone behaviour. State no defect if none is reproduced. Existing app/layout evidence remains intact.
 
-## [ ] warning-token-audit
+## [x] warning-token-audit
 From docs/ROADMAP.md version 1 (owner-approved via #18, merge e8e5a63), task `warning-token-audit`.
 
 Investigate the existing audit finding that `.c-b` is used for Delete round, Turn KBs off and Out of date as well
