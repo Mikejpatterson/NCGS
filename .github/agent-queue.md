@@ -30,7 +30,7 @@ says. Long round names may take up to three lines at large text sizes, but must 
 - Keep the Ruling "i" glyph as a documented exception; don't change it.
 Close the task with layout passing on both looks, and before/after screenshots of the long title at 360px with 135% text.
 
-## [ ] long-names (pause)
+## [x] long-names (pause)
 Finish the long-name fix, building on draft PR #15 (branch `origin/agent/run-39416700568`; bring its files across with
 `git show origin/agent/run-39416700568:<path>`). Keep everything from #15 except the score-entry layout.
 
