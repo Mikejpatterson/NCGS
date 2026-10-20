@@ -33,7 +33,15 @@ def comment(body):
     return http(f"{API}/issues/{PR}/comments", {"body": body[:60000]}).get("html_url", "")
 
 
-pr = http(f"{API}/pulls/{PR}")
+def fail(msg):
+    print(f"::error title=Claude review::{msg}")   # shows as an annotation, readable through the checks API
+    sys.exit(1)
+
+
+try:
+    pr = http(f"{API}/pulls/{PR}")
+except Exception as e:
+    fail(f"could not read pull request {PR}: {e}")
 head, base = pr["head"]["sha"], pr["base"]["ref"]
 done = [c["body"] for c in http(f"{API}/issues/{PR}/comments?per_page=100") if MARK in (c.get("body") or "")]
 if any(f"{MARK}{head} " in b for b in done):
@@ -82,10 +90,14 @@ try:
     text = (res.get("result") or "").strip()
     ok = r.returncode == 0 and not res.get("is_error") and text
 except Exception as e:
-    text, ok = f"(the review could not be completed: {str(e)[:300]})", False
+    text, ok = f"(the review could not be completed: {str(e)[:300]}; stderr: {(locals().get('r').stderr if locals().get('r') else '')[-300:]})", False
 
 verdict = "APPROVE" if ok and text.rstrip().endswith("VERDICT: APPROVE") else ("CHANGES REQUESTED" if ok and "VERDICT: CHANGES REQUESTED" in text[-200:] else "NO VERDICT")
-url = comment(f"{MARK}{head} verdict={verdict} -->\n## Claude review of `{head[:12]}`: {verdict}\n\n{text}\n\n"
+try:
+  url = comment(f"{MARK}{head} verdict={verdict} -->\n## Claude review of `{head[:12]}`: {verdict}\n\n{text}\n\n"
               f"_Automated Claude review requested with `/claude-review` · [run]({RUN_URL}) · applies to commit `{head[:12]}` only; a new commit needs a new review._")
+except Exception as e:
+    fail(f"could not post the review comment: {getattr(e, 'code', '')} {e}")
 print("Posted:", url, verdict)
-sys.exit(0 if verdict != "NO VERDICT" else 1)
+if verdict == "NO VERDICT":
+    fail("Claude did not finish with a verdict: " + text[-300:].replace("\n", " "))
