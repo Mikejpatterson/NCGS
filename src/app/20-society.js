@@ -68,6 +68,8 @@ function homeHeadline(feature) {
   if (days > 1) return `${nm} is in ${days} days`;
   return nm;
 }
+// The round name's length, for the CSS that makes a long name smaller (styles.css, --t-display-fit)
+const lenStyle = s => `style="--len:${[...s].length}"`;
 function nowCard(r) {
   const live = r.status === 'live';
   const playable = canScore(r) && (live || !r.date || daysFromToday(r.date) <= 0);
@@ -78,7 +80,7 @@ function nowCard(r) {
   return `<div class="now">
     <button class="now-main" data-act="round" data-rid="${r.id}">
       <span class="now-top"><span class="now-kind">${kind}</span>${statusPill(r)}</span>
-      <span class="now-name">${esc(roundName(r))}</span>
+      <span class="now-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</span>
       ${line2 ? `<span class="now-line">${esc(line2)}</span>` : ''}
       <span class="now-line">${esc(heroFacts(r))}</span>
     </button>
@@ -426,7 +428,7 @@ VIEWS.round = p => {
     go = `<button class="go" data-act="play" data-rid="${r.id}">${lbl}</button>`;
   } else if (live) go = `<button class="go" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>`;
   html = `<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">Stableford</span></div>
-    <h1 class="rp-name">${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
+    <h1 class="rp-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
   if (playable && me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
 
   const tabsAvail = ['players', 'groups', 'kb', 'weather', 'course'];

@@ -44,11 +44,12 @@ window.TRIP_CARD_FIXTURES = ${safe(JSON.stringify(fixtures))};</script>` : ''}
 // Preview (in-browser data)
 const previewBody = `<title>NCGS</title>\n<style>\n${previewCss}\n</style>\n${body({ mode: 'local', version, server: serverBuild })}\n`;
 out('golf-trip.html', previewBody);
-const head = extra => `<!doctype html><html lang="en-IE"><head><meta charset="utf-8">
+const head = (extra, attrs) => `<!doctype html><html lang="en-IE"${attrs || ''}><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#FAF8F3">
 ${extra || ''}<style>:root{color-scheme:light}[hidden]{display:none!important}</style>`;
-out('preview.html', `${head()}<title>NCGS</title><style>${previewCss}</style></head><body>${body({ mode: 'local', version, server: serverBuild })}</body></html>`);
+// data-design marks the editorial preview, so tests know which look they are checking
+out('preview.html', `${head('', process.env.NCGS_DESIGN === 'editorial' ? ' data-design="editorial"' : '')}<title>NCGS</title><style>${previewCss}</style></head><body>${body({ mode: 'local', version, server: serverBuild })}</body></html>`);
 
 // Test card photos next to the preview
 fs.mkdirSync(path.join(__dirname, 'dist', 'cards'), { recursive: true });

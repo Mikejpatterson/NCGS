@@ -24,6 +24,9 @@
   --team-b-soft: rgba(198, 40, 40, .13);
   /* Display type for the brand and a few big titles (the editorial trial swaps this for a serif) */
   --font-display: var(--font);
+  /* A long round name gets smaller so it keeps to two lines on a small phone: its size is this ÷ its length (--len,
+     set by the view). Names up to about 30 letters keep their full size. It is in rem, so it still grows with text size. */
+  --t-display-fit: 60rem;
   --red: #CF2A2A;
   --amber-soft: #FFEFC2;
   --amber: #7A4300;
@@ -798,7 +801,8 @@ html, body { background: var(--bg); }
 .headline { margin: 4px 0 0; font-size: 1.85rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; color: var(--text); text-wrap: balance; }
 .hero.home .now { margin-top: 14px; padding: 18px; }
 .hero.home .now > * { position: relative; z-index: 1; }
-.hero.home .now-name { font-size: 1.8rem; letter-spacing: -.02em; }
+.hero.home .now-name { font-size: clamp(1.15rem, calc(var(--t-display-fit) / var(--len, 1)), 1.8rem); letter-spacing: -.02em;
+  padding-bottom: .08em; margin-bottom: -.08em; }   /* room for the last line's descenders (line-height 1.05), same layout */
 .mini { margin-top: 14px; border-radius: 18px; background: rgba(255, 255, 255, .1); padding: 2px 14px; }
 .mr { display: flex; align-items: center; gap: 10px; min-height: 44px; }
 .mr + .mr { border-top: 1px solid rgba(255, 255, 255, .14); }
@@ -1574,7 +1578,7 @@ body { font-variant-numeric: tabular-nums; }
 .rp-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .rp-kind { font-size: .8rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--flag); }
 .rp-fmt { font-size: .9rem; font-weight: 700; color: #CFE0D6; }
-.rp-name { margin: 8px 0 0; font-size: 2rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.08; color: #fff; overflow-wrap: anywhere; }
+.rp-name { margin: 8px 0 0; font-size: clamp(1.15rem, calc(var(--t-display-fit) / var(--len, 1)), 2rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.08; color: #fff; overflow-wrap: anywhere; }
 .rp-line { margin: 6px 0 0; font-size: .9rem; color: #CFE0D6; }
 .rp-you { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, .16); }
 .rp-time { display: flex; flex-direction: column; }
