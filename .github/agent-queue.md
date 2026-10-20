@@ -68,7 +68,7 @@ reopening settled decisions. No application, workflow or queue edits by the codi
 Acceptance: statements match current remote refs/runs and owner decisions; historical escalation remains visible;
 no claim that phone review, native Codex activation or production approval occurred. Normal documentation gates.
 
-## [ ] name-resize-check
+## [x] name-resize-check
 From docs/ROADMAP.md version 1 (owner-approved via #18, merge e8e5a63), task `name-resize-check`.
 
 Investigate the documented limitation in `docs/LONG-NAMES.md`: rows are remeasured on redraw/orientation change,
