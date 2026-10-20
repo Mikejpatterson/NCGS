@@ -131,7 +131,8 @@ Action yellow and the standard look are untouched; they appear in the pictures o
 ## Seen in passing, outside this task
 - `.c-b` (Buggy 2's text colour) is also used for "Delete round", "Turn KBs off for the round" and "Out of date" on
   organiser screens, so in the editorial look those turn crimson. They are warnings, not teams. Not changed here;
-  now queued as roadmap task `warning-token-audit`.
+  checked by roadmap task `warning-token-audit` in `docs/WARNING-TOKENS.md`: "Delete round" and "Turn KBs off" are
+  in fact green and grey (a later rule wins), and the three that do turn crimson pass and need no change.
 - `.pr` is both the crimson pair pill on the round page and the player row on the hole screen. The hole screen
   overrides the border, and the audit found no crimson border on any hole-screen row, so it has no visible effect.
 
