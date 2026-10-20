@@ -14,7 +14,7 @@ Supply linked before/after screenshots of Ruling at those sizes, from fictional 
 colours, words and navigation must remain unchanged. Run the normal hard gates. Report unrelated failures
 separately; do not change tests or controls to hide them.
 
-## [ ] serif-check
+## [x] serif-check
 Finish the editorial typography check, building on the work in draft PR #13 (branch `origin/agent/run-39379145362`;
 bring its files across with `git show origin/agent/run-39379145362:<path>`), but follow the owner's decision:
 
