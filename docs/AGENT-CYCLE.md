@@ -22,6 +22,9 @@ Stage 3 proposal: hole header with a PAR | SI stat block (see DECIDED on issue #
 ```
 Add a line `mode: pr` to always get a draft pull request instead of an automatic update of the design branch.
 
+Codex uses this same issue and queue. See `docs/CODEX-INTEGRATION.md` for branch locations,
+direct contribution/review arrangements, and the distinction between a handoff comment and a verified run.
+
 ## Safety
 | Risk | What stops it |
 |---|---|
@@ -31,6 +34,11 @@ Add a line `mode: pr` to always get a draft pull request instead of an automatic
 | A lost score | Every round runs the several-phones, whole-round and start-hole tests and the engine/server tests. |
 | Leaked keys | Claude gets only its own key, with no GitHub token and no OpenAI key. It cannot push, commit or use the web. |
 | Anything reaching golfers | Nothing in this cycle can push to `main`. Protecting `main` (owner setting) makes that a hard rule for everyone. |
+
+Before installing model tools or making paid calls, the workflow runs the offline controller regression tests
+from its trusted checkout. Approved work is published at the tested SHA only. If a fast-forward is rejected,
+the controller retains that run branch and opens a draft PR; it never rebases after testing or advances the
+queue on a failed integration. The agents resolve the changed base with fresh checks and review.
 
 ## What each round posts on the issue
 The commit, a table of hard-test results, Claude's report (changes, commands run, answer to each finding), and the

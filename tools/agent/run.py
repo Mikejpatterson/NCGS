@@ -317,20 +317,6 @@ def main():
     finish(status, review_data, gates, report, changed)
 
 
-def catch_up_base():
-    """The design branch moved during the run. If the new commits only touch the to-do list or documents
-    (someone edited the list, or a note), replay this run's commits on top so the result can still go in.
-    Anything else is a real overlap: leave it for a pull request."""
-    sh(["git", "fetch", "-q", "origin", BASE])
-    moved = git("diff", "--name-only", BASE_SHA, f"origin/{BASE}").splitlines()
-    if not moved or not all(re.match(r'^(\.github/agent-queue\.md|docs/)', f) for f in moved):
-        return False
-    if sh(["git", "rebase", "-q", f"origin/{BASE}"]).returncode:
-        sh(["git", "rebase", "--abort"])
-        return False
-    return True
-
-
 def push(ref):
     if BASE != "design/crest-editorial-prototype" or ref not in (
         f"HEAD:refs/heads/{BRANCH}", f"HEAD:refs/heads/{BASE}"
@@ -383,9 +369,8 @@ def finish(status, rv, gates, report, changed):
             raise RuntimeError(f"Could not push `{BRANCH}`; no pull request or queue advancement was attempted")
         if status == "approved" and MODE == "merge":
             r = push(f"HEAD:refs/heads/{BASE}")      # fast-forward only: refused if the base moved meanwhile
-            if r.returncode and catch_up_base():     # only the to-do list or documents moved: replay and try again
-                head = git("rev-parse", "HEAD")
-                r = push(f"HEAD:refs/heads/{BASE}")
+            # Never rebase after review: that would publish a SHA the gates and reviewer did not see.
+            # Keep the tested run branch for a draft PR; integration needs fresh checks and review.
             merged = r.returncode == 0
             where = f"fast-forwarded `{BASE}` to `{head[:12]}`" if merged else f"`{BASE}` moved during the run, so it was not updated"
         if not merged:
@@ -401,6 +386,8 @@ def finish(status, rv, gates, report, changed):
         where = "no file changes"
     needs = {"approved": "nothing: done", "escalated": f"@{OWNER} a decision is needed", "out-of-rounds": f"@{OWNER} or the design lead: the agents did not converge in {MAX_ROUNDS} rounds",
              "error": f"@{OWNER} the run failed; see the run log"}[status]
+    if status == "approved" and changed and not merged:
+        needs = "Design lead and the other agent: review the draft pull request and rerun the required checks against the current design base; nothing was integrated."
     if pr_failed:
         needs = f"Automation must investigate the pull request creation error in the result above. Work is retained on `{BRANCH}`. An owner-only setting has not been established as the cause."
     q = rv.get("owner_question") if rv else ""
@@ -410,7 +397,8 @@ def finish(status, rv, gates, report, changed):
         nexts = chain(status, merged)
     except Exception as e:
         nexts = f"@{OWNER} the to-do list step failed ({str(e)[:150]}); nothing further started."
-    comment(f"## Agent cycle finished · {status.upper()}\n\n**STATUS:** {'ready' if status == 'approved' else 'review needed'} · **Tested commit:** `{head[:12]}` · [run]({RUN_URL})\n\n"
+    ready = status == "approved" and (merged or not changed)
+    comment(f"## Agent cycle finished · {status.upper()}\n\n**STATUS:** {'ready' if ready else 'review needed'} · **Tested commit:** `{head[:12]}` · [run]({RUN_URL})\n\n"
             f"**Result:** {where}\n\n**Needs:** {needs}" + (f"\n\n**Question for the owner:** {q}" if q and status != "approved" else "")
             + f"\n\n**To-do list:** {nexts}"
             + "\n\n`main` and the live app were not touched. Anything for production goes through a pull request the owner approves.")

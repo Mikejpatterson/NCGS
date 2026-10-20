@@ -136,6 +136,48 @@ class AgentCycleTests(unittest.TestCase):
         self.assertIn('An owner-only setting has not been established', messages[-1])
         self.assertNotIn('tick "Allow GitHub Actions', messages[-1])
 
+    def test_diverged_design_base_keeps_tested_sha_and_does_not_advance_queue(self):
+        self.m.MODE = 'merge'
+        self.m.TASK_ID = 'current-task'
+        tested_sha = 'b' * 40
+        # Even a docs-only concurrent change must not produce an untested rebase.
+        def git(*args, **kwargs):
+            return 'docs/CLAUDE-HANDOVER.md' if args[0] == 'diff' else tested_sha
+        messages = []
+        with patch.object(self.m, 'git', side_effect=git), \
+             patch.object(self.m, 'sh', return_value=self.result()) as sh, \
+             patch.object(self.m, 'push', side_effect=[self.result(), self.result(1), self.result()]) as push, \
+             patch.object(self.m, 'http', return_value={'html_url': 'https://example.test/pr/1'}) as http, \
+             patch.object(self.m, 'chain', return_value='Queue paused') as chain, \
+             patch.object(self.m, 'comment', side_effect=messages.append):
+            with self.assertRaises(SystemExit) as done:
+                self.m.finish('approved', {}, {}, '', True)
+        self.assertEqual(done.exception.code, 0)
+        self.assertEqual(push.call_count, 2)  # run branch, then one fast-forward attempt
+        self.assertFalse(any(c.args[0][:2] == ['git', 'rebase'] for c in sh.call_args_list))
+        pr = next(c.args[2] for c in http.call_args_list if c.args[0].endswith('/pulls'))
+        self.assertEqual(pr['head'], self.m.BRANCH)
+        self.assertEqual(pr['base'], self.m.BASE)
+        self.assertTrue(pr['draft'])
+        chain.assert_called_once_with('approved', False)
+        self.assertIn(tested_sha[:12], messages[-1])
+        self.assertIn('nothing was integrated', messages[-1])
+        self.assertNotIn('nothing: done', messages[-1])
+
+    def test_successful_fast_forward_still_advances_queue(self):
+        self.m.MODE = 'merge'
+        with patch.object(self.m, 'git', return_value='b' * 40), \
+             patch.object(self.m, 'push', return_value=self.result()) as push, \
+             patch.object(self.m, 'http') as http, \
+             patch.object(self.m, 'chain', return_value='Queue continued') as chain, \
+             patch.object(self.m, 'comment'):
+            with self.assertRaises(SystemExit) as done:
+                self.m.finish('approved', {}, {}, '', True)
+        self.assertEqual(done.exception.code, 0)
+        self.assertEqual(push.call_count, 2)
+        self.assertFalse(any(c.args[0].endswith('/pulls') for c in http.call_args_list))
+        chain.assert_called_once_with('approved', True)
+
 
 if __name__ == '__main__':
     unittest.main()
