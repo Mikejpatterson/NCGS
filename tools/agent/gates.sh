@@ -14,6 +14,18 @@ export NODE_PATH="${NODE_PATH:-$(npm root -g)}"
 RESULTS="$OUT/results.tsv"; : > "$RESULTS"
 record() { printf '%s\t%s\t%s\t%s\n' "$1" "$2" "$3" "$4" >> "$RESULTS"; }   # name, hard|info, ok|fail|skip, detail
 cd "$WORK"
+# Anything the coding agent left running (a test server on 8765/8766) would steal the ports these checks use.
+free_port() { fuser -k -n tcp "$1" > /dev/null 2>&1 || { command -v ss > /dev/null && ss -ltnpH "sport = :$1" | grep -o 'pid=[0-9]*' | cut -d= -f2 | xargs -r kill; } ; }
+free_port 8765; free_port 8766; sleep 1
+serve() {   # $1 = port, $2 = dir; waits until it answers
+  python3 -m http.server "$1" -d "$2" > /dev/null 2>&1 &
+  for i in $(seq 1 20); do curl -sf -o /dev/null "http://localhost:$1/" && return 0; sleep 0.5; done
+  return 1
+}
+layout_detail() {   # pass/fail counts, or why the test did not run at all
+  p=$(grep -c '^PASS' "$1" 2>/dev/null); f=$(grep -c '^FAIL' "$1" 2>/dev/null)
+  if [ "${p:-0}" = 0 ] && [ "${f:-0}" = 0 ]; then echo "did not run: $(grep -v '^\s*$' "$1" 2>/dev/null | tail -1 | cut -c1-150)"; else echo "$p pass, $f fail"; fi
+}
 
 CHANGED="$(git diff --name-only "$BASE" HEAD)"
 APP="$(printf '%s\n' "$CHANGED" | grep -E '^(src/|build\.js$|data/fixture-seed\.json$)' || true)"
@@ -50,8 +62,8 @@ if [ "$LEVEL" = quick ]; then
     if build_previews "$WORK" head; then record build hard ok "standard and editorial previews"; else record build hard fail "$(tail -3 "$OUT/build-head.log" | tr '\n' ' ')"; fi
     base_previews
     mkdir -p "$OUT/serve"; cp "$OUT"/head-*.html "$OUT/serve/" 2>/dev/null
-    python3 -m http.server 8765 -d "$OUT/serve" > /dev/null 2>&1 & SERVE=$!
-    sleep 1
+    serve 8765 "$OUT/serve" || record test-server hard fail "could not start the test web server on port 8765"
+    SERVE=$!
     if grep -q LAYOUT_URL test/layout.run.js; then          # both looks side by side
       PIDS=""
       for look in standard editorial; do
@@ -68,7 +80,7 @@ if [ "$LEVEL" = quick ]; then
     kill $SERVE 2>/dev/null
     for look in standard editorial; do
       r=$([ "$(cat "$OUT/layout-$look.rc" 2>/dev/null)" = 0 ] && echo ok || echo fail)
-      record "layout-$look" hard $r "$(grep -c '^PASS' "$OUT/layout-$look.log" 2>/dev/null) pass, $(grep -c '^FAIL' "$OUT/layout-$look.log" 2>/dev/null) fail"
+      record "layout-$look" hard $r "$(layout_detail "$OUT/layout-$look.log")"
     done
     [ "$SCOPE" = app ] && compare editorial 390 design-compare-editorial-390
   else
@@ -85,11 +97,12 @@ else
       cp data/fixture-seed.json data/seed.json
       if node build.js > "$OUT/fullbuild.log" 2>&1; then
         node tools/devserver.js 8766 > "$OUT/devserver.log" 2>&1 & DEV=$!
-        python3 -m http.server 8765 -d dist > /dev/null 2>&1 & SERVE=$!
-        sleep 1
+        serve 8765 dist || record test-server hard fail "could not start the test web server on port 8765"
+        SERVE=$!
+        for i in $(seq 1 20); do curl -sf -o /dev/null http://localhost:8766/ && break; sleep 0.5; done
         for t in phones finish starthole; do
           if timeout 400 node "test/$t.run.js" > "$OUT/$t.log" 2>&1; then r=ok; else r=fail; fi
-          record "$t" hard $r "$(grep -c '^PASS' "$OUT/$t.log") pass, $(grep -c '^FAIL' "$OUT/$t.log") fail"
+          record "$t" hard $r "$(layout_detail "$OUT/$t.log")"
         done
         kill $DEV $SERVE 2>/dev/null
       else record score-safety hard fail "full build failed"; fi
