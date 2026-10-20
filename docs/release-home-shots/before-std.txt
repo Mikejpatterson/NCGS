@@ -1,0 +1,105 @@
+next std 360: root 17px | title "Cabopino" 1 line(s), 30.6px, -apple-system
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge text .now-kind bg .go
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 54px (second shot -end)
+next std 390: root 17px | title "Cabopino" 1 line(s), 30.6px, -apple-system
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge text .now-kind bg .go
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 0px
+next std 390-135: root 21.6px | title "Cabopino" 1 line(s), 38.88px, -apple-system
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge text .now-kind bg .go
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 41px (second shot -end)
+live std 360: root 17px | title "Cabopino" 1 line(s), 30.6px, -apple-system
+  nav pill 328x68 radius 34px blur yes, 4 tabs [Home, Hole 10, Results, Ruling], smallest 52px high, inside screen yes
+  flag-yellow bg .badge text .now-kind bg .pill bg .go
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 328px (second shot -end)
+live std 390: root 17px | title "Cabopino" 1 line(s), 30.6px, -apple-system
+  nav pill 358x68 radius 34px blur yes, 4 tabs [Home, Hole 10, Results, Ruling], smallest 52px high, inside screen yes
+  flag-yellow bg .badge text .now-kind bg .pill bg .go
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 224px (second shot -end)
+live std 390-135: root 21.6px | title "Cabopino" 1 line(s), 38.88px, -apple-system
+  nav pill 358x68 radius 34px blur yes, 4 tabs [Home, Hole 10, Results, Ruling], smallest 52px high, inside screen yes
+  flag-yellow bg .badge text .now-kind bg .pill bg .go
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 308px (second shot -end)
+live-long std 360: root 17px | title "Cabopino, the long-named second day of the trip" 2 line(s), 21.7021px, -apple-system
+  nav pill 328x68 radius 34px blur yes, 4 tabs [Home, Hole 10, Results, Ruling], smallest 52px high, inside screen yes
+  flag-yellow bg .badge text .now-kind bg .pill bg .go
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 341px (second shot -end)
+live-long std 390: root 17px | title "Cabopino, the long-named second day of the trip" 2 line(s), 21.7021px, -apple-system
+  nav pill 358x68 radius 34px blur yes, 4 tabs [Home, Hole 10, Results, Ruling], smallest 52px high, inside screen yes
+  flag-yellow bg .badge text .now-kind bg .pill bg .go
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 237px (second shot -end)
+live-long std 390-135: root 21.6px | title "Cabopino, the long-named second day of the trip" 3 line(s), 27.5745px, -apple-system
+  nav pill 358x68 radius 34px blur yes, 4 tabs [Home, Hole 10, Results, Ruling], smallest 52px high, inside screen yes
+  flag-yellow bg .badge text .now-kind bg .pill bg .go
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 332px (second shot -end)
+finished std 360: root 17px | title "No round booked" 1 line(s), 30.6px, -apple-system
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 0px
+finished std 390: root 17px | title "No round booked" 1 line(s), 30.6px, -apple-system
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 0px
+finished std 390-135: root 21.6px | title "No round booked" 1 line(s), 38.88px, -apple-system
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 0px
+no-round std 360: root 17px | title "No round booked" 1 line(s), 30.6px, -apple-system
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 0px
+no-round std 390: root 17px | title "No round booked" 1 line(s), 30.6px, -apple-system
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 0px
+no-round std 390-135: root 21.6px | title "No round booked" 1 line(s), 38.88px, -apple-system
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge
+  serif none
+  cut/off-screen none
+  under 44px none
+  scrolls 0px

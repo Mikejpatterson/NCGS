@@ -35,7 +35,7 @@ const measure = () => {
   const tabs = document.querySelector('#tabs'); const tr = tabs && tabs.getBoundingClientRect(); const tcs = tabs && getComputedStyle(tabs);
   const tb = tabs ? [...tabs.querySelectorAll('button,a')].filter(e => e.getBoundingClientRect().width) : [];
   out.nav = tabs && !tabs.hidden ? `pill ${Math.round(tr.width)}x${Math.round(tr.height)} radius ${tcs.borderRadius} blur ${/blur/.test(tcs.backdropFilter || tcs.webkitBackdropFilter) ? 'yes' : 'no'}, ` +
-    `${tb.length} tabs [${tb.map(e => e.textContent.trim()).join(', ')}], smallest ${Math.round(Math.min(...tb.map(e => e.getBoundingClientRect().height)))}px high, inside screen ${tr.left >= 0 && tr.right <= vw ? 'yes' : 'NO'}` : 'NO TAB BAR';
+    `${tb.length} tabs [${tb.map(e => e.textContent.trim()).join(', ')}], smallest ${Math.round(Math.min(...tb.map(e => e.getBoundingClientRect().height)))}px high, inside screen ${tr.left >= 0 && tr.right <= vw ? 'yes' : 'NO'}` : 'hidden (shown only while a round is in play)';
   const flag = [];
   for (const e of document.querySelectorAll('#app *')) {
     const cs = getComputedStyle(e), r = e.getBoundingClientRect(); if (!r.width) continue;
