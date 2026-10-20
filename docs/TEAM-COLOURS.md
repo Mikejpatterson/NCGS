@@ -5,9 +5,20 @@ appears, "subject to sunlight and colour-blindness checks". Keep the text labels
 editorial look, with the standard look (blue `#0A60C9`, red `#C62828`) beside it for comparison.
 
 **Result: no colour change is recommended.** Every piece of text in a team colour, or on one, is at least 4.5:1 in
-both looks. The two teams stay clearly different in both simulations. Nothing in the app was changed. Two points
-need the owner's eye on a real phone (see the end): Buggy Wars result pills show the leader by colour only, and in
-simulated protanopia crimson comes out close to the pine of the selected tabs and + buttons.
+both looks. The two teams stay clearly different in both simulations. Nothing in the app was changed. The audit
+raised two points for the owner: Buggy Wars result pills show the leader by colour only, and in simulated
+protanopia crimson comes out close to the pine of the selected tabs and + buttons.
+
+**Status (refreshed 20 October 2026, task `handover-current`).** The audit ran as queue item
+`team-colours-check (pause)` in run [39469125470](https://github.com/Mikejpatterson/NCGS/actions/runs/39469125470)
+(`772be23`). That cycle escalated to the owner instead of approving; the evidence then reached the design branch
+through PR #17 (merge `804d8fd`), and Claude recorded the owner's decision and ticked the item in `79ba222`.
+- **DECIDED (owner, 20 October):** the result pills keep showing the leading pair by colour only, with no visible
+  names or initials. A deliberate exception to "colour is never the only team identifier", recorded in
+  `docs/CLAUDE-HANDOVER.md`. Existing screen-reader labels stay. It is not an accessibility conformance claim and
+  must not be broadened. Navy and crimson stay.
+- **Still not done:** the real-phone and sunlight review. The protanopia crimson/pine closeness stays a point for
+  that review. The measurements below are unchanged.
 
 ## What was checked, and how
 `node tools/team-colour-audit.js <standard.html> <editorial.html> docs/team-colour-shots` (fixture builds only:
@@ -92,8 +103,8 @@ What this means:
 - **Buggy Wars**: the pairs are initials badges (AF BF v CF DF), and the hole board keeps Buggy 1 on the top row and
   Buggy 2 below. **But the Front nine / Back nine / Overall result pills ("Won 2 up", "1 up, 4 to play") say who leads
   only by colour.** The words are the same for either side; the screen-reader label has the pair name, the visible pill
-  does not. Same in both looks, so it is not caused by navy and crimson, and fixing it means changing words, not
-  colours (see NEEDS OWNER).
+  does not. Same in both looks, so it is not caused by navy and crimson, and fixing it would mean changing words, not
+  colours. This went to the owner, who decided on 20 October to keep it as it is (see Status at the top).
 - **Hole screen**: each pair is its own card with both names in it, so the pair is never shown by colour alone. Which
   card is Buggy 1 is shown by colour and by order (Buggy 1 on top); there is no visible "Buggy 1" word (it is in the
   screen-reader label). Same in both looks.
@@ -119,7 +130,8 @@ Action yellow and the standard look are untouched; they appear in the pictures o
 
 ## Seen in passing, outside this task
 - `.c-b` (Buggy 2's text colour) is also used for "Delete round", "Turn KBs off for the round" and "Out of date" on
-  organiser screens, so in the editorial look those turn crimson. They are warnings, not teams. Not changed here.
+  organiser screens, so in the editorial look those turn crimson. They are warnings, not teams. Not changed here;
+  now queued as roadmap task `warning-token-audit`.
 - `.pr` is both the crimson pair pill on the round page and the player row on the hole screen. The hole screen
   overrides the border, and the audit found no crimson border on any hole-screen row, so it has no visible effect.
 
