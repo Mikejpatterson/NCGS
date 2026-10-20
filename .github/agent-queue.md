@@ -15,18 +15,20 @@ colours, words and navigation must remain unchanged. Run the normal hard gates. 
 separately; do not change tests or controls to hide them.
 
 ## [ ] serif-check
-Verify the agreed editorial typography; change CSS only if the evidence shows a violation. Extend an existing
-browser test to check every golfer screen at 360px, 390px and 390px with 135% text. Display serif is allowed only
-on `.hero.home .wordmark`, `.hero.home .now-name` and `.rp-name`, including their intentionally inheriting children.
-Functional labels, scoring numbers, people names, buttons, tabs and the hole screen remain in the system sans.
+Finish the editorial typography check, building on the work in draft PR #13 (branch `origin/agent/run-39379145362`;
+bring its files across with `git show origin/agent/run-39379145362:<path>`), but follow the owner's decision:
 
-Acceptance: assert the computed font-family at each allowed element and detect serif leakage outside those
-subtrees, rather than merely searching the CSS source. Assert lining numerals on display text. With the existing
-long round title, show that the whole title fits in at most two lines at 360px and at 360px with 135% text,
-without clipping or ellipsis. Preserve the standard look and the token-only editorial-file restriction. If those
-constraints conflict, explain the specific engineering conflict rather than silently widening scope.
-Link representative screenshots and run the normal hard gates. Linux Chromium proves the configured stack and
-layout, not the actual New York rendering on iPhone; record that distinction. A proved no-change outcome is valid.
+**DECIDED (owner, 20 October): option A.** Display titles keep growing with the phone's text size, as DESIGN.md
+says. Long round names may take up to three lines at large text sizes, but must never be cut off.
+- Remove the `min(…, 6.8vw)` cap from #13. The display titles keep scaling with text size in both looks.
+- Change the long-title check to: never clipped, never ellipsis, at most 2 lines at 360px and 390px at normal text
+  size, at most 3 lines at 135% text. Apply it in **both** looks.
+- Fix the existing clip found in the standard (live) look: the long `.hero.home .now-name` at 360px with 135% text
+  is cut off by about 2px (292×165 in a 292×163 box). Use the smallest CSS change; normal-length names must look identical.
+- Keep #13's computed-font and lining-numeral checks (serif only on the three allowed elements). Make the
+  editorial detection explicit and robust (reviewer point R2-2), not a search for a comment string.
+- Keep the Ruling "i" glyph as a documented exception; don't change it.
+Close the task with layout passing on both looks, and before/after screenshots of the long title at 360px with 135% text.
 
 ## [ ] long-names (pause)
 Fix the recorded player-name clipping and overlap as a separate usability task. Include the score-entry case
