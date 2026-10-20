@@ -71,6 +71,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Controller regression tests (offline, trusted checkout)
+        run: python3 -m unittest discover -s ctl/test -p agent_cycle_test.py
       - name: Tools (pinned)
         run: |
           npm install -g @anthropic-ai/claude-code@2.1.296 playwright@1.56.1
