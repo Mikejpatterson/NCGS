@@ -91,3 +91,45 @@ Acceptance: selector/element map, contrast values and screenshots for demonstrat
 remedy only if warranted. Colour distance alone is not an accessibility pass. Keep owner-approved team colours
 and the colour-only result-pill exception. A no-change conclusion is valid.
 
+
+
+## [ ] name-resize-fix
+From docs/ROADMAP.md version 1 (owner-approved via #18, merge `e8e5a63`), conditional task
+`name-resize-fix`. Run [39487303357](https://github.com/Mikejpatterson/NCGS/actions/runs/39487303357)
+demonstrated overlap in Chromium before the next tap after a live text-size change: 2 of 12 states failed in
+both looks. Build on `docs/NAME-RESIZE.md` and commit `0a5a79a`.
+
+Make the smallest render/measurement fix in permitted UI files so rows remeasure when the effective text size
+changes, without waiting for another tap. Avoid redraw loops, polling timers, duplicate event listeners and any
+score-control or protected core/data change. Preserve compact normal-name rows.
+
+Acceptance: the task 2 reproduction passes before another tap in both looks at 360/390px for 100%↔135% changes;
+normal-name layout remains compact; four players and Save still fit at 390×844/100%; both looks meet the existing
+large-text and 44px checks. Supply before/after screenshots and normal app hard gates. Keep the documented
+iPhone limitation explicit; browser evidence must not be described as an iPhone result.
+
+## [ ] release-home-evidence
+From docs/ROADMAP.md version 1 (owner-approved via #18, merge `e8e5a63`), task
+`release-home-evidence`.
+
+Reuse valid SHA-pinned evidence where possible; otherwise capture the baseline and current Home for live,
+no-round and finished fixture states at 360px, 390px and 390px/135%, in both looks. Include a long round title
+and normal names. Record screenshot source SHAs, commands and the limited serif allowlist. This is evidence,
+not a styling pass.
+
+Acceptance: linked before/after pairs; action yellow, full pill navigation, large text and unclipped content;
+explicit difference notes. Use no real member data and do not claim that Linux screenshots establish iPhone
+typography. No application change is required merely to complete the evidence.
+
+## [ ] release-hole-evidence
+From docs/ROADMAP.md version 1 (owner-approved via #18, merge `e8e5a63`), task
+`release-hole-evidence`. Run after `name-resize-fix`, so the candidate evidence includes that result.
+
+Capture or reuse SHA-matching evidence for empty, partial and completed score entry; normal and long names;
+three-digit scores and Pick up; at 360px, 390px and 390px/135%, in both looks. Show normal names remain compact
+and the Save pill is reachable. Reference relevant phone, finish and start-hole results at the candidate SHA;
+missing results remain pending for the existing full gates and must not be presented as passed. Do not change
+score logic or control attributes.
+
+Acceptance: linked before/after pairs, exact source SHAs and checks; intentional differences explained; no
+clipping or name/control overlap. Preserve behaviour and data invariants.
