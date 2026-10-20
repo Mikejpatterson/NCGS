@@ -93,7 +93,7 @@ and the colour-only result-pill exception. A no-change conclusion is valid.
 
 
 
-## [ ] name-resize-fix
+## [x] name-resize-fix
 From docs/ROADMAP.md version 1 (owner-approved via #18, merge `e8e5a63`), conditional task
 `name-resize-fix`. Run [39487303357](https://github.com/Mikejpatterson/NCGS/actions/runs/39487303357)
 demonstrated overlap in Chromium before the next tap after a live text-size change: 2 of 12 states failed in
