@@ -21,7 +21,17 @@ line. Text keeps its size, buttons keep their size, and no name is hidden behind
 text cut off or ellipsised, text/icon/initials overlapping each other or a control, each name in the same row as its
 own −, + and Pick up, and that Pick up, Save and the tab bar can be tapped and are at least 44px.
 
-RESULTS_TABLE
+| Build (66 screens each) | Long names | Normal names |
+|---|---|---|
+| Before, standard | 44 fail | 3 fail (Donnacha's arrow / name runs into Pick up at 390px) |
+| Before, editorial | 44 fail | 3 fail (same) |
+| After, standard | all pass | all pass |
+| After, editorial | all pass | all pass |
+
+"Before" is the code at `6b27051`, built the same way. With normal names, score entry before and after is
+pixel-identical at 360px and at 135% text. At 390px only Donnacha's row changes (name on its own line, the buttons
+below); Aidan, Bartley and Cathal are unchanged, and all four players plus the save button still fit on a 390×844
+screen.
 
 Full output: `long-names-shots/check-{before,after}-{std,ed}-{long,normal}.txt`.
 
