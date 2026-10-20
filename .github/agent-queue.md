@@ -108,7 +108,7 @@ normal-name layout remains compact; four players and Save still fit at 390×844/
 large-text and 44px checks. Supply before/after screenshots and normal app hard gates. Keep the documented
 iPhone limitation explicit; browser evidence must not be described as an iPhone result.
 
-## [ ] release-home-evidence
+## [x] release-home-evidence
 From docs/ROADMAP.md version 1 (owner-approved via #18, merge `e8e5a63`), task
 `release-home-evidence`.
 
