@@ -1578,7 +1578,7 @@ body { font-variant-numeric: tabular-nums; }
 .rp-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .rp-kind { font-size: .8rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--flag); }
 .rp-fmt { font-size: .9rem; font-weight: 700; color: #CFE0D6; }
-.rp-name { margin: 8px 0 0; font-size: clamp(1.15rem, calc(var(--t-display-fit) / var(--len, 1)), 2rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.08; color: #fff; overflow-wrap: anywhere; }
+.rp-name { margin: 8px 0 -.08em; padding-bottom: .08em; font-size: clamp(1.15rem, calc(var(--t-display-fit) / var(--len, 1)), 2rem); font-weight: 800; letter-spacing: -.02em; line-height: 1.08; color: #fff; overflow-wrap: anywhere; }
 .rp-line { margin: 6px 0 0; font-size: .9rem; color: #CFE0D6; }
 .rp-you { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255, 255, 255, .16); }
 .rp-time { display: flex; flex-direction: column; }
