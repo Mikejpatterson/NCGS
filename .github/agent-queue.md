@@ -43,7 +43,7 @@ Acceptance: #15's long-name check passes on all 22 screens × 3 sizes in both lo
 today's layout for normal names, and the missing "before" check log the reviewer asked for is added.
 Owner reviews the screenshots at this pause.
 
-## [ ] team-colours-check (pause)
+## [x] team-colours-check (pause)
 Audit the editorial navy #244A78 and crimson #9B3443 on Buggy Wars, the hole screen and round-page groups,
 including labels, borders, selected states and soft backgrounds. Keep pair names/initials: colour must never be
 the only team identifier. This is an evidence task first; do not recolour the app just to produce a change.

@@ -15,6 +15,11 @@ and every decision is on GitHub issue #1. Decisions there are tagged **DECIDED**
 - **Separate task, not part of the redesign:** a long player name is cut off on about 12 screens.
 
 ## Decided (issue #1)
+- **Owner, 20 October: Buggy Wars result pills show the leading pair by colour only, with no names or initials.**
+  This is a deliberate exception to "colour is never the only team identifier". Do not flag it again or add leader text.
+  Team colours stay navy #244A78 and crimson #9B3443 (contrast and colour-blindness evidence in `docs/TEAM-COLOURS.md`).
+- **Owner, 20 October: option A.** Display titles keep growing with the phone's text size. Long round names may take
+  up to three lines at large text sizes, and are never cut off.
 - Flag-yellow `#F6C515` stays as the one action / "now" accent. Champagne `#D4B483` is for the crest and awards only (it's 1.86:1 on ivory, so never use it to convey meaning there).
 - Buttons, the save pill and the glass tab bar stay fully rounded pills.
 - Serif **only** on `.hero.home .wordmark`, `.hero.home .now-name` and `.rp-name`, using `ui-serif` (New York on iPhone). Names, numbers, controls and the hole screen stay in the system font.
