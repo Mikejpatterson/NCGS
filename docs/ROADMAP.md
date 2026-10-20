@@ -1,7 +1,8 @@
 # Remaining NCGS redesign roadmap — version 1
 
 **Status: proposed, not yet owner-approved.** Prepared by Codex on 20 October 2026 against design
-`79ba2225886f99e1af748adf19b047232164ff8c` and controller main `a4460a3`.
+`79ba2225886f99e1af748adf19b047232164ff8c` and controller main
+[`a4460a3`](https://github.com/Mikejpatterson/NCGS/commit/a4460a334ea2eceb1fe945aebdf962a552cc3072).
 This document is the finite scope and decision policy; `.github/agent-queue.md` remains the only executable queue.
 Approval must identify this version/commit and explicitly include the delegation policy below. Claude's proposal,
 an agent's approval, an elapsed deadline or an unanswered digest does not constitute owner approval.
@@ -29,7 +30,8 @@ alternative, reason, affected task and exact commit on issue #1 or in the eviden
 decisions under a standing mandate, not statements that the owner personally approved each choice.
 
 Prefer the smallest measured change that preserves existing words, controls and behaviour. Where two compliant
-options remain, Codex selects one and Claude records any reasoned dissent; no 24-hour wait is required. Failed
+options remain and Claude does not object, Codex selects one; no 24-hour wait is required. Any reasoned Claude
+dissent parks that task for the single owner digest, preserving the existing stop-on-disagreement rule. Failed
 tests, scope/permission conflicts, a proposed change to an explicit owner decision, missing real-device evidence,
 or score/data risk cannot be overridden as a design preference. Park the affected task and continue independent
 eligible work; put genuine owner choices in the single daily digest. Never mark a hard failure as approved.
