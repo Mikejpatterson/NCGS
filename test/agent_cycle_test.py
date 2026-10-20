@@ -72,6 +72,37 @@ class AgentCycleTests(unittest.TestCase):
         self.assertEqual(finish.call_args.args[0], 'error')
         self.assertTrue(finish.call_args.args[-1])  # Changes really existed.
 
+    def _run_with_coder(self, coder_results, verdict='approve'):
+        calls = iter(coder_results)
+        def coder(*a):
+            text, ok, unfinished = next(calls)
+            self.m.UNFINISHED = unfinished
+            return text, ok
+        def sh(cmd, **kwargs):
+            return self.result(1 if cmd == ['git', 'diff', '--cached', '--quiet'] else 0)
+        with patch.object(self.m, 'git', return_value='a' * 40), \
+             patch.object(self.m, 'sh', side_effect=sh), \
+             patch.object(self.m, 'comment'), \
+             patch.object(self.m, 'run_claude', side_effect=coder), \
+             patch.object(self.m, 'run_gates', return_value={'hard_ok': True, 'checks': []}), \
+             patch.object(self.m, 'review', return_value={'verdict': verdict, 'summary': '', 'findings': []}) as review, \
+             patch.object(self.m, 'finish') as finish:
+            self.m.main()
+        return finish.call_args.args[0], review.call_count
+
+    def test_unfinished_round_carries_on_and_is_never_reviewed(self):
+        status, reviews = self._run_with_coder([('timed out', False, True), ('## Report done', True, False)])
+        self.assertEqual(status, 'approved')
+        self.assertEqual(reviews, 1)  # only the finished round was reviewed
+
+    def test_unfinished_last_round_is_an_error(self):
+        status, _ = self._run_with_coder([('t', False, True)] * 3)
+        self.assertEqual(status, 'error')
+
+    def test_crash_is_still_an_error_not_a_retry(self):
+        status, _ = self._run_with_coder([('crash', False, False), ('## Report', True, False)])
+        self.assertEqual(status, 'error')
+
     def test_branch_push_failure_prevents_pr_and_queue_advance(self):
         with patch.object(self.m, 'git', return_value='a' * 40), \
              patch.object(self.m, 'push', return_value=self.result(1)), \
