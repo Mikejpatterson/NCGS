@@ -178,6 +178,23 @@ function entryRow(pid, val, shots, par, rid) {
   return { tile, drop };
 }
 
+/* A name that does not fit beside Pick up and the buttons gets a line of its own, with the buttons below it.
+   Every row is first laid out the usual way, then only the ones whose name or arrow would reach a button beside it
+   are marked "long". */
+function fitNames() {
+  const tiles = [...document.querySelectorAll('.entry .bugs .ptile')];
+  if (!tiles.length) return;
+  tiles.forEach(t => t.classList.remove('long'));
+  const runsOver = t => {
+    const nm = t.querySelector('.nm'); if (!nm) return false;
+    const box = nm.getBoundingClientRect();
+    const end = Math.max(...[...nm.querySelectorAll('.nmrow > *')].map(e => e.getBoundingClientRect().right));
+    return [...t.querySelectorAll('.pu, .st, .stv')].some(c => { const r = c.getBoundingClientRect(); return r.left > box.left && r.top < box.bottom && r.bottom > box.top && end > r.left; });
+  };
+  tiles.filter(runsOver).forEach(t => t.classList.add('long'));
+}
+window.addEventListener('resize', fitNames);
+
 VIEWS.entry = () => {
   const ctx = entryCtx();
   const comp = computeR(ctx.rid);

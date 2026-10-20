@@ -444,8 +444,8 @@ VIEWS.round = p => {
   return { html, tabs: 'home' };
 };
 
-/* Names joined so a line only breaks after the "&", never inside a name. */
-const pairNames = list => list.map(pid => esc(D.nameOf(pid)).replace(/ /g, '\u00a0')).join('\u00a0& ');
+/* Names joined so the "&" stays with the name before it. A long name may wrap, so it is never cut off. */
+const pairNames = list => list.map(pid => esc(D.nameOf(pid))).join('\u00a0& ');
 
 /* Groups on the round page: one row per tee time, the two buggies in equal blue and red pills. A row opens to the handicaps. */
 function roundGroups(r) {

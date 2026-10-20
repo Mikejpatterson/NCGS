@@ -1709,3 +1709,24 @@ body { font-variant-numeric: tabular-nums; }
 
 /* Display type: only the brand name, the Home round name and the round page title. Names, numbers and controls stay in the system font. */
 .hero.home .wordmark, .hero.home .now-name, .rp-name { font-family: var(--font-display); }
+
+/* Long names: a name wraps onto another line instead of being cut off or running into a score, icon or button.
+   Text keeps its size and buttons keep their size. A single word too long for its space breaks inside the word. */
+.lname > span, .lrow .ln .n { overflow: visible; text-overflow: clip; white-space: normal; }
+.ln .n, .pl-n > span, .sn .n, .hrow .nm > span, .rg .pb, .rg .pr, .rg .pk, .rp-kbs .pk, .lc-n, .ct-r .b { overflow-wrap: anywhere; hyphens: auto; }
+.row > .chev, .row > .c-g { flex: none; }
+.lc-row { flex-wrap: wrap; }
+.lc-n { min-width: 0; }
+.lc-p { flex: none; margin-left: auto; white-space: nowrap; }
+.crow .ct-l { flex-shrink: 0; max-width: 55%; }
+.ct-r { min-width: 0; white-space: normal; text-align: right; }
+.ct-r .pill { white-space: nowrap; }
+/* Score entry: a name that fits keeps the one-line row. A name that does not fit (fitNames in 30-play.js marks the
+   row "long") gets the full width, and Pick up, minus, score and plus move to the line below, in the same places. */
+.entry .bugs .pr.ptile.long { grid-template-areas: "nm nm nm nm" "pu dn sc up"; row-gap: 2px; }
+.entry .bugs .ptile.long .nmrow { white-space: normal; }
+.entry .bugs .ptile.long .nmrow > span { min-width: 0; overflow-wrap: anywhere; hyphens: auto; }
+.entry .bugs .ptile.long .nmrow > svg { flex: none; }
+@container (min-width: 19.5em) {
+  .entry .bugs .pr.ptile.long { grid-template-areas: "nm nm nm nm nm" ". pu dn sc up"; }
+}

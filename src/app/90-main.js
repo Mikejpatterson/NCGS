@@ -496,6 +496,7 @@ function render() {
   tabs.classList.toggle('under', !!app.querySelector('.scrim, .full'));
   if (showTabs) document.documentElement.style.setProperty('--tabh', (tabs.offsetHeight + parseFloat(getComputedStyle(tabs).bottom || 0) || tabs.offsetHeight) + 'px');
   sizeAsk();
+  fitNames();
   /* The Hole tab names the hole this player's group is on: "Hole 3", or "Card" once all 18 are in. */
   if (showTabs) {
     let lbl = 'Hole';
