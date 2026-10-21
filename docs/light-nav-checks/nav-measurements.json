@@ -1,0 +1,57 @@
+[
+  {
+    "look": "standard",
+    "size": "360",
+    "reducedTransparency": {
+      "surface": "rgb(250, 248, 243)",
+      "filter": "none"
+    }
+  },
+  {
+    "look": "standard",
+    "size": "390",
+    "reducedTransparency": {
+      "surface": "rgb(250, 248, 243)",
+      "filter": "none"
+    }
+  },
+  {
+    "look": "standard",
+    "size": "390-135",
+    "reducedTransparency": {
+      "surface": "rgb(250, 248, 243)",
+      "filter": "none"
+    }
+  },
+  {
+    "look": "editorial",
+    "size": "360",
+    "reducedTransparency": {
+      "surface": "rgb(250, 248, 243)",
+      "filter": "none"
+    }
+  },
+  {
+    "look": "editorial",
+    "size": "390",
+    "reducedTransparency": {
+      "surface": "rgb(250, 248, 243)",
+      "filter": "none"
+    }
+  },
+  {
+    "look": "editorial",
+    "size": "390-135",
+    "reducedTransparency": {
+      "surface": "rgb(250, 248, 243)",
+      "filter": "none"
+    }
+  },
+  {
+    "unsupportedFilter": {
+      "surface": "rgb(250, 248, 243)",
+      "filter": "none"
+    },
+    "forcedColors": "screenshot inspected"
+  }
+]

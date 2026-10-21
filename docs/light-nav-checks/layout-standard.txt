@@ -1,0 +1,103 @@
+PASS  small 360 / home
+PASS  small 360 / who
+PASS  small 360 / rounds
+PASS  small 360 / round-past
+PASS  small 360 / round-long-title
+PASS  small 360 / home-long-title
+PASS  small 360 / round-players
+PASS  small 360 / round-groups
+PASS  small 360 / round-group-open
+PASS  small 360 / round-kb
+PASS  small 360 / round-weather
+PASS  small 360 / round-course
+PASS  small 360 / goy
+PASS  small 360 / player
+PASS  small 360 / players
+PASS  small 360 / stats
+PASS  small 360 / trip
+PASS  small 360 / board-scores
+PASS  small 360 / board-bw
+PASS  small 360 / board-ct
+PASS  small 360 / board-st
+PASS  small 360 / rules
+PASS  small 360 / hole-pick
+PASS  small 360 / hole-intro
+PASS  small 360 / hole-tee
+PASS  small 360 / entry
+PASS  small 360 / entry-100
+PASS  small 360 / ask
+PASS  small 360 / after
+PASS  normal 390 / home
+PASS  normal 390 / who
+PASS  normal 390 / rounds
+PASS  normal 390 / round-past
+PASS  normal 390 / round-long-title
+PASS  normal 390 / home-long-title
+PASS  normal 390 / round-players
+PASS  normal 390 / round-groups
+PASS  normal 390 / round-group-open
+PASS  normal 390 / round-kb
+PASS  normal 390 / round-weather
+PASS  normal 390 / round-course
+PASS  normal 390 / goy
+PASS  normal 390 / player
+PASS  normal 390 / players
+PASS  normal 390 / stats
+PASS  normal 390 / trip
+PASS  normal 390 / board-scores
+PASS  normal 390 / board-bw
+PASS  normal 390 / board-ct
+PASS  normal 390 / board-st
+PASS  normal 390 / rules
+PASS  normal 390 / hole-pick
+PASS  normal 390 / hole-intro
+PASS  normal 390 / hole-tee
+PASS  normal 390 / entry
+PASS  normal 390 / entry-100
+PASS  normal 390 / ask
+PASS  normal 390 / after
+PASS  large text 390 / home
+PASS  large text 390 / who
+PASS  large text 390 / rounds
+PASS  large text 390 / round-past
+PASS  large text 390 / round-long-title
+PASS  large text 390 / home-long-title
+PASS  large text 390 / round-players
+PASS  large text 390 / round-groups
+PASS  large text 390 / round-group-open
+PASS  large text 390 / round-kb
+PASS  large text 390 / round-weather
+PASS  large text 390 / round-course
+PASS  large text 390 / goy
+PASS  large text 390 / player
+PASS  large text 390 / players
+PASS  large text 390 / stats
+PASS  large text 390 / trip
+PASS  large text 390 / board-scores
+PASS  large text 390 / board-bw
+PASS  large text 390 / board-ct
+PASS  large text 390 / board-st
+PASS  large text 390 / rules
+PASS  large text 390 / hole-pick
+PASS  large text 390 / hole-intro
+PASS  large text 390 / hole-tee
+PASS  large text 390 / entry
+PASS  large text 390 / entry-100
+PASS  large text 390 / ask
+PASS  large text 390 / after
+PASS  small 360 / long round title .rp-name shows in full
+TITLE  standard look | small 360 | .rp-name | 2 lines (limit 2) | -apple-system 21.7021px
+PASS  small 360 / long round title .hero.home .now-name shows in full
+TITLE  standard look | small 360 | .hero.home .now-name | 2 lines (limit 2) | -apple-system 21.7021px
+PASS  small 360 large text / long round title .rp-name shows in full
+TITLE  standard look | small 360 large text | .rp-name | 3 lines (limit 3) | -apple-system 27.5745px
+PASS  small 360 large text / long round title .hero.home .now-name shows in full
+TITLE  standard look | small 360 large text | .hero.home .now-name | 3 lines (limit 3) | -apple-system 27.5745px
+PASS  normal 390 / long round title .rp-name shows in full
+TITLE  standard look | normal 390 | .rp-name | 2 lines (limit 2) | -apple-system 21.7021px
+PASS  normal 390 / long round title .hero.home .now-name shows in full
+TITLE  standard look | normal 390 | .hero.home .now-name | 2 lines (limit 2) | -apple-system 21.7021px
+PASS  large text 390 / long round title .rp-name shows in full
+TITLE  standard look | large text 390 | .rp-name | 3 lines (limit 3) | -apple-system 27.5745px
+PASS  large text 390 / long round title .hero.home .now-name shows in full
+TITLE  standard look | large text 390 | .hero.home .now-name | 3 lines (limit 3) | -apple-system 27.5745px

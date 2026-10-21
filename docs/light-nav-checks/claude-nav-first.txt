@@ -1,0 +1,361 @@
+CONTRAST  after-standard | 360 | home | page | "Home" selected | 11.57:1
+CONTRAST  after-standard | 360 | home | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 360 | home | page | "Results" | 6.20:1
+CONTRAST  after-standard | 360 | home | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 360 | home | pine | "Home" selected | 10.02:1
+CONTRAST  after-standard | 360 | home | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 360 | home | pine | "Results" | 5.37:1
+CONTRAST  after-standard | 360 | home | pine | "Ruling" | 5.37:1
+PASS  after-standard | 360 | home (bar 68px)
+CONTRAST  after-standard | 360 | hole entry | page | "Home" | 6.20:1
+CONTRAST  after-standard | 360 | hole entry | page | "Hole 18" selected | 11.57:1
+CONTRAST  after-standard | 360 | hole entry | page | "Results" | 6.20:1
+CONTRAST  after-standard | 360 | hole entry | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 360 | hole entry | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 360 | hole entry | pine | "Hole 18" selected | 10.02:1
+CONTRAST  after-standard | 360 | hole entry | pine | "Results" | 5.37:1
+CONTRAST  after-standard | 360 | hole entry | pine | "Ruling" | 5.37:1
+PASS  after-standard | 360 | hole entry (bar 68px)
+CONTRAST  after-standard | 360 | results | page | "Home" | 6.20:1
+CONTRAST  after-standard | 360 | results | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 360 | results | page | "Results" selected | 11.57:1
+CONTRAST  after-standard | 360 | results | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 360 | results | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 360 | results | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 360 | results | pine | "Results" selected | 10.02:1
+CONTRAST  after-standard | 360 | results | pine | "Ruling" | 5.37:1
+PASS  after-standard | 360 | results (bar 68px)
+CONTRAST  after-standard | 360 | results buggy wars | page | "Home" | 6.20:1
+CONTRAST  after-standard | 360 | results buggy wars | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 360 | results buggy wars | page | "Results" selected | 11.57:1
+CONTRAST  after-standard | 360 | results buggy wars | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 360 | results buggy wars | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 360 | results buggy wars | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 360 | results buggy wars | pine | "Results" selected | 10.02:1
+CONTRAST  after-standard | 360 | results buggy wars | pine | "Ruling" | 5.37:1
+PASS  after-standard | 360 | results buggy wars (bar 68px)
+CONTRAST  after-standard | 360 | ruling | page | "Home" | 6.20:1
+CONTRAST  after-standard | 360 | ruling | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 360 | ruling | page | "Results" | 6.20:1
+CONTRAST  after-standard | 360 | ruling | page | "Ruling" selected | 11.57:1
+CONTRAST  after-standard | 360 | ruling | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 360 | ruling | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 360 | ruling | pine | "Results" | 5.37:1
+CONTRAST  after-standard | 360 | ruling | pine | "Ruling" selected | 10.02:1
+PASS  after-standard | 360 | ruling (bar 68px)
+CONTRAST  after-standard | 360 large text | home | page | "Home" selected | 11.57:1
+CONTRAST  after-standard | 360 large text | home | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 360 large text | home | page | "Results" | 6.20:1
+CONTRAST  after-standard | 360 large text | home | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 360 large text | home | pine | "Home" selected | 10.02:1
+CONTRAST  after-standard | 360 large text | home | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 360 large text | home | pine | "Results" | 5.37:1
+CONTRAST  after-standard | 360 large text | home | pine | "Ruling" | 5.37:1
+PASS  after-standard | 360 large text | home (bar 68px)
+CONTRAST  after-standard | 360 large text | hole entry | page | "Home" | 6.20:1
+CONTRAST  after-standard | 360 large text | hole entry | page | "Hole 18" selected | 11.57:1
+CONTRAST  after-standard | 360 large text | hole entry | page | "Results" | 6.20:1
+CONTRAST  after-standard | 360 large text | hole entry | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 360 large text | hole entry | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 360 large text | hole entry | pine | "Hole 18" selected | 10.02:1
+CONTRAST  after-standard | 360 large text | hole entry | pine | "Results" | 5.37:1
+CONTRAST  after-standard | 360 large text | hole entry | pine | "Ruling" | 5.37:1
+PASS  after-standard | 360 large text | hole entry (bar 68px)
+CONTRAST  after-standard | 360 large text | results | page | "Home" | 6.20:1
+CONTRAST  after-standard | 360 large text | results | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 360 large text | results | page | "Results" selected | 11.57:1
+CONTRAST  after-standard | 360 large text | results | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 360 large text | results | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 360 large text | results | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 360 large text | results | pine | "Results" selected | 10.02:1
+CONTRAST  after-standard | 360 large text | results | pine | "Ruling" | 5.37:1
+PASS  after-standard | 360 large text | results (bar 68px)
+CONTRAST  after-standard | 360 large text | results buggy wars | page | "Home" | 6.20:1
+CONTRAST  after-standard | 360 large text | results buggy wars | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 360 large text | results buggy wars | page | "Results" selected | 11.57:1
+CONTRAST  after-standard | 360 large text | results buggy wars | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 360 large text | results buggy wars | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 360 large text | results buggy wars | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 360 large text | results buggy wars | pine | "Results" selected | 10.02:1
+CONTRAST  after-standard | 360 large text | results buggy wars | pine | "Ruling" | 5.37:1
+PASS  after-standard | 360 large text | results buggy wars (bar 68px)
+CONTRAST  after-standard | 360 large text | ruling | page | "Home" | 6.20:1
+CONTRAST  after-standard | 360 large text | ruling | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 360 large text | ruling | page | "Results" | 6.20:1
+CONTRAST  after-standard | 360 large text | ruling | page | "Ruling" selected | 11.57:1
+CONTRAST  after-standard | 360 large text | ruling | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 360 large text | ruling | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 360 large text | ruling | pine | "Results" | 5.37:1
+CONTRAST  after-standard | 360 large text | ruling | pine | "Ruling" selected | 10.02:1
+PASS  after-standard | 360 large text | ruling (bar 68px)
+CONTRAST  after-standard | 390 | home | page | "Home" selected | 11.57:1
+CONTRAST  after-standard | 390 | home | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 390 | home | page | "Results" | 6.20:1
+CONTRAST  after-standard | 390 | home | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 390 | home | pine | "Home" selected | 10.02:1
+CONTRAST  after-standard | 390 | home | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 390 | home | pine | "Results" | 5.37:1
+CONTRAST  after-standard | 390 | home | pine | "Ruling" | 5.37:1
+PASS  after-standard | 390 | home (bar 68px)
+CONTRAST  after-standard | 390 | hole entry | page | "Home" | 6.20:1
+CONTRAST  after-standard | 390 | hole entry | page | "Hole 18" selected | 11.57:1
+CONTRAST  after-standard | 390 | hole entry | page | "Results" | 6.20:1
+CONTRAST  after-standard | 390 | hole entry | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 390 | hole entry | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 390 | hole entry | pine | "Hole 18" selected | 10.02:1
+CONTRAST  after-standard | 390 | hole entry | pine | "Results" | 5.37:1
+CONTRAST  after-standard | 390 | hole entry | pine | "Ruling" | 5.37:1
+PASS  after-standard | 390 | hole entry (bar 68px)
+CONTRAST  after-standard | 390 | results | page | "Home" | 6.20:1
+CONTRAST  after-standard | 390 | results | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 390 | results | page | "Results" selected | 11.57:1
+CONTRAST  after-standard | 390 | results | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 390 | results | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 390 | results | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 390 | results | pine | "Results" selected | 10.02:1
+CONTRAST  after-standard | 390 | results | pine | "Ruling" | 5.37:1
+PASS  after-standard | 390 | results (bar 68px)
+CONTRAST  after-standard | 390 | results buggy wars | page | "Home" | 6.20:1
+CONTRAST  after-standard | 390 | results buggy wars | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 390 | results buggy wars | page | "Results" selected | 11.57:1
+CONTRAST  after-standard | 390 | results buggy wars | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 390 | results buggy wars | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 390 | results buggy wars | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 390 | results buggy wars | pine | "Results" selected | 10.02:1
+CONTRAST  after-standard | 390 | results buggy wars | pine | "Ruling" | 5.37:1
+PASS  after-standard | 390 | results buggy wars (bar 68px)
+CONTRAST  after-standard | 390 | ruling | page | "Home" | 6.20:1
+CONTRAST  after-standard | 390 | ruling | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 390 | ruling | page | "Results" | 6.20:1
+CONTRAST  after-standard | 390 | ruling | page | "Ruling" selected | 11.57:1
+CONTRAST  after-standard | 390 | ruling | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 390 | ruling | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 390 | ruling | pine | "Results" | 5.37:1
+CONTRAST  after-standard | 390 | ruling | pine | "Ruling" selected | 10.02:1
+PASS  after-standard | 390 | ruling (bar 68px)
+CONTRAST  after-standard | 390 large text | home | page | "Home" selected | 11.57:1
+CONTRAST  after-standard | 390 large text | home | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 390 large text | home | page | "Results" | 6.20:1
+CONTRAST  after-standard | 390 large text | home | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 390 large text | home | pine | "Home" selected | 10.02:1
+CONTRAST  after-standard | 390 large text | home | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 390 large text | home | pine | "Results" | 5.37:1
+CONTRAST  after-standard | 390 large text | home | pine | "Ruling" | 5.37:1
+PASS  after-standard | 390 large text | home (bar 68px)
+CONTRAST  after-standard | 390 large text | hole entry | page | "Home" | 6.20:1
+CONTRAST  after-standard | 390 large text | hole entry | page | "Hole 18" selected | 11.57:1
+CONTRAST  after-standard | 390 large text | hole entry | page | "Results" | 6.20:1
+CONTRAST  after-standard | 390 large text | hole entry | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 390 large text | hole entry | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 390 large text | hole entry | pine | "Hole 18" selected | 10.02:1
+CONTRAST  after-standard | 390 large text | hole entry | pine | "Results" | 5.37:1
+CONTRAST  after-standard | 390 large text | hole entry | pine | "Ruling" | 5.37:1
+PASS  after-standard | 390 large text | hole entry (bar 68px)
+CONTRAST  after-standard | 390 large text | results | page | "Home" | 6.20:1
+CONTRAST  after-standard | 390 large text | results | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 390 large text | results | page | "Results" selected | 11.57:1
+CONTRAST  after-standard | 390 large text | results | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 390 large text | results | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 390 large text | results | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 390 large text | results | pine | "Results" selected | 10.02:1
+CONTRAST  after-standard | 390 large text | results | pine | "Ruling" | 5.37:1
+PASS  after-standard | 390 large text | results (bar 68px)
+CONTRAST  after-standard | 390 large text | results buggy wars | page | "Home" | 6.20:1
+CONTRAST  after-standard | 390 large text | results buggy wars | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 390 large text | results buggy wars | page | "Results" selected | 11.57:1
+CONTRAST  after-standard | 390 large text | results buggy wars | page | "Ruling" | 6.20:1
+CONTRAST  after-standard | 390 large text | results buggy wars | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 390 large text | results buggy wars | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 390 large text | results buggy wars | pine | "Results" selected | 10.02:1
+CONTRAST  after-standard | 390 large text | results buggy wars | pine | "Ruling" | 5.37:1
+PASS  after-standard | 390 large text | results buggy wars (bar 68px)
+CONTRAST  after-standard | 390 large text | ruling | page | "Home" | 6.20:1
+CONTRAST  after-standard | 390 large text | ruling | page | "Hole 18" | 6.20:1
+CONTRAST  after-standard | 390 large text | ruling | page | "Results" | 6.20:1
+CONTRAST  after-standard | 390 large text | ruling | page | "Ruling" selected | 11.57:1
+CONTRAST  after-standard | 390 large text | ruling | pine | "Home" | 5.37:1
+CONTRAST  after-standard | 390 large text | ruling | pine | "Hole 18" | 5.37:1
+CONTRAST  after-standard | 390 large text | ruling | pine | "Results" | 5.37:1
+CONTRAST  after-standard | 390 large text | ruling | pine | "Ruling" selected | 10.02:1
+PASS  after-standard | 390 large text | ruling (bar 68px)
+CONTRAST  after-editorial | 360 | home | page | "Home" selected | 11.57:1
+CONTRAST  after-editorial | 360 | home | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 360 | home | page | "Results" | 6.20:1
+CONTRAST  after-editorial | 360 | home | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 360 | home | pine | "Home" selected | 10.02:1
+CONTRAST  after-editorial | 360 | home | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 360 | home | pine | "Results" | 5.37:1
+CONTRAST  after-editorial | 360 | home | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 360 | home (bar 68px)
+CONTRAST  after-editorial | 360 | hole entry | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 360 | hole entry | page | "Hole 18" selected | 11.57:1
+CONTRAST  after-editorial | 360 | hole entry | page | "Results" | 6.20:1
+CONTRAST  after-editorial | 360 | hole entry | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 360 | hole entry | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 360 | hole entry | pine | "Hole 18" selected | 10.02:1
+CONTRAST  after-editorial | 360 | hole entry | pine | "Results" | 5.37:1
+CONTRAST  after-editorial | 360 | hole entry | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 360 | hole entry (bar 68px)
+CONTRAST  after-editorial | 360 | results | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 360 | results | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 360 | results | page | "Results" selected | 11.57:1
+CONTRAST  after-editorial | 360 | results | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 360 | results | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 360 | results | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 360 | results | pine | "Results" selected | 10.02:1
+CONTRAST  after-editorial | 360 | results | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 360 | results (bar 68px)
+CONTRAST  after-editorial | 360 | results buggy wars | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 360 | results buggy wars | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 360 | results buggy wars | page | "Results" selected | 11.57:1
+CONTRAST  after-editorial | 360 | results buggy wars | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 360 | results buggy wars | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 360 | results buggy wars | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 360 | results buggy wars | pine | "Results" selected | 10.02:1
+CONTRAST  after-editorial | 360 | results buggy wars | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 360 | results buggy wars (bar 68px)
+CONTRAST  after-editorial | 360 | ruling | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 360 | ruling | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 360 | ruling | page | "Results" | 6.20:1
+CONTRAST  after-editorial | 360 | ruling | page | "Ruling" selected | 11.57:1
+CONTRAST  after-editorial | 360 | ruling | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 360 | ruling | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 360 | ruling | pine | "Results" | 5.37:1
+CONTRAST  after-editorial | 360 | ruling | pine | "Ruling" selected | 10.02:1
+PASS  after-editorial | 360 | ruling (bar 68px)
+CONTRAST  after-editorial | 360 large text | home | page | "Home" selected | 11.57:1
+CONTRAST  after-editorial | 360 large text | home | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 360 large text | home | page | "Results" | 6.20:1
+CONTRAST  after-editorial | 360 large text | home | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 360 large text | home | pine | "Home" selected | 10.02:1
+CONTRAST  after-editorial | 360 large text | home | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 360 large text | home | pine | "Results" | 5.37:1
+CONTRAST  after-editorial | 360 large text | home | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 360 large text | home (bar 68px)
+CONTRAST  after-editorial | 360 large text | hole entry | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 360 large text | hole entry | page | "Hole 18" selected | 11.57:1
+CONTRAST  after-editorial | 360 large text | hole entry | page | "Results" | 6.20:1
+CONTRAST  after-editorial | 360 large text | hole entry | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 360 large text | hole entry | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 360 large text | hole entry | pine | "Hole 18" selected | 10.02:1
+CONTRAST  after-editorial | 360 large text | hole entry | pine | "Results" | 5.37:1
+CONTRAST  after-editorial | 360 large text | hole entry | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 360 large text | hole entry (bar 68px)
+CONTRAST  after-editorial | 360 large text | results | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 360 large text | results | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 360 large text | results | page | "Results" selected | 11.57:1
+CONTRAST  after-editorial | 360 large text | results | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 360 large text | results | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 360 large text | results | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 360 large text | results | pine | "Results" selected | 10.02:1
+CONTRAST  after-editorial | 360 large text | results | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 360 large text | results (bar 68px)
+CONTRAST  after-editorial | 360 large text | results buggy wars | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 360 large text | results buggy wars | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 360 large text | results buggy wars | page | "Results" selected | 11.57:1
+CONTRAST  after-editorial | 360 large text | results buggy wars | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 360 large text | results buggy wars | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 360 large text | results buggy wars | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 360 large text | results buggy wars | pine | "Results" selected | 10.02:1
+CONTRAST  after-editorial | 360 large text | results buggy wars | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 360 large text | results buggy wars (bar 68px)
+CONTRAST  after-editorial | 360 large text | ruling | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 360 large text | ruling | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 360 large text | ruling | page | "Results" | 6.20:1
+CONTRAST  after-editorial | 360 large text | ruling | page | "Ruling" selected | 11.57:1
+CONTRAST  after-editorial | 360 large text | ruling | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 360 large text | ruling | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 360 large text | ruling | pine | "Results" | 5.37:1
+CONTRAST  after-editorial | 360 large text | ruling | pine | "Ruling" selected | 10.02:1
+PASS  after-editorial | 360 large text | ruling (bar 68px)
+CONTRAST  after-editorial | 390 | home | page | "Home" selected | 11.57:1
+CONTRAST  after-editorial | 390 | home | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 390 | home | page | "Results" | 6.20:1
+CONTRAST  after-editorial | 390 | home | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 390 | home | pine | "Home" selected | 10.02:1
+CONTRAST  after-editorial | 390 | home | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 390 | home | pine | "Results" | 5.37:1
+CONTRAST  after-editorial | 390 | home | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 390 | home (bar 68px)
+CONTRAST  after-editorial | 390 | hole entry | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 390 | hole entry | page | "Hole 18" selected | 11.57:1
+CONTRAST  after-editorial | 390 | hole entry | page | "Results" | 6.20:1
+CONTRAST  after-editorial | 390 | hole entry | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 390 | hole entry | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 390 | hole entry | pine | "Hole 18" selected | 10.02:1
+CONTRAST  after-editorial | 390 | hole entry | pine | "Results" | 5.37:1
+CONTRAST  after-editorial | 390 | hole entry | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 390 | hole entry (bar 68px)
+CONTRAST  after-editorial | 390 | results | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 390 | results | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 390 | results | page | "Results" selected | 11.57:1
+CONTRAST  after-editorial | 390 | results | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 390 | results | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 390 | results | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 390 | results | pine | "Results" selected | 10.02:1
+CONTRAST  after-editorial | 390 | results | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 390 | results (bar 68px)
+CONTRAST  after-editorial | 390 | results buggy wars | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 390 | results buggy wars | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 390 | results buggy wars | page | "Results" selected | 11.57:1
+CONTRAST  after-editorial | 390 | results buggy wars | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 390 | results buggy wars | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 390 | results buggy wars | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 390 | results buggy wars | pine | "Results" selected | 10.02:1
+CONTRAST  after-editorial | 390 | results buggy wars | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 390 | results buggy wars (bar 68px)
+CONTRAST  after-editorial | 390 | ruling | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 390 | ruling | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 390 | ruling | page | "Results" | 6.20:1
+CONTRAST  after-editorial | 390 | ruling | page | "Ruling" selected | 11.57:1
+CONTRAST  after-editorial | 390 | ruling | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 390 | ruling | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 390 | ruling | pine | "Results" | 5.37:1
+CONTRAST  after-editorial | 390 | ruling | pine | "Ruling" selected | 10.02:1
+PASS  after-editorial | 390 | ruling (bar 68px)
+CONTRAST  after-editorial | 390 large text | home | page | "Home" selected | 11.57:1
+CONTRAST  after-editorial | 390 large text | home | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 390 large text | home | page | "Results" | 6.20:1
+CONTRAST  after-editorial | 390 large text | home | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 390 large text | home | pine | "Home" selected | 10.02:1
+CONTRAST  after-editorial | 390 large text | home | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 390 large text | home | pine | "Results" | 5.37:1
+CONTRAST  after-editorial | 390 large text | home | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 390 large text | home (bar 68px)
+CONTRAST  after-editorial | 390 large text | hole entry | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 390 large text | hole entry | page | "Hole 18" selected | 11.57:1
+CONTRAST  after-editorial | 390 large text | hole entry | page | "Results" | 6.20:1
+CONTRAST  after-editorial | 390 large text | hole entry | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 390 large text | hole entry | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 390 large text | hole entry | pine | "Hole 18" selected | 10.02:1
+CONTRAST  after-editorial | 390 large text | hole entry | pine | "Results" | 5.37:1
+CONTRAST  after-editorial | 390 large text | hole entry | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 390 large text | hole entry (bar 68px)
+CONTRAST  after-editorial | 390 large text | results | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 390 large text | results | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 390 large text | results | page | "Results" selected | 11.57:1
+CONTRAST  after-editorial | 390 large text | results | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 390 large text | results | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 390 large text | results | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 390 large text | results | pine | "Results" selected | 10.02:1
+CONTRAST  after-editorial | 390 large text | results | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 390 large text | results (bar 68px)
+CONTRAST  after-editorial | 390 large text | results buggy wars | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 390 large text | results buggy wars | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 390 large text | results buggy wars | page | "Results" selected | 11.57:1
+CONTRAST  after-editorial | 390 large text | results buggy wars | page | "Ruling" | 6.20:1
+CONTRAST  after-editorial | 390 large text | results buggy wars | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 390 large text | results buggy wars | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 390 large text | results buggy wars | pine | "Results" selected | 10.02:1
+CONTRAST  after-editorial | 390 large text | results buggy wars | pine | "Ruling" | 5.37:1
+PASS  after-editorial | 390 large text | results buggy wars (bar 68px)
+CONTRAST  after-editorial | 390 large text | ruling | page | "Home" | 6.20:1
+CONTRAST  after-editorial | 390 large text | ruling | page | "Hole 18" | 6.20:1
+CONTRAST  after-editorial | 390 large text | ruling | page | "Results" | 6.20:1
+CONTRAST  after-editorial | 390 large text | ruling | page | "Ruling" selected | 11.57:1
+CONTRAST  after-editorial | 390 large text | ruling | pine | "Home" | 5.37:1
+CONTRAST  after-editorial | 390 large text | ruling | pine | "Hole 18" | 5.37:1
+CONTRAST  after-editorial | 390 large text | ruling | pine | "Results" | 5.37:1
+CONTRAST  after-editorial | 390 large text | ruling | pine | "Ruling" selected | 10.02:1
+PASS  after-editorial | 390 large text | ruling (bar 68px)
+ALL PASSED

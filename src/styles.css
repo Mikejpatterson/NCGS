@@ -13,6 +13,12 @@
   --press: #D9E3DB;
   --ink: #0F1A14;
   --pine: #0B3D2E;
+  /* Shared floating navigation: warm, quiet, readable over changing page content. */
+  --nav-surface: #FAF8F3;
+  --nav-glass: rgba(250, 248, 243, .92);
+  --nav-text: #526158;
+  --nav-active: var(--pine);
+  --nav-shadow: 0 6px 20px rgba(20, 35, 27, .12), 0 0 0 1px rgba(11, 61, 46, .10);
   --pine-2: #14573F;
   --green: #167A41;
   --green-soft: #DDF1E4;
@@ -204,10 +210,6 @@ textarea.export { width: 100%; height: 140px; border-radius: 12px; border: 1px s
 .banner { background: var(--amber-soft); color: var(--amber); border-radius: 12px; padding: 12px 16px; font-size: var(--t-sub); }
 
 /* Tab bar */
-.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(3, 1fr); background: rgba(249, 249, 249, .94); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border-top: .5px solid #C6C6C8; padding: 4px 0 calc(4px + env(safe-area-inset-bottom, 0px)); }
-.tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 48px; font-size: .66rem; color: #8A8A8E; }
-.tab svg { width: 24px; height: 24px; }
-.tab.on { color: var(--green); font-weight: 600; }
 
 /* Toast */
 .toast { position: fixed; left: 50%; bottom: calc(80px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: #fff; border-radius: 12px; padding: 12px 16px; font-size: var(--t-sub); z-index: 40; max-width: calc(100% - 32px); }
@@ -367,10 +369,7 @@ button.btn:has(> svg) { flex-direction: row; }
 .seg { background: var(--press); }
 .seg button.on { color: var(--pine); }
 .chip.on { background: var(--pine); }
-.tabs { background: rgba(255,255,255,.92); border-top: .5px solid var(--line); }
-.tab { color: #7C8A82; }
-.tab.on { color: var(--pine); }
-.tab.on svg { color: var(--green); }
+
 .lrow:first-child .b.r, .lrow.goy:first-child .b.r { color: var(--green); }
 .mrow.now { background: var(--green-soft); }
 .choice.on { border-color: var(--green); }
@@ -549,7 +548,7 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 /* The strip behind the clock takes the colour of the body, so the body is the header green and the app sits on top of it in the light page colour. */
 html, body { background: var(--bg); }
 #app { background: var(--bg); min-height: 100vh; }
-.tabs { background: #fff; -webkit-backdrop-filter: none; backdrop-filter: none; }
+
 .stv.out { color: var(--faint); }
 
 /* Strokes with points beside them, the word under (Scratch = 0 points, the same as a pick-up) */
@@ -815,11 +814,7 @@ html, body { background: var(--bg); }
 .lnk { border-radius: 22px; }
 
 /* Floating pill tab bar */
-.tabs { left: 50%; right: auto; width: min(calc(100% - 32px), 448px); transform: translateX(-50%); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); height: 68px; border-radius: 34px; padding: 0 8px; gap: 2px; grid-template-columns: repeat(4, 1fr); align-items: center; background: rgba(255, 255, 255, .94); -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px); border: 0; box-shadow: 0 8px 28px rgba(20, 35, 27, .16), 0 0 0 1px rgba(20, 35, 27, .08); }
-.tab { height: 52px; min-height: 52px; border-radius: 26px; font-size: .68rem; font-weight: 600; color: var(--sub); }
-.tab svg { width: 22px; height: 22px; }
-.tab.on { background: #FBEFB8; color: var(--pine); font-weight: 700; }
-.tab.on svg { color: var(--pine); }
+
 .askbar { bottom: calc(var(--tabh, 90px) + 4px); }
 .thread { padding-bottom: calc(var(--tabh, 90px) + var(--askh, 76px) + 16px); }
 .toast { bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
@@ -901,24 +896,6 @@ html, body { background: var(--bg); }
 .entry .pr-dots .dots { margin: 0; }
 .entry .stepper .pu { margin-top: 4px; margin-left: 10px; height: 32px; }
 
-/* ===== Liquid glass tab bar: clear, blurred, bright edge; the chosen tab is a lens of yellow glass ===== */
-.tabs { background: rgba(255, 255, 255, .68); -webkit-backdrop-filter: blur(30px) saturate(190%) brightness(1.05); backdrop-filter: blur(30px) saturate(190%) brightness(1.05); box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .95), inset 0 -1px 0 rgba(255, 255, 255, .4), inset 0 0 0 1px rgba(255, 255, 255, .55), 0 12px 32px rgba(20, 35, 27, .2), 0 0 0 .5px rgba(20, 35, 27, .12); }
-.tabs::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(180deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, 0) 55%); pointer-events: none; z-index: -1; }
-.tab { color: #36413B; }
-.tab.on { background: linear-gradient(180deg, rgba(255, 248, 214, .95), rgba(250, 232, 160, .7)); box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .95), inset 0 0 0 1px rgba(255, 255, 255, .6), 0 3px 10px rgba(122, 90, 0, .18); }
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .tabs { background: rgba(255, 255, 255, .96); } }
-
-/* ===== More glass: clearer, stronger blur and colour lift, bright rim light all the way round, a curved highlight across the top ===== */
-.tabs { background: linear-gradient(135deg, rgba(255, 255, 255, .46), rgba(255, 255, 255, .14) 42%, rgba(255, 255, 255, .32)); -webkit-backdrop-filter: blur(14px) saturate(230%) contrast(1.06) brightness(1.1); backdrop-filter: blur(14px) saturate(230%) contrast(1.06) brightness(1.1); box-shadow: inset 0 2px 1px -1px rgba(255, 255, 255, 1), inset 0 -2px 2px -1px rgba(255, 255, 255, .7), inset 2px 0 3px -2px rgba(255, 255, 255, .9), inset -2px 0 3px -2px rgba(255, 255, 255, .9), inset 0 0 24px rgba(255, 255, 255, .3), 0 16px 38px rgba(20, 35, 27, .24), 0 0 0 .5px rgba(20, 35, 27, .14); }
-.tabs::before { background: radial-gradient(130% 100% at 50% -35%, rgba(255, 255, 255, .8), rgba(255, 255, 255, 0) 62%); }
-.tab { text-shadow: 0 0 8px rgba(255, 255, 255, .95), 0 0 2px rgba(255, 255, 255, .8); }
-.tab svg { filter: drop-shadow(0 0 4px rgba(255, 255, 255, .9)); }
-.tab.on { background: linear-gradient(180deg, rgba(255, 255, 255, .7), rgba(247, 197, 22, .34)); -webkit-backdrop-filter: blur(6px) saturate(180%) brightness(1.08); backdrop-filter: blur(6px) saturate(180%) brightness(1.08); box-shadow: inset 0 2px 1px -1px #fff, inset 0 -2px 2px -1px rgba(255, 255, 255, .8), inset 0 0 0 1px rgba(255, 255, 255, .65), inset 0 0 14px rgba(255, 255, 255, .4), 0 5px 14px rgba(122, 90, 0, .22); }
-
-/* Selected tab: a stronger yellow glass lens, darker bolder icon and label */
-.tab.on { background: linear-gradient(180deg, rgba(255, 255, 255, .85), rgba(247, 197, 22, .62)); box-shadow: inset 0 2px 1px -1px #fff, inset 0 -2px 3px -1px rgba(255, 255, 255, .9), inset 0 0 0 1.5px rgba(255, 255, 255, .85), inset 0 0 16px rgba(255, 255, 255, .5), 0 0 0 1px rgba(214, 160, 0, .45), 0 6px 16px rgba(160, 110, 0, .32); color: #0B3D2C; font-weight: 800; text-shadow: none; }
-.tab.on svg { stroke-width: 2.5; color: #0B3D2C; filter: none; }
-
 /* Golfer of the Year: the leader in a pine card, each counting score as a green chip */
 .leadcard { position: relative; overflow: hidden; margin-top: 14px; border-radius: 28px; background: var(--pine); color: #fff; padding: 18px; display: flex; flex-direction: column; gap: 4px; }
 .leadcard::after { content: ""; position: absolute; right: -50px; top: -50px; width: 170px; height: 170px; border-radius: 50%; background: rgba(247, 197, 22, .14); }
@@ -955,9 +932,6 @@ html { scroll-padding-bottom: calc(var(--tabh, 90px) + 16px); }
 body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: env(safe-area-inset-top, 0px); background: var(--bg); z-index: 60; pointer-events: none; }
 
 /* Glassier bar: far more see-through, stronger blur and colour lift, a bright edge */
-.tabs { background: linear-gradient(135deg, rgba(255, 255, 255, .36), rgba(255, 255, 255, .06) 45%, rgba(255, 255, 255, .24)); -webkit-backdrop-filter: blur(22px) saturate(260%) contrast(1.04) brightness(1.12); backdrop-filter: blur(22px) saturate(260%) contrast(1.04) brightness(1.12); box-shadow: inset 0 2px 1px -1px #fff, inset 0 -2px 2px -1px rgba(255, 255, 255, .8), inset 2px 0 3px -2px #fff, inset -2px 0 3px -2px #fff, inset 0 0 28px rgba(255, 255, 255, .35), 0 0 0 1px rgba(255, 255, 255, .35), 0 18px 40px rgba(20, 35, 27, .26), 0 0 0 .5px rgba(20, 35, 27, .16); }
-.tab { text-shadow: 0 0 10px rgba(255, 255, 255, 1), 0 0 3px rgba(255, 255, 255, .9); }
-.tab.on { background: linear-gradient(180deg, rgba(255, 255, 255, .6), rgba(247, 197, 22, .5)); }
 
 /* ===== Richer pages: Home tiles, Past rounds, Players, Stats ===== */
 .av.sm { width: 28px; height: 28px; font-size: .5rem; }
@@ -1068,15 +1042,6 @@ body::before { content: ""; position: fixed; top: 0; left: 0; right: 0; height: 
 .entcard .prog { margin-top: 14px; }
 .entcard .prog i { height: 5px; }
 
-/* Selected tab: clean glass lens, no colour patch (so nothing looks hidden behind it) */
-.tab.on {
-  background: linear-gradient(180deg, rgba(255, 255, 255, .95), rgba(255, 255, 255, .7));
-  -webkit-backdrop-filter: blur(8px) saturate(180%); backdrop-filter: blur(8px) saturate(180%);
-  box-shadow: 0 0 0 1px rgba(20, 35, 27, .10), 0 3px 10px rgba(20, 35, 27, .16), inset 0 1.5px 0 #fff, inset 0 -1px 2px rgba(20, 35, 27, .08);
-  color: var(--pine); font-weight: 800; text-shadow: none;
-}
-.tab.on svg { color: var(--pine); stroke-width: 2.4; filter: none; }
-
 /* Results selector: tidy 2 x 2 grid */
 .seg.pills.four { display: grid; grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; padding: 4px; }
 .seg.pills.four button { flex: none; width: 100%; min-height: 44px; font-size: .95rem; white-space: nowrap; }
@@ -1088,20 +1053,6 @@ body::before { display: none; }
 .entright { display: inline-flex; align-items: center; gap: 10px; }
 .tee .entcard { margin-bottom: 4px; }
 
-/* Glass v5: frosted, slightly cool bar so the lighter lens clearly stands out */
-.tabs {
-  background: linear-gradient(180deg, rgba(228, 233, 229, .62), rgba(214, 221, 216, .50));
-  -webkit-backdrop-filter: blur(26px) saturate(200%) brightness(1.02); backdrop-filter: blur(26px) saturate(200%) brightness(1.02);
-  box-shadow: inset 0 1.5px 0 rgba(255, 255, 255, .9), inset 0 -1px 0 rgba(255, 255, 255, .35), inset 0 0 0 1px rgba(255, 255, 255, .45), 0 14px 34px rgba(20, 35, 27, .22), 0 0 0 .5px rgba(20, 35, 27, .18);
-}
-.tabs::before { background: linear-gradient(180deg, rgba(255, 255, 255, .5), rgba(255, 255, 255, 0) 50%); }
-.tab { text-shadow: none; color: #2B3630; }
-.tab svg { filter: none; }
-.tab.on {
-  background: linear-gradient(180deg, rgba(255, 255, 255, .98), rgba(255, 255, 255, .78) 60%, rgba(255, 255, 255, .9));
-  box-shadow: inset 0 2px 1px -1px #fff, inset 0 -3px 4px -2px rgba(20, 35, 27, .10), inset 0 0 0 1px rgba(255, 255, 255, .9), 0 0 0 1px rgba(20, 35, 27, .09), 0 6px 14px rgba(20, 35, 27, .22);
-  color: var(--pine);
-}
 .entright .pill.w2 { background: #fff; color: var(--sub); box-shadow: inset 0 0 0 1.5px rgba(20, 35, 27, .22); }
 .hero.s .tile .bignum, .hero.c:not(.pine) .tile .bignum { color: var(--text); }
 .hero.s .tile .cap, .hero.c:not(.pine) .tile .cap { color: var(--sub); }
@@ -1159,7 +1110,7 @@ body { font-variant-numeric: tabular-nums; }
 .hero.s, .hero.c:not(.pine) { padding-top: 12px; }
 
 /* Nothing smaller than 12px except tiny caps labels (which are bold and spaced) */
-.tab { font-size: .72rem; }
+
 .dchip small { font-size: .7rem; }
 .idx small { font-size: .68rem; }
 .av.sm { font-size: .62rem; }
@@ -1293,38 +1244,42 @@ body { font-variant-numeric: tabular-nums; }
 .feat::after { right: -38px; top: -52px; width: 140px; height: 140px; background: rgba(247, 197, 22, .16); }
 .ft-p b { position: relative; z-index: 2; }
 
-/* Glass v6: close to Apple's liquid glass. Almost clear, light blur so you can see through it,
-   bright rim light on the edges, and a clear lens for the chosen tab. */
+/* Light floating navigation (owner direction, 21 October 2026).
+   Keep the established geometry and routes; replace the bright lens with quiet pine emphasis.
+   Start opaque so browsers without backdrop filtering always have a readable surface. */
 .tabs {
-  background: linear-gradient(180deg, rgba(255, 255, 255, .26), rgba(255, 255, 255, .10) 55%, rgba(255, 255, 255, .20));
-  -webkit-backdrop-filter: blur(5px) saturate(190%) brightness(1.06); backdrop-filter: blur(5px) saturate(190%) brightness(1.06);
-  box-shadow:
-    inset 0 1.5px 1px -.5px rgba(255, 255, 255, .95),
-    inset 0 -1.5px 1px -.5px rgba(255, 255, 255, .55),
-    inset 1.5px 0 1px -1px rgba(255, 255, 255, .6),
-    inset -1.5px 0 1px -1px rgba(255, 255, 255, .6),
-    inset 0 0 18px rgba(255, 255, 255, .22),
-    0 0 0 .5px rgba(20, 35, 27, .16),
-    0 10px 28px rgba(20, 35, 27, .16);
+  position: fixed; z-index: 10; left: 50%; right: auto; transform: translateX(-50%);
+  bottom: calc(18px + env(safe-area-inset-bottom, 0px)); width: min(calc(100% - 32px), 448px);
+  height: 68px; display: grid; grid-template-columns: repeat(4, 1fr); align-items: center;
+  padding: 0 8px; gap: 2px; border: 0; border-radius: 34px;
+  background: var(--nav-surface);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  box-shadow: var(--nav-shadow);
 }
-.tabs::before { background: linear-gradient(180deg, rgba(255, 255, 255, .28), rgba(255, 255, 255, 0) 45%); }
-.tab { color: #14231B; font-weight: 700; text-shadow: 0 0 6px rgba(255, 255, 255, .95), 0 0 2px rgba(255, 255, 255, .9); }
-.tab svg { filter: drop-shadow(0 0 3px rgba(255, 255, 255, .9)); }
+.tabs::before { display: none; }
+.tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; height: 52px; min-height: 52px; border-radius: 26px; font-size: .72rem; position: relative; min-width: 0; color: var(--nav-text); font-weight: 600; text-shadow: none; white-space: nowrap; }
+.tab span { white-space: nowrap; }
+.tab svg { width: 22px; height: 22px; filter: none; }
 .tab.on {
-  background: linear-gradient(180deg, rgba(255, 255, 255, .34), rgba(255, 255, 255, .12) 60%, rgba(255, 255, 255, .26));
-  -webkit-backdrop-filter: blur(1.5px) saturate(210%) brightness(1.1); backdrop-filter: blur(1.5px) saturate(210%) brightness(1.1);
-  box-shadow:
-    inset 0 2px 1px -1px #fff,
-    inset 0 -2px 2px -1px rgba(255, 255, 255, .8),
-    inset 2px 0 2px -1.5px rgba(255, 255, 255, .8),
-    inset -2px 0 2px -1.5px rgba(255, 255, 255, .8),
-    inset 0 0 14px rgba(255, 255, 255, .35),
-    0 0 0 1px rgba(255, 255, 255, .5),
-    0 3px 10px rgba(20, 35, 27, .16);
-  color: var(--pine); font-weight: 800;
+  background: none; box-shadow: none;
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+  color: var(--nav-active); font-weight: 700;
 }
-.tab.on svg { filter: drop-shadow(0 0 3px rgba(255, 255, 255, .9)); }
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .tabs { background: rgba(255, 255, 255, .92); } }
+.tab.on svg { color: var(--nav-active); stroke-width: 2.4; filter: none; }
+/* A short marker also distinguishes selection without relying on colour alone. */
+.tab.on::after { content: ""; position: absolute; bottom: 2px; left: 50%; width: 18px; height: 2px; transform: translateX(-50%); border-radius: 1px; background: currentColor; }
+.tab:focus-visible { outline: 2px solid var(--nav-active); outline-offset: -3px; }
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .tabs { background: var(--nav-glass); -webkit-backdrop-filter: blur(18px) saturate(110%); backdrop-filter: blur(18px) saturate(110%); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .tabs { background: var(--nav-surface); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
+@media (forced-colors: active) {
+  .tabs { background: Canvas; border: 1px solid CanvasText; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .tab, .tab.on, .tab.on svg { color: ButtonText; }
+  .tab:focus-visible { outline-color: Highlight; }
+}
 
 /* Fixes 3: no bounce between tabs; sheets sit above the glass bar; classic score shapes with a key */
 #app.enter > * { animation: none !important; }
@@ -1732,3 +1687,4 @@ body { font-variant-numeric: tabular-nums; }
 @container (min-width: 19.5em) {
   .entry .bugs .pr.ptile.long { grid-template-areas: "nm nm nm nm nm" ". pu dn sc up"; }
 }
+
