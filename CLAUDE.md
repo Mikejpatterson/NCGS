@@ -7,7 +7,7 @@
 - KBs is a pair competition with partners in different groups. Call it "KBs" and do not explain it in the app.
 - Never write "NCGS Golf Society". NCGS already means golf society.
 - The real data (`data/ncgs-2026.json`, `data/seed.json`) is never committed. This repository is public.
-- Design: warm white pages, rounded pine cards for the big moments (home round, hole, leader), pine main buttons with white text (flag-yellow retired 21 October 2026; champagne gold only for identity and awards, on pine), floating glass tab bar (Home, Hole, Results, Ruling), initials badges on people, system font, big touch targets, readable outdoors.
+- Design: warm white pages, rounded pine cards for the big moments (home round, hole, leader), pine main buttons with white text (flag-yellow retired 21 October 2026; champagne gold only on pine, for identity, awards and small labels such as HOLE and RULING), floating glass tab bar (Home, Hole, Results, Ruling), initials badges on people, system font, big touch targets, readable outdoors.
 - Layout: no text may overflow or be cut off, and touch targets are at least 44px, at 360px, 390px and 135% text. `test/layout.run.js` checks this on every golfer screen. Numbers use tabular figures and leave room for three digits.
 - Run `node --test test/engine.test.js test/server.test.js` before every push.
 
