@@ -10,9 +10,12 @@
 // Distance: CIEDE2000 (ΔE00). Neither is an accessibility pass; they are evidence for people to judge.
 const path = require('path'), fs = require('fs');
 const { chromium } = require('playwright');
-const [STD, ED, OUT, TRIAL, TRIAL_TAG = 'trial'] = process.argv.slice(2);
-if (!STD || !ED || !OUT) { console.log('usage: node tools/team-colour-audit.js <std.html> <ed.html> <outdir> [<trial.html> [tag]]'); process.exit(2); }
-fs.mkdirSync(OUT, { recursive: true });
+// tools/release-buggy-shots.js reuses the measuring and simulation below through require(); the audit itself only
+// runs when this file is started directly.
+const MAIN = require.main === module;
+const [STD, ED, OUT, TRIAL, TRIAL_TAG = 'trial'] = MAIN ? process.argv.slice(2) : [];
+if (MAIN && (!STD || !ED || !OUT)) { console.log('usage: node tools/team-colour-audit.js <std.html> <ed.html> <outdir> [<trial.html> [tag]]'); process.exit(2); }
+if (MAIN) fs.mkdirSync(OUT, { recursive: true });
 const looks = [['standard', STD], ['editorial', ED]].concat(TRIAL ? [[TRIAL_TAG, TRIAL]] : []);
 const sizes = [['360', 360, 740, 1], ['390', 390, 844, 1], ['390-135', 390, 844, 1.35]];
 
@@ -125,7 +128,8 @@ async function triptych(page, png, file, title) {
   fs.writeFileSync(file, Buffer.from(out, 'base64'));
 }
 
-(async () => {
+module.exports = { measure, triptych, M, sim, ratio, toHex, hex, de2000 };
+if (MAIN) (async () => {
   const b = await chromium.launch(); const all = [];
   const tokens = {};
   for (const [look, F] of looks) {
