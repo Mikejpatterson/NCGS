@@ -6,7 +6,7 @@
 // (and text inside them). Every screen checks the computed font of each allowed title and fails on serif
 // anywhere else. The long fixture round title (owner's decision A, 20 October) must never be cut off or end in an
 // ellipsis, in either look: at most 2 lines at 360px and 390px, at most 3 lines with 135% text. Titles keep growing with
-// text size. Which look is being checked comes from the build's mark, <html data-design="editorial"> (build.js).
+// text size. There is one look since 21 October 2026, so the display serif is always expected on the allowed titles.
 // Linux Chromium has no New York: this proves the font stack and the layout, not how New York looks on an iPhone.
 // Run: python3 -m http.server 8765 -d dist & NODE_PATH=/opt/npm-tools/node_modules node test/layout.run.js
 // Opt-in stricter audit: MIN_TARGET=44 node test/layout.run.js checks width and height against 44px, names controls
@@ -98,7 +98,7 @@ const fontsCheck = ({ display, glyph }) => {
   const isSerif = s => fam(s).some(f => SERIF.has(f));
   // The look comes from the build's explicit mark. Cross-check it against the display font token, so a mark without
   // the editorial styles (or the styles without the mark) fails instead of checking the wrong rules.
-  const editorial = document.documentElement.dataset.design === 'editorial';
+  const editorial = true;   // one look since 21 October 2026 (Option 2): the display serif is always on
   const token = getComputedStyle(document.documentElement).getPropertyValue('--font-display').trim();
   const sans = getComputedStyle(document.body).fontFamily;
   const out = { editorial, bad: [], seen: [], glyph: [] };

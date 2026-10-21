@@ -33,12 +33,13 @@
   --action-tint: #E3EFE6;               /* "next", "you" and "lowest" markers on ivory, with a pine edge or words */
   --lead-tint: #F3EFE5;                 /* the leader's row on ivory (the pine and gold badge says who) */
   /* Team colours: Buggy 1 and Buggy 2 everywhere (pills, dots, hole cards, Buggy Wars). Red for errors stays --red. */
-  --team-a: #0A60C9;
-  --team-b: #C62828;
-  --team-a-soft: rgba(10, 96, 201, .13);
-  --team-b-soft: rgba(198, 40, 40, .13);
-  /* Display type for the brand and a few big titles (the editorial trial swaps this for a serif) */
-  --font-display: var(--font);
+  /* Buggy Wars teams: navy and crimson (docs/TEAM-COLOURS.md) */
+  --team-a: #244A78;
+  --team-b: #9B3443;
+  --team-a-soft: rgba(36, 74, 120, .13);
+  --team-b-soft: rgba(155, 52, 67, .13);
+  /* Display serif for titles and headings (see "Display type" below). iPhone: New York. Others: Georgia or the phone's serif. */
+  --font-display: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
   /* A long round name gets smaller so it keeps to two lines on a small phone: its size is this ÷ its length (--len,
      set by the view). Names up to about 30 letters keep their full size. It is in rem, so it still grows with text size. */
   --t-display-fit: 60rem;
@@ -1692,7 +1693,7 @@ body { font-variant-numeric: tabular-nums; }
 /* Display type (owner, 21 October): one serif title at the top of each screen, and the words in the hole header
    ("HOLE", "Par 3", "Index 14 · 148 yds"), plus the subtitle under each title, Home's date line and section labels. The big hole number, player names (including a person's own page title,
    marked .is-name), scores, buttons and the tab bar stay in the system font. */
-.hero.home .wordmark, .hero.home .now-name, .rp-name { font-family: var(--font-display); }
+.hero.home .now-name, .rp-name { font-family: var(--font-display); font-variant-numeric: lining-nums; letter-spacing: -.01em; }
 h1.title:not(.is-name), h1.big, .entl small, .entr > b, .entr > b + span { font-family: var(--font-display); }
 /* A lighter sprinkling (owner, 21 October): the line under each title, the date line on Home and section labels. */
 header.hero:not(:has(.is-name)) > p.sub, .greet, .sec-label > .sub { font-family: var(--font-display); font-variant-numeric: lining-nums tabular-nums; }

@@ -5,7 +5,6 @@
 //   dist/preview.html     the app with an in-browser copy of the data, for tests and review
 //   dist/golf-trip.html   the same preview as page content for publishing as an artifact
 // NCGS_FIXTURE=1 builds only the two previews, from invented data (data/fixture-seed.json), never the live app or server.
-// NCGS_DESIGN=editorial adds the editorial trial styles to the two previews only; the live app is never built with them.
 const fs = require('fs');
 const path = require('path');
 const read = f => fs.readFileSync(path.join(__dirname, f), 'utf8');
@@ -26,7 +25,7 @@ const version = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, '');
 const appFiles = fs.readdirSync(path.join(__dirname, 'src/app')).filter(f => f.endsWith('.js')).sort();
 const appJs = `(function () {\n'use strict';\n${appFiles.map(f => `/* ---- ${f} ---- */\n${read('src/app/' + f)}`).join('\n')}\n})();`;
 const css = read('src/styles.css');
-const previewCss = css + (process.env.NCGS_DESIGN === 'editorial' ? '\n/* NCGS editorial prototype */\n' + read('src/editorial-prototype.css') : '');
+const previewCss = css;   // one look since 21 October 2026: the preview and the live app use the same styles
 const engine = read('src/engine.js');
 const serverBuild = require('crypto').createHash('sha1').update(read('src/server.js')).digest('hex').slice(0, 8);
 const server = read('src/server.js').replace(/__BUILD__/g, serverBuild);
@@ -48,8 +47,7 @@ const head = (extra, attrs) => `<!doctype html><html lang="en-IE"${attrs || ''}>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#FAF8F3">
 ${extra || ''}<style>:root{color-scheme:light}[hidden]{display:none!important}</style>`;
-// data-design marks the editorial preview, so tests know which look they are checking
-out('preview.html', `${head('', process.env.NCGS_DESIGN === 'editorial' ? ' data-design="editorial"' : '')}<title>NCGS</title><style>${previewCss}</style></head><body>${body({ mode: 'local', version, server: serverBuild })}</body></html>`);
+out('preview.html', `${head('')}<title>NCGS</title><style>${previewCss}</style></head><body>${body({ mode: 'local', version, server: serverBuild })}</body></html>`);
 
 // Test card photos next to the preview
 fs.mkdirSync(path.join(__dirname, 'dist', 'cards'), { recursive: true });
@@ -58,7 +56,7 @@ Object.keys(fixtures.cards).forEach(f => {
   if (fs.existsSync(src)) fs.copyFileSync(src, path.join(__dirname, 'dist', 'cards', f));
 });
 if (FIXTURE) {
-  console.log(`Built ${version} preview only, from invented fixture data${process.env.NCGS_DESIGN === 'editorial' ? ', editorial styles' : ''}: ${(previewBody.length / 1024).toFixed(0)} KB`);
+  console.log(`Built ${version} preview only, from invented fixture data: ${(previewBody.length / 1024).toFixed(0)} KB`);
   process.exit(0);
 }
 

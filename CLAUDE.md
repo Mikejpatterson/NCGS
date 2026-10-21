@@ -29,6 +29,6 @@ Read `docs/EDITORIAL-PROTOTYPE.md`, `docs/AI-COLLABORATION.md` and `docs/CLAUDE-
 - Approved crest: ivory serif NCGS and underline, double thin champagne-gold ring on pine green. The production vector is `docs/design/assets/ncgs-crest.svg` (app icon: `ncgs-app-icon.svg`), owner-approved 21 October 2026. Use those files; never redraw the crest from a mock-up.
 - Known design defect: Hole screen pine-green header overloaded on left and underuses right side; redistribute hole/par/SI hierarchy intentionally, without centring everything arbitrarily.
 - Only work on `design/crest-editorial-prototype`. Do not commit to `main`, merge, deploy, or alter production integrations, data or secrets.
-- Keep optional `NCGS_DESIGN=editorial` prototype isolated. Audit selectors: first-pass CSS needs checking against actual DOM.
-- Test with `node --test test/engine.test.js test/server.test.js`, layout suite if available, standard build and opt-in design build. Include truthful pass/fail evidence and screenshots if available.
+- One look since 21 October 2026: the Option 2 styles live in `src/styles.css` and the old `NCGS_DESIGN=editorial` switch is gone. Audit selectors: first-pass CSS needs checking against the actual DOM.
+- Test with `node --test test/engine.test.js test/server.test.js`, the layout suite and the fixture build (`NCGS_FIXTURE=1 node build.js`). Include truthful pass/fail evidence and screenshots if available.
 - Stop for the owner's approval before any production merge.
