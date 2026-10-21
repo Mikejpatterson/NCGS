@@ -165,7 +165,7 @@ function entryRow(pid, val, shots, par, rid) {
   const atOne = base !== null && base <= 1;
   const mid = base === null
     ? `<div class="stv none" data-pid="${pid}" data-n="" aria-live="polite">Par ${par}</div>`
-    : `<button class="stv${scratch ? ' out' : ''}" data-act="clear" data-pid="${pid}" data-n="${base}" aria-label="${name}: ${base} strokes. Tap to clear and start again from par"><b>${base}<sup>${pts}</sup></b><small>${word}</small></button>`;
+    : `<button class="stv${scratch ? ' out' : ''}" data-act="clear" data-pid="${pid}" data-n="${base}" aria-label="${name}: ${base} strokes. Tap to clear and start again from par"><b${base > 99 ? ' class="wide"' : ''}>${base}<sup>${pts}</sup></b><small>${word}</small></button>`;
   const drop = dopen && dpl ? `<div class="dropcard in"><p class="cap dropwho">${name}</p>${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : '';
   const tile = `<div class="pr ptile${flash}">
     <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span class="nmrow"><span>${name}</span>${dpl ? dropChev : ''}</span><span class="pr-dots" role="img" aria-label="${shots} ${shots === 1 ? 'shot' : 'shots'}">${dots(shots, true)}</span></button>
