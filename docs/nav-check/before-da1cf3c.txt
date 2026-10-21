@@ -1,0 +1,361 @@
+CONTRAST  standard | 360 | home | page | "Home" selected | 11.69:1
+CONTRAST  standard | 360 | home | page | "Hole 18" | 15.54:1
+CONTRAST  standard | 360 | home | page | "Results" | 15.54:1
+CONTRAST  standard | 360 | home | page | "Ruling" | 15.54:1
+FAIL  standard | 360 | home
+      "Home" (selected) label contrast 2.14:1 over a pine card
+      "Hole 18" label contrast 1.90:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  standard | 360 | hole entry | page | "Home" | 15.51:1
+CONTRAST  standard | 360 | hole entry | page | "Hole 18" selected | 11.79:1
+CONTRAST  standard | 360 | hole entry | page | "Results" | 15.54:1
+CONTRAST  standard | 360 | hole entry | page | "Ruling" | 15.54:1
+FAIL  standard | 360 | hole entry
+      "Home" label contrast 1.87:1 over a pine card
+      "Hole 18" (selected) label contrast 2.17:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  standard | 360 | results | page | "Home" | 15.51:1
+CONTRAST  standard | 360 | results | page | "Hole 18" | 15.54:1
+CONTRAST  standard | 360 | results | page | "Results" selected | 11.69:1
+CONTRAST  standard | 360 | results | page | "Ruling" | 15.54:1
+FAIL  standard | 360 | results
+      "Home" label contrast 1.87:1 over a pine card
+      "Hole 18" label contrast 1.90:1 over a pine card
+      "Results" (selected) label contrast 2.14:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  standard | 360 | results buggy wars | page | "Home" | 15.51:1
+CONTRAST  standard | 360 | results buggy wars | page | "Hole 18" | 15.54:1
+CONTRAST  standard | 360 | results buggy wars | page | "Results" selected | 11.69:1
+CONTRAST  standard | 360 | results buggy wars | page | "Ruling" | 15.54:1
+FAIL  standard | 360 | results buggy wars
+      "Home" label contrast 1.87:1 over a pine card
+      "Hole 18" label contrast 1.90:1 over a pine card
+      "Results" (selected) label contrast 2.14:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  standard | 360 | ruling | page | "Home" | 15.51:1
+CONTRAST  standard | 360 | ruling | page | "Hole 18" | 15.54:1
+CONTRAST  standard | 360 | ruling | page | "Results" | 15.54:1
+CONTRAST  standard | 360 | ruling | page | "Ruling" selected | 11.69:1
+FAIL  standard | 360 | ruling
+      "Home" label contrast 1.87:1 over a pine card
+      "Hole 18" label contrast 1.90:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" (selected) label contrast 2.14:1 over a pine card
+CONTRAST  standard | 360 large text | home | page | "Home" selected | 11.69:1
+CONTRAST  standard | 360 large text | home | page | "Hole 18" | 15.64:1
+CONTRAST  standard | 360 large text | home | page | "Results" | 15.64:1
+CONTRAST  standard | 360 large text | home | page | "Ruling" | 15.64:1
+FAIL  standard | 360 large text | home
+      "Home" (selected) label contrast 2.28:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" label contrast 1.90:1 over a pine card
+CONTRAST  standard | 360 large text | hole entry | page | "Home" | 15.64:1
+CONTRAST  standard | 360 large text | hole entry | page | "Hole 18" selected | 11.25:1
+CONTRAST  standard | 360 large text | hole entry | page | "Results" | 15.64:1
+CONTRAST  standard | 360 large text | hole entry | page | "Ruling" | 15.64:1
+FAIL  standard | 360 large text | hole entry
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" (selected) label contrast 2.47:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" label contrast 1.90:1 over a pine card
+CONTRAST  standard | 360 large text | results | page | "Home" | 15.64:1
+CONTRAST  standard | 360 large text | results | page | "Hole 18" | 15.64:1
+CONTRAST  standard | 360 large text | results | page | "Results" selected | 11.71:1
+CONTRAST  standard | 360 large text | results | page | "Ruling" | 15.64:1
+FAIL  standard | 360 large text | results
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" (selected) label contrast 2.42:1 over a pine card
+      "Ruling" label contrast 1.90:1 over a pine card
+CONTRAST  standard | 360 large text | results buggy wars | page | "Home" | 15.64:1
+CONTRAST  standard | 360 large text | results buggy wars | page | "Hole 18" | 15.64:1
+CONTRAST  standard | 360 large text | results buggy wars | page | "Results" selected | 11.71:1
+CONTRAST  standard | 360 large text | results buggy wars | page | "Ruling" | 15.64:1
+FAIL  standard | 360 large text | results buggy wars
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" (selected) label contrast 2.42:1 over a pine card
+      "Ruling" label contrast 1.90:1 over a pine card
+CONTRAST  standard | 360 large text | ruling | page | "Home" | 15.64:1
+CONTRAST  standard | 360 large text | ruling | page | "Hole 18" | 15.64:1
+CONTRAST  standard | 360 large text | ruling | page | "Results" | 15.64:1
+CONTRAST  standard | 360 large text | ruling | page | "Ruling" selected | 11.79:1
+FAIL  standard | 360 large text | ruling
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" (selected) label contrast 2.33:1 over a pine card
+CONTRAST  standard | 390 | home | page | "Home" selected | 11.71:1
+CONTRAST  standard | 390 | home | page | "Hole 18" | 15.64:1
+CONTRAST  standard | 390 | home | page | "Results" | 15.54:1
+CONTRAST  standard | 390 | home | page | "Ruling" | 15.54:1
+FAIL  standard | 390 | home
+      "Home" (selected) label contrast 2.17:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  standard | 390 | hole entry | page | "Home" | 15.54:1
+CONTRAST  standard | 390 | hole entry | page | "Hole 18" selected | 11.71:1
+CONTRAST  standard | 390 | hole entry | page | "Results" | 15.54:1
+CONTRAST  standard | 390 | hole entry | page | "Ruling" | 15.54:1
+FAIL  standard | 390 | hole entry
+      "Home" label contrast 1.90:1 over a pine card
+      "Hole 18" (selected) label contrast 2.17:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  standard | 390 | results | page | "Home" | 15.54:1
+CONTRAST  standard | 390 | results | page | "Hole 18" | 15.64:1
+CONTRAST  standard | 390 | results | page | "Results" selected | 11.69:1
+CONTRAST  standard | 390 | results | page | "Ruling" | 15.54:1
+FAIL  standard | 390 | results
+      "Home" label contrast 1.90:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" (selected) label contrast 2.14:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  standard | 390 | results buggy wars | page | "Home" | 15.54:1
+CONTRAST  standard | 390 | results buggy wars | page | "Hole 18" | 15.64:1
+CONTRAST  standard | 390 | results buggy wars | page | "Results" selected | 11.69:1
+CONTRAST  standard | 390 | results buggy wars | page | "Ruling" | 15.54:1
+FAIL  standard | 390 | results buggy wars
+      "Home" label contrast 1.90:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" (selected) label contrast 2.14:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  standard | 390 | ruling | page | "Home" | 15.54:1
+CONTRAST  standard | 390 | ruling | page | "Hole 18" | 15.64:1
+CONTRAST  standard | 390 | ruling | page | "Results" | 15.54:1
+CONTRAST  standard | 390 | ruling | page | "Ruling" selected | 11.71:1
+FAIL  standard | 390 | ruling
+      "Home" label contrast 1.90:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" (selected) label contrast 2.17:1 over a pine card
+CONTRAST  standard | 390 large text | home | page | "Home" selected | 11.69:1
+CONTRAST  standard | 390 large text | home | page | "Hole 18" | 15.54:1
+CONTRAST  standard | 390 large text | home | page | "Results" | 15.64:1
+CONTRAST  standard | 390 large text | home | page | "Ruling" | 15.64:1
+FAIL  standard | 390 large text | home
+      "Home" (selected) label contrast 2.28:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" label contrast 1.90:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  standard | 390 large text | hole entry | page | "Home" | 15.64:1
+CONTRAST  standard | 390 large text | hole entry | page | "Hole 18" selected | 11.69:1
+CONTRAST  standard | 390 large text | hole entry | page | "Results" | 15.64:1
+CONTRAST  standard | 390 large text | hole entry | page | "Ruling" | 15.64:1
+FAIL  standard | 390 large text | hole entry
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" (selected) label contrast 2.35:1 over a pine card
+      "Results" label contrast 1.90:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  standard | 390 large text | results | page | "Home" | 15.64:1
+CONTRAST  standard | 390 large text | results | page | "Hole 18" | 15.54:1
+CONTRAST  standard | 390 large text | results | page | "Results" selected | 11.71:1
+CONTRAST  standard | 390 large text | results | page | "Ruling" | 15.64:1
+FAIL  standard | 390 large text | results
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" (selected) label contrast 2.34:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  standard | 390 large text | results buggy wars | page | "Home" | 15.64:1
+CONTRAST  standard | 390 large text | results buggy wars | page | "Hole 18" | 15.54:1
+CONTRAST  standard | 390 large text | results buggy wars | page | "Results" selected | 11.71:1
+CONTRAST  standard | 390 large text | results buggy wars | page | "Ruling" | 15.64:1
+FAIL  standard | 390 large text | results buggy wars
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" (selected) label contrast 2.34:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  standard | 390 large text | ruling | page | "Home" | 15.64:1
+CONTRAST  standard | 390 large text | ruling | page | "Hole 18" | 15.54:1
+CONTRAST  standard | 390 large text | ruling | page | "Results" | 15.64:1
+CONTRAST  standard | 390 large text | ruling | page | "Ruling" selected | 11.71:1
+FAIL  standard | 390 large text | ruling
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" label contrast 1.90:1 over a pine card
+      "Ruling" (selected) label contrast 2.30:1 over a pine card
+CONTRAST  editorial | 360 | home | page | "Home" selected | 11.69:1
+CONTRAST  editorial | 360 | home | page | "Hole 18" | 15.54:1
+CONTRAST  editorial | 360 | home | page | "Results" | 15.54:1
+CONTRAST  editorial | 360 | home | page | "Ruling" | 15.54:1
+FAIL  editorial | 360 | home
+      "Home" (selected) label contrast 2.14:1 over a pine card
+      "Hole 18" label contrast 1.90:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  editorial | 360 | hole entry | page | "Home" | 15.51:1
+CONTRAST  editorial | 360 | hole entry | page | "Hole 18" selected | 11.79:1
+CONTRAST  editorial | 360 | hole entry | page | "Results" | 15.54:1
+CONTRAST  editorial | 360 | hole entry | page | "Ruling" | 15.54:1
+FAIL  editorial | 360 | hole entry
+      "Home" label contrast 1.87:1 over a pine card
+      "Hole 18" (selected) label contrast 2.17:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  editorial | 360 | results | page | "Home" | 15.51:1
+CONTRAST  editorial | 360 | results | page | "Hole 18" | 15.54:1
+CONTRAST  editorial | 360 | results | page | "Results" selected | 11.69:1
+CONTRAST  editorial | 360 | results | page | "Ruling" | 15.54:1
+FAIL  editorial | 360 | results
+      "Home" label contrast 1.87:1 over a pine card
+      "Hole 18" label contrast 1.90:1 over a pine card
+      "Results" (selected) label contrast 2.14:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  editorial | 360 | results buggy wars | page | "Home" | 15.51:1
+CONTRAST  editorial | 360 | results buggy wars | page | "Hole 18" | 15.54:1
+CONTRAST  editorial | 360 | results buggy wars | page | "Results" selected | 11.69:1
+CONTRAST  editorial | 360 | results buggy wars | page | "Ruling" | 15.54:1
+FAIL  editorial | 360 | results buggy wars
+      "Home" label contrast 1.87:1 over a pine card
+      "Hole 18" label contrast 1.90:1 over a pine card
+      "Results" (selected) label contrast 2.14:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  editorial | 360 | ruling | page | "Home" | 15.51:1
+CONTRAST  editorial | 360 | ruling | page | "Hole 18" | 15.54:1
+CONTRAST  editorial | 360 | ruling | page | "Results" | 15.54:1
+CONTRAST  editorial | 360 | ruling | page | "Ruling" selected | 11.69:1
+FAIL  editorial | 360 | ruling
+      "Home" label contrast 1.87:1 over a pine card
+      "Hole 18" label contrast 1.90:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" (selected) label contrast 2.14:1 over a pine card
+CONTRAST  editorial | 360 large text | home | page | "Home" selected | 11.69:1
+CONTRAST  editorial | 360 large text | home | page | "Hole 18" | 15.64:1
+CONTRAST  editorial | 360 large text | home | page | "Results" | 15.64:1
+CONTRAST  editorial | 360 large text | home | page | "Ruling" | 15.64:1
+FAIL  editorial | 360 large text | home
+      "Home" (selected) label contrast 2.28:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" label contrast 1.90:1 over a pine card
+CONTRAST  editorial | 360 large text | hole entry | page | "Home" | 15.64:1
+CONTRAST  editorial | 360 large text | hole entry | page | "Hole 18" selected | 11.25:1
+CONTRAST  editorial | 360 large text | hole entry | page | "Results" | 15.64:1
+CONTRAST  editorial | 360 large text | hole entry | page | "Ruling" | 15.64:1
+FAIL  editorial | 360 large text | hole entry
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" (selected) label contrast 2.47:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" label contrast 1.90:1 over a pine card
+CONTRAST  editorial | 360 large text | results | page | "Home" | 15.64:1
+CONTRAST  editorial | 360 large text | results | page | "Hole 18" | 15.64:1
+CONTRAST  editorial | 360 large text | results | page | "Results" selected | 11.71:1
+CONTRAST  editorial | 360 large text | results | page | "Ruling" | 15.64:1
+FAIL  editorial | 360 large text | results
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" (selected) label contrast 2.42:1 over a pine card
+      "Ruling" label contrast 1.90:1 over a pine card
+CONTRAST  editorial | 360 large text | results buggy wars | page | "Home" | 15.64:1
+CONTRAST  editorial | 360 large text | results buggy wars | page | "Hole 18" | 15.64:1
+CONTRAST  editorial | 360 large text | results buggy wars | page | "Results" selected | 11.71:1
+CONTRAST  editorial | 360 large text | results buggy wars | page | "Ruling" | 15.64:1
+FAIL  editorial | 360 large text | results buggy wars
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" (selected) label contrast 2.42:1 over a pine card
+      "Ruling" label contrast 1.90:1 over a pine card
+CONTRAST  editorial | 360 large text | ruling | page | "Home" | 15.64:1
+CONTRAST  editorial | 360 large text | ruling | page | "Hole 18" | 15.64:1
+CONTRAST  editorial | 360 large text | ruling | page | "Results" | 15.64:1
+CONTRAST  editorial | 360 large text | ruling | page | "Ruling" selected | 11.79:1
+FAIL  editorial | 360 large text | ruling
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" (selected) label contrast 2.33:1 over a pine card
+CONTRAST  editorial | 390 | home | page | "Home" selected | 11.71:1
+CONTRAST  editorial | 390 | home | page | "Hole 18" | 15.64:1
+CONTRAST  editorial | 390 | home | page | "Results" | 15.54:1
+CONTRAST  editorial | 390 | home | page | "Ruling" | 15.54:1
+FAIL  editorial | 390 | home
+      "Home" (selected) label contrast 2.17:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  editorial | 390 | hole entry | page | "Home" | 15.54:1
+CONTRAST  editorial | 390 | hole entry | page | "Hole 18" selected | 11.71:1
+CONTRAST  editorial | 390 | hole entry | page | "Results" | 15.54:1
+CONTRAST  editorial | 390 | hole entry | page | "Ruling" | 15.54:1
+FAIL  editorial | 390 | hole entry
+      "Home" label contrast 1.90:1 over a pine card
+      "Hole 18" (selected) label contrast 2.17:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  editorial | 390 | results | page | "Home" | 15.54:1
+CONTRAST  editorial | 390 | results | page | "Hole 18" | 15.64:1
+CONTRAST  editorial | 390 | results | page | "Results" selected | 11.69:1
+CONTRAST  editorial | 390 | results | page | "Ruling" | 15.54:1
+FAIL  editorial | 390 | results
+      "Home" label contrast 1.90:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" (selected) label contrast 2.14:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  editorial | 390 | results buggy wars | page | "Home" | 15.54:1
+CONTRAST  editorial | 390 | results buggy wars | page | "Hole 18" | 15.64:1
+CONTRAST  editorial | 390 | results buggy wars | page | "Results" selected | 11.69:1
+CONTRAST  editorial | 390 | results buggy wars | page | "Ruling" | 15.54:1
+FAIL  editorial | 390 | results buggy wars
+      "Home" label contrast 1.90:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" (selected) label contrast 2.14:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  editorial | 390 | ruling | page | "Home" | 15.54:1
+CONTRAST  editorial | 390 | ruling | page | "Hole 18" | 15.64:1
+CONTRAST  editorial | 390 | ruling | page | "Results" | 15.54:1
+CONTRAST  editorial | 390 | ruling | page | "Ruling" selected | 11.71:1
+FAIL  editorial | 390 | ruling
+      "Home" label contrast 1.90:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" label contrast 1.89:1 over a pine card
+      "Ruling" (selected) label contrast 2.17:1 over a pine card
+CONTRAST  editorial | 390 large text | home | page | "Home" selected | 11.69:1
+CONTRAST  editorial | 390 large text | home | page | "Hole 18" | 15.54:1
+CONTRAST  editorial | 390 large text | home | page | "Results" | 15.64:1
+CONTRAST  editorial | 390 large text | home | page | "Ruling" | 15.64:1
+FAIL  editorial | 390 large text | home
+      "Home" (selected) label contrast 2.28:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" label contrast 1.90:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  editorial | 390 large text | hole entry | page | "Home" | 15.64:1
+CONTRAST  editorial | 390 large text | hole entry | page | "Hole 18" selected | 11.69:1
+CONTRAST  editorial | 390 large text | hole entry | page | "Results" | 15.64:1
+CONTRAST  editorial | 390 large text | hole entry | page | "Ruling" | 15.64:1
+FAIL  editorial | 390 large text | hole entry
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" (selected) label contrast 2.35:1 over a pine card
+      "Results" label contrast 1.90:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  editorial | 390 large text | results | page | "Home" | 15.64:1
+CONTRAST  editorial | 390 large text | results | page | "Hole 18" | 15.54:1
+CONTRAST  editorial | 390 large text | results | page | "Results" selected | 11.71:1
+CONTRAST  editorial | 390 large text | results | page | "Ruling" | 15.64:1
+FAIL  editorial | 390 large text | results
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" (selected) label contrast 2.34:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  editorial | 390 large text | results buggy wars | page | "Home" | 15.64:1
+CONTRAST  editorial | 390 large text | results buggy wars | page | "Hole 18" | 15.54:1
+CONTRAST  editorial | 390 large text | results buggy wars | page | "Results" selected | 11.71:1
+CONTRAST  editorial | 390 large text | results buggy wars | page | "Ruling" | 15.64:1
+FAIL  editorial | 390 large text | results buggy wars
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" (selected) label contrast 2.34:1 over a pine card
+      "Ruling" label contrast 1.89:1 over a pine card
+CONTRAST  editorial | 390 large text | ruling | page | "Home" | 15.64:1
+CONTRAST  editorial | 390 large text | ruling | page | "Hole 18" | 15.54:1
+CONTRAST  editorial | 390 large text | ruling | page | "Results" | 15.64:1
+CONTRAST  editorial | 390 large text | ruling | page | "Ruling" selected | 11.71:1
+FAIL  editorial | 390 large text | ruling
+      "Home" label contrast 1.89:1 over a pine card
+      "Hole 18" label contrast 1.89:1 over a pine card
+      "Results" label contrast 1.90:1 over a pine card
+      "Ruling" (selected) label contrast 2.30:1 over a pine card
+SOME FAILED (40)
