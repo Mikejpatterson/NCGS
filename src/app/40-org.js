@@ -242,7 +242,7 @@ ORG.group = p => {
     return `<${c ? 'button' : 'div'} class="row"${c ? ` data-act="photo-full" data-rid="${p.rid}" data-gid="${gc.id}" data-seg="${sg}"` : ''}><span>${segName(sg)}</span><span class="right ${c && c.resolved ? 'c-g' : 'sub'}">${st}${c ? chev : ''}</span></${c ? 'button' : 'div'}>`;
   }).join('');
   return {
-    html: `<header class="hero s">${navBack(roundName(D.round(p.rid)))}<div class="head"><h1 class="title">Group ${gc.n}</h1></div><p class="sub">${esc(gc.labels.map(l => l.long).join(' v '))}</p></header>
+    html: `<header class="hero s">${navBack(roundName(D.round(p.rid)))}<div class="head"><h1 class="title">Group ${gc.n}</h1></div><p class="sub names">${esc(gc.labels.map(l => l.long).join(' v '))}</p></header>
     ${sec(label('Card check'), cardOf(checks), true)}
     ${sec('', cardOf(head + rows), true)}`
   };
@@ -278,7 +278,7 @@ function scoresFor(rid, pid) { const sc = D.scores(rid)[pid]; return sc ? Object
 ORG.late = p => {
   const r = D.round(p.rid);
   const sel = UI.late && UI.late.rid === r.id ? UI.late.pid : null;
-  let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Change a player</h1></div><p class="sub">${sel ? esc(D.nameOf(sel)) : 'Tap the player who is changing'}</p></header>`;
+  let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Change a player</h1></div><p class="sub names">${sel ? esc(D.nameOf(sel)) : 'Tap the player who is changing'}</p></header>`;
   const inRound = new Set((r.groups || []).flatMap(g => g.teams.flat()));
   if (!sel) {
     html += (r.groups || []).map((g, gi) => sec(label(`Group ${gi + 1}`), cardOf(g.teams.flat().map(pid => `<button class="row" data-act="late-pick" data-rid="${r.id}" data-pid="${pid}"><span>${esc(D.nameOf(pid))}</span>${scoresFor(r.id, pid) ? `<span class="sub">${plural(scoresFor(r.id, pid), 'score')}</span>` : chev}</button>`).join('')), gi === 0)).join('');
@@ -314,7 +314,7 @@ ORG.members = () => {
 ORG.member = p => {
   const m = p.pid ? D.member(p.pid) : null;
   return {
-    html: `<header class="hero s">${navBack('Members')}<div class="head"><h1 class="title">${m ? esc(m.name) : 'New member'}</h1></div></header>
+    html: `<header class="hero s">${navBack('Members')}<div class="head"><h1 class="title${m ? ' is-name' : ''}">${m ? esc(m.name) : 'New member'}</h1></div></header>
     <form data-form="member" autocomplete="off" class="sec near">
       ${field('m-name', 'Name on the leaderboard', m ? m.name : '', 'placeholder="Mike P"')}
       ${field('m-full', 'Full name', m ? m.full : '')}

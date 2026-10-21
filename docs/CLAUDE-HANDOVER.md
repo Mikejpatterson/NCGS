@@ -53,13 +53,12 @@ the remote refs, the queue and issue #1 before acting; these lines go out of dat
 - `build.js` joins `src/app/*.js`, `styles.css`, `engine.js` and `server.js` into one HTML file. Views are template strings (`VIEWS.*`), and behaviour hangs off `data-act` attributes, not classes.
 - `src/styles.css` is about 1,700 lines of stacked passes. Later rules override earlier ones, so read the whole cascade for a selector before changing it.
 - Design tokens are in `:root` in `styles.css`: `--team-a`, `--team-b`, `--team-a-soft`, `--team-b-soft` and `--font-display`. `--red` is for errors and double-bogey marks, **not** a team.
-- `src/editorial-prototype.css` must stay **token swaps only**: no selector restyling.
+- One look since 21 October 2026: `src/editorial-prototype.css` and `NCGS_DESIGN` are gone, and everything is in `styles.css`.
 
 ## Commands
 ```sh
 node --test test/engine.test.js test/server.test.js       # before every push
-NCGS_FIXTURE=1 node build.js                              # standard preview from invented data
-NCGS_FIXTURE=1 NCGS_DESIGN=editorial node build.js        # editorial preview
+NCGS_FIXTURE=1 node build.js                              # preview from invented data (one look)
 sh tools/guard.sh                                         # fails if scoring, sync, data or site/ changed
 python3 -m http.server 8765 -d dist & node test/layout.run.js
 node test/design.run.js a.html b.html out/ [--same-pixels]   # same controls + words, pixel count, screenshots

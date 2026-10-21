@@ -26,6 +26,8 @@ Before every push: `node --test test/engine.test.js test/server.test.js`.
 
 These are for the editorial design work on `design/crest-editorial-prototype`. The redesign changes looks only.
 
+> **One look since 21 October 2026 (owner).** The Option 2 styles are in `src/styles.css`; `src/editorial-prototype.css` and the `NCGS_DESIGN=editorial` switch are gone. The variable is now ignored, so a "standard v editorial" comparison compares two identical builds and proves nothing. To compare designs, build an older commit (for example `da1cf3c`, the design before the redesign) in a `git worktree` and compare against that.
+
 **The guard: `sh tools/guard.sh [base]`** (default base: `origin/main`). Fails if the branch has changed scoring, storage or sync code, real data or the published site since `base`: `src/engine.js`, `src/server.js`, `src/app/00-core.js`, `src/app/10-data.js`, anything in `site/` or `data/`, or `deploy.json`. The one file allowed in `data/` is `data/fixture-seed.json` (the invented data). It looks at committed changes only, so commit first, then run it.
 
 **Previews from invented data.** The real data is never in this repository, so preview builds use the made-up members in `data/fixture-seed.json` (remake it with `node tools/make-fixture.js`; same file every time).

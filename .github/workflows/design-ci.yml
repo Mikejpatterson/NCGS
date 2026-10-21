@@ -1,5 +1,5 @@
 name: Design branch checks
-# Tests and screenshots for the redesign (one look since 21 October 2026). No secrets, no deploy, read-only.
+# Tests and screenshots for the editorial design trial. No secrets, no deploy, read-only.
 on:
   push:
     branches: [design/crest-editorial-prototype]
@@ -30,17 +30,19 @@ jobs:
         run: node tools/make-fixture.js && git diff --exit-code data/fixture-seed.json
       - name: Install browser
         run: npm install --no-save --no-package-lock playwright@1.56.1 && npx playwright install --with-deps chromium
-      - name: Build the preview from fixture data (one look since 21 October 2026)
+      - name: Build the standard and editorial previews from fixture data
         run: |
-          NCGS_FIXTURE=1 node build.js && cp dist/preview.html dist/app.html
+          NCGS_FIXTURE=1 node build.js && cp dist/preview.html dist/standard.html
+          NCGS_FIXTURE=1 NCGS_DESIGN=editorial node build.js && cp dist/preview.html dist/editorial.html
           test ! -e dist/site && test ! -e dist/server.js
-      - name: Layout at 360, 390 and 135% text
+      - name: Layout - standard and editorial at 360, 390 and 135% text
         run: |
           python3 -m http.server 8765 -d dist > /dev/null 2>&1 &
           sleep 1
-          node test/layout.run.js
-      - name: Every screen opens without a script error; screenshots
-        run: node test/design.run.js dist/app.html dist/app.html test/shots/design
+          cp dist/standard.html dist/preview.html && node test/layout.run.js
+          cp dist/editorial.html dist/preview.html && node test/layout.run.js
+      - name: Same controls and words in both looks; screenshots
+        run: node test/design.run.js dist/standard.html dist/editorial.html test/shots/design
       - name: Keep the screenshots
         if: always()
         uses: actions/upload-artifact@v4

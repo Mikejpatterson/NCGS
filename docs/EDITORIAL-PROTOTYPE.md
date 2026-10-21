@@ -12,18 +12,18 @@ The current published app on `main` remains unchanged.
 ## Preview without activating in normal builds
 No private data is needed. The fixture has invented names and rounds (`tools/make-fixture.js`).
 
+> **One look since 21 October 2026 (owner).** The Option 2 styles are in `src/styles.css`; `src/editorial-prototype.css` and the `NCGS_DESIGN=editorial` switch are gone. The variable is now ignored, so a "standard v editorial" comparison compares two identical builds and proves nothing. To compare designs, build an older commit (for example `da1cf3c`, the design before the redesign) in a `git worktree` and compare against that.
+
 ```sh
-NCGS_FIXTURE=1 node build.js                          # standard look  -> dist/preview.html
-NCGS_FIXTURE=1 NCGS_DESIGN=editorial node build.js    # editorial look -> dist/preview.html
+NCGS_FIXTURE=1 node build.js                          # the preview -> dist/preview.html
 ```
 
-With the fixture flag the build writes only the two previews, never `dist/site` or `dist/server.js`.
-`NCGS_DESIGN=editorial` changes only the previews, even in a full build, so the live app cannot pick it up.
+With the fixture flag the build writes only the preview, never `dist/site` or `dist/server.js`.
 Open `dist/preview.html` in a local web server (`python3 -m http.server 8765 -d dist`).
 
 ## How the trial is built
 - `src/styles.css` holds design tokens: `--team-a`, `--team-b` (and `-soft`), `--font-display`.
-- `src/editorial-prototype.css` only changes those tokens. It must not restyle selectors.
+- (Until 21 October 2026, `src/editorial-prototype.css` swapped those tokens; it has been folded into `styles.css`.)
 - Decisions are recorded on GitHub issue #1, tagged **DECIDED**.
 
 ## Checks

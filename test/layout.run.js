@@ -90,7 +90,7 @@ const metrics = ({ min, strict }) => {
 };
 // Fonts. Allowed display titles; anything inside them inherits on purpose. The Ruling "i" (official rule wording)
 // button is a serif italic info glyph in the standard look since 135a8c9; it is reported, not hidden (see TYPE lines).
-const DISPLAY = ['.hero.home .now-name', '.rp-name', 'h1.title:not(.is-name)', 'h1.big', '.entl small', '.entr > b', '.entr > b + span', 'header.hero:not(:has(.is-name)) > p.sub', '.greet', '.sec-label > .sub', '.ah-txt small', '.ah-txt b', '.ah-txt > span', '.sitlab'];
+const DISPLAY = ['.hero.home .now-name', '.rp-name', 'h1.title:not(.is-name)', 'h1.big', '.entl small', '.entr > b', '.entr > b + span', 'header.hero:not(:has(.is-name)) > p.sub:not(.names)', '.greet', '.sec-label > .sub', '.ah-txt small', '.ah-txt b', '.ah-txt > span', '.sitlab'];
 const GLYPH = ['.rbtn.rinfo'];
 const fontsCheck = ({ display, glyph }) => {
   const fam = s => s.split(',').map(x => x.trim().replace(/^["']|["']$/g, '').toLowerCase());
