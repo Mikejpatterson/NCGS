@@ -1,7 +1,7 @@
 // Layout check: every golfer screen at small, normal and large-text phone sizes.
 // Fails on text that overflows or is cut off, anything off the edge of the screen, and touch targets under 40px.
 // Typography (issue #1, DECIDED; widened by the owner on 21 October): the display serif is allowed only on
-// .hero.home .wordmark, .hero.home .now-name, .rp-name, screen titles (h1.title except a person's name, h1.big) and the
+// .hero.home .now-name, .rp-name, screen titles (h1.title except a person's name, h1.big) and the
 // hole header words .entl small, .entr > b, .entr > b + span, title subtitles, the Home date line and section labels
 // (and text inside them). Every screen checks the computed font of each allowed title and fails on serif
 // anywhere else. The long fixture round title (owner's decision A, 20 October) must never be cut off or end in an
@@ -90,7 +90,7 @@ const metrics = ({ min, strict }) => {
 };
 // Fonts. Allowed display titles; anything inside them inherits on purpose. The Ruling "i" (official rule wording)
 // button is a serif italic info glyph in the standard look since 135a8c9; it is reported, not hidden (see TYPE lines).
-const DISPLAY = ['.hero.home .wordmark', '.hero.home .now-name', '.rp-name', 'h1.title:not(.is-name)', 'h1.big', '.entl small', '.entr > b', '.entr > b + span', 'header.hero:not(:has(.is-name)) > p.sub', '.greet', '.sec-label > .sub'];
+const DISPLAY = ['.hero.home .now-name', '.rp-name', 'h1.title:not(.is-name)', 'h1.big', '.entl small', '.entr > b', '.entr > b + span', 'header.hero:not(:has(.is-name)) > p.sub', '.greet', '.sec-label > .sub'];
 const GLYPH = ['.rbtn.rinfo'];
 const fontsCheck = ({ display, glyph }) => {
   const fam = s => s.split(',').map(x => x.trim().replace(/^["']|["']$/g, '').toLowerCase());
@@ -156,7 +156,7 @@ const titleCheck = ({ sel, want, max }) => {
       if (STRICT) m.small.forEach(x => console.log('TARGET  ' + sn + ' | ' + name + ' | ' + x));
       const f = await p.evaluate(fontsCheck, { display: DISPLAY, glyph: GLYPH });
       f.glyph.forEach(x => console.log('TYPE  ' + sn + ' | ' + name + ' | info glyph (known, reported): ' + x));
-      if (name === 'home' && !f.seen.some(x => /wordmark/.test(x))) f.bad.push('home brand title not found');
+      if (name === 'home' && !f.seen.some(x => /greet/.test(x))) f.bad.push('home greeting not found');
       if (name === 'round-long-title' && !f.seen.some(x => /rp-name/.test(x))) f.bad.push('round title not found');
       const bad = [...f.bad.map(x => 'type: ' + x), ...m.hover.map(x => 'page wider than screen ' + x), ...m.clip.filter(x => !/Pick up|\[vh\]/.test(x)).map(x => 'cut off: ' + x), ...m.wide.map(x => 'off screen: ' + x), ...m.small.filter(x => !/^\s*\d+x\d+$/.test(x)).map(x => 'small target: ' + x)];
       if (bad.length) { fails++; console.log('FAIL  ' + sn + ' / ' + name); bad.slice(0, 6).forEach(x => console.log('      ' + x)); }

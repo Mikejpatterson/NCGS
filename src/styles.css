@@ -804,7 +804,7 @@ html, body { background: var(--bg); }
 .hero.home .hsub { color: var(--pine); }
 .hero.home .badge { background: var(--pine); color: var(--award); }
 /* The crest replaces the flag tile: round, no tile behind it. */
-.hero.home .badge.crest { width: 48px; height: 48px; border-radius: 50%; background: none; }
+.hero.home .badge.crest { width: 64px; height: 64px; border-radius: 50%; background: none; }
 .hero.home .badge.crest svg { width: 100%; height: 100%; display: block; }
 .who-chip { display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 6px 0 14px; border-radius: 22px; background: #fff; color: var(--text); box-shadow: var(--ring); font-weight: 600; }
 .who-av { width: 32px; height: 32px; border-radius: 50%; background: var(--pine); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; }
@@ -1539,6 +1539,8 @@ body { font-variant-numeric: tabular-nums; }
 .sit:nth-child(n) .sit-i { background: #E3EFE6; }
 /* Home: quiet rows */
 .hero.home .greet { margin-bottom: 4px; }
+/* The greeting replaces the date line: larger, in the display face, in the page's text colour. */
+.hero.home .greet { margin-top: 18px; font-size: 1.6rem; line-height: 1.2; font-weight: 600; color: var(--text); letter-spacing: -.01em; text-wrap: balance; }
 /* Organiser: one calm tint for the menu icons */
 .row .ic { background: #E3EFE6 !important; color: var(--pine) !important; }
 
