@@ -41,7 +41,7 @@ the remote refs, the queue and issue #1 before acting; these lines go out of dat
   Team colours stay navy #244A78 and crimson #9B3443 (contrast and colour-blindness evidence in `docs/TEAM-COLOURS.md`).
 - **Owner, 20 October: option A.** Display titles keep growing with the phone's text size. Long round names may take
   up to three lines at large text sizes, and are never cut off.
-- Flag-yellow `#F6C515` stays as the one action / "now" accent. Champagne `#D4B483` is for the crest and awards only (it's 1.86:1 on ivory, so never use it to convey meaning there).
+- **Owner, 21 October: flag-yellow `#F6C515` is retired.** Main buttons are pine with white text (`--action`); a button on a pine card is ivory with pine words (`--action-inverse`); small labels on pine use `--on-pine-label`. Champagne `#D4B483` (`--award`) is for identity and awards, on pine only (it's 1.86:1 on ivory, so never use it to convey meaning there). See `docs/ACTION-COLOUR.md`.
 - Buttons, the save pill and the glass tab bar stay fully rounded pills.
 - Serif **only** on `.hero.home .wordmark`, `.hero.home .now-name` and `.rp-name`, using `ui-serif` (New York on iPhone). Names, numbers, controls and the hole screen stay in the system font.
 - Team colours: navy `#244A78` and crimson `#9B3443` wherever a team appears. Sunlight and colour-blindness checks may adjust them. Keep the text labels.

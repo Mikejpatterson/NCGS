@@ -151,7 +151,7 @@ The group still keeps a paper card. The app checks the two against each other at
 
 ## Contest icons (chosen 15 October 2026, not built yet)
 
-Draw them the same way as the Stats tab medals (built 15 October): flag-yellow line icon, stroke 1.9, no fills, on a pine circle. The pictures below were chosen in a two-tone mock; keep the shapes and drop the fills.
+Draw them the same way as the Stats tab medals (built 15 October): champagne line icon (an award on pine; flag-yellow was retired on 21 October 2026), stroke 1.9, no fills, on a pine circle. The pictures below were chosen in a two-tone mock; keep the shapes and drop the fills.
 
 - **Longest drive: "Ball on fire"** (option E), green ring #1B7A43. SVG (24 grid, stroke #1D3B30, width 1.6):
   `<path d="M14.5 7.6C11 6 7.5 6.6 2.5 4.5c1.6 2.6 3.4 3.6 5.2 4.1-2.2.4-4 .2-5.7-.2 1.9 2.4 4.4 3.4 7 3.7-1.8 1-3.6 1.6-5.6 1.7 3 1.8 7 2 11.3.4z" fill="#FFB27A"/><path d="M14.5 9.2C12 8.4 9.8 8.6 7 8c1.3 1.4 2.8 2.1 4.3 2.4-1.4.6-2.6.9-4 1 2.4.9 4.7.9 7.2.1z" fill="#F0C63F" stroke="none"/><circle cx="17" cy="10.5" r="4.5" fill="#fff"/><path d="M15 8.7a2.8 2.8 0 0 1 2.4-1" stroke-width="1.3"/>`

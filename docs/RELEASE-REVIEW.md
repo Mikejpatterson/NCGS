@@ -74,7 +74,7 @@ colour and font settings only.
   labels kept. Not an accessibility conformance claim; not broadened.
 - 20 October, option A: display titles keep growing with text size; long round names up to three lines at large text,
   never cut off.
-- Flag-yellow `#F6C515` is the one action / "now" colour. Champagne `#D4B483` only for crest and awards.
+- (Superseded 21 October 2026: flag-yellow `#F6C515` is retired and actions are pine with white text; see `docs/ACTION-COLOUR.md`.) Champagne `#D4B483` only for crest and awards, on pine.
 - Buttons, the Save pill and the glass tab bar stay fully rounded pills.
 - Serif only on `.hero.home .wordmark`, `.hero.home .now-name` and `.rp-name`.
 - Team colours navy `#244A78` and crimson `#9B3443`, with text labels kept.

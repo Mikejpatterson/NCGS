@@ -55,7 +55,7 @@ Costs
   with large text that leaves less of the second buggy on screen before you scroll.
 - The words on screen change ("Par 3", "Index 14" become "PAR 3", "SI 14"). The app says "Index" everywhere else
   (the next-hole button, the per-player shot details), and changing that is a wording decision that isn't recorded.
-- Two more yellow labels next to "HOLE" weaken flag-yellow as the one "now" accent (DECIDED).
+- Two more yellow labels next to "HOLE" weaken flag-yellow as the one "now" accent (DECIDED at the time; flag-yellow was retired on 21 October 2026, see `docs/ACTION-COLOUR.md`).
 - It needs new markup in `src/app/30-play.js` and new rules in `styles.css`, so it would change the standard look too.
   It can't be kept to the editorial look, because `editorial-prototype.css` is token swaps only.
 - Par is what scoring starts from (every empty score reads "Par 3"), so it already gets the most weight on the right.

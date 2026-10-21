@@ -54,7 +54,7 @@ It fails if the controls or the words differ, a screen cannot be opened or the p
 3. Microphone permission and dictation (iOS Safari).
 4. iOS back swipe from the left edge on every screen.
 5. Rotate the phone mid-round; lock and unlock.
-6. Bright sunlight: green header and yellow accent readable.
+6. Bright sunlight: green header, pine buttons and ivory labels on pine readable.
 7. Two real phones scoring one group at the same time.
 8. After uploading the new server: banner "server is out of date" disappears; Backup now works and a copy appears in the Drive folder "NCGS backups".
 9. After changing the PIN: old PIN refused, new one accepted.

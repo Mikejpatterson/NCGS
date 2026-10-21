@@ -15,7 +15,7 @@ All four current queue items are checked off. References: `docs/LONG-NAMES.md`, 
 and issue #1. The audit's automated cycle escalated; Claude subsequently integrated its evidence and recorded
 the owner's decision. Do not rewrite that history as an automated approval.
 
-**Preserve the owner's recorded decisions:** flag-yellow actions; pill buttons and floating glass navigation;
+**Preserve the owner's recorded decisions:** pine actions with white text (flag-yellow retired 21 October 2026); pill buttons and floating glass navigation;
 serif only on the three allowlisted display elements; text-size scaling; normal names retain compact score rows;
 navy/crimson team colours. The 20 October handover explicitly records the owner's exception: Buggy Wars result
 pills keep the leader identified visibly by colour only, without added names/initials. Preserve existing
@@ -104,7 +104,7 @@ Reuse valid pinned evidence where possible; otherwise capture the baseline and c
 finished fixture states at 360/390px and 390px/135%, in both looks. Include a long round title and normal names.
 Record screenshot source SHAs, commands and the limited serif allowlist. This is evidence, not a styling pass.
 
-Acceptance: linked before/after pairs; action yellow, full pill navigation, large text and unclipped content;
+Acceptance: linked before/after pairs; pine actions, full pill navigation, large text and unclipped content;
 explicit difference notes. No real member data and no claim that Linux screenshots establish iPhone typography.
 
 ### 7. `release-hole-evidence` — current score-entry comparison
