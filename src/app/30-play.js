@@ -739,7 +739,7 @@ function statsOf(rid) {
     return any ? s : null;
   });
 }
-/* The round in numbers: one pine medal per stat with a flag-yellow line icon, drawn like the app's other icons. */
+/* The round in numbers: one pine medal per stat with a champagne line icon, drawn like the app's other icons. */
 const BADGE = inner => `<span class="sbm" aria-hidden="true"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${inner}</svg></span>`;
 const STAT_BADGE = {
   birdie: '<path d="M8 21V9"/><path d="M8 11h9l-2.2 2.8L17 16.6H8z"/><path d="M5 21h6"/><path d="M3 6.8c0-2.6 2-4.6 4.6-4.6 1.5 0 2.7.6 3.5 1.7l2.5.5-2.1 1.3c-.3 2.3-2.2 4-4.5 4H3.5z"/><circle cx="9.2" cy="4.4" r=".7" fill="currentColor" stroke="none"/><path d="M4.8 7.4c1.3.2 2.7-.3 3.4-1.4"/>',

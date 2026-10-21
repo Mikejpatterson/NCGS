@@ -1,7 +1,8 @@
 /* NCGS editorial trial: preview builds only (NCGS_DESIGN=editorial). The live app is never built with this file.
    It only swaps design tokens defined in styles.css; it does not restyle selectors.
    Decisions recorded on GitHub issue #1 (18 October 2026):
-   - flag-yellow stays the one action / "now" accent; champagne is for the crest and awards only
+   - (owner, 21 October) flag-yellow is retired: actions are pine with white text (styles.css role tokens --action,
+     --on-pine-label, --award); champagne is for identity and awards, on pine only
    - buttons and the save pill stay fully rounded pills; the glass tab bar is unchanged
    - serif only for the brand name, the Home round name and the round page title (see styles.css "Display type")
    - team colours are navy and crimson everywhere a team appears, subject to sunlight and colour-blindness checks */

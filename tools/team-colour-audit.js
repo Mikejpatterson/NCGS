@@ -141,7 +141,7 @@ if (MAIN) (async () => {
         await p.goto('file://' + path.resolve(F)); await p.evaluate(() => localStorage.clear()); await p.reload(); await p.waitForSelector('.brand');
         if (sc !== 1) await p.addStyleTag({ content: `html{font-size:${sc * 100}% !important}` });
         await p.addStyleTag({ content: '*,*::before,*::after{animation:none!important;transition:none!important}' });
-        const team = await p.evaluate(() => { const cs = getComputedStyle(document.documentElement); const h = s => { s = cs.getPropertyValue(s).trim(); return [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16)); }; return { a: h('--team-a'), b: h('--team-b'), pine: h('--pine'), flag: h('--flag'), bg: h('--bg') }; });
+        const team = await p.evaluate(() => { const cs = getComputedStyle(document.documentElement); const h = s => { s = cs.getPropertyValue(s).trim(); return [1, 3, 5].map(i => parseInt(s.slice(i, i + 2), 16)); }; return { a: h('--team-a'), b: h('--team-b'), pine: h('--pine'), award: h('--award'), bg: h('--bg') }; });
         tokens[look] = team;
         try { await fn(p); } catch (e) { console.log(`FAIL  ${look} ${sn} ${name}: ${e.message.split('\n')[0]}`); process.exitCode = 1; continue; }
         await p.waitForTimeout(250);
