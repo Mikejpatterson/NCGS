@@ -2,7 +2,8 @@
 // Fails on text that overflows or is cut off, anything off the edge of the screen, and touch targets under 40px.
 // Typography (issue #1, DECIDED; widened by the owner on 21 October): the display serif is allowed only on
 // .hero.home .wordmark, .hero.home .now-name, .rp-name, screen titles (h1.title except a person's name, h1.big) and the
-// hole header words .entl small, .entr > b, .entr > b + span (and text inside them). Every screen checks the computed font of each allowed title and fails on serif
+// hole header words .entl small, .entr > b, .entr > b + span, title subtitles, the Home date line and section labels
+// (and text inside them). Every screen checks the computed font of each allowed title and fails on serif
 // anywhere else. The long fixture round title (owner's decision A, 20 October) must never be cut off or end in an
 // ellipsis, in either look: at most 2 lines at 360px and 390px, at most 3 lines with 135% text. Titles keep growing with
 // text size. Which look is being checked comes from the build's mark, <html data-design="editorial"> (build.js).
@@ -89,7 +90,7 @@ const metrics = ({ min, strict }) => {
 };
 // Fonts. Allowed display titles; anything inside them inherits on purpose. The Ruling "i" (official rule wording)
 // button is a serif italic info glyph in the standard look since 135a8c9; it is reported, not hidden (see TYPE lines).
-const DISPLAY = ['.hero.home .wordmark', '.hero.home .now-name', '.rp-name', 'h1.title:not(.is-name)', 'h1.big', '.entl small', '.entr > b', '.entr > b + span'];
+const DISPLAY = ['.hero.home .wordmark', '.hero.home .now-name', '.rp-name', 'h1.title:not(.is-name)', 'h1.big', '.entl small', '.entr > b', '.entr > b + span', 'header.hero:not(:has(.is-name)) > p.sub', '.greet', '.sec-label > .sub'];
 const GLYPH = ['.rbtn.rinfo'];
 const fontsCheck = ({ display, glyph }) => {
   const fam = s => s.split(',').map(x => x.trim().replace(/^["']|["']$/g, '').toLowerCase());

@@ -1683,10 +1683,12 @@ body { font-variant-numeric: tabular-nums; }
 .ah-mic svg { width: 58px !important; height: 58px !important; }
 
 /* Display type (owner, 21 October): one serif title at the top of each screen, and the words in the hole header
-   ("HOLE", "Par 3", "Index 14 · 148 yds"). The big hole number, player names (including a person's own page title,
+   ("HOLE", "Par 3", "Index 14 · 148 yds"), plus the subtitle under each title, Home's date line and section labels. The big hole number, player names (including a person's own page title,
    marked .is-name), scores, buttons and the tab bar stay in the system font. */
 .hero.home .wordmark, .hero.home .now-name, .rp-name { font-family: var(--font-display); }
 h1.title:not(.is-name), h1.big, .entl small, .entr > b, .entr > b + span { font-family: var(--font-display); }
+/* A lighter sprinkling (owner, 21 October): the line under each title, the date line on Home and section labels. */
+header.hero:not(:has(.is-name)) > p.sub, .greet, .sec-label > .sub { font-family: var(--font-display); font-variant-numeric: lining-nums tabular-nums; }
 h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-nums tabular-nums; }
 .entl small, .entr > b, .entr > b + span { font-variant-numeric: lining-nums tabular-nums; }
 
