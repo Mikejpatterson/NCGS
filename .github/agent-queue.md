@@ -121,7 +121,7 @@ Acceptance: linked before/after pairs; action yellow, full pill navigation, larg
 explicit difference notes. Use no real member data and do not claim that Linux screenshots establish iPhone
 typography. No application change is required merely to complete the evidence.
 
-## [ ] release-hole-evidence
+## [x] release-hole-evidence
 From docs/ROADMAP.md version 1 (owner-approved via #18, merge `e8e5a63`), task
 `release-hole-evidence`. Run after `name-resize-fix`, so the candidate evidence includes that result.
 
@@ -133,6 +133,19 @@ score logic or control attributes.
 
 Acceptance: linked before/after pairs, exact source SHAs and checks; intentional differences explained; no
 clipping or name/control overlap. Preserve behaviour and data invariants.
+
+## [ ] three-digit-fix
+Found by `release-hole-evidence` (run 39553987116, `docs/RELEASE-HOLE.md`, `docs/release-hole-shots/after-*.txt`):
+at 390px with 135% text, a three-digit score ("100 (0 pts)") runs 6-9px under the - and + buttons in both looks.
+At 360px/135% it clears by only 1px. `CLAUDE.md` requires numbers to leave room for three digits with nothing cut
+off or overlapping, so this is a required fix, not an owner choice (Claude, 21 October, issue #1).
+
+Make the smallest CSS change in permitted UI files so the score and its points never overlap the - or + buttons at
+360px, 390px and 390px/135% in both looks. Keep the buttons at least 44px, tabular figures, compact normal rows,
+four players plus Save on the first screen at 390x844/100%. No change to score logic, control attributes or words.
+
+Acceptance: rerun `tools/release-hole-shots.js` and update the "after" shots, logs and `docs/RELEASE-HOLE.md`, so
+all 36 states pass in each look, with linked before/after for the three-digit states. Normal hard gates pass.
 
 ## [ ] release-buggy-evidence
 From docs/ROADMAP.md version 1 (owner-approved via #18, merge `e8e5a63`), task
