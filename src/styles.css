@@ -1539,8 +1539,13 @@ body { font-variant-numeric: tabular-nums; }
 .sit:nth-child(n) .sit-i { background: #E3EFE6; }
 /* Home: quiet rows */
 .hero.home .greet { margin-bottom: 4px; }
-/* The greeting replaces the date line: larger, in the display face, in the page's text colour. */
-.hero.home .greet { margin-top: 18px; font-size: 1.6rem; line-height: 1.2; font-weight: 600; color: var(--text); letter-spacing: -.01em; text-wrap: balance; }
+/* The greeting sits beside the crest on one line: crest, greeting, then your initials (tap to change who you are).
+   It replaces the date line and the wordmark. It wraps beside the crest when long or at large text sizes. */
+.hero.home .brand { align-items: center; }
+.hero.home .brand .greet { flex: 1; min-width: 0; margin: 0; font-size: 1.45rem; line-height: 1.2; font-weight: 600; color: var(--text); letter-spacing: -.01em; text-wrap: balance; overflow-wrap: anywhere; }
+.hero.home .who-chip { align-self: center; flex: none; }
+.hero.home .who-chip.only-av { width: 44px; padding: 0; justify-content: center; background: none; box-shadow: none; }
+.hero.home .who-chip.only-av .who-av { width: 44px; height: 44px; font-size: .85rem; }
 /* Organiser: one calm tint for the menu icons */
 .row .ic { background: #E3EFE6 !important; color: var(--pine) !important; }
 
