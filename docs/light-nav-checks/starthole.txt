@@ -1,0 +1,6 @@
+PASS  each group offers a start hole
+PASS  choosing 10 shows it on the group
+PASS  the start hole is saved on the round
+PASS  and that group's scoring order begins on hole 10
+PASS  no script errors
+all passed

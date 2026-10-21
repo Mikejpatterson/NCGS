@@ -1,7 +1,8 @@
 # NCGS agent instructions
 
 Read `CLAUDE.md`, `docs/CLAUDE-HANDOVER.md`, current activity and human decisions on GitHub Issue #1, and
-`docs/JOINT-WORKING-AGREEMENT.md`. The human's 21 October joint instruction supersedes older role descriptions.
+the full `docs/OWNER-JOINT-INSTRUCTIONS.md` and `docs/JOINT-WORKING-AGREEMENT.md`. The human's 21 October joint
+instruction supersedes older role descriptions. Read its sections for both agents.
 
 ## Authority and collaboration
 

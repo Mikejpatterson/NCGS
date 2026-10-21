@@ -1,0 +1,29 @@
+PASS  1. a saved hole reaches the server
+PASS  1. the other phone sees it after a sync
+PASS  2. offline saves are queued on the phone
+PASS  2. the server has not seen them yet
+PASS  2. everything arrives after reconnecting
+PASS  2. the queue is empty afterwards
+PASS  3. unsent scores survive a reload
+PASS  3. the phone still shows the scores it holds
+PASS  3. and are sent when the server is back
+PASS  4. the first score to arrive stays
+PASS  4. the late phone is told about the clash
+PASS  4. the clash is not lost: it is still on that phone
+PASS  5. with the server down, the phone still takes the score
+PASS  5. after the down outage everything is on the server
+PASS  5. with the server drop, the phone still takes the score
+PASS  5. after the drop outage everything is on the server
+PASS  5. with the server slow, the phone still takes the score
+PASS  5. after the slow outage everything is on the server
+PASS  5. no hole was skipped or doubled
+PASS  6. a triple-tap on Save writes each score once
+PASS  6. and does not spam the change log
+PASS  6b. the score stays visible while the slow server confirms it
+PASS  7. a late score for a finished round is not added
+PASS  7. it is kept on the phone, not thrown away
+PASS  8. the phone does not crash when its round disappears
+PASS  8. and nothing is written for a round that no longer exists
+PASS  9. every phone ends with the same scores
+PASS  no script errors on any phone
+all passed

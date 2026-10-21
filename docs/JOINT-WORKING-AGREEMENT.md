@@ -1,6 +1,6 @@
 # Joint working agreement — human instruction, 21 October 2026
 
-This records the human Product Owner's **NCGS — Joint Design and Development Instructions**, supplied directly
+This summarizes the human Product Owner's [complete joint instruction](OWNER-JOINT-INSTRUCTIONS.md), supplied directly
 to both Codex and Claude. It replaces older agent-role descriptions; it does not replace score/data protections.
 
 The human owns direction, significant decisions, priorities and release approval. Codex initially leads

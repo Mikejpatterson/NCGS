@@ -1,0 +1,275 @@
+[
+ {
+  "screen": "home",
+  "size": "360",
+  "controls": 14,
+  "same": true,
+  "pixels": "10.81% (28787 px)"
+ },
+ {
+  "screen": "rounds",
+  "size": "360",
+  "controls": 7,
+  "same": true,
+  "pixels": "0.00% (0 px)"
+ },
+ {
+  "screen": "round-past",
+  "size": "360",
+  "controls": 17,
+  "same": true,
+  "pixels": "0.00% (0 px)"
+ },
+ {
+  "screen": "round-now",
+  "size": "360",
+  "controls": 22,
+  "same": true,
+  "pixels": "10.82% (28831 px)"
+ },
+ {
+  "screen": "tee",
+  "size": "360",
+  "controls": 23,
+  "same": true,
+  "pixels": "10.78% (28724 px)"
+ },
+ {
+  "screen": "entry-empty",
+  "size": "360",
+  "controls": 23,
+  "same": true,
+  "pixels": "10.78% (28724 px)"
+ },
+ {
+  "screen": "entry-partial",
+  "size": "360",
+  "controls": 25,
+  "same": true,
+  "pixels": "10.78% (28724 px)"
+ },
+ {
+  "screen": "entry-complete",
+  "size": "360",
+  "controls": 27,
+  "same": true,
+  "pixels": "10.83% (28843 px)"
+ },
+ {
+  "screen": "entry-high",
+  "size": "360",
+  "controls": 27,
+  "same": true,
+  "pixels": "10.83% (28843 px)"
+ },
+ {
+  "screen": "after",
+  "size": "360",
+  "controls": 6,
+  "same": true,
+  "pixels": "10.83% (28840 px)"
+ },
+ {
+  "screen": "board",
+  "size": "360",
+  "controls": 21,
+  "same": true,
+  "pixels": "10.79% (28746 px)"
+ },
+ {
+  "screen": "buggy-wars",
+  "size": "360",
+  "controls": 13,
+  "same": true,
+  "pixels": "10.82% (28812 px)"
+ },
+ {
+  "screen": "buggy-wars-g2",
+  "size": "360",
+  "controls": 13,
+  "same": true,
+  "pixels": "10.82% (28812 px)"
+ },
+ {
+  "screen": "home",
+  "size": "390",
+  "controls": 14,
+  "same": true,
+  "pixels": "9.50% (31262 px)"
+ },
+ {
+  "screen": "rounds",
+  "size": "390",
+  "controls": 7,
+  "same": true,
+  "pixels": "0.00% (0 px)"
+ },
+ {
+  "screen": "round-past",
+  "size": "390",
+  "controls": 17,
+  "same": true,
+  "pixels": "0.00% (0 px)"
+ },
+ {
+  "screen": "round-now",
+  "size": "390",
+  "controls": 22,
+  "same": true,
+  "pixels": "9.51% (31293 px)"
+ },
+ {
+  "screen": "tee",
+  "size": "390",
+  "controls": 23,
+  "same": true,
+  "pixels": "9.55% (31440 px)"
+ },
+ {
+  "screen": "entry-empty",
+  "size": "390",
+  "controls": 23,
+  "same": true,
+  "pixels": "9.55% (31440 px)"
+ },
+ {
+  "screen": "entry-partial",
+  "size": "390",
+  "controls": 25,
+  "same": true,
+  "pixels": "9.55% (31440 px)"
+ },
+ {
+  "screen": "entry-complete",
+  "size": "390",
+  "controls": 27,
+  "same": true,
+  "pixels": "9.55% (31440 px)"
+ },
+ {
+  "screen": "entry-high",
+  "size": "390",
+  "controls": 27,
+  "same": true,
+  "pixels": "9.55% (31440 px)"
+ },
+ {
+  "screen": "after",
+  "size": "390",
+  "controls": 6,
+  "same": true,
+  "pixels": "9.55% (31436 px)"
+ },
+ {
+  "screen": "board",
+  "size": "390",
+  "controls": 21,
+  "same": true,
+  "pixels": "9.56% (31456 px)"
+ },
+ {
+  "screen": "buggy-wars",
+  "size": "390",
+  "controls": 13,
+  "same": true,
+  "pixels": "9.54% (31414 px)"
+ },
+ {
+  "screen": "buggy-wars-g2",
+  "size": "390",
+  "controls": 13,
+  "same": true,
+  "pixels": "9.54% (31414 px)"
+ },
+ {
+  "screen": "home",
+  "size": "390-135",
+  "controls": 14,
+  "same": true,
+  "pixels": "9.46% (31149 px)"
+ },
+ {
+  "screen": "rounds",
+  "size": "390-135",
+  "controls": 7,
+  "same": true,
+  "pixels": "0.00% (0 px)"
+ },
+ {
+  "screen": "round-past",
+  "size": "390-135",
+  "controls": 17,
+  "same": true,
+  "pixels": "0.00% (0 px)"
+ },
+ {
+  "screen": "round-now",
+  "size": "390-135",
+  "controls": 22,
+  "same": true,
+  "pixels": "9.58% (31535 px)"
+ },
+ {
+  "screen": "tee",
+  "size": "390-135",
+  "controls": 23,
+  "same": true,
+  "pixels": "9.50% (31259 px)"
+ },
+ {
+  "screen": "entry-empty",
+  "size": "390-135",
+  "controls": 23,
+  "same": true,
+  "pixels": "9.50% (31259 px)"
+ },
+ {
+  "screen": "entry-partial",
+  "size": "390-135",
+  "controls": 25,
+  "same": true,
+  "pixels": "9.50% (31254 px)"
+ },
+ {
+  "screen": "entry-complete",
+  "size": "390-135",
+  "controls": 27,
+  "same": true,
+  "pixels": "9.54% (31388 px)"
+ },
+ {
+  "screen": "entry-high",
+  "size": "390-135",
+  "controls": 27,
+  "same": true,
+  "pixels": "9.54% (31388 px)"
+ },
+ {
+  "screen": "after",
+  "size": "390-135",
+  "controls": 6,
+  "same": true,
+  "pixels": "9.54% (31388 px)"
+ },
+ {
+  "screen": "board",
+  "size": "390-135",
+  "controls": 21,
+  "same": true,
+  "pixels": "9.56% (31471 px)"
+ },
+ {
+  "screen": "buggy-wars",
+  "size": "390-135",
+  "controls": 13,
+  "same": true,
+  "pixels": "9.53% (31369 px)"
+ },
+ {
+  "screen": "buggy-wars-g2",
+  "size": "390-135",
+  "controls": 13,
+  "same": true,
+  "pixels": "9.53% (31369 px)"
+ }
+]

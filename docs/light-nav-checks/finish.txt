@@ -1,0 +1,8 @@
+PASS  Hole tab opens the score entry
+PASS  scores saved for a lot of holes
+PASS  screens seen in order: entry, after, and finish or check
+PASS  the Back history is short after a whole round (no stack of identical hole screens)
+ended on finish after 4 holes; saw tee,after,finish
+PASS  can get back to the front page after the round
+PASS  no script errors
+all passed
