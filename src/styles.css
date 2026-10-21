@@ -1691,6 +1691,13 @@ body { font-variant-numeric: tabular-nums; }
 h1.title:not(.is-name), h1.big, .entl small, .entr > b, .entr > b + span { font-family: var(--font-display); }
 /* A lighter sprinkling (owner, 21 October): the line under each title, the date line on Home and section labels. */
 header.hero:not(:has(.is-name)) > p.sub, .greet, .sec-label > .sub { font-family: var(--font-display); font-variant-numeric: lining-nums tabular-nums; }
+/* Ruling (owner, 21 October): the header matches the other screens. The serif goes on the eyebrow, the question and the
+   line under it, the heavy black weight comes down to the title weight, and the "common ones" label becomes a
+   sentence-case section label like the others. */
+.ah-txt small, .ah-txt b, .ah-txt > span, .sitlab { font-family: var(--font-display); font-variant-numeric: lining-nums tabular-nums; }
+.ah-txt b { font-weight: 700; letter-spacing: -.01em; text-wrap: balance; }
+.hero.pine.askhero { gap: 26px; }   /* the mic's 12px halo sits outside its box, so leave room for it */
+.sitlab { text-transform: none; letter-spacing: 0; font-size: var(--t-sub); font-weight: 700; color: var(--pine); }
 h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-nums tabular-nums; }
 .entl small, .entr > b, .entr > b + span { font-variant-numeric: lining-nums tabular-nums; }
 
