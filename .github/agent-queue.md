@@ -160,7 +160,7 @@ Acceptance: labelled originals and relevant simulations, measured contrast, sour
 parity results. Keep simulations separate from the outstanding real-phone sunlight check. Use no real member data,
 do not broaden the colour-only exception and do not present browser evidence as a real-iPhone result.
 
-## [ ] prelaunch-review-pack
+## [x] prelaunch-review-pack
 From docs/ROADMAP.md version 1 (owner-approved via #18, merge `e8e5a63`), task
 `prelaunch-review-pack`. Run after the Home, Hole and Buggy Wars evidence tasks.
 
