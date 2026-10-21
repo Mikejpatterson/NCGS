@@ -147,7 +147,7 @@ four players plus Save on the first screen at 390x844/100%. No change to score l
 Acceptance: rerun `tools/release-hole-shots.js` and update the "after" shots, logs and `docs/RELEASE-HOLE.md`, so
 all 36 states pass in each look, with linked before/after for the three-digit states. Normal hard gates pass.
 
-## [ ] release-buggy-evidence
+## [x] release-buggy-evidence
 From docs/ROADMAP.md version 1 (owner-approved via #18, merge `e8e5a63`), task
 `release-buggy-evidence`.
 
