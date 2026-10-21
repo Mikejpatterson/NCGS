@@ -31,7 +31,8 @@ the remote refs, the queue and issue #1 before acting; these lines go out of dat
   (roadmap, "Blocked or owner-only work").
 - **Phone preview:** fixture data only, its own path and service-worker scope, never replacing the live app shell.
   Agreed in principle; no hosting route has been authorised or published (roadmap task `prelaunch-review-pack`).
-- **Crest: blocked** until vector artwork arrives (list on issue #1). Never draw a substitute.
+- **Crest: done.** The owner approved the vector on 21 October (`docs/design/assets/ncgs-crest.svg`, `ncgs-app-icon.svg`). It is on Home and is the app icon (`2b10a0b`). Never redraw it.
+- **Owner, 21 October: the app is not launched; nobody uses it.** Claude builds the redesign directly on the design branch in larger pieces (tests, guard and layout every time), and Codex reviews. One full pre-launch check comes at the end. Details are on issue #1.
 - **Production:** nothing from the design branch has been approved for `main` or the live app.
 
 ## Decided (issue #1)

@@ -26,7 +26,7 @@ Read `docs/EDITORIAL-PROTOTYPE.md`, `docs/AI-COLLABORATION.md` and `docs/CLAUDE-
 - Palette: forest/pine green #0B3D2E, warm ivory #FAF8F3, extremely limited flat champagne gold #D4B483 in crest only or award accents, Buggy Wars deep navy #244A78 and crimson #9B3443.
 - Use contemporary serif selectively for brand and editorial display titles; system sans for interaction, navigation, player names and scoring. Preserve floating Liquid Glass pill navigation and generous phone touch targets.
 - No golf-course photos, decorative ornamental motifs, fake metallic shine or luxury-brand effects.
-- Approved crest: ivory serif NCGS and underline, double thin champagne-gold ring on pine green. **Do not** improvise a new production crest from a mockup; mark blocked pending accurate vector artwork if necessary.
+- Approved crest: ivory serif NCGS and underline, double thin champagne-gold ring on pine green. The production vector is `docs/design/assets/ncgs-crest.svg` (app icon: `ncgs-app-icon.svg`), owner-approved 21 October 2026. Use those files; never redraw the crest from a mock-up.
 - Known design defect: Hole screen pine-green header overloaded on left and underuses right side; redistribute hole/par/SI hierarchy intentionally, without centring everything arbitrarily.
 - Only work on `design/crest-editorial-prototype`. Do not commit to `main`, merge, deploy, or alter production integrations, data or secrets.
 - Keep optional `NCGS_DESIGN=editorial` prototype isolated. Audit selectors: first-pass CSS needs checking against actual DOM.

@@ -28,7 +28,7 @@ const extra = [
 
 // The roles that changed. Text roles are checked at 4.5:1 (3:1 when large); marker roles at 3:1.
 const ROLES = [
-  ['.go', 'text'], ['.now-kind', 'text'], ['.hero .pill.w', 'text'], ['.badge', 'mark'], ['.rulechip', 'text'], ['.hs-tag', 'text'],
+  ['.go', 'text'], ['.now-kind', 'text'], ['.hero .pill.w', 'text'], ['.badge:not(.crest)', 'mark'], ['.rulechip', 'text'], ['.hs-tag', 'text'],
   ['.entl small', 'text'], ['.holebtn .hdown', 'mark'], ['.prog i.cur', 'mark'], ['.savebar .btn:not(.quiet)', 'text'],
   ['.av.is-lead', 'text'], ['.posp.p1', 'text'], ['.rk.r1', 'text'], ['.lc-k', 'text'], ['.mr .mn small', 'text'],
   ['.rp-kind', 'text'], ['.rp-time b', 'text'], ['.ah-txt small', 'text'], ['.ah-mic', 'mark'], ['.mgk', 'text'],
