@@ -1682,12 +1682,13 @@ body { font-variant-numeric: tabular-nums; }
 .ah-mic { width: 92px !important; height: 92px !important; background: var(--action-inverse); color: var(--on-action-inverse); box-shadow: 0 0 0 6px rgba(250, 248, 243, .18), 0 0 0 12px rgba(250, 248, 243, .08) !important; }
 .ah-mic svg { width: 58px !important; height: 58px !important; }
 
-/* Display type (owner, 21 October): one serif title at the top of each screen, plus the big hole number.
-   Player names (including a person's own page title, marked .is-name), scores, buttons and the tab bar stay in the system font. */
+/* Display type (owner, 21 October): one serif title at the top of each screen, and the words in the hole header
+   ("HOLE", "Par 3", "Index 14 · 148 yds"). The big hole number, player names (including a person's own page title,
+   marked .is-name), scores, buttons and the tab bar stay in the system font. */
 .hero.home .wordmark, .hero.home .now-name, .rp-name { font-family: var(--font-display); }
-h1.title:not(.is-name), h1.big, .entn { font-family: var(--font-display); }
+h1.title:not(.is-name), h1.big, .entl small, .entr > b, .entr > b + span { font-family: var(--font-display); }
 h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-nums tabular-nums; }
-.entn { font-variant-numeric: lining-nums tabular-nums; }
+.entl small, .entr > b, .entr > b + span { font-variant-numeric: lining-nums tabular-nums; }
 
 /* Long names: a name wraps onto another line instead of being cut off or running into a score, icon or button.
    Text keeps its size and buttons keep their size. A single word too long for its space breaks inside the word. */
