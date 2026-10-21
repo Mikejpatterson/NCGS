@@ -48,7 +48,8 @@ No standalone verified production SVG of the selected gold-border crest has been
 1. **Page composition:** ivory/light canvases for practical screens, deliberate headline/data/action hierarchy, deep green reserved for brand/emphasis and the most important actions. Avoid entire screens of green.
 2. **Typography:** display serif for occasional event or society headlines; plain high-contrast sans for player names, score entry, leaderboard cells, forms and tab captions. Tabular numerals, adequate space for three-digit scores, no tiny shrunk player names.
 3. **Navigation:** light floating translucent pill with a graceful opaque fallback, subtle shadow/border, limited pine-selected state, nonwrapping labels, hit targets ≥44 CSS px where practicable. No overlap with page content; test iPhone safe area.
-4. **Cards/buttons:** consistent radius, margins, strokes and spacing. Avoid using champagne-gold as normal-size body text on ivory; keep accessible contrast.
+4. **Not a flag (owner, 21 October):** the owner doesn't want the app to read as Irish national colours. Keep gold rare (crest and awards), keep the green a deep pine, never emerald, and never put green, ivory and gold side by side as equal blocks or stripes.
+5. **Cards/buttons:** consistent radius, margins, strokes and spacing. Avoid using champagne-gold as normal-size body text on ivory; keep accessible contrast.
 5. **Competition:** Buggy Wars may use navy/crimson for participants, supplemented by accessible text/status, never colour alone. Keep score-entry and match statuses legible in outdoor light.
 6. **Icons:** simple, consistent functional vectors; no decorative photography, emoji illustrations or heavy ornamental branding.
 7. **Scope of flexibility:** Agents should independently design every route using the same primitives rather than asking owner to select a mock-up for each page. Escalate only material identity departures, risky functional changes or truly unresolved business rules.
