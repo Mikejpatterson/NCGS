@@ -655,7 +655,7 @@ VIEWS.hcp = p => {
   const row = (k, v, strong) => `<div class="row num"><span class="${strong ? 'b' : 'sub'}">${k}</span><span class="${strong ? 'b' : ''}">${v}</span></div>`;
   return {
     html: `${navBack(roundName(r))}
-      <div class="head"><h1 class="title">${esc(m.name)}</h1><span class="bignum">${frozen !== null ? frozen : w.playing}</span></div>
+      <div class="head"><h1 class="title is-name">${esc(m.name)}</h1><span class="bignum">${frozen !== null ? frozen : w.playing}</span></div>
       <p class="sub">Playing handicap · ${esc(tee.name)} tees</p>
       ${sec('', cardOf(`${row('WHS index', fmtIndex(m.index))}${row(`× slope ${tee.slope} ÷ 113`, f2(w.slopePart))}${row(`+ rating ${tee.rating} − par ${tee.par}`, f2(w.ratingPart))}${row('Course handicap', f2(w.courseHandicap), true)}${pct !== 100 ? row(`× ${pct}%`, f2(w.beforeRounding)) : ''}${row('Playing handicap', frozen !== null ? frozen : w.playing, true)}`))}`
   };
