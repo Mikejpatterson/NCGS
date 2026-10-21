@@ -13,6 +13,9 @@ the same four players in memory (the same names as `docs/LONG-NAMES.md`). No rea
 `git diff --stat 79ba222 c70b254 -- src build.js data/fixture-seed.json` shows one change: `src/app/30-play.js`
 (+14 lines, the `name-resize-fix` re-measure when the text size changes, `docs/NAME-RESIZE.md`).
 `git diff --stat a462872 c70b254 -- src build.js data/fixture-seed.json` is empty.
+Re-checked in round 3 at `a5fe07e6e1eafb2332dfcb19dceca819c5cb8f24` (round 2 added only this file):
+`git diff --stat c70b254 a5fe07e -- src build.js data/fixture-seed.json` is empty, so the screenshots stand for
+that tree too, and for the round-3 commit, which adds only documentation.
 
 How the screenshots were tied to those commits (checked this round, not assumed):
 - The baseline tree used (`dist/base`, unpacked with `git archive`) differs from the candidate's `src/` only by that
@@ -82,7 +85,8 @@ layout task in permitted UI files (for example letting the score number shrink t
 same evidence re-run.
 
 ## Other gates at the candidate SHA
-Run this round on the fixture preview built from `c70b254` (served on port 8765), standard and editorial looks:
+Run on the fixture preview built from `c70b254` (round 1) and again from `a5fe07e` (round 3, same app source),
+served on port 8765, standard and editorial looks; same results both times:
 
 | Test | Standard | Editorial |
 |---|---|---|
