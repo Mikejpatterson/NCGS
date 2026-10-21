@@ -1,0 +1,4421 @@
+{
+ "live-open-360": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "bw"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g1"
+    },
+    null,
+    "true",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g2"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g3"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g1-front",
+     "open": "0"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g1-back",
+     "open": "1"
+    },
+    null,
+    null,
+    "true",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Aidan",
+   "Bartley",
+   "Cathal",
+   "Donnacha",
+   "Won",
+   "Aidan & Bartley Won 2 up",
+   "Aidan & Bartley 1 up, 4 to play",
+   "Aidan & Bartley 3 up, 4 to play"
+  ],
+  "text": "LIVE · THRU 14 Leaderboard Demo round · Stableford Scores Buggy Wars Contests Stats Group 1 Group 2 Group 3 AF BF v CF DF Front nine Won 2 up Back nine 1 up, 4 to play 10 3 1 11 3 1 12 3 0 13 1 2 14 1 2 15 16 17 18 Holes 3 2 Overall 3 up, 4 to play"
+ },
+ "live-decided-360": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "bw"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g1"
+    },
+    null,
+    "true",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g2"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g3"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g1-front",
+     "open": "1"
+    },
+    null,
+    null,
+    "true",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g1-back",
+     "open": "0"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Aidan",
+   "Bartley",
+   "Cathal",
+   "Donnacha",
+   "Won",
+   "Aidan & Bartley Won 2 up",
+   "Aidan & Bartley 1 up, 4 to play",
+   "Aidan & Bartley 3 up, 4 to play"
+  ],
+  "text": "LIVE · THRU 14 Leaderboard Demo round · Stableford Scores Buggy Wars Contests Stats Group 1 Group 2 Group 3 AF BF v CF DF Front nine Won 2 up 1 1 2 2 2 2 3 4 1 4 3 2 5 3 1 6 2 3 7 1 2 8 2 1 9 3 2 Holes 5 3 Back nine 1 up, 4 to play Overall 3 up, 4 to play"
+ },
+ "live-halved-360": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "bw"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g1"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g2"
+    },
+    null,
+    "true",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g3"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g2-front",
+     "open": "0"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g2-back",
+     "open": "1"
+    },
+    null,
+    null,
+    "true",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Eoghan",
+   "Fiachra",
+   "Gearóid",
+   "Hugh",
+   "Halved",
+   "Eoghan & Fiachra 1 up, 4 to play",
+   "Eoghan & Fiachra 1 up, 4 to play"
+  ],
+  "text": "LIVE · THRU 14 Leaderboard Demo round · Stableford Scores Buggy Wars Contests Stats Group 1 Group 2 Group 3 EF FF v GF HF Front nine Halved Back nine 1 up, 4 to play 10 2 1 11 3 3 12 0 5 13 3 3 14 3 2 15 16 17 18 Holes 2 1 Overall 1 up, 4 to play"
+ },
+ "final-decided-360": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "bw"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g1"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g2"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g3"
+    },
+    null,
+    "true",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-fx-r2-g3-front",
+     "open": "1"
+    },
+    null,
+    null,
+    "true",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-fx-r2-g3-back",
+     "open": "0"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Ivor",
+   "Jarlath",
+   "Kevin",
+   "Lorcan",
+   "Won",
+   "Kevin & Lorcan Won 3&2",
+   "Won",
+   "Ivor & Jarlath Won 4&2",
+   "Won",
+   "Kevin & Lorcan Won 1 up"
+  ],
+  "text": "Leaderboard Cabopino, the long-named second day of the trip · Stableford Scores Buggy Wars Contests Stats Group 1 Group 2 Group 3 IF JF v KF LF Front nine Won 3&2 1 2 2 2 1 2 3 2 3 4 1 2 5 2 2 6 3 2 7 2 3 8 2 3 9 1 3 Holes 1 6 Back nine Won 4&2 Overall Won 1 up"
+ },
+ "results-360": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "back"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-john-k"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-mike-p"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-sean"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-john-w"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-brian"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-colin"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-damien"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-mike-f"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "all-fx-r2"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "kb-fx-r2"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "grp-fx-r2"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "results",
+     "rid": "fx-r2"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Won"
+  ],
+  "text": "NCGS WINNER Final Bartley Cabopino, the long-named second day of the trip · Fri 15 May 37 Stableford 1 BF Bartley 37 2 EF Eoghan 35 3 FF Fiachra 34 4 AF Aidan 32 5 KF Kevin 32 6 CF Cathal 31 7 DF Donnacha 31 8 IF Ivor 31 Show all 12 KBs and contests KBs Cathal & Eoghan · 66 Nearest the pin 7 Not awarded Longest drive 12 Not awarded Buggy Wars Aidan & Bartley v Cathal & Donnacha Front nine Buggy 1 won 2 & 1 Back nine Halved Overall Buggy 1 won 2 & 1 Eoghan & Fiachra v Gearóid & Hugh Front nine Halved Back nine Buggy 1 won 3 & 2 Overall Buggy 1 won 3 & 2 Ivor & Jarlath v Kevin & Lorcan Front nine Buggy 2 won 3 & 2 Back nine Buggy 1 won 4 & 2 Overall Buggy 2 won 1 up Groups Share results"
+ },
+ "nobug-results-360": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-kieran"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-mike-f"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-derek"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-john-k"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-peadar"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-sean"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-dave"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-damien"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-mike-p"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-brian"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-john-w"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-colin"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "results",
+     "rid": "demo-cabopino"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [],
+  "text": "LIVE · THRU 14 Leaderboard Demo round · Stableford Scores Contests Stats Demo round Demo 1 LF Lorcan Leads by 2 · thru 14 37 2 IF Ivor thru 14 35 3 JF Jarlath thru 14 33 4 BF Bartley thru 14 27 5 GF Gearóid thru 14 24 T6 FF Fiachra thru 14 22 T6 HF Hugh thru 14 22 T8 DF Donnacha thru 14 19 T8 EF Eoghan thru 14 19 10 KF Kevin thru 14 16 11 AF Aidan thru 14 14 12 CF Cathal thru 14 9 KBs 1 Bartley & Lorcan 64 2 Gearóid & Ivor 59 3 Hugh & Jarlath 55 4 Donnacha & Fiachra 41 5 Aidan & Kevin 30 6 Cathal & Eoghan 28 Share results"
+ },
+ "nobug-hole-360": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "holes"
+    },
+    "Go to a hole. Now on hole 15",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-john-w"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "pid": "john-w",
+     "v": "P"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "down",
+     "pid": "john-w",
+     "v": "3"
+    },
+    "One fewer stroke for Aidan",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "up",
+     "pid": "john-w",
+     "v": "3"
+    },
+    "One more stroke for Aidan",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-john-k"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "pid": "john-k",
+     "v": "P"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "down",
+     "pid": "john-k",
+     "v": "3"
+    },
+    "One fewer stroke for Bartley",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "up",
+     "pid": "john-k",
+     "v": "3"
+    },
+    "One more stroke for Bartley",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-colin"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "pid": "colin",
+     "v": "P"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "down",
+     "pid": "colin",
+     "v": "3"
+    },
+    "One fewer stroke for Cathal",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "up",
+     "pid": "colin",
+     "v": "3"
+    },
+    "One more stroke for Cathal",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-damien"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "pid": "damien",
+     "v": "P"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "down",
+     "pid": "damien",
+     "v": "3"
+    },
+    "One fewer stroke for Donnacha",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "up",
+     "pid": "damien",
+     "v": "3"
+    },
+    "One more stroke for Donnacha",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "open-check",
+     "seg": "front"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "save"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Go to a hole. Now on hole 15",
+   "Hole 15 of 18",
+   "0 shots",
+   "no shots",
+   "Strokes for Aidan",
+   "One fewer stroke for Aidan",
+   "One more stroke for Aidan",
+   "1 shot",
+   "1 shot",
+   "Strokes for Bartley",
+   "One fewer stroke for Bartley",
+   "One more stroke for Bartley",
+   "1 shot",
+   "1 shot",
+   "Strokes for Cathal",
+   "One fewer stroke for Cathal",
+   "One more stroke for Cathal",
+   "1 shot",
+   "1 shot",
+   "Strokes for Donnacha",
+   "One fewer stroke for Donnacha",
+   "One more stroke for Donnacha"
+  ],
+  "text": "HOLE 15 Par 3 Index 14 · 148 yds Aidan Pick up Par 3 − + Bartley Pick up Par 3 − + Cathal Pick up Par 3 − + Donnacha Pick up Par 3 − + Scorecard Front nine card Add photo 4 scores to go"
+ },
+ "live-open-390": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "bw"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g1"
+    },
+    null,
+    "true",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g2"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g3"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g1-front",
+     "open": "0"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g1-back",
+     "open": "1"
+    },
+    null,
+    null,
+    "true",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Aidan",
+   "Bartley",
+   "Cathal",
+   "Donnacha",
+   "Won",
+   "Aidan & Bartley Won 2 up",
+   "Aidan & Bartley 1 up, 4 to play",
+   "Aidan & Bartley 3 up, 4 to play"
+  ],
+  "text": "LIVE · THRU 14 Leaderboard Demo round · Stableford Scores Buggy Wars Contests Stats Group 1 Group 2 Group 3 AF BF v CF DF Front nine Won 2 up Back nine 1 up, 4 to play 10 3 1 11 3 1 12 3 0 13 1 2 14 1 2 15 16 17 18 Holes 3 2 Overall 3 up, 4 to play"
+ },
+ "live-decided-390": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "bw"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g1"
+    },
+    null,
+    "true",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g2"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g3"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g1-front",
+     "open": "1"
+    },
+    null,
+    null,
+    "true",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g1-back",
+     "open": "0"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Aidan",
+   "Bartley",
+   "Cathal",
+   "Donnacha",
+   "Won",
+   "Aidan & Bartley Won 2 up",
+   "Aidan & Bartley 1 up, 4 to play",
+   "Aidan & Bartley 3 up, 4 to play"
+  ],
+  "text": "LIVE · THRU 14 Leaderboard Demo round · Stableford Scores Buggy Wars Contests Stats Group 1 Group 2 Group 3 AF BF v CF DF Front nine Won 2 up 1 1 2 2 2 2 3 4 1 4 3 2 5 3 1 6 2 3 7 1 2 8 2 1 9 3 2 Holes 5 3 Back nine 1 up, 4 to play Overall 3 up, 4 to play"
+ },
+ "live-halved-390": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "bw"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g1"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g2"
+    },
+    null,
+    "true",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g3"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g2-front",
+     "open": "0"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g2-back",
+     "open": "1"
+    },
+    null,
+    null,
+    "true",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Eoghan",
+   "Fiachra",
+   "Gearóid",
+   "Hugh",
+   "Halved",
+   "Eoghan & Fiachra 1 up, 4 to play",
+   "Eoghan & Fiachra 1 up, 4 to play"
+  ],
+  "text": "LIVE · THRU 14 Leaderboard Demo round · Stableford Scores Buggy Wars Contests Stats Group 1 Group 2 Group 3 EF FF v GF HF Front nine Halved Back nine 1 up, 4 to play 10 2 1 11 3 3 12 0 5 13 3 3 14 3 2 15 16 17 18 Holes 2 1 Overall 1 up, 4 to play"
+ },
+ "final-decided-390": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "bw"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g1"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g2"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g3"
+    },
+    null,
+    "true",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-fx-r2-g3-front",
+     "open": "1"
+    },
+    null,
+    null,
+    "true",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-fx-r2-g3-back",
+     "open": "0"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Ivor",
+   "Jarlath",
+   "Kevin",
+   "Lorcan",
+   "Won",
+   "Kevin & Lorcan Won 3&2",
+   "Won",
+   "Ivor & Jarlath Won 4&2",
+   "Won",
+   "Kevin & Lorcan Won 1 up"
+  ],
+  "text": "Leaderboard Cabopino, the long-named second day of the trip · Stableford Scores Buggy Wars Contests Stats Group 1 Group 2 Group 3 IF JF v KF LF Front nine Won 3&2 1 2 2 2 1 2 3 2 3 4 1 2 5 2 2 6 3 2 7 2 3 8 2 3 9 1 3 Holes 1 6 Back nine Won 4&2 Overall Won 1 up"
+ },
+ "results-390": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "back"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-john-k"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-mike-p"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-sean"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-john-w"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-brian"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-colin"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-damien"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-mike-f"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "all-fx-r2"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "kb-fx-r2"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "grp-fx-r2"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "results",
+     "rid": "fx-r2"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Won"
+  ],
+  "text": "NCGS WINNER Final Bartley Cabopino, the long-named second day of the trip · Fri 15 May 37 Stableford 1 BF Bartley 37 2 EF Eoghan 35 3 FF Fiachra 34 4 AF Aidan 32 5 KF Kevin 32 6 CF Cathal 31 7 DF Donnacha 31 8 IF Ivor 31 Show all 12 KBs and contests KBs Cathal & Eoghan · 66 Nearest the pin 7 Not awarded Longest drive 12 Not awarded Buggy Wars Aidan & Bartley v Cathal & Donnacha Front nine Buggy 1 won 2 & 1 Back nine Halved Overall Buggy 1 won 2 & 1 Eoghan & Fiachra v Gearóid & Hugh Front nine Halved Back nine Buggy 1 won 3 & 2 Overall Buggy 1 won 3 & 2 Ivor & Jarlath v Kevin & Lorcan Front nine Buggy 2 won 3 & 2 Back nine Buggy 1 won 4 & 2 Overall Buggy 2 won 1 up Groups Share results"
+ },
+ "nobug-results-390": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-kieran"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-mike-f"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-derek"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-john-k"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-peadar"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-sean"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-dave"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-damien"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-mike-p"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-brian"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-john-w"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-colin"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "results",
+     "rid": "demo-cabopino"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [],
+  "text": "LIVE · THRU 14 Leaderboard Demo round · Stableford Scores Contests Stats Demo round Demo 1 LF Lorcan Leads by 2 · thru 14 37 2 IF Ivor thru 14 35 3 JF Jarlath thru 14 33 4 BF Bartley thru 14 27 5 GF Gearóid thru 14 24 T6 FF Fiachra thru 14 22 T6 HF Hugh thru 14 22 T8 DF Donnacha thru 14 19 T8 EF Eoghan thru 14 19 10 KF Kevin thru 14 16 11 AF Aidan thru 14 14 12 CF Cathal thru 14 9 KBs 1 Bartley & Lorcan 64 2 Gearóid & Ivor 59 3 Hugh & Jarlath 55 4 Donnacha & Fiachra 41 5 Aidan & Kevin 30 6 Cathal & Eoghan 28 Share results"
+ },
+ "nobug-hole-390": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "holes"
+    },
+    "Go to a hole. Now on hole 15",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-john-w"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "pid": "john-w",
+     "v": "P"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "down",
+     "pid": "john-w",
+     "v": "3"
+    },
+    "One fewer stroke for Aidan",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "up",
+     "pid": "john-w",
+     "v": "3"
+    },
+    "One more stroke for Aidan",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-john-k"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "pid": "john-k",
+     "v": "P"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "down",
+     "pid": "john-k",
+     "v": "3"
+    },
+    "One fewer stroke for Bartley",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "up",
+     "pid": "john-k",
+     "v": "3"
+    },
+    "One more stroke for Bartley",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-colin"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "pid": "colin",
+     "v": "P"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "down",
+     "pid": "colin",
+     "v": "3"
+    },
+    "One fewer stroke for Cathal",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "up",
+     "pid": "colin",
+     "v": "3"
+    },
+    "One more stroke for Cathal",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-damien"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "pid": "damien",
+     "v": "P"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "down",
+     "pid": "damien",
+     "v": "3"
+    },
+    "One fewer stroke for Donnacha",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "up",
+     "pid": "damien",
+     "v": "3"
+    },
+    "One more stroke for Donnacha",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "open-check",
+     "seg": "front"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "save"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Go to a hole. Now on hole 15",
+   "Hole 15 of 18",
+   "0 shots",
+   "no shots",
+   "Strokes for Aidan",
+   "One fewer stroke for Aidan",
+   "One more stroke for Aidan",
+   "1 shot",
+   "1 shot",
+   "Strokes for Bartley",
+   "One fewer stroke for Bartley",
+   "One more stroke for Bartley",
+   "1 shot",
+   "1 shot",
+   "Strokes for Cathal",
+   "One fewer stroke for Cathal",
+   "One more stroke for Cathal",
+   "1 shot",
+   "1 shot",
+   "Strokes for Donnacha",
+   "One fewer stroke for Donnacha",
+   "One more stroke for Donnacha"
+  ],
+  "text": "HOLE 15 Par 3 Index 14 · 148 yds Aidan Pick up Par 3 − + Bartley Pick up Par 3 − + Cathal Pick up Par 3 − + Donnacha Pick up Par 3 − + Scorecard Front nine card Add photo 4 scores to go"
+ },
+ "live-open-390-135": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "bw"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g1"
+    },
+    null,
+    "true",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g2"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g3"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g1-front",
+     "open": "0"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g1-back",
+     "open": "1"
+    },
+    null,
+    null,
+    "true",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Aidan",
+   "Bartley",
+   "Cathal",
+   "Donnacha",
+   "Won",
+   "Aidan & Bartley Won 2 up",
+   "Aidan & Bartley 1 up, 4 to play",
+   "Aidan & Bartley 3 up, 4 to play"
+  ],
+  "text": "LIVE · THRU 14 Leaderboard Demo round · Stableford Scores Buggy Wars Contests Stats Group 1 Group 2 Group 3 AF BF v CF DF Front nine Won 2 up Back nine 1 up, 4 to play 10 3 1 11 3 1 12 3 0 13 1 2 14 1 2 15 16 17 18 Holes 3 2 Overall 3 up, 4 to play"
+ },
+ "live-decided-390-135": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "bw"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g1"
+    },
+    null,
+    "true",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g2"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g3"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g1-front",
+     "open": "1"
+    },
+    null,
+    null,
+    "true",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g1-back",
+     "open": "0"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Aidan",
+   "Bartley",
+   "Cathal",
+   "Donnacha",
+   "Won",
+   "Aidan & Bartley Won 2 up",
+   "Aidan & Bartley 1 up, 4 to play",
+   "Aidan & Bartley 3 up, 4 to play"
+  ],
+  "text": "LIVE · THRU 14 Leaderboard Demo round · Stableford Scores Buggy Wars Contests Stats Group 1 Group 2 Group 3 AF BF v CF DF Front nine Won 2 up 1 1 2 2 2 2 3 4 1 4 3 2 5 3 1 6 2 3 7 1 2 8 2 1 9 3 2 Holes 5 3 Back nine 1 up, 4 to play Overall 3 up, 4 to play"
+ },
+ "live-halved-390-135": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "bw"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g1"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g2"
+    },
+    null,
+    "true",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g3"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g2-front",
+     "open": "0"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-demo-cabopino-g2-back",
+     "open": "1"
+    },
+    null,
+    null,
+    "true",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Eoghan",
+   "Fiachra",
+   "Gearóid",
+   "Hugh",
+   "Halved",
+   "Eoghan & Fiachra 1 up, 4 to play",
+   "Eoghan & Fiachra 1 up, 4 to play"
+  ],
+  "text": "LIVE · THRU 14 Leaderboard Demo round · Stableford Scores Buggy Wars Contests Stats Group 1 Group 2 Group 3 EF FF v GF HF Front nine Halved Back nine 1 up, 4 to play 10 2 1 11 3 3 12 0 5 13 3 3 14 3 2 15 16 17 18 Holes 2 1 Overall 1 up, 4 to play"
+ },
+ "final-decided-390-135": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "bw"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g1"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g2"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "mgroup",
+     "gid": "g3"
+    },
+    null,
+    "true",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-fx-r2-g3-front",
+     "open": "1"
+    },
+    null,
+    null,
+    "true",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "bwseg",
+     "key": "bw-fx-r2-g3-back",
+     "open": "0"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Ivor",
+   "Jarlath",
+   "Kevin",
+   "Lorcan",
+   "Won",
+   "Kevin & Lorcan Won 3&2",
+   "Won",
+   "Ivor & Jarlath Won 4&2",
+   "Won",
+   "Kevin & Lorcan Won 1 up"
+  ],
+  "text": "Leaderboard Cabopino, the long-named second day of the trip · Stableford Scores Buggy Wars Contests Stats Group 1 Group 2 Group 3 IF JF v KF LF Front nine Won 3&2 1 2 2 2 1 2 3 2 3 4 1 2 5 2 2 6 3 2 7 2 3 8 2 3 9 1 3 Holes 1 6 Back nine Won 4&2 Overall Won 1 up"
+ },
+ "results-390-135": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "back"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-john-k"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-mike-p"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-sean"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-john-w"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-brian"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-colin"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-damien"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-fx-r2-mike-f"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "all-fx-r2"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "kb-fx-r2"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "grp-fx-r2"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "results",
+     "rid": "fx-r2"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Won"
+  ],
+  "text": "NCGS WINNER Final Bartley Cabopino, the long-named second day of the trip · Fri 15 May 37 Stableford 1 BF Bartley 37 2 EF Eoghan 35 3 FF Fiachra 34 4 AF Aidan 32 5 KF Kevin 32 6 CF Cathal 31 7 DF Donnacha 31 8 IF Ivor 31 Show all 12 KBs and contests KBs Cathal & Eoghan · 66 Nearest the pin 7 Not awarded Longest drive 12 Not awarded Buggy Wars Aidan & Bartley v Cathal & Donnacha Front nine Buggy 1 won 2 & 1 Back nine Halved Overall Buggy 1 won 2 & 1 Eoghan & Fiachra v Gearóid & Hugh Front nine Halved Back nine Buggy 1 won 3 & 2 Overall Buggy 1 won 3 & 2 Ivor & Jarlath v Kevin & Lorcan Front nine Buggy 2 won 3 & 2 Back nine Buggy 1 won 4 & 2 Overall Buggy 2 won 1 up Groups Share results"
+ },
+ "nobug-results-390-135": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "lb"
+    },
+    null,
+    null,
+    null,
+    "true",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "ct"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "respill",
+     "p": "st"
+    },
+    null,
+    null,
+    null,
+    "false",
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-kieran"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-mike-f"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-derek"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-john-k"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-peadar"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-sean"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-dave"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-damien"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-mike-p"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-brian"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-john-w"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-colin"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "results",
+     "rid": "demo-cabopino"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [],
+  "text": "LIVE · THRU 14 Leaderboard Demo round · Stableford Scores Contests Stats Demo round Demo 1 LF Lorcan Leads by 2 · thru 14 37 2 IF Ivor thru 14 35 3 JF Jarlath thru 14 33 4 BF Bartley thru 14 27 5 GF Gearóid thru 14 24 T6 FF Fiachra thru 14 22 T6 HF Hugh thru 14 22 T8 DF Donnacha thru 14 19 T8 EF Eoghan thru 14 19 10 KF Kevin thru 14 16 11 AF Aidan thru 14 14 12 CF Cathal thru 14 9 KBs 1 Bartley & Lorcan 64 2 Gearóid & Ivor 59 3 Hugh & Jarlath 55 4 Donnacha & Fiachra 41 5 Aidan & Kevin 30 6 Cathal & Eoghan 28 Share results"
+ },
+ "nobug-hole-390-135": {
+  "controls": [
+   [
+    "BUTTON",
+    {
+     "act": "holes"
+    },
+    "Go to a hole. Now on hole 15",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-john-w"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "pid": "john-w",
+     "v": "P"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "down",
+     "pid": "john-w",
+     "v": "3"
+    },
+    "One fewer stroke for Aidan",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "up",
+     "pid": "john-w",
+     "v": "3"
+    },
+    "One more stroke for Aidan",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-john-k"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "pid": "john-k",
+     "v": "P"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "down",
+     "pid": "john-k",
+     "v": "3"
+    },
+    "One fewer stroke for Bartley",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "up",
+     "pid": "john-k",
+     "v": "3"
+    },
+    "One more stroke for Bartley",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-colin"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "pid": "colin",
+     "v": "P"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "down",
+     "pid": "colin",
+     "v": "3"
+    },
+    "One fewer stroke for Cathal",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "up",
+     "pid": "colin",
+     "v": "3"
+    },
+    "One more stroke for Cathal",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "toggle",
+     "key": "bd-demo-cabopino-damien"
+    },
+    null,
+    null,
+    "false",
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "pid": "damien",
+     "v": "P"
+    },
+    null,
+    "false",
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "down",
+     "pid": "damien",
+     "v": "3"
+    },
+    "One fewer stroke for Donnacha",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "set",
+     "dir": "up",
+     "pid": "damien",
+     "v": "3"
+    },
+    "One more stroke for Donnacha",
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "open-check",
+     "seg": "front"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "save"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "home"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "hole"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "board"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ],
+   [
+    "BUTTON",
+    {
+     "act": "tab",
+     "tab": "rules"
+    },
+    null,
+    null,
+    null,
+    null,
+    null
+   ]
+  ],
+  "labels": [
+   "Go to a hole. Now on hole 15",
+   "Hole 15 of 18",
+   "0 shots",
+   "no shots",
+   "Strokes for Aidan",
+   "One fewer stroke for Aidan",
+   "One more stroke for Aidan",
+   "1 shot",
+   "1 shot",
+   "Strokes for Bartley",
+   "One fewer stroke for Bartley",
+   "One more stroke for Bartley",
+   "1 shot",
+   "1 shot",
+   "Strokes for Cathal",
+   "One fewer stroke for Cathal",
+   "One more stroke for Cathal",
+   "1 shot",
+   "1 shot",
+   "Strokes for Donnacha",
+   "One fewer stroke for Donnacha",
+   "One more stroke for Donnacha"
+  ],
+  "text": "HOLE 15 Par 3 Index 14 · 148 yds Aidan Pick up Par 3 − + Bartley Pick up Par 3 − + Cathal Pick up Par 3 − + Donnacha Pick up Par 3 − + Scorecard Front nine card Add photo 4 scores to go"
+ }
+}
