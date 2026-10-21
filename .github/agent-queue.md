@@ -134,7 +134,7 @@ score logic or control attributes.
 Acceptance: linked before/after pairs, exact source SHAs and checks; intentional differences explained; no
 clipping or name/control overlap. Preserve behaviour and data invariants.
 
-## [ ] three-digit-fix
+## [x] three-digit-fix
 Found by `release-hole-evidence` (run 39553987116, `docs/RELEASE-HOLE.md`, `docs/release-hole-shots/after-*.txt`):
 at 390px with 135% text, a three-digit score ("100 (0 pts)") runs 6-9px under the - and + buttons in both looks.
 At 360px/135% it clears by only 1px. `CLAUDE.md` requires numbers to leave room for three digits with nothing cut
