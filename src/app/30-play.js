@@ -321,6 +321,22 @@ function undoSave() {
   replaceTop('entry', { rid: a.rid });
 }
 
+/* One Buggy Wars result pill: the leader's colour, golf wording, "3 up, 4 to play" while it is being played.
+   Shared by the Buggy Wars results and the screen after saving a hole, so the two look the same. */
+function bwPill(gc, m) {
+  const st = m.status;
+  let txt;
+  if (st.state === 'pending') txt = 'Not started';
+  else if (st.state === 'halved') txt = 'Halved';
+  else if (st.state === 'won') txt = m.closed && m.closed.toPlay > 0 ? `Won ${m.closed.up}&${m.closed.toPlay}` : `Won ${Math.abs(m.lead)} up`;
+  else txt = `${m.lead === 0 ? 'AS' : Math.abs(m.lead) + ' up'}, ${st.toPlay} to play`;
+  const cls = st.leader === 'A' ? 'a' : st.leader === 'B' ? 'b' : 'n';
+  const who = st.leader ? `${gc.labels[st.leader === 'A' ? 0 : 1].long} ` : '';
+  return `<span class="bw-res ${cls}" aria-label="${esc(who + txt)}">${txt}</span>`;
+}
+/* The two pairs as initials badges, blue v red. */
+const bwBadges = (t, i) => `<span class="bw-pair">${t.map(pid => `<span class="bw-bd ${i ? 'b' : 'a'}" aria-label="${esc(D.nameOf(pid))}">${esc(initialsOf(D.member(pid)) || D.nameOf(pid).slice(0, 2))}</span>`).join('')}</span>`;
+
 VIEWS.after = () => {
   const a = UI.after;
   if (!a) return VIEWS[playHomeView(playRid())]({ rid: playRid() });
@@ -334,21 +350,20 @@ VIEWS.after = () => {
   const buggies = gc.teams.length === 2;
   let head, sub = '';
   if (!buggies) head = `<span class="res-t">Hole ${a.n} saved</span>`;
-  else if (hr.result === 'H') { head = `<i class="afdot n"></i><span class="res-t">Halved</span>`; sub = `Both buggies scored ${plural(hr.best[0], 'point')}`; }
+  else if (hr.result === 'H') { head = `<span class="bw-res n">Halved</span>`; sub = `Both buggies scored ${plural(hr.best[0], 'point')}`; }
   else {
     const w = hr.result === 'A' ? 0 : 1;
-    head = `<i class="afdot ${w ? 'b' : 'a'}"></i><span class="res-t">Buggy ${w + 1} won the hole</span>`;
+    head = `<span class="bw-res ${w ? 'b' : 'a'}" aria-label="${esc(L[w].long)} won the hole">Buggy ${w + 1} won</span>`;
     sub = `${who(hr.counting[w])}'s ${plural(hr.best[w], 'point')} beat ${hr.best[1 - w]}`;
   }
-  // One line per match. A note only when something changed hands: someone takes the lead, or it comes back to all square.
+  // One line per match, in the Buggy Wars style: the label on the left, the same result pill as the results page on the
+  // right. A note under the label only when something changed hands: someone takes the lead, or it comes back to all square.
   const rows = buggies ? [a.n <= 9 ? 'front' : 'back', 'overall'].map(s => {
     const m = gc.matches[s];
     const was = a.before[s];
     const turned = was.text !== 'Not started' && was.leader !== m.status.leader;
     const note = !turned ? '' : m.status.leader ? `Buggy ${m.status.leader === 'A' ? 1 : 2} ${was.leader ? 'take the lead' : 'go ahead'}` : 'Back to all square';
-    const st = m.status.leader ? `<i class="afdot ${m.status.leader === 'A' ? 'a' : 'b'}"></i>${esc(statusShort(m.status))}` : esc(m.status.text);
-    return `<div class="afrow"><span><b>${segName(s)}</b><small>${m.remaining ? `${m.remaining} to play` : 'Finished'}</small></span>
-      <span class="afst"><span class="b">${st}</span>${note ? `<small class="afnote">${esc(note)}</small>` : ''}</span></div>`;
+    return `<div class="bw-row"><span class="bw-l afl">${segName(s)}${note ? `<small class="afnote">${esc(note)}</small>` : ''}</span>${bwPill(gc, m)}<span></span></div>`;
   }).join('') : gc.teams.flat().map(pid => `<div class="afrow"><span><b>${esc(D.nameOf(pid))}</b></span><span class="afst"><span class="b num">${comp.players[pid].total}</span></span></div>`).join('');
   let next;
   const nine = a.n <= 9 ? 'front' : 'back';
@@ -361,7 +376,8 @@ VIEWS.after = () => {
   return {
     tabs: 'hole',
     html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
-      <div class="aftercard"><div class="afhead"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>${rows}</div>
+      ${buggies ? `<div class="bw-vs afvs">${bwBadges(gc.teams[0], 0)}<span class="sub">v</span>${bwBadges(gc.teams[1], 1)}</div>
+      <div class="card bw-card aftercard"><div class="bw-row afres"><span class="bw-l afl">Hole ${a.n}</span>${head}<span></span>${sub ? `<small class="afres-sub">${esc(sub)}</small>` : ''}</div>${rows}</div>` : `<div class="aftercard"><div class="afhead"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>${rows}</div>`}
       ${next}${saveWarning()}</div>`
   };
 };
@@ -674,20 +690,8 @@ function buggyView(rid) {
   const gc = comp.groups.find(g => g.id === gid);
   const canEdit = mine && mine.id === gid && r.status === 'live';
   const live = r.status === 'live';
-  /* The two pairs as initials badges, blue v red. */
-  const badges = (t, i) => `<span class="bw-pair">${t.map(pid => `<span class="bw-bd ${i ? 'b' : 'a'}" aria-label="${esc(D.nameOf(pid))}">${esc(initialsOf(D.member(pid)) || D.nameOf(pid).slice(0, 2))}</span>`).join('')}</span>`;
-  /* One result pill per match: the leader's colour, golf wording, "3 up, 4 to play" while it is being played. */
-  const pillOf = m => {
-    const st = m.status;
-    let txt;
-    if (st.state === 'pending') txt = 'Not started';
-    else if (st.state === 'halved') txt = 'Halved';
-    else if (st.state === 'won') txt = m.closed && m.closed.toPlay > 0 ? `Won ${m.closed.up}&${m.closed.toPlay}` : `Won ${Math.abs(m.lead)} up`;
-    else txt = `${m.lead === 0 ? 'AS' : Math.abs(m.lead) + ' up'}, ${st.toPlay} to play`;
-    const cls = st.leader === 'A' ? 'a' : st.leader === 'B' ? 'b' : 'n';
-    const who = st.leader ? `${gc.labels[st.leader === 'A' ? 0 : 1].long} ` : '';
-    return `<span class="bw-res ${cls}" aria-label="${esc(who + txt)}">${txt}</span>`;
-  };
+  const badges = bwBadges;
+  const pillOf = m => bwPill(gc, m);
   /* A nine's holes: each hole is one column, the winner's best points filled in their colour, then holes won. */
   const board = seg => {
     const order = gc.matches[seg].order;
