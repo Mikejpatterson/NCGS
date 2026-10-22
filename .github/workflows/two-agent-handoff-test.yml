@@ -1,0 +1,53 @@
+name: NCGS Two-Agent Handoff Test
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/two-agent-handoff-test.yml'
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+  actions: read
+  id-token: write
+
+concurrency:
+  group: ncgs-two-agent-handoff
+  cancel-in-progress: false
+
+jobs:
+  openai-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: design/crest-editorial-prototype
+          persist-credentials: false
+      - name: Publish independent OpenAI review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          OPENAI_REVIEW_MODEL: gpt-5-mini
+        run: python3 tools/openai_design_review.py
+
+  claude-response:
+    needs: openai-review
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Check Anthropic model API
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python3 tools/anthropic-api-smoke.py
+      - name: Claude responds to latest OpenAI review
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/claude_api_review.py

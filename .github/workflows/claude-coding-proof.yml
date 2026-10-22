@@ -1,0 +1,59 @@
+name: NCGS Claude Coding Proof
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/claude-coding-proof.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ncgs-claude-coding-proof
+  cancel-in-progress: false
+
+jobs:
+  document-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout isolated design branch
+        uses: actions/checkout@v4
+        with:
+          ref: design/crest-editorial-prototype
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Claude reads repository and creates harmless evidence file
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CI: "true"
+        run: |
+          claude -p 'Read CLAUDE.md and docs/AI-COLLABORATION.md. This is only an automation integration proof. Create docs/AGENT-AUTOMATION-CHECK.md summarizing the verified repository design-branch safety rules, what files you read and which tests are required. Do not edit ANY other file. Do not run tests or Git commands: the workflow itself will test and commit after checking your output. Do not touch production or application files. Complete this single small documentation task and stop.' --permission-mode acceptEdits --allowedTools 'Read,Write,Edit' --max-turns 12
+
+      - name: Verify output and protect other files
+        run: |
+          test -s docs/AGENT-AUTOMATION-CHECK.md
+          # Fail if any tracked file was modified.
+          test -z "$(git diff --name-only)"
+          # Fail if any other untracked file was added.
+          unexpected="$(git ls-files --others --exclude-standard | grep -v '^docs/AGENT-AUTOMATION-CHECK.md$' || true)"
+          test -z "$unexpected"
+          echo "Claude produced only the required documentation file."
+
+      - name: Run required regression tests
+        run: node --test test/engine.test.js test/server.test.js
+
+      - name: Commit evidence only to design branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs/AGENT-AUTOMATION-CHECK.md
+          git commit -m 'Document successful bounded Claude coding automation proof'
+          git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push origin HEAD:design/crest-editorial-prototype
+          echo "Committed documentation-only task to design branch."
