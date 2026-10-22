@@ -106,7 +106,7 @@ button.row:active, button.mrow:active, button.lrow:active { background: var(--fi
 .pill.b { background: var(--team-b); color: #fff; }
 .pill.n { background: var(--fill); color: var(--text); }
 .pill.w { background: var(--amber-soft); color: var(--amber); }
-.pill.g { background: var(--green-soft); color: #155C2D; }
+.pill.g { background: var(--green-soft); color: var(--pine); }
 .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
 .dot.a { background: var(--team-a); }
 .dot.b { background: var(--team-b); }
@@ -231,7 +231,7 @@ label.btn { cursor: pointer; flex-direction: row; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .choice { min-height: 48px; border-radius: 12px; background: var(--card); border: 1.5px solid var(--line); font-size: var(--t-body); text-align: center; font-variant-numeric: tabular-nums; }
-.choice.on { border-color: var(--green); background: var(--green-soft); color: #155C2D; font-weight: 600; }
+.choice.on { border-color: var(--green); background: var(--green-soft); color: var(--pine); font-weight: 600; }
 .full { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, .92); display: flex; align-items: center; justify-content: center; overflow: auto; }
 .full img { max-width: 100%; max-height: 100%; }
 .full-close { position: absolute; top: calc(8px + env(safe-area-inset-top, 0px)); right: 16px; color: #fff; }
@@ -361,7 +361,7 @@ button.btn:has(> svg) { flex-direction: row; }
 .row, .lrow, .hrow, .grow, .mrow { min-height: 52px; }
 .row.tall { min-height: 64px; }
 .pr { padding-block: 8px 10px; }
-.btn { background: var(--green); min-height: 56px; border-radius: 16px; box-shadow: 0 6px 16px rgba(22, 122, 65, .28); font-size: var(--t-body); }
+.btn { background: var(--green); min-height: 56px; border-radius: 16px; box-shadow: 0 6px 16px rgba(11, 61, 46, .22); font-size: var(--t-body); }
 .btn.quiet { background: #fff; color: var(--pine); box-shadow: var(--lift); }
 .btn small { color: #D6EEDD; }
 .savebar { background: linear-gradient(to top, var(--bg) 70%, rgba(229,236,230,0)); box-shadow: none; padding-top: 12px; }
@@ -386,7 +386,7 @@ button.btn:has(> svg) { flex-direction: row; }
 .tile { box-shadow: var(--lift); }
 .title { color: var(--pine); }
 .hero .title { color: #fff; }
-.field:focus { outline: 3px solid rgba(22,122,65,.35); border-color: var(--green); }
+.field:focus { outline: 3px solid rgba(11,61,46,.3); border-color: var(--green); }
 
 .hero.c { padding-block: calc(env(safe-area-inset-top, 0px) + 4px) 14px; border-radius: 0 0 22px 22px; }
 .hrow2 { display: flex; align-items: center; gap: 10px; min-height: 52px; }
@@ -489,7 +489,7 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 .pp.p0 { background: #FBE3E3; color: #A31F1F; }
 .pp.p1 { background: var(--fill); color: var(--sub); }
 .pp.p2 { background: var(--fill); color: var(--pine); }
-.pp.p3 { background: var(--green-soft); color: #0F6A38; }
+.pp.p3 { background: var(--green-soft); color: var(--pine); }
 .pp.p4 { background: var(--green); color: #fff; }
 .mk { width: 30px; height: 30px; font-weight: 600; }
 .mk.birdie { background: var(--green); border: 0; color: #fff; border-radius: 50%; }
@@ -791,7 +791,7 @@ html, body { background: var(--bg); }
 .hero.s .link, .hero.s .back-icon, .hero.s .link.inline { color: var(--pine); }
 .hero.s .sub, .hero.s .cap, .hero.s .hsub { color: var(--sub); }
 .hero.s .pill.w { background: var(--action); color: var(--on-action); }
-.hero.s .pill.g { background: var(--green-soft); color: #155C2D; }
+.hero.s .pill.g { background: var(--green-soft); color: var(--pine); }
 .hero.s + .sec, .hero.s + .btn { margin-top: 16px; }
 
 /* Cards that stay pine: the hole, the front-page round */
@@ -1760,3 +1760,68 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .hs-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .hs-t { font-weight: 600; font-size: 1.02rem; color: var(--text); }
 .hs-s { font-size: .86rem; color: var(--sub); line-height: 1.3; overflow-wrap: anywhere; }
+
+/* ----- Design review, 22 October: one green ----- */
+/* The old bright green (#167A41) still coloured buttons, links, bars, chips and some leader numbers, so the app looked
+   as if it had two brands. Pine is now the only green; its soft tint replaces the mint. The grey for secondary text is
+   a touch darker so it reads better outdoors. */
+:root { --green: var(--pine); --green-soft: #E3EFE6; --sub: #4A564F; }
+.lrow:first-child .b.r, .lrow.goy:first-child .b.r, .srow.top .sv { color: var(--text); }   /* the leader is shown by the row tint and badge, not a coloured number */
+.chart .cbar { fill: var(--pine); fill-opacity: .55; }
+.chart .cbar.top { fill-opacity: 1; }
+.link, .back-icon { font-weight: 500; }
+.bar i { background: var(--pine); }
+.stile.tb { --tone: var(--team-a); --soft: var(--team-a-soft); }
+/* Neutral status pills ("Demo", "In progress") on ivory: warm grey, not the old yellow. Warnings (.banner) keep amber. */
+.pill.w { background: #EDE9DF; color: var(--text); }
+@keyframes flash { 50% { background: var(--action-tint); } }
+
+/* ----- Design review, 22 October: hole rows ----- */
+/* Every row has the same shape: the name (with its shot dots) on top, Pick up on its own line below, and - score + on
+   the right spanning both lines. Pick up no longer sits right beside the minus (mis-taps), long names like
+   "Donnacha" don't push the controls onto a second line, and all four rows line up. Pick up is an outlined pill, so
+   it reads as a button. Shot dots are pine, not black. The 3² points superscript stays (owner). */
+@container (min-width: 19.5em) {
+  .entry .bugs .pr.ptile { grid-template-columns: minmax(0, 1fr) 48px minmax(64px, max-content) 48px; grid-template-areas: "nm dn sc up" "pu dn sc up"; row-gap: 2px; }
+  .entry .bugs .st { width: 48px; height: 48px; }
+  .entry .bugs .pr-top .pu, .entry .bugs .pr-top .pu.on { justify-self: start; }
+}
+.entry .bugs .pr-top .pu { padding: 0 14px; height: 36px; min-height: 36px; margin: 4px 0; border: 1.5px solid #D9D4C8; border-radius: 18px; color: var(--sub); font-weight: 600; font-size: .85rem; }
+.entry .bugs .pr-top .pu.on { border-color: var(--pine); background: var(--pine); color: #fff; padding: 0 14px; }
+.entry .dots i, .entry .dots.s i { background: var(--pine); }
+.entry .dots.s i { width: 8px; height: 8px; }
+
+/* ----- Design review, 22 October: one rule for "leader" and "you" ----- */
+/* Leader: warm tint, and the badge pine with champagne initials. You: soft pine tint with a pine bar on the left, and
+   the badge pine with white initials. If you lead, both apply. KBs "lowest" uses the leader tint, not the "you" style. */
+.lrow:has(.av.is-me) { background: var(--action-tint); box-shadow: inset 3px 0 0 var(--pine); }
+.lrow:has(.av.is-lead) { background: var(--lead-tint); }
+.lrow.low { background: var(--lead-tint); box-shadow: none; }
+.rp-groups .rg.me, .rp-players .pl-row.me { box-shadow: inset 3px 0 0 var(--pine); }
+/* Stats: tint the top row only when there is a single leader, so ties don't turn whole cards beige. */
+.srow.top:has(+ .srow.top), .srow.top + .srow.top { background: none; }
+
+/* ----- Design review: section labels as a proper level ----- */
+.sec-label > .sub { font-size: 1.2rem; font-weight: 600; color: var(--text); letter-spacing: -.01em; }
+.entry .sec-label > .sub { font-size: 1.1rem; }
+
+/* ----- Design review: the hole header keeps its shape after saving ----- */
+/* Par, index and yards stay on the right as before. "Saved" and Undo sit on their own line above the progress bar.
+   Undo is a ghost pill, not underlined link text. */
+.after .afsaved { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 0 2px; }
+.after .afsaved .savedchip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border-radius: 16px; background: var(--on-pine-label); color: var(--pine); font-weight: 700; font-size: .95rem; }
+.after .afsaved .undochip { min-height: 44px; padding: 0 18px; border: 1.5px solid rgba(255, 255, 255, .45); border-radius: 22px; background: none; color: #fff; font: inherit; font-weight: 600; font-size: .95rem; text-decoration: none; }
+
+/* ----- Design review: small leftovers ----- */
+.leadcard::after { display: none; }   /* the one ornament in the app: a faint disc behind the leader's points */
+/* Home card during a live round: "Continue · Hole 7" is the main button; Players · Groups · KBs a quieter link under it. */
+.now-acts .go-link { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 44px; margin-top: 6px; background: none; border: 0; color: rgba(255, 255, 255, .85); font: inherit; font-weight: 600; font-size: var(--t-sub); }
+.now-acts .go-link:active { color: #fff; }
+.after .entr { flex-direction: column; align-items: flex-end; gap: 0; }   /* Par over Index, as on the hole screen */
+/* Pick up keeps a 44px tap area; the visible outline is a 36px pill drawn behind the word. */
+.entry .bugs .pr-top .pu, .entry .bugs .pr-top .pu.on { position: relative; z-index: 0; height: 44px; min-height: 44px; margin: 0; border: 0; background: none; }
+.entry .bugs .pr-top .pu::before { content: ""; position: absolute; left: 0; right: 0; top: 4px; bottom: 4px; z-index: -1; border: 1.5px solid #D9D4C8; border-radius: 18px; }
+.entry .bugs .pr-top .pu.on { color: #fff; }
+.entry .bugs .pr-top .pu.on::before { border-color: var(--pine); background: var(--pine); }
+/* A name too long for its line gets the whole top line; Pick up and the controls share the line below (4 columns now). */
+@container (min-width: 19.5em) { .entry .bugs .pr.ptile.long { grid-template-areas: "nm nm nm nm" "pu dn sc up"; } }

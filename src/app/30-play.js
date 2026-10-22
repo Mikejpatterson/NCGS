@@ -365,6 +365,7 @@ VIEWS.after = () => {
   const ask1 = askPending(a.rid, gc, a.gid);
   if (ask1) return VIEWS.ask(a.rid, gc, ask1);
   const hr = gc.holes[a.n];
+  const ah = holeOf(a.rid, a.n);   // par, index and yards stay in the header after saving, so it keeps its shape
   const L = gc.labels;
   const who = list => list.map(D.nameOf).join(' and ');
   const buggies = gc.teams.length === 2;
@@ -399,7 +400,7 @@ VIEWS.after = () => {
   } else next = `<button class="btn" data-act="to-finish">See the card</button>`;
   return {
     tabs: 'hole',
-    html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
+    html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><b>Par ${ah.par}</b><span>Index ${ah.si}${ah.yards ? ` · ${ah.yards} yds` : ''}</span></div></div><div class="afsaved"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
       ${buggies ? `<div class="sec-label afbw"><span class="sub">Buggy Wars</span></div><div class="bw-vs afvs">${bwBadges(gc.teams[0], 0)}<span class="sub">v</span>${bwBadges(gc.teams[1], 1)}</div>
       <div class="card bw-card aftercard"><div class="bw-row afres"><span class="bw-l afl">Hole ${a.n}</span>${head}<span></span>${sub ? `<small class="afres-sub">${esc(sub)}</small>` : ''}</div>${rows}</div>` : `<div class="aftercard"><div class="afhead"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>${rows}</div>`}
       ${next}${saveWarning()}</div>`
@@ -832,7 +833,7 @@ VIEWS.board = () => {
 VIEWS.trip = p => {
   const list = tripRounds(D.round(p.rid));
   const r0 = D.round(p.rid);
-  let html = `${navBack('Back')}<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">${esc(r0.trip || 'Trip standings')}</h1></div></header>`;
+  let html = `${navBack(backLabel())}<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">${esc(r0.trip || 'Trip standings')}</h1></div></header>`;
   html += tripTable(list);
   html += sec(label('Each day'), cardOf(list.map(x => `<button class="row" data-act="leaderboard" data-rid="${x.id}"><span>Day ${x.trip_day || x.seq}</span><span class="right">${x.status === 'upcoming' ? '<span class="sub">Not played</span>' : ''}${chev}</span></button>`).join('')));
   return { html };
@@ -864,7 +865,7 @@ VIEWS.results = p => {
   const r = D.round(p.rid);
   const res = resultsOf(p.rid);
   const lb = res.rows;
-  if (!lb.length) return { html: `${navBack('Back')}<p class="sub">No results yet</p>` };
+  if (!lb.length) return { html: `${navBack(backLabel())}<p class="sub">No results yet</p>` };
   const top = lb[0];
   const leaders = lb.filter(x => x.pos === 1);
   const final = r.status === 'final';
@@ -891,7 +892,7 @@ VIEWS.results = p => {
     ${isDemo(r) ? '<div class="blk cap">Demo scores</div>' : ''}
   </div>`;
   return {
-    html: `${navBack('Back')}<div style="margin-top:8px">${card}</div><button class="btn" data-act="share-card" data-rid="${r.id}">${sized(ICON.share, 20)}<span>Share</span></button>`
+    html: `${navBack(backLabel())}<div style="margin-top:8px">${card}</div><button class="btn" data-act="share-card" data-rid="${r.id}">${sized(ICON.share, 20)}<span>Share</span></button>`
   };
 };
 
