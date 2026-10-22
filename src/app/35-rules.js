@@ -14,21 +14,70 @@ function askText(t) {
   return String(t).trim().split(/\n{2,}/).map(par => `<div class="ap">${par.split('\n').map(l => /^\s*[-•*]\s+/.test(l) ? `<div class="ab">${inline(l.replace(/^\s*[-•*]\s+/, ''))}</div>` : `<div>${inline(l)}</div>`).join('')}</div>`).join('');
 }
 
+/* ----- Rule chips: every rule a ruling cites can be tapped to see the rule itself ----- */
+// The 25 Rules of Golf by name (titles only; the wording itself is read on the R&A site or quoted from it).
+const RULE_TITLES = ['', 'The Game, Player Conduct and the Rules', 'The Course', 'The Competition', "The Player's Equipment",
+  'Playing the Round', 'Playing a Hole', 'Ball Search: Finding and Identifying Ball', 'Course Played as It Is Found',
+  'Ball Played as It Lies; Ball at Rest Lifted or Moved', 'Preparing for and Making a Stroke; Advice and Help; Caddies',
+  'Ball in Motion Accidentally Hits Person, Animal or Object; Deliberate Actions to Affect Ball in Motion', 'Bunkers',
+  'Putting Greens', 'Procedures for Ball: Marking, Lifting and Cleaning; Replacing on Spot; Dropping in Relief Area; Playing from Wrong Place',
+  'Relief from Loose Impediments and Movable Obstructions', 'Relief from Abnormal Course Conditions, Dangerous Animal Condition, Embedded Ball',
+  'Penalty Areas', 'Stroke-and-Distance Relief, Ball Lost or Out of Bounds, Provisional Ball', 'Unplayable Ball',
+  'Resolving Rules Issues During Round; Rulings by Referee and Committee', 'Other Forms of Individual Stroke Play and Match Play',
+  'Foursomes', 'Four-Ball', 'Team Competitions', 'Modifications for Players with Disabilities'];
+// Shorter names for the chips; the pop-up shows the full name.
+const RULE_SHORT = { 9: 'Ball Played as It Lies', 10: 'Making a Stroke; Advice; Caddies', 11: 'Ball in Motion Hits Person or Object',
+  14: 'Procedures for Ball', 15: 'Loose Impediments, Movable Obstructions', 16: 'Abnormal Course Conditions, Embedded Ball',
+  18: 'Stroke and Distance, Lost, Out of Bounds', 20: 'Resolving Rules Issues', 21: 'Other Forms of Play' };
+const ruleShort = r => RULE_SHORT[ruleMain(r)] || RULE_TITLES[ruleMain(r)];
+const RULE_RE = /Rules?\s+(\d{1,2}(?:\.\d+)?[a-z]?(?:\(\d+\))?)/g;
+// "Rule 19", "Rule 14.7a" and so on, in the order they first appear, real rule numbers only.
+function ruleRefs(texts) {
+  const out = [];
+  texts.filter(Boolean).forEach(t => { for (const m of String(t).matchAll(RULE_RE)) { const n = parseInt(m[1], 10); if (n >= 1 && n <= 25 && !out.includes(m[1])) out.push(m[1]); } });
+  return out;
+}
+const ruleMain = r => parseInt(r, 10);
+const ruleUrl = r => `https://www.randa.org/en/rog/the-rules-of-golf/rule-${ruleMain(r)}`;
+function ruleChips(refs, i) {
+  if (!refs.length) return '';
+  return `<div class="rrefs">${refs.map(r => `<button class="rref" data-act="rule-open" data-rule="${esc(r)}" data-i="${i}" aria-label="Show Rule ${esc(r)}, ${esc(RULE_TITLES[ruleMain(r)])}"><span class="rref-n">Rule ${esc(r)}</span><span class="rref-t">${esc(ruleShort(r))}</span></button>`).join('')}</div>`;
+}
+// The pop-up for one rule: its name, the official wording when this answer copied it from the R&A site, and the official page.
+function ruleSheetHtml(r, i) {
+  const m = UI.chat[i], c = m && m.card;
+  const main = ruleMain(r);
+  const quote = c && c.quote && c.rule && ruleMain(String(c.rule).replace(/^Rules?\s+/, '')) === main ? c.quote : '';
+  return `<div class="scrim rule-scrim" data-act="rule-close"><div class="sheet rulesheet" role="dialog" aria-label="Rule ${esc(r)}">
+    <div class="nav"><span class="b">Rule ${esc(r)}</span><button class="link" data-act="rule-close">Done</button></div>
+    <h2 class="rs-title">${esc(RULE_TITLES[main])}</h2>
+    ${quote ? `<div class="rs-lab">Official wording${c.rule && c.rule !== 'Rule ' + r ? ` · ${esc(c.rule)}` : ''}</div><blockquote class="rs-quote">${esc(quote)}</blockquote>`
+      : `<p class="rs-none">The full official wording of Rule ${main} is on the R&amp;A site.</p>`}
+    <a class="btn rs-go" href="${ruleUrl(r)}" target="_blank" rel="noopener">Read Rule ${main} on the R&amp;A site</a>
+    <p class="cap rs-cap">The official Rules of Golf, from The R&amp;A. It is the official rule that counts.</p></div></div>`;
+}
+function ruleOpen(r, i) {
+  ruleClose();
+  document.body.insertAdjacentHTML('beforeend', `<div id="rulesheet">${ruleSheetHtml(r, i)}</div>`);
+  const d = document.querySelector('#rulesheet .link'); if (d) d.focus({ preventScroll: true });
+}
+function ruleClose() { const el = document.getElementById('rulesheet'); if (el) el.remove(); }
+
 // A ruling: the first sentence is the verdict, shown big enough to read out; the rule numbers become chips.
-function askRuling(t) {
+function askRuling(t, i) {
   const text = String(t).trim();
   const m = /^([\s\S]*?[.!?])(?:\s+|$)([\s\S]*)$/.exec(text);
   let verdict = m ? m[1] : text, rest = m ? m[2] : '';
   if (verdict.length > 200) { verdict = text.split('\n')[0]; rest = text.slice(verdict.length); }
-  const rules = [...new Set((text.match(/Rules?\s+\d+(?:\.\d+)?(?:[a-z])?(?:\(\d+\))?/g) || []).map(r => r.replace(/^Rules\b/, 'Rule')))];
   const inline = x => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
-  return `<div class="verdict">${inline(verdict.replace(/^\*\*|\*\*$/g, ''))}</div>${rest.trim() ? `<div class="rest">${askText(rest)}</div>` : ''}${rules.length ? `<div class="rules">${rules.map(r => `<span class="rulechip">${esc(r)}</span>`).join('')}</div>` : ''}`;
+  return `<div class="verdict">${inline(verdict.replace(/^\*\*|\*\*$/g, ''))}</div>${rest.trim() ? `<div class="rest">${askText(rest)}</div>` : ''}${ruleChips(ruleRefs([text]), i)}`;
 }
 
 // A card from the checker: either one quick question with big tap answers, or the ruling itself.
 const boldBits = x => esc(x).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
 function askCardHtml(c, i, live, sources) {
-  const hasInfo = c.type === 'ruling' && !!(c.quote || (sources || []).some(x => x && /^https:\/\//.test(x.url))), open = !!(UI.chatInfo && UI.chatInfo[i]);
+  const refs = c.type === 'ruling' ? ruleRefs([c.rule, c.verdict, c.intro, ...(c.steps || []), c.note]) : [];
+  const hasInfo = c.type === 'ruling' && !refs.length && !!(c.quote || (sources || []).some(x => x && /^https:\/\//.test(x.url))), open = !!(UI.chatInfo && UI.chatInfo[i]);
   if (c.type === 'ask') {
     return `<div class="qcard"><div class="qtext">${esc(c.question)}</div><div class="qopts">${c.options.map(o =>
       `<button class="qopt${o.tag ? ' t-' + o.tag : ''}${/^not sure/i.test(o.label) ? ' dim' : ''}" data-act="ask-idea" data-q="${esc(o.label)}"${live ? '' : ' disabled'}>${o.tag ? `<span class="qtag">${o.tag === 'red' ? 'Red' : 'Yellow'}</span>` : ''}<span>${esc(o.label)}</span></button>`).join('')}</div></div>`;
@@ -37,6 +86,7 @@ function askCardHtml(c, i, live, sources) {
   return `<div class="rcard">${top ? `<div class="rtop">${esc(top)}</div>` : ''}<div class="rverdict">${boldBits(c.verdict)}</div>${c.intro ? `<div class="rintro">${boldBits(c.intro)}</div>` : ''}
     ${c.steps.length ? `<ol class="rsteps">${c.steps.map((x, n) => `<li><span class="rn">${n + 1}</span><span>${boldBits(x)}</span></li>`).join('')}</ol>` : ''}
     ${c.note ? `<div class="rnote">${boldBits(c.note)}</div>` : ''}
+    ${ruleChips(refs, i)}
     <div class="ract"><button class="rbtn" data-act="ask-read" data-i="${i}">${ICON.speak}<span>Read out</span></button><button class="rbtn" data-act="ask-more">Ask more</button>${hasInfo ? `<button class="rbtn rinfo" data-act="ask-info" data-i="${i}" aria-expanded="${open}" aria-label="The official rule wording">i</button>` : ''}</div>
     ${hasInfo && open ? `<div class="rquote"><div class="rqh">${esc(c.rule || 'The rule')} · official wording</div>${c.quote ? `<blockquote>${esc(c.quote)}</blockquote>` : '<p class="rqn">No exact wording came back this time. Open the official rule to read it.</p>'}${askSources(sources)}<p class="rqn">Check it against the link. It is the official rule that counts.</p></div>` : ''}</div>`;
 }
@@ -65,7 +115,7 @@ function askThread() {
   return UI.chat.map((m, i) => m.role === 'user'
     ? `<div class="msg me"><div class="bub">${esc(m.text)}</div></div>`
     : m.card ? `<div class="msg ai card">${askCardHtml(m.card, i, i === UI.chat.length - 1 && !UI.chatBusy, m.sources)}</div>`
-    : `<div class="msg ai"><div class="bub${m.error ? ' err' : ''}">${m.error ? esc(m.text) : askRuling(m.text) + askSources(m.sources)}</div></div>`).join('')
+    : `<div class="msg ai"><div class="bub${m.error ? ' err' : ''}">${m.error ? esc(m.text) : askRuling(m.text, i) + askSources(m.sources)}</div></div>`).join('')
     + (UI.chatBusy ? '<div class="msg ai"><div class="bub wait" aria-label="Checking the rules"><i></i><i></i><i></i></div></div>' : '')
     + `<p class="cap ask-note">Checked against the official Rules of Golf (R&amp;A and USGA). For anything close, play a second ball and ask the organiser.</p>`;
 }
