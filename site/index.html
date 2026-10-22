@@ -1867,7 +1867,7 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .rulesheet .rs-cap { text-align: center; margin: 10px 0 0; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610222139","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610222149","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -4846,7 +4846,8 @@ function undoSave() {
   replaceTop('entry', { rid: a.rid });
 }
 
-/* One Buggy Wars result pill: the leader's colour, golf wording, "3 up, 4 to play" while it is being played.
+/* One Buggy Wars result pill: the leader's colour, golf wording, "3 up, 4 to play" while it is being played,
+   "Dormie 2" when the lead equals the holes left (owner, 22 October).
    Shared by the Buggy Wars results and the screen after saving a hole, so the two look the same. */
 function bwPill(gc, m) {
   const st = m.status;
@@ -4854,6 +4855,7 @@ function bwPill(gc, m) {
   if (st.state === 'pending') txt = 'Not started';
   else if (st.state === 'halved') txt = 'Halved';
   else if (st.state === 'won') txt = m.closed && m.closed.toPlay > 0 ? `Won ${m.closed.up}&${m.closed.toPlay}` : `Won ${Math.abs(m.lead)} up`;
+  else if (st.dormie) txt = `Dormie ${st.toPlay}`;
   else txt = `${m.lead === 0 ? 'AS' : Math.abs(m.lead) + ' up'}, ${st.toPlay} to play`;
   const cls = st.leader === 'A' ? 'a' : st.leader === 'B' ? 'b' : 'n';
   const who = st.leader ? `${gc.labels[st.leader === 'A' ? 0 : 1].long} ` : '';
