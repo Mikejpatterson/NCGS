@@ -321,7 +321,8 @@ function undoSave() {
   replaceTop('entry', { rid: a.rid });
 }
 
-/* One Buggy Wars result pill: the leader's colour, golf wording, "3 up, 4 to play" while it is being played.
+/* One Buggy Wars result pill: the leader's colour, golf wording, "3 up, 4 to play" while it is being played,
+   "Dormie 2" when the lead equals the holes left (owner, 22 October).
    Shared by the Buggy Wars results and the screen after saving a hole, so the two look the same. */
 function bwPill(gc, m) {
   const st = m.status;
@@ -329,6 +330,7 @@ function bwPill(gc, m) {
   if (st.state === 'pending') txt = 'Not started';
   else if (st.state === 'halved') txt = 'Halved';
   else if (st.state === 'won') txt = m.closed && m.closed.toPlay > 0 ? `Won ${m.closed.up}&${m.closed.toPlay}` : `Won ${Math.abs(m.lead)} up`;
+  else if (st.dormie) txt = `Dormie ${st.toPlay}`;
   else txt = `${m.lead === 0 ? 'AS' : Math.abs(m.lead) + ' up'}, ${st.toPlay} to play`;
   const cls = st.leader === 'A' ? 'a' : st.leader === 'B' ? 'b' : 'n';
   const who = st.leader ? `${gc.labels[st.leader === 'A' ? 0 : 1].long} ` : '';
