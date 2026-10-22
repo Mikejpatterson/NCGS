@@ -334,6 +334,25 @@ function bwPill(gc, m) {
   const who = st.leader ? `${gc.labels[st.leader === 'A' ? 0 : 1].long} ` : '';
   return `<span class="bw-res ${cls}" aria-label="${esc(who + txt)}">${txt}</span>`;
 }
+/* Who has an extra shot on the other buggy on hole n, in the owner's words: "Mike has an extra shot on Buggy 2 on 16".
+   teams: [[pid, pid], [pid, pid]] (Buggy 1, Buggy 2); shots(pid): that player's shots on hole n. A player counts only when
+   they get more shots there than anyone in the other buggy. Returns [{ team, text }]; empty when nobody has an edge. */
+function extraShotLines(teams, shots, n, nameOf) {
+  const word = k => (k === 1 ? 'an extra shot' : k === 2 ? 'two extra shots' : `${k} extra shots`);
+  const out = [];
+  [0, 1].forEach(i => {
+    const best = Math.max(...teams[1 - i].map(shots));
+    const ahead = teams[i].filter(pid => shots(pid) > best);
+    if (!ahead.length) return;
+    const diffs = ahead.map(pid => shots(pid) - best);
+    const who = diffs.every(d => d === diffs[0])
+      ? `${ahead.map(nameOf).join(' and ')} ${ahead.length > 1 ? 'have' : 'has'} ${word(diffs[0])}`
+      : ahead.map((pid, k) => `${nameOf(pid)} ${k ? '' : 'has '}${word(diffs[k])}`).join(' and ');
+    out.push({ team: i, text: `${who} on Buggy\u00a0${2 - i} on\u00a0${n}` });   // no-break spaces keep "Buggy 1" and "on 16" together
+  });
+  return out;
+}
+
 /* A nine's holes as a small grid: one column per hole, each buggy's best points, the hole winner's filled in their
    colour, then holes won. Shared by the Buggy Wars results and the card after saving a hole. */
 function bwBoard(gc, seg, live, canEdit) {
@@ -390,6 +409,10 @@ VIEWS.after = () => {
     const key = `bwa-${a.rid}-${a.gid}-${s}`, open = !!UI.open[key];
     return `<button class="bw-row" data-act="bwseg" data-key="${key}" data-open="${open ? 1 : 0}" aria-expanded="${open}">${label}<span class="chev dn${open ? ' up' : ''}">${chev}</span></button>${open ? bwBoard(gc, s, D.round(a.rid).status === 'live', false) : ''}`;
   }).join('') : gc.teams.flat().map(pid => `<div class="afrow"><span><b>${esc(D.nameOf(pid))}</b></span><span class="afst"><span class="b num">${comp.players[pid].total}</span></span></div>`).join('');
+  /* Before the next hole: who has an extra shot on the other buggy there, in the owner's words ("Mike has an extra shot on
+     Buggy 2 on 16"). Only when a player gets more shots on that hole than anyone in the other buggy; otherwise nothing. */
+  const edge = buggies && gc.nextHole ? extraShotLines(gc.teams, pid => (comp.players[pid] && comp.players[pid].holes[gc.nextHole] ? comp.players[pid].holes[gc.nextHole].shots || 0 : 0), gc.nextHole, D.nameOf)
+    .map(x => `<p class="afedge"><i class="afdot ${x.team ? 'b' : 'a'}"></i>${esc(x.text)}</p>`).join('') : '';
   let next;
   const nine = a.n <= 9 ? 'front' : 'back';
   if (D.round(a.rid).status === 'live' && nineComplete(gc, nine) && !D.check(a.rid, a.gid, nine)) {
@@ -403,7 +426,7 @@ VIEWS.after = () => {
     html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><b>Par ${ah.par}</b><span>Index ${ah.si}${ah.yards ? ` · ${ah.yards} yds` : ''}</span></div></div><div class="afsaved"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
       ${buggies ? `<div class="sec-label afbw"><span class="sub">Buggy Wars</span></div><div class="bw-vs afvs">${bwBadges(gc.teams[0], 0)}<span class="sub">v</span>${bwBadges(gc.teams[1], 1)}</div>
       <div class="card bw-card aftercard"><div class="bw-row afres"><span class="bw-l afl">Hole ${a.n}</span>${head}<span></span>${sub ? `<small class="afres-sub">${esc(sub)}</small>` : ''}</div>${rows}</div>` : `<div class="aftercard"><div class="afhead"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>${rows}</div>`}
-      ${next}${saveWarning()}</div>`
+      ${edge}${next}${saveWarning()}</div>`
   };
 };
 

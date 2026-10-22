@@ -1825,3 +1825,8 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .entry .bugs .pr-top .pu.on::before { border-color: var(--pine); background: var(--pine); }
 /* A name too long for its line gets the whole top line; Pick up and the controls share the line below (4 columns now). */
 @container (min-width: 19.5em) { .entry .bugs .pr.ptile.long { grid-template-areas: "nm nm nm nm" "pu dn sc up"; } }
+/* "Cathal has an extra shot on Buggy 1 on 16", above the next-hole button (owner's wording, 22 October) */
+.after .afedge { display: flex; align-items: baseline; gap: 8px; margin: 14px 4px 10px; font-weight: 600; font-size: 1rem; color: var(--text); line-height: 1.35; }
+.after .afedge .afdot { flex: none; width: 10px; height: 10px; margin: 0; transform: translateY(1px); }
+.after .afedge + .afedge { margin-top: 0; }
+.after .afedge { text-wrap: balance; }
