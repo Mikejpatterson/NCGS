@@ -7,7 +7,7 @@ const body = src.slice(src.indexOf('function extraShotLines('), src.indexOf('/* 
 const extraShotLines = new Function(`${body}; return extraShotLines;`)();
 const teams = [['mike', 'sean'], ['cathal', 'dom']];
 const name = id => ({ mike: 'Mike', sean: 'Sean', cathal: 'Cathal', dom: 'Dom' })[id];
-const run = s => extraShotLines(teams, id => s[id], 16, name);
+const run = s => extraShotLines(teams, id => s[id], 16, name).map(x => ({ team: x.team, text: x.text }));
 
 test('nobody has an edge when the highest on each side match', () => {
   assert.deepStrictEqual(run({ mike: 1, sean: 0, cathal: 1, dom: 0 }), []);
@@ -26,4 +26,8 @@ test('partners with different edges', () => {
 });
 test('an extra shot counts against the other buggy\'s highest, not its lowest', () => {
   assert.deepStrictEqual(run({ mike: 1, sean: 1, cathal: 1, dom: 0 }), []);
+});
+test('the card parts: who has the shot, where, and whose badges', () => {
+  assert.deepStrictEqual(extraShotLines(teams, id => ({ cathal: 1 })[id] || 0, 16, name),
+    [{ team: 1, pids: ['cathal'], who: 'Cathal has an extra shot', where: 'on Buggy\u00a01 on\u00a016', text: 'Cathal has an extra shot on Buggy\u00a01 on\u00a016' }]);
 });
