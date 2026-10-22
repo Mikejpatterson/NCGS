@@ -56,6 +56,19 @@ function miniBoard(r) {
 /* The friendly line at the top of Home (owner, 21 October). It follows the clock and what is on, never standings or
    results, and stays the same for the same moment rather than changing at random.
    Order: round day, then early or late, then a trip coming up within 14 days, then plain time of day. */
+/* The back link names the screen it goes back to ("Home", "Players", "Results"), never "NCGS" or a bare "Back"
+   (design review, 22 October). If the screen behind can't be named, "Back" is the fallback. */
+function backLabel() {
+  const st = typeof stackOf === 'function' ? stackOf() : UI.stack;
+  const prev = st && st.length > 1 ? st[st.length - 2] : null;
+  if (!prev) return 'Home';
+  const names = { home: 'Home', players: 'Players', rounds: 'Past rounds', goy: 'Golfer of the Year', trip: 'Trip standings', stats: 'Stats', board: 'Results', rules: 'Ruling', who: 'Home' };
+  if (names[prev.v]) return names[prev.v];
+  if (prev.v === 'round' && prev.p && prev.p.rid && D.round(prev.p.rid)) return roundName(D.round(prev.p.rid));
+  if (prev.v === 'player' && prev.p && prev.p.pid) return D.nameOf(prev.p.pid);
+  return 'Back';
+}
+
 function greeting(me, now = new Date()) {
   const name = me ? ', ' + me.name.split(' ')[0] : '';
   const hr = now.getHours(), pad = n => String(n).padStart(2, '0');
@@ -89,6 +102,17 @@ function homeHeadline(feature) {
 }
 // The round name's length, for the CSS that makes a long name smaller (styles.css, --t-display-fit)
 const lenStyle = s => `style="--len:${[...s].length}"`;
+/* The round card's buttons. During a live round that you're playing, the main button takes you back to scoring
+   ("Continue · Hole 7"), and Players · Groups · KBs becomes a quieter link underneath (design review, 22 October). */
+function nowActs(r, live) {
+  const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">Players · Groups · KBs</button>`;
+  let next = null;
+  try { const mine = live && myGroup(r.id); const gc = mine && computeR(r.id).groups.find(g => g.id === mine.id); next = gc ? gc.nextHole : null; } catch (e) { next = null; }
+  if (!next) return `<div class="now-acts one">${groups}</div>`;
+  return `<div class="now-acts one"><button class="go" data-act="tab" data-tab="hole">Continue \u00b7 Hole ${next}</button>
+    <button class="go-link" data-act="round" data-rid="${r.id}" data-tab="players">Players \u00b7 Groups \u00b7 KBs</button></div>`;
+}
+
 function nowCard(r) {
   const live = r.status === 'live';
   const playable = canScore(r) && (live || !r.date || daysFromToday(r.date) <= 0);
@@ -104,7 +128,7 @@ function nowCard(r) {
       <span class="now-line">${esc(heroFacts(r))}</span>
     </button>
     ${live ? miniBoard(r) : ''}
-    <div class="now-acts one"><button class="go" data-act="round" data-rid="${r.id}" data-tab="players">Players · Groups · KBs</button></div>
+    ${nowActs(r, live)}
   </div>`;
 }
 VIEWS.home = () => {
@@ -153,7 +177,7 @@ VIEWS.rounds = () => {
   const yr = yearOn();
   const past = D.rounds().filter(r => r.status === 'final' && !isDemo(r) && (r.season || seasonOf()) === yr).reverse();
   return {
-    html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Past rounds</h1></div><p class="sub">Tap a round for the scorecards</p>${yearPicker()}</header>
+    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Past rounds</h1></div><p class="sub">Tap a round for the scorecards</p>${yearPicker()}</header>
       ${past.length ? sec('', cardOf(past.map(pastRow).join('')), false) : sec('', '<div class="prose">No rounds played yet.</div>', false)}`
   };
 };
@@ -163,7 +187,7 @@ VIEWS.players = () => {
   const table = goy(season);
   const pos = Object.fromEntries(table.map(x => [x.id, x.posLabel]));
   return {
-    html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Players</h1></div><p class="sub">Tap a name for their cards</p></header>
+    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Players</h1></div><p class="sub">Tap a name for their cards</p></header>
       ${sec('', cardOf(D.regulars().map(m => `<button class="row tall prow" data-act="player" data-pid="${m.id}">${avBadge(m.id, 'lg')}<span class="two"><span class="b">${esc(m.name)}</span><span class="sub">${esc(m.full && m.full !== m.name ? m.full : 'Index ' + fmtIndex(m.index))}</span></span><span class="right"><span class="idx" title="Handicap index"><small>Index</small>${esc(fmtIndex(m.index))}</span>${pos[m.id] ? `<span class="posp p${/^\d+$/.test(pos[m.id]) && Number(pos[m.id]) <= 3 ? pos[m.id] : ''}">${posWord(pos[m.id])}</span>` : ''}${chev}</span></button>`).join('')), false)}`
   };
 };
@@ -176,7 +200,7 @@ VIEWS.goy = () => {
   const season = yearOn();
   const table = goy(season);
   return {
-    html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Golfer of the Year</h1></div>
+    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Golfer of the Year</h1></div>
       <p class="sub">${season} · best ${D.goyBest()} scores count</p>${yearPicker()}</header>
       ${table[0] ? `<div class="leadcard"><span class="lc-k">LEADING</span><span class="lc-row"><span class="lc-n">${esc(table[0].name)}</span><span class="lc-p"><b>${table[0].total}</b> pts</span></span>${table[1] ? `<span class="lc-s">${table[0].total - table[1].total === 0 ? 'Level with' : (table[0].total - table[1].total) + ' point' + (table[0].total - table[1].total === 1 ? '' : 's') + ' clear of'} ${esc(table[1].name)}</span>` : ''}</div>` : ''}
       ${sec('', cardOf(table.map(goyRow).join('')), false)}`
@@ -392,7 +416,7 @@ function finishedBody(r, res) {
 
 VIEWS.round = p => {
   const r = D.round(p.rid);
-  if (!r) return { html: `${navBack(D.society())}<div class="head"><h1 class="title">Round not found</h1></div>` };
+  if (!r) return { html: `${navBack(backLabel())}<div class="head"><h1 class="title">Round not found</h1></div>` };
   const c = courseOf(r);
   const tee = teeOf(r);
   const holes = holesOf(r);
@@ -542,7 +566,8 @@ function scoreChart(entries, avg) {
   const aveLine = avg === null ? '' : `<line class="avg" x1="${padL}" x2="${W}" y1="${y(avg).toFixed(1)}" y2="${y(avg).toFixed(1)}"/>`;
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Stableford points in each round, average ${fmt1(avg)}">${grid}${bars}${aveLine}</svg>`;
 }
-const shortRound = e => { const w = String(e.name || '').replace(/\b(GC|Golf Club|Golf Links|Golf)\b/g, '').trim().split(/\s+/)[0] || ''; return w.slice(0, 3); };
+const shortRound = e => { if (e.date) return new Date(e.date + 'T12:00:00').toLocaleDateString('en-IE', { day: 'numeric', month: 'short' }); return shortRoundName(e); };   // dates tell rounds at the same course apart
+const shortRoundName = e => { const w = String(e.name || '').replace(/\b(GC|Golf Club|Golf Links|Golf)\b/g, '').trim().split(/\s+/)[0] || ''; return w.slice(0, 3); };
 function statRow(label, value, sub) { return `<div class="row"><span>${label}${sub ? `<span class="sub"> ${sub}</span>` : ''}</span><span class="b num">${value}</span></div>`; }
 function playerStatsBlock(pid) {
   const entries = playerEntries(pid);
@@ -575,7 +600,7 @@ VIEWS.stats = () => {
     all.filter(x => x.st[key] > (min || 0)).sort((a, b) => b.st[key] - a.st[key] || a.name.localeCompare(b.name)).map(x => ({ id: x.id, name: x.name, v: x.st[key] })),
     x => `${x.v}${unit || ''}`, sub);
   const avg = all.filter(x => x.st.rounds >= 1).sort((a, b) => b.st.average - a.st.average || a.name.localeCompare(b.name)).map(x => ({ id: x.id, name: x.name, v: x.st.average }));
-  let html = `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Stats</h1></div><p class="sub">Tap a name for their own numbers</p>${yearPicker()}</header>`;
+  let html = `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Stats</h1></div><p class="sub">Tap a name for their own numbers</p>${yearPicker()}</header>`;
   if (!all.length) return { html: html + sec('', '<div class="prose">Stats appear once a round has been played.</div>') };
   const bestRound = all.slice().sort((a, b) => (b.st.best || 0) - (a.st.best || 0))[0];
   const nRounds = seasonRounds(yr).filter(r => r.status === 'final').length;
@@ -589,12 +614,12 @@ VIEWS.stats = () => {
 
 VIEWS.player = p => {
   const m = D.member(p.pid);
-  if (!m) return { html: `${navBack('Back')}<div class="head"><h1 class="title">Not found</h1></div>` };
+  if (!m) return { html: `${navBack(backLabel())}<div class="head"><h1 class="title">Not found</h1></div>` };
   const season = seasonOf();
   const table = goy(season);
   const row = table.find(x => x.id === m.id);
   const counting = row ? row.countingRids.slice() : [];
-  let html = '<header class="hero s">' + navBack('Back');
+  let html = '<header class="hero s">' + navBack(backLabel());
   html += `<div class="head"><h1 class="title is-name">${esc(m.name)}</h1></div><p class="sub">${esc([m.full, 'Index ' + fmtIndex(m.index)].filter(Boolean).join(' · '))}</p>`;
   html += `<div class="tiles"><div class="tile flag"><span class="cap">GOY</span><span class="bignum">${row ? posWord(row.posLabel) : '–'}</span></div>
     <div class="tile"><span class="cap">Best ${D.goyBest()}</span><span class="bignum">${row ? row.total : '–'}</span></div>
@@ -656,13 +681,13 @@ VIEWS.card = p => {
   const r = D.round(p.rid);
   const comp = computeR(p.rid);
   const pl = comp ? comp.players[p.pid] : null;
-  if (!r || !pl) return { html: `${navBack('Back')}<div class="head"><h1 class="title">No card</h1></div>` };
+  if (!r || !pl) return { html: `${navBack(backLabel())}<div class="head"><h1 class="title">No card</h1></div>` };
   const tee = teeOf(r);
   const res = resultsOf(r.id);
   const me = res.rows.find(x => x.id === p.pid);
   const { F, B, table } = cardParts(r, pl);
   const sub = [r.date ? fmtDate(r.date, true) : roundWhenShort(r), tee ? `${tee.name} · Par ${tee.par}` : '', `Playing hcp ${pl.ph}`].filter(Boolean).join(' · ');
-  const html = `<header class="hero s">${navBack('Back')}
+  const html = `<header class="hero s">${navBack(backLabel())}
     <div class="head"><h1 class="title is-name">${esc(pl.name)}</h1>${me && r.status === 'final' ? `<span class="sub">${posWord(me.posLabel)}</span>` : ''}</div>
     <p class="sub"><button class="link inline cardlink" data-act="round" data-rid="${r.id}">${esc(roundName(r))}</button> · ${esc(sub)}</p>
     ${isDemo(r) ? '<div class="note"><span class="pill w">Demo scores</span></div>' : ''}
@@ -675,7 +700,7 @@ VIEWS.card = p => {
 VIEWS.who = p => {
   const list = D.regulars();
   return {
-    html: `<header class="hero s">${UI.stack.length > 1 ? navBack('Back') : '<div class="nav"></div>'}<div class="head"><h1 class="title">Who are you?</h1></div><p class="sub">So your scores and card are yours.</p></header>
+    html: `<header class="hero s">${UI.stack.length > 1 ? navBack(backLabel()) : '<div class="nav"></div>'}<div class="head"><h1 class="title">Who are you?</h1></div><p class="sub">So your scores and card are yours.</p></header>
       ${sec('', cardOf(list.map(m => `<button class="row" data-act="pick" data-id="${m.id}"><span class="lname${m.id === DB.prefs.me ? ' b' : ''}">${avBadge(m.id, m.id === DB.prefs.me ? 'is-me' : '')}<span class="ln"><span class="n">${esc(m.name)}</span>${m.full && m.full !== m.name ? `<span class="cap">${esc(m.full)}</span>` : ''}</span></span>${m.id === DB.prefs.me ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : chev}</button>`).join('')), false)}`
   };
 };
