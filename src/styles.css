@@ -1544,6 +1544,7 @@ body { font-variant-numeric: tabular-nums; }
    It replaces the date line and the wordmark. It wraps beside the crest when long or at large text sizes. */
 .hero.home .brand { align-items: center; }
 .hero.home .brand .greet { flex: 1; min-width: 0; margin: 0; font-size: 1.45rem; line-height: 1.2; font-weight: 600; color: var(--text); letter-spacing: -.01em; text-wrap: balance; overflow-wrap: anywhere; }
+.hero.home .brand .greet.long { font-size: 1.2rem; }   /* a long greeting ("Marbella's nearly here, Bartholomew") keeps to two lines on most phones */
 .hero.home .who-chip { align-self: center; flex: none; }
 .hero.home .who-chip.only-av { width: 44px; padding: 0; justify-content: center; background: none; box-shadow: none; }
 .hero.home .who-chip.only-av .who-av { width: 44px; height: 44px; font-size: .85rem; }
