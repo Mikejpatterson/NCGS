@@ -838,14 +838,18 @@ VIEWS.trip = p => {
   return { html };
 };
 
-function tripTable(list) {
+/* The trip's golfers ranked on total points across its rounds (also used for the trip line on Home). */
+function tripRows(list) {
   const ids = new Set();
   list.forEach(r => (r.groups || []).forEach(g => g.teams.flat().forEach(pid => ids.add(pid))));
   const pts = list.map(r => (r.status === 'upcoming' ? {} : pointsOf(r.id)));
-  const rows = E.rankRows([...ids].map(pid => {
+  return E.rankRows([...ids].map(pid => {
     const per = pts.map(p => (p[pid] === undefined ? null : p[pid]));
     return { id: pid, name: D.nameOf(pid), per, total: per.reduce((s, v) => s + (v || 0), 0) };
   }), 'total', 'desc');
+}
+function tripTable(list) {
+  const rows = tripRows(list);
   const allFinal = list.every(r => r.status === 'final');
   /* One row per golfer, like the round leaderboard: place, initials and name, total on the right. Each day's points sit
      on a small line under the name ("D1 26 · D2 41 · D3 39"), so names never get squeezed by a column per day

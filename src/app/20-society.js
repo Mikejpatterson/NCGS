@@ -125,21 +125,25 @@ VIEWS.home = () => {
   const pastAll = D.rounds().filter(r => r.status === 'final').reverse();
   const tripFor = feature && feature.trip ? feature : (D.rounds().filter(r => r.trip).slice(-1)[0] || null);
   const tripList = tripFor ? tripRounds(tripFor) : [];
-  const qrow = (act, t, right, rid) => `<button class="row" data-act="${act}"${rid ? ` data-rid="${rid}"` : ''}><span>${t}</span><span class="right">${right}${chev}</span></button>`;
-  const goyRowHome = lead
-    ? qrow('goy', 'Golfer of the Year', `<span class="b">${esc(lead.name)}</span><span class="sub"><span class="num">${lead.total}</span> pts</span>`)
-    : qrow('goy', 'Golfer of the Year', `<span class="sub">Best ${D.goyBest()} scores count</span>`);
   const goyHidden = lead ? `<span class="vh">Golfer of the Year ${esc(lead.name)} leads on ${lead.total}</span>` : '';
   const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
   const lastRound = pastAll.find(r => !isDemo(r));
-  html += `${goyHidden}${sec('', cardOf([
-    !inPlay && lastRound ? qrow('round', 'Last round', `<span class="sub">${esc(roundName(lastRound))}</span>`, lastRound.id) : '',
-    goyRowHome,
-    tripList.length > 1 ? qrow('trip', 'Trip standings', `<span class="sub">${esc(tripFor.trip)}</span>`, tripFor.id) : '',
-    qrow('rounds', 'Past rounds', `<span class="sub">${played.length ? `${played.length} played` : 'None played yet'}</span>`),
-    qrow('stats', 'Stats', '<span class="sub">KBs, birdies, averages</span>'),
-    qrow('players', 'Players', `<span class="sub">${plural(D.regulars().length, 'golfer')}</span>`)
-  ].join('')), true)}`;
+  /* The season block under the round card (owner chose option C, 22 October): one list headed "The season", each row
+     with an icon and a useful second line (who leads, how many rounds played). */
+  const second = table[1];
+  const goyLine = lead ? (second && lead.total > second.total ? `${esc(lead.name)} leads by ${lead.total - second.total}` : `${esc(lead.name)} leads`) : `Best ${D.goyBest()} scores count`;
+  const tRows = tripList.length > 1 ? tripRows(tripList) : [];
+  const tLead = tRows[0] && tRows[0].total ? tRows[0] : null;
+  const tripLine = tripFor && tripList.length > 1 ? (tLead ? `${esc(tripFor.trip)} \u00b7 ${esc(tLead.name)} leads` : esc(tripFor.trip)) : '';
+  const ic = k => `<span class="hs-ic" aria-hidden="true">${sized(ICON[k], 20)}</span>`;
+  const rrow = (act, k, t, sub, rid) => `<button class="row hs-row" data-act="${act}"${rid ? ` data-rid="${rid}"` : ''}>${ic(k)}<span class="hs-txt"><span class="hs-t">${t}</span><span class="hs-s">${sub}</span></span>${chev}</button>`;
+  html += `${goyHidden}${sec(label('The season'), cardOf([
+    !inPlay && lastRound ? rrow('round', 'flagpin', 'Last round', esc(roundName(lastRound)), lastRound.id) : '',
+    rrow('goy', 'trophy', 'Golfer of the Year', goyLine),
+    tripList.length > 1 ? rrow('trip', 'course', 'Trip standings', tripLine, tripFor.id) : '',
+    rrow('rounds', 'history', 'Past rounds', played.length ? `${plural(played.length, 'round')} played` : 'None played yet'),
+    rrow('stats', 'bars', 'Stats', 'KBs, birdies, averages'),
+    rrow('players', 'users', 'Players', plural(D.regulars().length, 'golfer'))].join('')), true)}`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
   return { html, tabs: 'home' };
