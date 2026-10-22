@@ -116,7 +116,7 @@ button.row:active, button.mrow:active, button.lrow:active { background: var(--fi
 .pill.b { background: var(--team-b); color: #fff; }
 .pill.n { background: var(--fill); color: var(--text); }
 .pill.w { background: var(--amber-soft); color: var(--amber); }
-.pill.g { background: var(--green-soft); color: #155C2D; }
+.pill.g { background: var(--green-soft); color: var(--pine); }
 .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: none; }
 .dot.a { background: var(--team-a); }
 .dot.b { background: var(--team-b); }
@@ -241,7 +241,7 @@ label.btn { cursor: pointer; flex-direction: row; }
 .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .choice { min-height: 48px; border-radius: 12px; background: var(--card); border: 1.5px solid var(--line); font-size: var(--t-body); text-align: center; font-variant-numeric: tabular-nums; }
-.choice.on { border-color: var(--green); background: var(--green-soft); color: #155C2D; font-weight: 600; }
+.choice.on { border-color: var(--green); background: var(--green-soft); color: var(--pine); font-weight: 600; }
 .full { position: fixed; inset: 0; z-index: 50; background: rgba(0, 0, 0, .92); display: flex; align-items: center; justify-content: center; overflow: auto; }
 .full img { max-width: 100%; max-height: 100%; }
 .full-close { position: absolute; top: calc(8px + env(safe-area-inset-top, 0px)); right: 16px; color: #fff; }
@@ -371,7 +371,7 @@ button.btn:has(> svg) { flex-direction: row; }
 .row, .lrow, .hrow, .grow, .mrow { min-height: 52px; }
 .row.tall { min-height: 64px; }
 .pr { padding-block: 8px 10px; }
-.btn { background: var(--green); min-height: 56px; border-radius: 16px; box-shadow: 0 6px 16px rgba(22, 122, 65, .28); font-size: var(--t-body); }
+.btn { background: var(--green); min-height: 56px; border-radius: 16px; box-shadow: 0 6px 16px rgba(11, 61, 46, .22); font-size: var(--t-body); }
 .btn.quiet { background: #fff; color: var(--pine); box-shadow: var(--lift); }
 .btn small { color: #D6EEDD; }
 .savebar { background: linear-gradient(to top, var(--bg) 70%, rgba(229,236,230,0)); box-shadow: none; padding-top: 12px; }
@@ -396,7 +396,7 @@ button.btn:has(> svg) { flex-direction: row; }
 .tile { box-shadow: var(--lift); }
 .title { color: var(--pine); }
 .hero .title { color: #fff; }
-.field:focus { outline: 3px solid rgba(22,122,65,.35); border-color: var(--green); }
+.field:focus { outline: 3px solid rgba(11,61,46,.3); border-color: var(--green); }
 
 .hero.c { padding-block: calc(env(safe-area-inset-top, 0px) + 4px) 14px; border-radius: 0 0 22px 22px; }
 .hrow2 { display: flex; align-items: center; gap: 10px; min-height: 52px; }
@@ -499,7 +499,7 @@ table.sc { border-collapse: separate; border-spacing: 0; }
 .pp.p0 { background: #FBE3E3; color: #A31F1F; }
 .pp.p1 { background: var(--fill); color: var(--sub); }
 .pp.p2 { background: var(--fill); color: var(--pine); }
-.pp.p3 { background: var(--green-soft); color: #0F6A38; }
+.pp.p3 { background: var(--green-soft); color: var(--pine); }
 .pp.p4 { background: var(--green); color: #fff; }
 .mk { width: 30px; height: 30px; font-weight: 600; }
 .mk.birdie { background: var(--green); border: 0; color: #fff; border-radius: 50%; }
@@ -801,7 +801,7 @@ html, body { background: var(--bg); }
 .hero.s .link, .hero.s .back-icon, .hero.s .link.inline { color: var(--pine); }
 .hero.s .sub, .hero.s .cap, .hero.s .hsub { color: var(--sub); }
 .hero.s .pill.w { background: var(--action); color: var(--on-action); }
-.hero.s .pill.g { background: var(--green-soft); color: #155C2D; }
+.hero.s .pill.g { background: var(--green-soft); color: var(--pine); }
 .hero.s + .sec, .hero.s + .btn { margin-top: 16px; }
 
 /* Cards that stay pine: the hole, the front-page round */
@@ -1770,9 +1770,74 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .hs-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .hs-t { font-weight: 600; font-size: 1.02rem; color: var(--text); }
 .hs-s { font-size: .86rem; color: var(--sub); line-height: 1.3; overflow-wrap: anywhere; }
+
+/* ----- Design review, 22 October: one green ----- */
+/* The old bright green (#167A41) still coloured buttons, links, bars, chips and some leader numbers, so the app looked
+   as if it had two brands. Pine is now the only green; its soft tint replaces the mint. The grey for secondary text is
+   a touch darker so it reads better outdoors. */
+:root { --green: var(--pine); --green-soft: #E3EFE6; --sub: #4A564F; }
+.lrow:first-child .b.r, .lrow.goy:first-child .b.r, .srow.top .sv { color: var(--text); }   /* the leader is shown by the row tint and badge, not a coloured number */
+.chart .cbar { fill: var(--pine); fill-opacity: .55; }
+.chart .cbar.top { fill-opacity: 1; }
+.link, .back-icon { font-weight: 500; }
+.bar i { background: var(--pine); }
+.stile.tb { --tone: var(--team-a); --soft: var(--team-a-soft); }
+/* Neutral status pills ("Demo", "In progress") on ivory: warm grey, not the old yellow. Warnings (.banner) keep amber. */
+.pill.w { background: #EDE9DF; color: var(--text); }
+@keyframes flash { 50% { background: var(--action-tint); } }
+
+/* ----- Design review, 22 October: hole rows ----- */
+/* Every row has the same shape: the name (with its shot dots) on top, Pick up on its own line below, and - score + on
+   the right spanning both lines. Pick up no longer sits right beside the minus (mis-taps), long names like
+   "Donnacha" don't push the controls onto a second line, and all four rows line up. Pick up is an outlined pill, so
+   it reads as a button. Shot dots are pine, not black. The 3² points superscript stays (owner). */
+@container (min-width: 19.5em) {
+  .entry .bugs .pr.ptile { grid-template-columns: minmax(0, 1fr) 48px minmax(64px, max-content) 48px; grid-template-areas: "nm dn sc up" "pu dn sc up"; row-gap: 2px; }
+  .entry .bugs .st { width: 48px; height: 48px; }
+  .entry .bugs .pr-top .pu, .entry .bugs .pr-top .pu.on { justify-self: start; }
+}
+.entry .bugs .pr-top .pu { padding: 0 14px; height: 36px; min-height: 36px; margin: 4px 0; border: 1.5px solid #D9D4C8; border-radius: 18px; color: var(--sub); font-weight: 600; font-size: .85rem; }
+.entry .bugs .pr-top .pu.on { border-color: var(--pine); background: var(--pine); color: #fff; padding: 0 14px; }
+.entry .dots i, .entry .dots.s i { background: var(--pine); }
+.entry .dots.s i { width: 8px; height: 8px; }
+
+/* ----- Design review, 22 October: one rule for "leader" and "you" ----- */
+/* Leader: warm tint, and the badge pine with champagne initials. You: soft pine tint with a pine bar on the left, and
+   the badge pine with white initials. If you lead, both apply. KBs "lowest" uses the leader tint, not the "you" style. */
+.lrow:has(.av.is-me) { background: var(--action-tint); box-shadow: inset 3px 0 0 var(--pine); }
+.lrow:has(.av.is-lead) { background: var(--lead-tint); }
+.lrow.low { background: var(--lead-tint); box-shadow: none; }
+.rp-groups .rg.me, .rp-players .pl-row.me { box-shadow: inset 3px 0 0 var(--pine); }
+/* Stats: tint the top row only when there is a single leader, so ties don't turn whole cards beige. */
+.srow.top:has(+ .srow.top), .srow.top + .srow.top { background: none; }
+
+/* ----- Design review: section labels as a proper level ----- */
+.sec-label > .sub { font-size: 1.2rem; font-weight: 600; color: var(--text); letter-spacing: -.01em; }
+.entry .sec-label > .sub { font-size: 1.1rem; }
+
+/* ----- Design review: the hole header keeps its shape after saving ----- */
+/* Par, index and yards stay on the right as before. "Saved" and Undo sit on their own line above the progress bar.
+   Undo is a ghost pill, not underlined link text. */
+.after .afsaved { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 0 2px; }
+.after .afsaved .savedchip { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 0 12px; border-radius: 16px; background: var(--on-pine-label); color: var(--pine); font-weight: 700; font-size: .95rem; }
+.after .afsaved .undochip { min-height: 44px; padding: 0 18px; border: 1.5px solid rgba(255, 255, 255, .45); border-radius: 22px; background: none; color: #fff; font: inherit; font-weight: 600; font-size: .95rem; text-decoration: none; }
+
+/* ----- Design review: small leftovers ----- */
+.leadcard::after { display: none; }   /* the one ornament in the app: a faint disc behind the leader's points */
+/* Home card during a live round: "Continue · Hole 7" is the main button; Players · Groups · KBs a quieter link under it. */
+.now-acts .go-link { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 44px; margin-top: 6px; background: none; border: 0; color: rgba(255, 255, 255, .85); font: inherit; font-weight: 600; font-size: var(--t-sub); }
+.now-acts .go-link:active { color: #fff; }
+.after .entr { flex-direction: column; align-items: flex-end; gap: 0; }   /* Par over Index, as on the hole screen */
+/* Pick up keeps a 44px tap area; the visible outline is a 36px pill drawn behind the word. */
+.entry .bugs .pr-top .pu, .entry .bugs .pr-top .pu.on { position: relative; z-index: 0; height: 44px; min-height: 44px; margin: 0; border: 0; background: none; }
+.entry .bugs .pr-top .pu::before { content: ""; position: absolute; left: 0; right: 0; top: 4px; bottom: 4px; z-index: -1; border: 1.5px solid #D9D4C8; border-radius: 18px; }
+.entry .bugs .pr-top .pu.on { color: #fff; }
+.entry .bugs .pr-top .pu.on::before { border-color: var(--pine); background: var(--pine); }
+/* A name too long for its line gets the whole top line; Pick up and the controls share the line below (4 columns now). */
+@container (min-width: 19.5em) { .entry .bugs .pr.ptile.long { grid-template-areas: "nm nm nm nm" "pu dn sc up"; } }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610221307","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610222023","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3778,6 +3843,19 @@ function miniBoard(r) {
 /* The friendly line at the top of Home (owner, 21 October). It follows the clock and what is on, never standings or
    results, and stays the same for the same moment rather than changing at random.
    Order: round day, then early or late, then a trip coming up within 14 days, then plain time of day. */
+/* The back link names the screen it goes back to ("Home", "Players", "Results"), never "NCGS" or a bare "Back"
+   (design review, 22 October). If the screen behind can't be named, "Back" is the fallback. */
+function backLabel() {
+  const st = typeof stackOf === 'function' ? stackOf() : UI.stack;
+  const prev = st && st.length > 1 ? st[st.length - 2] : null;
+  if (!prev) return 'Home';
+  const names = { home: 'Home', players: 'Players', rounds: 'Past rounds', goy: 'Golfer of the Year', trip: 'Trip standings', stats: 'Stats', board: 'Results', rules: 'Ruling', who: 'Home' };
+  if (names[prev.v]) return names[prev.v];
+  if (prev.v === 'round' && prev.p && prev.p.rid && D.round(prev.p.rid)) return roundName(D.round(prev.p.rid));
+  if (prev.v === 'player' && prev.p && prev.p.pid) return D.nameOf(prev.p.pid);
+  return 'Back';
+}
+
 function greeting(me, now = new Date()) {
   const name = me ? ', ' + me.name.split(' ')[0] : '';
   const hr = now.getHours(), pad = n => String(n).padStart(2, '0');
@@ -3811,6 +3889,17 @@ function homeHeadline(feature) {
 }
 // The round name's length, for the CSS that makes a long name smaller (styles.css, --t-display-fit)
 const lenStyle = s => `style="--len:${[...s].length}"`;
+/* The round card's buttons. During a live round that you're playing, the main button takes you back to scoring
+   ("Continue · Hole 7"), and Players · Groups · KBs becomes a quieter link underneath (design review, 22 October). */
+function nowActs(r, live) {
+  const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">Players · Groups · KBs</button>`;
+  let next = null;
+  try { const mine = live && myGroup(r.id); const gc = mine && computeR(r.id).groups.find(g => g.id === mine.id); next = gc ? gc.nextHole : null; } catch (e) { next = null; }
+  if (!next) return `<div class="now-acts one">${groups}</div>`;
+  return `<div class="now-acts one"><button class="go" data-act="tab" data-tab="hole">Continue \u00b7 Hole ${next}</button>
+    <button class="go-link" data-act="round" data-rid="${r.id}" data-tab="players">Players \u00b7 Groups \u00b7 KBs</button></div>`;
+}
+
 function nowCard(r) {
   const live = r.status === 'live';
   const playable = canScore(r) && (live || !r.date || daysFromToday(r.date) <= 0);
@@ -3826,7 +3915,7 @@ function nowCard(r) {
       <span class="now-line">${esc(heroFacts(r))}</span>
     </button>
     ${live ? miniBoard(r) : ''}
-    <div class="now-acts one"><button class="go" data-act="round" data-rid="${r.id}" data-tab="players">Players · Groups · KBs</button></div>
+    ${nowActs(r, live)}
   </div>`;
 }
 VIEWS.home = () => {
@@ -3875,7 +3964,7 @@ VIEWS.rounds = () => {
   const yr = yearOn();
   const past = D.rounds().filter(r => r.status === 'final' && !isDemo(r) && (r.season || seasonOf()) === yr).reverse();
   return {
-    html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Past rounds</h1></div><p class="sub">Tap a round for the scorecards</p>${yearPicker()}</header>
+    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Past rounds</h1></div><p class="sub">Tap a round for the scorecards</p>${yearPicker()}</header>
       ${past.length ? sec('', cardOf(past.map(pastRow).join('')), false) : sec('', '<div class="prose">No rounds played yet.</div>', false)}`
   };
 };
@@ -3885,7 +3974,7 @@ VIEWS.players = () => {
   const table = goy(season);
   const pos = Object.fromEntries(table.map(x => [x.id, x.posLabel]));
   return {
-    html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Players</h1></div><p class="sub">Tap a name for their cards</p></header>
+    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Players</h1></div><p class="sub">Tap a name for their cards</p></header>
       ${sec('', cardOf(D.regulars().map(m => `<button class="row tall prow" data-act="player" data-pid="${m.id}">${avBadge(m.id, 'lg')}<span class="two"><span class="b">${esc(m.name)}</span><span class="sub">${esc(m.full && m.full !== m.name ? m.full : 'Index ' + fmtIndex(m.index))}</span></span><span class="right"><span class="idx" title="Handicap index"><small>Index</small>${esc(fmtIndex(m.index))}</span>${pos[m.id] ? `<span class="posp p${/^\d+$/.test(pos[m.id]) && Number(pos[m.id]) <= 3 ? pos[m.id] : ''}">${posWord(pos[m.id])}</span>` : ''}${chev}</span></button>`).join('')), false)}`
   };
 };
@@ -3898,7 +3987,7 @@ VIEWS.goy = () => {
   const season = yearOn();
   const table = goy(season);
   return {
-    html: `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Golfer of the Year</h1></div>
+    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Golfer of the Year</h1></div>
       <p class="sub">${season} · best ${D.goyBest()} scores count</p>${yearPicker()}</header>
       ${table[0] ? `<div class="leadcard"><span class="lc-k">LEADING</span><span class="lc-row"><span class="lc-n">${esc(table[0].name)}</span><span class="lc-p"><b>${table[0].total}</b> pts</span></span>${table[1] ? `<span class="lc-s">${table[0].total - table[1].total === 0 ? 'Level with' : (table[0].total - table[1].total) + ' point' + (table[0].total - table[1].total === 1 ? '' : 's') + ' clear of'} ${esc(table[1].name)}</span>` : ''}</div>` : ''}
       ${sec('', cardOf(table.map(goyRow).join('')), false)}`
@@ -4114,7 +4203,7 @@ function finishedBody(r, res) {
 
 VIEWS.round = p => {
   const r = D.round(p.rid);
-  if (!r) return { html: `${navBack(D.society())}<div class="head"><h1 class="title">Round not found</h1></div>` };
+  if (!r) return { html: `${navBack(backLabel())}<div class="head"><h1 class="title">Round not found</h1></div>` };
   const c = courseOf(r);
   const tee = teeOf(r);
   const holes = holesOf(r);
@@ -4264,7 +4353,8 @@ function scoreChart(entries, avg) {
   const aveLine = avg === null ? '' : `<line class="avg" x1="${padL}" x2="${W}" y1="${y(avg).toFixed(1)}" y2="${y(avg).toFixed(1)}"/>`;
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Stableford points in each round, average ${fmt1(avg)}">${grid}${bars}${aveLine}</svg>`;
 }
-const shortRound = e => { const w = String(e.name || '').replace(/\b(GC|Golf Club|Golf Links|Golf)\b/g, '').trim().split(/\s+/)[0] || ''; return w.slice(0, 3); };
+const shortRound = e => { if (e.date) return new Date(e.date + 'T12:00:00').toLocaleDateString('en-IE', { day: 'numeric', month: 'short' }); return shortRoundName(e); };   // dates tell rounds at the same course apart
+const shortRoundName = e => { const w = String(e.name || '').replace(/\b(GC|Golf Club|Golf Links|Golf)\b/g, '').trim().split(/\s+/)[0] || ''; return w.slice(0, 3); };
 function statRow(label, value, sub) { return `<div class="row"><span>${label}${sub ? `<span class="sub"> ${sub}</span>` : ''}</span><span class="b num">${value}</span></div>`; }
 function playerStatsBlock(pid) {
   const entries = playerEntries(pid);
@@ -4297,7 +4387,7 @@ VIEWS.stats = () => {
     all.filter(x => x.st[key] > (min || 0)).sort((a, b) => b.st[key] - a.st[key] || a.name.localeCompare(b.name)).map(x => ({ id: x.id, name: x.name, v: x.st[key] })),
     x => `${x.v}${unit || ''}`, sub);
   const avg = all.filter(x => x.st.rounds >= 1).sort((a, b) => b.st.average - a.st.average || a.name.localeCompare(b.name)).map(x => ({ id: x.id, name: x.name, v: x.st.average }));
-  let html = `<header class="hero s">${navBack(D.society())}<div class="head"><h1 class="title">Stats</h1></div><p class="sub">Tap a name for their own numbers</p>${yearPicker()}</header>`;
+  let html = `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Stats</h1></div><p class="sub">Tap a name for their own numbers</p>${yearPicker()}</header>`;
   if (!all.length) return { html: html + sec('', '<div class="prose">Stats appear once a round has been played.</div>') };
   const bestRound = all.slice().sort((a, b) => (b.st.best || 0) - (a.st.best || 0))[0];
   const nRounds = seasonRounds(yr).filter(r => r.status === 'final').length;
@@ -4311,12 +4401,12 @@ VIEWS.stats = () => {
 
 VIEWS.player = p => {
   const m = D.member(p.pid);
-  if (!m) return { html: `${navBack('Back')}<div class="head"><h1 class="title">Not found</h1></div>` };
+  if (!m) return { html: `${navBack(backLabel())}<div class="head"><h1 class="title">Not found</h1></div>` };
   const season = seasonOf();
   const table = goy(season);
   const row = table.find(x => x.id === m.id);
   const counting = row ? row.countingRids.slice() : [];
-  let html = '<header class="hero s">' + navBack('Back');
+  let html = '<header class="hero s">' + navBack(backLabel());
   html += `<div class="head"><h1 class="title is-name">${esc(m.name)}</h1></div><p class="sub">${esc([m.full, 'Index ' + fmtIndex(m.index)].filter(Boolean).join(' · '))}</p>`;
   html += `<div class="tiles"><div class="tile flag"><span class="cap">GOY</span><span class="bignum">${row ? posWord(row.posLabel) : '–'}</span></div>
     <div class="tile"><span class="cap">Best ${D.goyBest()}</span><span class="bignum">${row ? row.total : '–'}</span></div>
@@ -4378,13 +4468,13 @@ VIEWS.card = p => {
   const r = D.round(p.rid);
   const comp = computeR(p.rid);
   const pl = comp ? comp.players[p.pid] : null;
-  if (!r || !pl) return { html: `${navBack('Back')}<div class="head"><h1 class="title">No card</h1></div>` };
+  if (!r || !pl) return { html: `${navBack(backLabel())}<div class="head"><h1 class="title">No card</h1></div>` };
   const tee = teeOf(r);
   const res = resultsOf(r.id);
   const me = res.rows.find(x => x.id === p.pid);
   const { F, B, table } = cardParts(r, pl);
   const sub = [r.date ? fmtDate(r.date, true) : roundWhenShort(r), tee ? `${tee.name} · Par ${tee.par}` : '', `Playing hcp ${pl.ph}`].filter(Boolean).join(' · ');
-  const html = `<header class="hero s">${navBack('Back')}
+  const html = `<header class="hero s">${navBack(backLabel())}
     <div class="head"><h1 class="title is-name">${esc(pl.name)}</h1>${me && r.status === 'final' ? `<span class="sub">${posWord(me.posLabel)}</span>` : ''}</div>
     <p class="sub"><button class="link inline cardlink" data-act="round" data-rid="${r.id}">${esc(roundName(r))}</button> · ${esc(sub)}</p>
     ${isDemo(r) ? '<div class="note"><span class="pill w">Demo scores</span></div>' : ''}
@@ -4397,7 +4487,7 @@ VIEWS.card = p => {
 VIEWS.who = p => {
   const list = D.regulars();
   return {
-    html: `<header class="hero s">${UI.stack.length > 1 ? navBack('Back') : '<div class="nav"></div>'}<div class="head"><h1 class="title">Who are you?</h1></div><p class="sub">So your scores and card are yours.</p></header>
+    html: `<header class="hero s">${UI.stack.length > 1 ? navBack(backLabel()) : '<div class="nav"></div>'}<div class="head"><h1 class="title">Who are you?</h1></div><p class="sub">So your scores and card are yours.</p></header>
       ${sec('', cardOf(list.map(m => `<button class="row" data-act="pick" data-id="${m.id}"><span class="lname${m.id === DB.prefs.me ? ' b' : ''}">${avBadge(m.id, m.id === DB.prefs.me ? 'is-me' : '')}<span class="ln"><span class="n">${esc(m.name)}</span>${m.full && m.full !== m.name ? `<span class="cap">${esc(m.full)}</span>` : ''}</span></span>${m.id === DB.prefs.me ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : chev}</button>`).join('')), false)}`
   };
 };
@@ -4770,6 +4860,7 @@ VIEWS.after = () => {
   const ask1 = askPending(a.rid, gc, a.gid);
   if (ask1) return VIEWS.ask(a.rid, gc, ask1);
   const hr = gc.holes[a.n];
+  const ah = holeOf(a.rid, a.n);   // par, index and yards stay in the header after saving, so it keeps its shape
   const L = gc.labels;
   const who = list => list.map(D.nameOf).join(' and ');
   const buggies = gc.teams.length === 2;
@@ -4804,7 +4895,7 @@ VIEWS.after = () => {
   } else next = `<button class="btn" data-act="to-finish">See the card</button>`;
   return {
     tabs: 'hole',
-    html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
+    html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><b>Par ${ah.par}</b><span>Index ${ah.si}${ah.yards ? ` · ${ah.yards} yds` : ''}</span></div></div><div class="afsaved"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
       ${buggies ? `<div class="sec-label afbw"><span class="sub">Buggy Wars</span></div><div class="bw-vs afvs">${bwBadges(gc.teams[0], 0)}<span class="sub">v</span>${bwBadges(gc.teams[1], 1)}</div>
       <div class="card bw-card aftercard"><div class="bw-row afres"><span class="bw-l afl">Hole ${a.n}</span>${head}<span></span>${sub ? `<small class="afres-sub">${esc(sub)}</small>` : ''}</div>${rows}</div>` : `<div class="aftercard"><div class="afhead"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>${rows}</div>`}
       ${next}${saveWarning()}</div>`
@@ -5237,7 +5328,7 @@ VIEWS.board = () => {
 VIEWS.trip = p => {
   const list = tripRounds(D.round(p.rid));
   const r0 = D.round(p.rid);
-  let html = `${navBack('Back')}<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">${esc(r0.trip || 'Trip standings')}</h1></div></header>`;
+  let html = `${navBack(backLabel())}<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">${esc(r0.trip || 'Trip standings')}</h1></div></header>`;
   html += tripTable(list);
   html += sec(label('Each day'), cardOf(list.map(x => `<button class="row" data-act="leaderboard" data-rid="${x.id}"><span>Day ${x.trip_day || x.seq}</span><span class="right">${x.status === 'upcoming' ? '<span class="sub">Not played</span>' : ''}${chev}</span></button>`).join('')));
   return { html };
@@ -5269,7 +5360,7 @@ VIEWS.results = p => {
   const r = D.round(p.rid);
   const res = resultsOf(p.rid);
   const lb = res.rows;
-  if (!lb.length) return { html: `${navBack('Back')}<p class="sub">No results yet</p>` };
+  if (!lb.length) return { html: `${navBack(backLabel())}<p class="sub">No results yet</p>` };
   const top = lb[0];
   const leaders = lb.filter(x => x.pos === 1);
   const final = r.status === 'final';
@@ -5296,7 +5387,7 @@ VIEWS.results = p => {
     ${isDemo(r) ? '<div class="blk cap">Demo scores</div>' : ''}
   </div>`;
   return {
-    html: `${navBack('Back')}<div style="margin-top:8px">${card}</div><button class="btn" data-act="share-card" data-rid="${r.id}">${sized(ICON.share, 20)}<span>Share</span></button>`
+    html: `${navBack(backLabel())}<div style="margin-top:8px">${card}</div><button class="btn" data-act="share-card" data-rid="${r.id}">${sized(ICON.share, 20)}<span>Share</span></button>`
   };
 };
 
