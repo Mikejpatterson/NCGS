@@ -1,0 +1,205 @@
+ok    live-open-std-360
+      pill a "Won 2 up"  label "Aidan & Bartley Won 2 up"
+      pill a "1 up, 4 to play"  label "Aidan & Bartley 1 up, 4 to play"
+      pill a "3 up, 4 to play"  label "Aidan & Bartley 3 up, 4 to play"
+      badges a:AF(Aidan) a:BF(Bartley) v b:CF(Cathal) b:DF(Donnacha)
+      1 hole board(s): Buggy 1 row above Buggy 2 in every column
+      text .bw-bd.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-bd.b #FFFFFF on #C62828 5.62:1
+      text .bw-res.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wa #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wb #FFFFFF on #C62828 5.62:1
+      text .bw-t.a #0A60C9 on #FFFFFF 5.95:1
+      text .bw-t.b #C62828 on #FFFFFF 5.62:1
+      contrast: 14 team text item(s), lowest 5.62:1; 14 team shape(s), lowest 5.30:1; 44px: all buttons 44px or more
+ok    live-decided-std-360
+      pill a "Won 2 up"  label "Aidan & Bartley Won 2 up"
+      pill a "1 up, 4 to play"  label "Aidan & Bartley 1 up, 4 to play"
+      pill a "3 up, 4 to play"  label "Aidan & Bartley 3 up, 4 to play"
+      badges a:AF(Aidan) a:BF(Bartley) v b:CF(Cathal) b:DF(Donnacha)
+      1 hole board(s): Buggy 1 row above Buggy 2 in every column
+      text .bw-bd.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-bd.b #FFFFFF on #C62828 5.62:1
+      text .bw-res.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wb #FFFFFF on #C62828 5.62:1
+      text .bw-c.wa #FFFFFF on #0A60C9 5.95:1
+      text .bw-t.a #0A60C9 on #FFFFFF 5.95:1
+      text .bw-t.b #C62828 on #FFFFFF 5.62:1
+      contrast: 17 team text item(s), lowest 5.62:1; 17 team shape(s), lowest 5.30:1; 44px: all buttons 44px or more
+ok    live-halved-std-360
+      pill n "Halved"  label "Halved"
+      pill a "1 up, 4 to play"  label "Eoghan & Fiachra 1 up, 4 to play"
+      pill a "1 up, 4 to play"  label "Eoghan & Fiachra 1 up, 4 to play"
+      badges a:EF(Eoghan) a:FF(Fiachra) v b:GF(Gearóid) b:HF(Hugh)
+      1 hole board(s): Buggy 1 row above Buggy 2 in every column
+      text .bw-bd.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-bd.b #FFFFFF on #C62828 5.62:1
+      text .bw-res.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wa #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wb #FFFFFF on #C62828 5.62:1
+      text .bw-t.a #0A60C9 on #FFFFFF 5.95:1
+      text .bw-t.b #C62828 on #FFFFFF 5.62:1
+      contrast: 11 team text item(s), lowest 5.62:1; 11 team shape(s), lowest 5.30:1; 44px: all buttons 44px or more
+ok    final-decided-std-360
+      pill b "Won 3&2"  label "Kevin & Lorcan Won 3&2"
+      pill a "Won 4&2"  label "Ivor & Jarlath Won 4&2"
+      pill b "Won 1 up"  label "Kevin & Lorcan Won 1 up"
+      badges a:IF(Ivor) a:JF(Jarlath) v b:KF(Kevin) b:LF(Lorcan)
+      1 hole board(s): Buggy 1 row above Buggy 2 in every column
+      text .bw-bd.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-bd.b #FFFFFF on #C62828 5.62:1
+      text .bw-res.b #FFFFFF on #C62828 5.62:1
+      text .bw-c.wb #FFFFFF on #C62828 5.62:1
+      text .bw-c.wa #FFFFFF on #0A60C9 5.95:1
+      text .bw-t.a #0A60C9 on #FFFFFF 5.95:1
+      text .bw-t.b #C62828 on #FFFFFF 5.62:1
+      text .bw-res.a #FFFFFF on #0A60C9 5.95:1
+      contrast: 16 team text item(s), lowest 5.62:1; 16 team shape(s), lowest 5.30:1; 44px: all buttons 44px or more
+ok    results-std-360
+      result pills Buggy 1, Buggy 2
+      text .pill.a #FFFFFF on #0A60C9 5.95:1
+      text .pill.a.soft #0A60C9 on #DFEAF8 4.89:1
+      text .pill.b #FFFFFF on #C62828 5.62:1
+      text .pill.b.soft #C62828 on #F8E3E3 4.57:1
+      contrast: 14 team text item(s), lowest 4.57:1; 14 team shape(s), lowest 1.22:1; 44px: all buttons 44px or more
+ok    nobug-results-std-360
+      contrast: 0 team text item(s); 0 team shape(s); 44px: all buttons 44px or more
+ok    nobug-hole-std-360
+      contrast: 0 team text item(s); 0 team shape(s); 44px: all buttons 44px or more
+ok    live-open-std-390
+      pill a "Won 2 up"  label "Aidan & Bartley Won 2 up"
+      pill a "1 up, 4 to play"  label "Aidan & Bartley 1 up, 4 to play"
+      pill a "3 up, 4 to play"  label "Aidan & Bartley 3 up, 4 to play"
+      badges a:AF(Aidan) a:BF(Bartley) v b:CF(Cathal) b:DF(Donnacha)
+      1 hole board(s): Buggy 1 row above Buggy 2 in every column
+      text .bw-bd.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-bd.b #FFFFFF on #C62828 5.62:1
+      text .bw-res.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wa #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wb #FFFFFF on #C62828 5.62:1
+      text .bw-t.a #0A60C9 on #FFFFFF 5.95:1
+      text .bw-t.b #C62828 on #FFFFFF 5.62:1
+      contrast: 14 team text item(s), lowest 5.62:1; 14 team shape(s), lowest 5.30:1; 44px: all buttons 44px or more
+ok    live-decided-std-390
+      pill a "Won 2 up"  label "Aidan & Bartley Won 2 up"
+      pill a "1 up, 4 to play"  label "Aidan & Bartley 1 up, 4 to play"
+      pill a "3 up, 4 to play"  label "Aidan & Bartley 3 up, 4 to play"
+      badges a:AF(Aidan) a:BF(Bartley) v b:CF(Cathal) b:DF(Donnacha)
+      1 hole board(s): Buggy 1 row above Buggy 2 in every column
+      text .bw-bd.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-bd.b #FFFFFF on #C62828 5.62:1
+      text .bw-res.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wb #FFFFFF on #C62828 5.62:1
+      text .bw-c.wa #FFFFFF on #0A60C9 5.95:1
+      text .bw-t.a #0A60C9 on #FFFFFF 5.95:1
+      text .bw-t.b #C62828 on #FFFFFF 5.62:1
+      contrast: 17 team text item(s), lowest 5.62:1; 17 team shape(s), lowest 5.30:1; 44px: all buttons 44px or more
+ok    live-halved-std-390
+      pill n "Halved"  label "Halved"
+      pill a "1 up, 4 to play"  label "Eoghan & Fiachra 1 up, 4 to play"
+      pill a "1 up, 4 to play"  label "Eoghan & Fiachra 1 up, 4 to play"
+      badges a:EF(Eoghan) a:FF(Fiachra) v b:GF(Gearóid) b:HF(Hugh)
+      1 hole board(s): Buggy 1 row above Buggy 2 in every column
+      text .bw-bd.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-bd.b #FFFFFF on #C62828 5.62:1
+      text .bw-res.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wa #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wb #FFFFFF on #C62828 5.62:1
+      text .bw-t.a #0A60C9 on #FFFFFF 5.95:1
+      text .bw-t.b #C62828 on #FFFFFF 5.62:1
+      contrast: 11 team text item(s), lowest 5.62:1; 11 team shape(s), lowest 5.30:1; 44px: all buttons 44px or more
+ok    final-decided-std-390
+      pill b "Won 3&2"  label "Kevin & Lorcan Won 3&2"
+      pill a "Won 4&2"  label "Ivor & Jarlath Won 4&2"
+      pill b "Won 1 up"  label "Kevin & Lorcan Won 1 up"
+      badges a:IF(Ivor) a:JF(Jarlath) v b:KF(Kevin) b:LF(Lorcan)
+      1 hole board(s): Buggy 1 row above Buggy 2 in every column
+      text .bw-bd.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-bd.b #FFFFFF on #C62828 5.62:1
+      text .bw-res.b #FFFFFF on #C62828 5.62:1
+      text .bw-c.wb #FFFFFF on #C62828 5.62:1
+      text .bw-c.wa #FFFFFF on #0A60C9 5.95:1
+      text .bw-t.a #0A60C9 on #FFFFFF 5.95:1
+      text .bw-t.b #C62828 on #FFFFFF 5.62:1
+      text .bw-res.a #FFFFFF on #0A60C9 5.95:1
+      contrast: 16 team text item(s), lowest 5.62:1; 16 team shape(s), lowest 5.30:1; 44px: all buttons 44px or more
+ok    results-std-390
+      result pills Buggy 1, Buggy 2
+      text .pill.a #FFFFFF on #0A60C9 5.95:1
+      text .pill.a.soft #0A60C9 on #DFEAF8 4.89:1
+      text .pill.b #FFFFFF on #C62828 5.62:1
+      text .pill.b.soft #C62828 on #F8E3E3 4.57:1
+      contrast: 14 team text item(s), lowest 4.57:1; 14 team shape(s), lowest 1.22:1; 44px: all buttons 44px or more
+ok    nobug-results-std-390
+      contrast: 0 team text item(s); 0 team shape(s); 44px: all buttons 44px or more
+ok    nobug-hole-std-390
+      contrast: 0 team text item(s); 0 team shape(s); 44px: all buttons 44px or more
+ok    live-open-std-390-135
+      pill a "Won 2 up"  label "Aidan & Bartley Won 2 up"
+      pill a "1 up, 4 to play"  label "Aidan & Bartley 1 up, 4 to play"
+      pill a "3 up, 4 to play"  label "Aidan & Bartley 3 up, 4 to play"
+      badges a:AF(Aidan) a:BF(Bartley) v b:CF(Cathal) b:DF(Donnacha)
+      1 hole board(s): Buggy 1 row above Buggy 2 in every column
+      text .bw-bd.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-bd.b #FFFFFF on #C62828 5.62:1
+      text .bw-res.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wa #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wb #FFFFFF on #C62828 5.62:1
+      text .bw-t.a #0A60C9 on #FFFFFF 5.95:1
+      text .bw-t.b #C62828 on #FFFFFF 5.62:1
+      contrast: 14 team text item(s), lowest 5.62:1; 14 team shape(s), lowest 5.30:1; 44px: all buttons 44px or more
+ok    live-decided-std-390-135
+      pill a "Won 2 up"  label "Aidan & Bartley Won 2 up"
+      pill a "1 up, 4 to play"  label "Aidan & Bartley 1 up, 4 to play"
+      pill a "3 up, 4 to play"  label "Aidan & Bartley 3 up, 4 to play"
+      badges a:AF(Aidan) a:BF(Bartley) v b:CF(Cathal) b:DF(Donnacha)
+      1 hole board(s): Buggy 1 row above Buggy 2 in every column
+      text .bw-bd.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-bd.b #FFFFFF on #C62828 5.62:1
+      text .bw-res.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wb #FFFFFF on #C62828 5.62:1
+      text .bw-c.wa #FFFFFF on #0A60C9 5.95:1
+      text .bw-t.a #0A60C9 on #FFFFFF 5.95:1
+      text .bw-t.b #C62828 on #FFFFFF 5.62:1
+      contrast: 17 team text item(s), lowest 5.62:1; 17 team shape(s), lowest 5.30:1; 44px: all buttons 44px or more
+ok    live-halved-std-390-135
+      pill n "Halved"  label "Halved"
+      pill a "1 up, 4 to play"  label "Eoghan & Fiachra 1 up, 4 to play"
+      pill a "1 up, 4 to play"  label "Eoghan & Fiachra 1 up, 4 to play"
+      badges a:EF(Eoghan) a:FF(Fiachra) v b:GF(Gearóid) b:HF(Hugh)
+      1 hole board(s): Buggy 1 row above Buggy 2 in every column
+      text .bw-bd.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-bd.b #FFFFFF on #C62828 5.62:1
+      text .bw-res.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wa #FFFFFF on #0A60C9 5.95:1
+      text .bw-c.wb #FFFFFF on #C62828 5.62:1
+      text .bw-t.a #0A60C9 on #FFFFFF 5.95:1
+      text .bw-t.b #C62828 on #FFFFFF 5.62:1
+      contrast: 11 team text item(s), lowest 5.62:1; 11 team shape(s), lowest 5.30:1; 44px: all buttons 44px or more
+ok    final-decided-std-390-135
+      pill b "Won 3&2"  label "Kevin & Lorcan Won 3&2"
+      pill a "Won 4&2"  label "Ivor & Jarlath Won 4&2"
+      pill b "Won 1 up"  label "Kevin & Lorcan Won 1 up"
+      badges a:IF(Ivor) a:JF(Jarlath) v b:KF(Kevin) b:LF(Lorcan)
+      1 hole board(s): Buggy 1 row above Buggy 2 in every column
+      text .bw-bd.a #FFFFFF on #0A60C9 5.95:1
+      text .bw-bd.b #FFFFFF on #C62828 5.62:1
+      text .bw-res.b #FFFFFF on #C62828 5.62:1
+      text .bw-c.wb #FFFFFF on #C62828 5.62:1
+      text .bw-c.wa #FFFFFF on #0A60C9 5.95:1
+      text .bw-t.a #0A60C9 on #FFFFFF 5.95:1
+      text .bw-t.b #C62828 on #FFFFFF 5.62:1
+      text .bw-res.a #FFFFFF on #0A60C9 5.95:1
+      contrast: 16 team text item(s), lowest 5.62:1; 16 team shape(s), lowest 5.30:1; 44px: all buttons 44px or more
+ok    results-std-390-135
+      result pills Buggy 1, Buggy 2
+      text .pill.a #FFFFFF on #0A60C9 5.95:1
+      text .pill.a.soft #0A60C9 on #DFEAF8 4.89:1
+      text .pill.b #FFFFFF on #C62828 5.62:1
+      text .pill.b.soft #C62828 on #F8E3E3 4.57:1
+      contrast: 14 team text item(s), lowest 4.57:1; 14 team shape(s), lowest 1.22:1; 44px: all buttons 44px or more
+ok    nobug-results-std-390-135
+      contrast: 0 team text item(s); 0 team shape(s); 44px: all buttons 44px or more
+ok    nobug-hole-std-390-135
+      contrast: 0 team text item(s); 0 team shape(s); 44px: all buttons 44px or more
+ALL PASSED (21 screens)

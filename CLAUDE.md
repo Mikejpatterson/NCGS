@@ -7,7 +7,7 @@
 - KBs is a pair competition with partners in different groups. Call it "KBs" and do not explain it in the app.
 - Never write "NCGS Golf Society". NCGS already means golf society.
 - The real data (`data/ncgs-2026.json`, `data/seed.json`) is never committed. This repository is public.
-- Design: warm white pages, rounded pine cards for the big moments (home round, hole, leader), flag-yellow accent, floating glass tab bar (Home, Hole, Results, Ruling), initials badges on people, system font, big touch targets, readable outdoors.
+- Design: warm white pages, rounded pine cards for the big moments (home round, hole, leader), pine main buttons with white text (flag-yellow retired 21 October 2026; champagne gold only on pine, for identity, awards and small labels such as HOLE and RULING), floating glass tab bar (Home, Hole, Results, Ruling), initials badges on people, system font, big touch targets, readable outdoors.
 - Layout: no text may overflow or be cut off, and touch targets are at least 44px, at 360px, 390px and 135% text. `test/layout.run.js` checks this on every golfer screen. Numbers use tabular figures and leave room for three digits.
 - Run `node --test test/engine.test.js test/server.test.js` before every push.
 
@@ -16,3 +16,19 @@
 - When asking them to do something by hand (Google Drive, Apps Script, GitHub and so on), give ONE step at a time, say exactly what they should see on screen, and wait for their reply before the next step. Ask for a screenshot when that is quicker than describing.
 - Do not guess facts about their situation (which round is real, what is live). Check, or ask.
 - Keep replies short and plain. Own mistakes briefly and carry on.
+
+
+# Approved editorial-design project (design branch only)
+
+Read `docs/EDITORIAL-PROTOTYPE.md`, `docs/AI-COLLABORATION.md` and `docs/CLAUDE-HANDOVER.md` (current state, decisions, commands and pitfalls from earlier Claude sessions). The existing functional and data-safety rules above take precedence.
+
+- Scope: Home, Hole/Score Entry and Buggy Wars aesthetics, **not** rules, storage or gameplay.
+- Palette: forest/pine green #0B3D2E, warm ivory #FAF8F3, extremely limited flat champagne gold #D4B483 in crest only or award accents, Buggy Wars deep navy #244A78 and crimson #9B3443.
+- Use contemporary serif selectively for brand and editorial display titles; system sans for interaction, navigation, player names and scoring. Preserve floating Liquid Glass pill navigation and generous phone touch targets.
+- No golf-course photos, decorative ornamental motifs, fake metallic shine or luxury-brand effects.
+- Approved crest: ivory serif NCGS and underline, double thin champagne-gold ring on pine green. The production vector is `docs/design/assets/ncgs-crest.svg` (app icon: `ncgs-app-icon.svg`), owner-approved 21 October 2026. Use those files; never redraw the crest from a mock-up.
+- Known design defect: Hole screen pine-green header overloaded on left and underuses right side; redistribute hole/par/SI hierarchy intentionally, without centring everything arbitrarily.
+- Only work on `design/crest-editorial-prototype`. Do not commit to `main`, merge, deploy, or alter production integrations, data or secrets.
+- One look since 21 October 2026: the Option 2 styles live in `src/styles.css` and the old `NCGS_DESIGN=editorial` switch is gone. Audit selectors: first-pass CSS needs checking against the actual DOM.
+- Test with `node --test test/engine.test.js test/server.test.js`, the layout suite and the fixture build (`NCGS_FIXTURE=1 node build.js`). Include truthful pass/fail evidence and screenshots if available.
+- Stop for the owner's approval before any production merge.

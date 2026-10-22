@@ -14,7 +14,7 @@ trap 'kill $SERVER $DEV 2>/dev/null || true' EXIT
 sleep 1
 FAIL=0
 for t in test/*.run.js; do
-  case "$t" in *crawl.run.js) continue;; esac   # the click-through crawler takes about 10 minutes: run it by itself, see docs/TEST-PLAN.md
+  case "$t" in *crawl.run.js|*design.run.js) continue;; esac   # the crawler (about 10 minutes) and the design comparison (needs two builds) run by themselves
   if NODE_PATH="${NODE_PATH:-/opt/npm-tools/node_modules}" timeout 240 node "$t" > /tmp/ncgs-check.out 2>&1; then echo "ok    $t"; else echo "FAIL  $t"; grep -E "FAIL|Error" /tmp/ncgs-check.out | head -5; FAIL=1; fi
 done
 exit $FAIL

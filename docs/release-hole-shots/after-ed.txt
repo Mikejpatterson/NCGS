@@ -1,0 +1,217 @@
+PASS  empty-normal-ed-360  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row 100px  name ends 103px, next control at 160px  score "Par 3" pick-up off
+      Bartley                            one line row 101px  name ends 115px, next control at 160px  score "Par 3" pick-up off
+      Cathal                             one line row 100px  name ends 108px, next control at 160px  score "Par 3" pick-up off
+      Donnacha                           one line row 101px  name ends 143px, next control at 160px  score "Par 3" pick-up off
+      save "4 scores to go" 328x56 radius 28px, on first screen; scrolled to end (83px): tap lands on it yes, 16px above tab bar
+PASS  empty-normal-ed-390  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row  72px  name ends 103px, next control at 129px  score "Par 3" pick-up off
+      Bartley                            one line row  73px  name ends 115px, next control at 129px  score "Par 3" pick-up off
+      Cathal                             one line row  72px  name ends 108px, next control at 129px  score "Par 3" pick-up off
+      Donnacha                           own line (borderline, by design) row 119px  name ends 143px, no control beside it  score "Par 3" pick-up off
+      save "4 scores to go" 358x56 radius 28px, on first screen; scrolled to end (0px): tap lands on it yes, 103px above tab bar
+PASS  empty-normal-ed-390-135  root 21.6px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row 100px  name ends 118px, next control at 190px  score "Par 3" pick-up off
+      Bartley                            one line row 101px  name ends 133px, next control at 190px  score "Par 3" pick-up off
+      Cathal                             one line row 100px  name ends 125px, next control at 190px  score "Par 3" pick-up off
+      Donnacha                           one line row 101px  name ends 169px, next control at 190px  score "Par 3" pick-up off
+      save "4 scores to go" 358x56 radius 28px, on first screen; scrolled to end (0px): tap lands on it yes, 17px above tab bar
+PASS  partial-normal-ed-360  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row 100px  name ends 103px, next control at 160px  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Bartley                            one line row 101px  name ends 115px, next control at 160px  score "4 (2 pts) Bogey" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Cathal                             one line row 100px  name ends 108px, next control at 160px  score "Par 3" pick-up off
+      Donnacha                           one line row 101px  name ends 143px, next control at 160px  score "Par 3" pick-up off
+      save "2 scores to go · Cathal, Donnacha" 328x56 radius 28px, on first screen; scrolled to end (83px): tap lands on it yes, 16px above tab bar
+PASS  partial-normal-ed-390  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row  72px  name ends 103px, next control at 129px  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Bartley                            one line row  73px  name ends 115px, next control at 129px  score "4 (2 pts) Bogey" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Cathal                             one line row  72px  name ends 108px, next control at 129px  score "Par 3" pick-up off
+      Donnacha                           own line (borderline, by design) row 119px  name ends 143px, no control beside it  score "Par 3" pick-up off
+      save "2 scores to go · Cathal, Donnacha" 358x56 radius 28px, on first screen; scrolled to end (0px): tap lands on it yes, 103px above tab bar
+PASS  partial-normal-ed-390-135  root 21.6px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row 100px  name ends 118px, next control at 190px  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Bartley                            one line row 101px  name ends 133px, next control at 190px  score "4 (2 pts) Bogey" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Cathal                             one line row 100px  name ends 125px, next control at 190px  score "Par 3" pick-up off
+      Donnacha                           one line row 101px  name ends 169px, next control at 190px  score "Par 3" pick-up off
+      save "2 scores to go · Cathal, Donnacha" 358x60 radius 28px, on first screen; scrolled to end (3px): tap lands on it yes, 16px above tab bar
+PASS  complete-normal-ed-360  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row 100px  name ends 103px, next control at 160px  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Bartley                            one line row 101px  name ends 115px, next control at 160px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Cathal                             one line row 100px  name ends 108px, next control at 160px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Donnacha                           one line row 101px  name ends 143px, next control at 160px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      save "Save hole 15" 328x56 radius 28px, on first screen; scrolled to end (83px): tap lands on it yes, 16px above tab bar
+PASS  complete-normal-ed-390  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row  72px  name ends 103px, next control at 129px  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Bartley                            one line row  73px  name ends 115px, next control at 129px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Cathal                             one line row  72px  name ends 108px, next control at 129px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Donnacha                           own line (borderline, by design) row 119px  name ends 143px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (0px): tap lands on it yes, 103px above tab bar
+PASS  complete-normal-ed-390-135  root 21.6px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row 100px  name ends 118px, next control at 190px  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Bartley                            one line row 101px  name ends 133px, next control at 190px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Cathal                             one line row 100px  name ends 125px, next control at 190px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Donnacha                           one line row 101px  name ends 169px, next control at 190px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (0px): tap lands on it yes, 17px above tab bar
+PASS  pickup-normal-ed-360  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row 100px  name ends 103px, next control at 160px  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Bartley                            one line row 101px  name ends 115px, next control at 160px  score "6 (0 pts) Scratch" pick-up on  figures tabular-nums, 22px to the nearer of - and +
+      Cathal                             one line row 100px  name ends 108px, next control at 160px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Donnacha                           one line row 101px  name ends 143px, next control at 160px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      save "Save hole 15" 328x56 radius 28px, on first screen; scrolled to end (83px): tap lands on it yes, 16px above tab bar
+PASS  pickup-normal-ed-390  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row  72px  name ends 103px, next control at 129px  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Bartley                            one line row  73px  name ends 115px, next control at 121px  score "6 (0 pts) Scratch" pick-up on  figures tabular-nums, 20px to the nearer of - and +
+      Cathal                             one line row  72px  name ends 108px, next control at 129px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Donnacha                           own line (borderline, by design) row 119px  name ends 143px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (0px): tap lands on it yes, 103px above tab bar
+PASS  pickup-normal-ed-390-135  root 21.6px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row 100px  name ends 118px, next control at 190px  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Bartley                            one line row 101px  name ends 133px, next control at 190px  score "6 (0 pts) Scratch" pick-up on  figures tabular-nums, 18px to the nearer of - and +
+      Cathal                             one line row 100px  name ends 125px, next control at 190px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Donnacha                           one line row 101px  name ends 169px, next control at 190px  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (0px): tap lands on it yes, 17px above tab bar
+PASS  two-normal-ed-360  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row 100px  name ends 103px, next control at 160px  score "10 (0 pts) Scratch" pick-up on  figures tabular-nums, 11px to the nearer of - and +
+      Bartley                            one line row 101px  name ends 115px, next control at 160px  score "11 (0 pts) Scratch" pick-up on  figures tabular-nums, 13px to the nearer of - and +
+      Cathal                             one line row 100px  name ends 108px, next control at 160px  score "12 (0 pts) Scratch" pick-up on  figures tabular-nums, 11px to the nearer of - and +
+      Donnacha                           one line row 101px  name ends 143px, next control at 160px  score "13 (0 pts) Scratch" pick-up on  figures tabular-nums, 11px to the nearer of - and +
+      save "Save hole 15" 328x56 radius 28px, on first screen; scrolled to end (83px): tap lands on it yes, 16px above tab bar
+PASS  two-normal-ed-390  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row  72px  name ends 103px, next control at 121px  score "10 (0 pts) Scratch" pick-up on  figures tabular-nums, 9px to the nearer of - and +
+      Bartley                            one line row  73px  name ends 115px, next control at 121px  score "11 (0 pts) Scratch" pick-up on  figures tabular-nums, 11px to the nearer of - and +
+      Cathal                             one line row  72px  name ends 108px, next control at 121px  score "12 (0 pts) Scratch" pick-up on  figures tabular-nums, 9px to the nearer of - and +
+      Donnacha                           own line (borderline, by design) row 119px  name ends 143px, no control beside it  score "13 (0 pts) Scratch" pick-up on  figures tabular-nums, 9px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (0px): tap lands on it yes, 103px above tab bar
+PASS  two-normal-ed-390-135  root 21.6px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row 100px  name ends 118px, next control at 187px  score "10 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      Bartley                            one line row 101px  name ends 133px, next control at 190px  score "11 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      Cathal                             one line row 100px  name ends 125px, next control at 187px  score "12 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      Donnacha                           one line row 101px  name ends 169px, next control at 187px  score "13 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (0px): tap lands on it yes, 17px above tab bar
+PASS  three-normal-ed-360  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row 100px  name ends 103px, next control at 160px  score "100 (0 pts) Scratch" pick-up on  figures tabular-nums, 9px to the nearer of - and +
+      Bartley                            one line row 101px  name ends 115px, next control at 160px  score "104 (0 pts) Scratch" pick-up on  figures tabular-nums, 9px to the nearer of - and +
+      Cathal                             one line row 100px  name ends 108px, next control at 160px  score "108 (0 pts) Scratch" pick-up on  figures tabular-nums, 9px to the nearer of - and +
+      Donnacha                           one line row 101px  name ends 143px, next control at 160px  score "111 (0 pts) Scratch" pick-up on  figures tabular-nums, 10px to the nearer of - and +
+      save "Save hole 15" 328x56 radius 28px, on first screen; scrolled to end (83px): tap lands on it yes, 16px above tab bar
+PASS  three-normal-ed-390  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row  72px  name ends 103px, next control at 121px  score "100 (0 pts) Scratch" pick-up on  figures tabular-nums, 7px to the nearer of - and +
+      Bartley                            one line row  73px  name ends 115px, next control at 121px  score "104 (0 pts) Scratch" pick-up on  figures tabular-nums, 7px to the nearer of - and +
+      Cathal                             one line row  72px  name ends 108px, next control at 121px  score "108 (0 pts) Scratch" pick-up on  figures tabular-nums, 7px to the nearer of - and +
+      Donnacha                           own line (borderline, by design) row 119px  name ends 143px, no control beside it  score "111 (0 pts) Scratch" pick-up on  figures tabular-nums, 8px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (0px): tap lands on it yes, 103px above tab bar
+PASS  three-normal-ed-390-135  root 21.6px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Aidan                              one line row 100px  name ends 118px, next control at 180px  score "100 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      Bartley                            one line row 101px  name ends 133px, next control at 180px  score "104 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      Cathal                             one line row 100px  name ends 125px, next control at 180px  score "108 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      Donnacha                           one line row 101px  name ends 169px, next control at 184px  score "111 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (0px): tap lands on it yes, 17px above tab bar
+PASS  empty-long-ed-360  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 131px  name ends 329px, no control beside it  score "Par 3" pick-up off
+      Maximilian Montgomery-Smythe       own line row 132px  name ends 329px, no control beside it  score "Par 3" pick-up off
+      Christopher Fitzwilliam-Harrington own line row 131px  name ends 330px, no control beside it  score "Par 3" pick-up off
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 274px, no control beside it  score "Par 3" pick-up off
+      save "4 scores to go" 328x56 radius 28px, on first screen; scrolled to end (193px): tap lands on it yes, 16px above tab bar
+PASS  empty-long-ed-390  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 131px  name ends 359px, no control beside it  score "Par 3" pick-up off
+      Maximilian Montgomery-Smythe       own line row 119px  name ends 348px, no control beside it  score "Par 3" pick-up off
+      Christopher Fitzwilliam-Harrington own line row 131px  name ends 359px, no control beside it  score "Par 3" pick-up off
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 274px, no control beside it  score "Par 3" pick-up off
+      save "4 scores to go" 358x56 radius 28px, on first screen; scrolled to end (77px): tap lands on it yes, 16px above tab bar
+PASS  empty-long-ed-390-135  root 21.6px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 143px  name ends 360px, no control beside it  score "Par 3" pick-up off
+      Maximilian Montgomery-Smythe       own line row 144px  name ends 360px, no control beside it  score "Par 3" pick-up off
+      Christopher Fitzwilliam-Harrington own line row 143px  name ends 361px, no control beside it  score "Par 3" pick-up off
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 336px, no control beside it  score "Par 3" pick-up off
+      save "4 scores to go" 358x56 radius 28px, on first screen; scrolled to end (146px): tap lands on it yes, 16px above tab bar
+PASS  partial-long-ed-360  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 131px  name ends 329px, no control beside it  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 132px  name ends 329px, no control beside it  score "4 (2 pts) Bogey" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 131px  name ends 330px, no control beside it  score "Par 3" pick-up off
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 274px, no control beside it  score "Par 3" pick-up off
+      save "2 scores to go · Christopher Fitzwilliam-Harrington, Fionnuala Ní Mhaonaigh" 328x69 radius 28px, on first screen; scrolled to end (207px): tap lands on it yes, 16px above tab bar
+PASS  partial-long-ed-390  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 131px  name ends 359px, no control beside it  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 119px  name ends 348px, no control beside it  score "4 (2 pts) Bogey" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 131px  name ends 359px, no control beside it  score "Par 3" pick-up off
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 274px, no control beside it  score "Par 3" pick-up off
+      save "2 scores to go · Christopher Fitzwilliam-Harrington, Fionnuala Ní Mhaonaigh" 358x56 radius 28px, on first screen; scrolled to end (77px): tap lands on it yes, 16px above tab bar
+PASS  partial-long-ed-390-135  root 21.6px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 143px  name ends 360px, no control beside it  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 144px  name ends 360px, no control beside it  score "4 (2 pts) Bogey" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 143px  name ends 361px, no control beside it  score "Par 3" pick-up off
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 336px, no control beside it  score "Par 3" pick-up off
+      save "2 scores to go · Christopher Fitzwilliam-Harrington, Fionnuala Ní Mhaonaigh" 358x86 radius 28px, on first screen; scrolled to end (176px): tap lands on it yes, 16px above tab bar
+PASS  complete-long-ed-360  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 131px  name ends 329px, no control beside it  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 132px  name ends 329px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 131px  name ends 330px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 274px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      save "Save hole 15" 328x56 radius 28px, on first screen; scrolled to end (193px): tap lands on it yes, 16px above tab bar
+PASS  complete-long-ed-390  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 131px  name ends 359px, no control beside it  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 119px  name ends 348px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 131px  name ends 359px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 274px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (77px): tap lands on it yes, 16px above tab bar
+PASS  complete-long-ed-390-135  root 21.6px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 143px  name ends 360px, no control beside it  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 144px  name ends 360px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 143px  name ends 361px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 336px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (146px): tap lands on it yes, 16px above tab bar
+PASS  pickup-long-ed-360  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 131px  name ends 329px, no control beside it  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 132px  name ends 329px, no control beside it  score "6 (0 pts) Scratch" pick-up on  figures tabular-nums, 22px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 131px  name ends 330px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 274px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 22px to the nearer of - and +
+      save "Save hole 15" 328x56 radius 28px, on first screen; scrolled to end (193px): tap lands on it yes, 16px above tab bar
+PASS  pickup-long-ed-390  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 131px  name ends 359px, no control beside it  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 119px  name ends 348px, no control beside it  score "6 (0 pts) Scratch" pick-up on  figures tabular-nums, 20px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 131px  name ends 359px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 274px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 20px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (77px): tap lands on it yes, 16px above tab bar
+PASS  pickup-long-ed-390-135  root 21.6px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 143px  name ends 360px, no control beside it  score "3 (2 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 144px  name ends 360px, no control beside it  score "6 (0 pts) Scratch" pick-up on  figures tabular-nums, 18px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 143px  name ends 361px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 336px, no control beside it  score "3 (3 pts) Par" pick-up off  figures tabular-nums, 18px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (146px): tap lands on it yes, 16px above tab bar
+PASS  two-long-ed-360  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 131px  name ends 329px, no control beside it  score "10 (0 pts) Scratch" pick-up on  figures tabular-nums, 11px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 132px  name ends 329px, no control beside it  score "11 (0 pts) Scratch" pick-up on  figures tabular-nums, 13px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 131px  name ends 330px, no control beside it  score "12 (0 pts) Scratch" pick-up on  figures tabular-nums, 11px to the nearer of - and +
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 274px, no control beside it  score "13 (0 pts) Scratch" pick-up on  figures tabular-nums, 11px to the nearer of - and +
+      save "Save hole 15" 328x56 radius 28px, on first screen; scrolled to end (193px): tap lands on it yes, 16px above tab bar
+PASS  two-long-ed-390  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 131px  name ends 359px, no control beside it  score "10 (0 pts) Scratch" pick-up on  figures tabular-nums, 9px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 119px  name ends 348px, no control beside it  score "11 (0 pts) Scratch" pick-up on  figures tabular-nums, 11px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 131px  name ends 359px, no control beside it  score "12 (0 pts) Scratch" pick-up on  figures tabular-nums, 9px to the nearer of - and +
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 274px, no control beside it  score "13 (0 pts) Scratch" pick-up on  figures tabular-nums, 9px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (77px): tap lands on it yes, 16px above tab bar
+PASS  two-long-ed-390-135  root 21.6px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 143px  name ends 360px, no control beside it  score "10 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 144px  name ends 360px, no control beside it  score "11 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 143px  name ends 361px, no control beside it  score "12 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 336px, no control beside it  score "13 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (146px): tap lands on it yes, 16px above tab bar
+PASS  three-long-ed-360  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 131px  name ends 329px, no control beside it  score "100 (0 pts) Scratch" pick-up on  figures tabular-nums, 9px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 132px  name ends 329px, no control beside it  score "104 (0 pts) Scratch" pick-up on  figures tabular-nums, 9px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 131px  name ends 330px, no control beside it  score "108 (0 pts) Scratch" pick-up on  figures tabular-nums, 9px to the nearer of - and +
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 274px, no control beside it  score "111 (0 pts) Scratch" pick-up on  figures tabular-nums, 10px to the nearer of - and +
+      save "Save hole 15" 328x56 radius 28px, on first screen; scrolled to end (193px): tap lands on it yes, 16px above tab bar
+PASS  three-long-ed-390  root 17px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 131px  name ends 359px, no control beside it  score "100 (0 pts) Scratch" pick-up on  figures tabular-nums, 7px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 119px  name ends 348px, no control beside it  score "104 (0 pts) Scratch" pick-up on  figures tabular-nums, 7px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 131px  name ends 359px, no control beside it  score "108 (0 pts) Scratch" pick-up on  figures tabular-nums, 7px to the nearer of - and +
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 274px, no control beside it  score "111 (0 pts) Scratch" pick-up on  figures tabular-nums, 8px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (77px): tap lands on it yes, 16px above tab bar
+PASS  three-long-ed-390-135  root 21.6px  tabs 4 tabs [Home, Hole 15, Results, Ruling], smallest 52px
+      Bartholomew Featherstonehaugh      own line row 143px  name ends 360px, no control beside it  score "100 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      Maximilian Montgomery-Smythe       own line row 144px  name ends 360px, no control beside it  score "104 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      Christopher Fitzwilliam-Harrington own line row 143px  name ends 361px, no control beside it  score "108 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      Fionnuala Ní Mhaonaigh             own line row 119px  name ends 336px, no control beside it  score "111 (0 pts) Scratch" pick-up on  figures tabular-nums, 6px to the nearer of - and +
+      save "Save hole 15" 358x56 radius 28px, on first screen; scrolled to end (146px): tap lands on it yes, 16px above tab bar
+ALL PASSED

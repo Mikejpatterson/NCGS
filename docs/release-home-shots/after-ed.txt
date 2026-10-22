@@ -1,0 +1,105 @@
+next ed 360: root 17px | title "Cabopino" 1 line(s), 30.6px, ui-serif
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge text .now-kind bg .go
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 54px (second shot -end)
+next ed 390: root 17px | title "Cabopino" 1 line(s), 30.6px, ui-serif
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge text .now-kind bg .go
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 0px
+next ed 390-135: root 21.6px | title "Cabopino" 1 line(s), 38.88px, ui-serif
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge text .now-kind bg .go
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 41px (second shot -end)
+live ed 360: root 17px | title "Cabopino" 1 line(s), 30.6px, ui-serif
+  nav pill 328x68 radius 34px blur yes, 4 tabs [Home, Hole 10, Results, Ruling], smallest 52px high, inside screen yes
+  flag-yellow bg .badge text .now-kind bg .pill bg .go
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 328px (second shot -end)
+live ed 390: root 17px | title "Cabopino" 1 line(s), 30.6px, ui-serif
+  nav pill 358x68 radius 34px blur yes, 4 tabs [Home, Hole 10, Results, Ruling], smallest 52px high, inside screen yes
+  flag-yellow bg .badge text .now-kind bg .pill bg .go
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 224px (second shot -end)
+live ed 390-135: root 21.6px | title "Cabopino" 1 line(s), 38.88px, ui-serif
+  nav pill 358x68 radius 34px blur yes, 4 tabs [Home, Hole 10, Results, Ruling], smallest 52px high, inside screen yes
+  flag-yellow bg .badge text .now-kind bg .pill bg .go
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 308px (second shot -end)
+live-long ed 360: root 17px | title "Cabopino, the long-named second day of the trip" 2 line(s), 21.7021px, ui-serif
+  nav pill 328x68 radius 34px blur yes, 4 tabs [Home, Hole 10, Results, Ruling], smallest 52px high, inside screen yes
+  flag-yellow bg .badge text .now-kind bg .pill bg .go
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 341px (second shot -end)
+live-long ed 390: root 17px | title "Cabopino, the long-named second day of the trip" 2 line(s), 21.7021px, ui-serif
+  nav pill 358x68 radius 34px blur yes, 4 tabs [Home, Hole 10, Results, Ruling], smallest 52px high, inside screen yes
+  flag-yellow bg .badge text .now-kind bg .pill bg .go
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 237px (second shot -end)
+live-long ed 390-135: root 21.6px | title "Cabopino, the long-named second day of the trip" 2 line(s), 27.5745px, ui-serif
+  nav pill 358x68 radius 34px blur yes, 4 tabs [Home, Hole 10, Results, Ruling], smallest 52px high, inside screen yes
+  flag-yellow bg .badge text .now-kind bg .pill bg .go
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 303px (second shot -end)
+finished ed 360: root 17px | title "No round booked" 1 line(s), 30.6px, ui-serif
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 0px
+finished ed 390: root 17px | title "No round booked" 1 line(s), 30.6px, ui-serif
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 0px
+finished ed 390-135: root 21.6px | title "No round booked" 1 line(s), 38.88px, ui-serif
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 0px
+no-round ed 360: root 17px | title "No round booked" 1 line(s), 30.6px, ui-serif
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 0px
+no-round ed 390: root 17px | title "No round booked" 1 line(s), 30.6px, ui-serif
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 0px
+no-round ed 390-135: root 21.6px | title "No round booked" 1 line(s), 38.88px, ui-serif
+  nav hidden (shown only while a round is in play)
+  flag-yellow bg .badge
+  serif .wordmark .now-name
+  cut/off-screen none
+  under 44px none
+  scrolls 0px

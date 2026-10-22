@@ -1,0 +1,77 @@
+# Measured team colour pairs (WCAG 2 contrast ratio, sRGB relative luminance)
+look | screen | sizes | element | kind | team | text | colour | behind | ratio | needs | result
+standard | hole | 360 390 390-135 | .bugs.b1 | border 2px | a |  | #0A60C9 | #FAF8F3 | 5.61:1 | 3:1 | pass
+standard | hole | 360 390 390-135 | .bugs.b2 | border 2px | b |  | #C62828 | #FAF8F3 | 5.30:1 | 3:1 | pass
+standard | after | 360 390 390-135 | .afdot.a | fill | a |  | #0A60C9 | #FFFFFF | 5.95:1 | 3:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-bd.a | text | a | "AF" 11.9px/800 | #FFFFFF | #0A60C9 | 5.95:1 | 4.5:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-bd.a | fill | a |  | #0A60C9 | #FAF8F3 | 5.61:1 | 3:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-bd.b | text | b | "CF" 11.9px/800 | #FFFFFF | #C62828 | 5.62:1 | 4.5:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-bd.b | fill | b |  | #C62828 | #FAF8F3 | 5.30:1 | 3:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-res.a | text | a | "Won 2 up" 15.3px/800 | #FFFFFF | #0A60C9 | 5.95:1 | 4.5:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-res.a | fill | a |  | #0A60C9 | #FFFFFF | 5.95:1 | 3:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-c.wa | text | a | "3" 13.6px/800 | #FFFFFF | #0A60C9 | 5.95:1 | 4.5:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-c.wa | fill | a |  | #0A60C9 | #FFFFFF | 5.95:1 | 3:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-c.wb | text | b | "2" 13.6px/800 | #FFFFFF | #C62828 | 5.62:1 | 4.5:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-c.wb | fill | b |  | #C62828 | #FFFFFF | 5.62:1 | 3:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-t.a | text | a | "3" 14.96px/800 | #0A60C9 | #FFFFFF | 5.95:1 | 4.5:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-t.a | ring | a |  | #0A60C9 | #FFFFFF | 5.95:1 | 3:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-t.b | text | b | "2" 14.96px/800 | #C62828 | #FFFFFF | 5.62:1 | 4.5:1 | pass
+standard | buggy-wars | 360 390 390-135 | .bw-t.b | ring | b |  | #C62828 | #FFFFFF | 5.62:1 | 3:1 | pass
+standard | round-groups | 360 390 390-135 | .pb | border 2px | a |  | #0A60C9 | #FFFFFF | 5.95:1 | 3:1 | pass
+standard | round-groups | 360 390 390-135 | .pr | border 2px | b |  | #C62828 | #FFFFFF | 5.62:1 | 3:1 | pass
+standard | round-groups | 360 390 390-135 | .dot.a | fill | a |  | #0A60C9 | #FAF8F3 | 5.61:1 | 3:1 | pass
+standard | round-groups | 360 390 390-135 | .dot.b | fill | b |  | #C62828 | #FAF8F3 | 5.30:1 | 3:1 | pass
+standard | round-results | 360 390 390-135 | .pill.a | text | a | "Buggy 1" 13.005px/600 | #FFFFFF | #0A60C9 | 5.95:1 | 4.5:1 | pass
+standard | round-results | 360 390 390-135 | .pill.a | fill | a |  | #0A60C9 | #FFFFFF | 5.95:1 | 3:1 | pass
+standard | round-results | 360 390 390-135 | .pill.a.soft | text | a | "won 2 & 1" 13.005px/600 | #0A60C9 | #DFEAF8 | 4.89:1 | 4.5:1 | pass
+standard | round-results | 360 390 390-135 | .pill.a.soft | soft fill | a |  | #DFEAF8 | #FFFFFF | 1.22:1 | 3:1 | below
+standard | round-results | 360 390 390-135 | .pill.b | text | b | "Buggy 2" 13.005px/600 | #FFFFFF | #C62828 | 5.62:1 | 4.5:1 | pass
+standard | round-results | 360 390 390-135 | .pill.b | fill | b |  | #C62828 | #FFFFFF | 5.62:1 | 3:1 | pass
+standard | round-results | 360 390 390-135 | .pill.b.soft | text | b | "won 3 & 2" 13.005px/600 | #C62828 | #F8E3E3 | 4.57:1 | 4.5:1 | pass
+standard | round-results | 360 390 390-135 | .pill.b.soft | soft fill | b |  | #F8E3E3 | #FFFFFF | 1.23:1 | 3:1 | below
+editorial | hole | 360 390 390-135 | .bugs.b1 | border 2px | a |  | #244A78 | #FAF8F3 | 8.51:1 | 3:1 | pass
+editorial | hole | 360 390 390-135 | .bugs.b2 | border 2px | b |  | #9B3443 | #FAF8F3 | 6.67:1 | 3:1 | pass
+editorial | after | 360 390 390-135 | .afdot.a | fill | a |  | #244A78 | #FFFFFF | 9.03:1 | 3:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-bd.a | text | a | "AF" 11.9px/800 | #FFFFFF | #244A78 | 9.03:1 | 4.5:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-bd.a | fill | a |  | #244A78 | #FAF8F3 | 8.51:1 | 3:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-bd.b | text | b | "CF" 11.9px/800 | #FFFFFF | #9B3443 | 7.08:1 | 4.5:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-bd.b | fill | b |  | #9B3443 | #FAF8F3 | 6.67:1 | 3:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-res.a | text | a | "Won 2 up" 15.3px/800 | #FFFFFF | #244A78 | 9.03:1 | 4.5:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-res.a | fill | a |  | #244A78 | #FFFFFF | 9.03:1 | 3:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-c.wa | text | a | "3" 13.6px/800 | #FFFFFF | #244A78 | 9.03:1 | 4.5:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-c.wa | fill | a |  | #244A78 | #FFFFFF | 9.03:1 | 3:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-c.wb | text | b | "2" 13.6px/800 | #FFFFFF | #9B3443 | 7.08:1 | 4.5:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-c.wb | fill | b |  | #9B3443 | #FFFFFF | 7.08:1 | 3:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-t.a | text | a | "3" 14.96px/800 | #244A78 | #FFFFFF | 9.03:1 | 4.5:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-t.a | ring | a |  | #244A78 | #FFFFFF | 9.03:1 | 3:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-t.b | text | b | "2" 14.96px/800 | #9B3443 | #FFFFFF | 7.08:1 | 4.5:1 | pass
+editorial | buggy-wars | 360 390 390-135 | .bw-t.b | ring | b |  | #9B3443 | #FFFFFF | 7.08:1 | 3:1 | pass
+editorial | round-groups | 360 390 390-135 | .pb | border 2px | a |  | #244A78 | #FFFFFF | 9.03:1 | 3:1 | pass
+editorial | round-groups | 360 390 390-135 | .pr | border 2px | b |  | #9B3443 | #FFFFFF | 7.08:1 | 3:1 | pass
+editorial | round-groups | 360 390 390-135 | .dot.a | fill | a |  | #244A78 | #FAF8F3 | 8.51:1 | 3:1 | pass
+editorial | round-groups | 360 390 390-135 | .dot.b | fill | b |  | #9B3443 | #FAF8F3 | 6.67:1 | 3:1 | pass
+editorial | round-results | 360 390 390-135 | .pill.a | text | a | "Buggy 1" 13.005px/600 | #FFFFFF | #244A78 | 9.03:1 | 4.5:1 | pass
+editorial | round-results | 360 390 390-135 | .pill.a | fill | a |  | #244A78 | #FFFFFF | 9.03:1 | 3:1 | pass
+editorial | round-results | 360 390 390-135 | .pill.a.soft | text | a | "won 2 & 1" 13.005px/600 | #244A78 | #E3E7ED | 7.27:1 | 4.5:1 | pass
+editorial | round-results | 360 390 390-135 | .pill.a.soft | soft fill | a |  | #E3E7ED | #FFFFFF | 1.24:1 | 3:1 | below
+editorial | round-results | 360 390 390-135 | .pill.b | text | b | "Buggy 2" 13.005px/600 | #FFFFFF | #9B3443 | 7.08:1 | 4.5:1 | pass
+editorial | round-results | 360 390 390-135 | .pill.b | fill | b |  | #9B3443 | #FFFFFF | 7.08:1 | 3:1 | pass
+editorial | round-results | 360 390 390-135 | .pill.b.soft | text | b | "won 3 & 2" 13.005px/600 | #9B3443 | #F2E5E7 | 5.78:1 | 4.5:1 | pass
+editorial | round-results | 360 390 390-135 | .pill.b.soft | soft fill | b |  | #F2E5E7 | #FFFFFF | 1.23:1 | 3:1 | below
+
+# Colour distance (CIEDE2000 ΔE00; bigger is more different). Normal / simulated deuteranopia / simulated protanopia
+look | pair | colours | ΔE00 normal | ΔE00 deuteranopia | ΔE00 protanopia | lightness contrast normal / deut / prot
+standard | Buggy 1 v Buggy 2 | #0A60C9 #C62828 | 44.5 | 57.4 | 47.8 | 1.06 / 1.33 / 1.51
+standard | Buggy 1 v pine (selected / + button / header) | #0A60C9 #0B3D2E | 38.3 | 33.6 | 38.3 | 2.05 / 2.01 / 2.26
+standard | Buggy 2 v pine | #C62828 #0B3D2E | 53.3 | 30.4 | 14.0 | 2.17 / 2.67 / 1.50
+standard | Buggy 1 v pick-up on (#167A41) | #0A60C9 #167A41 | 47.5 | 45.4 | 47.9 | 1.10 / 1.10 / 1.03
+standard | Buggy 2 v error red (#CF2A2A) | #C62828 #CF2A2A | 2.0 | 2.1 | 1.4 | 1.08 / 1.08 / 1.06
+standard | simulated colours | Buggy 1 #0A60C9 -> deut #005CC7, prot #0D6CCD; Buggy 2 #C62828 -> deut #817420, prot #5B5226; pine #0B3D2E -> deut #35332F, prot #3B382D
+editorial | Buggy 1 v Buggy 2 | #244A78 #9B3443 | 35.7 | 36.6 | 23.6 | 1.28 / 1.51 / 1.04
+editorial | Buggy 1 v pine (selected / + button / header) | #244A78 #0B3D2E | 28.0 | 23.0 | 26.6 | 1.35 / 1.33 / 1.40
+editorial | Buggy 2 v pine | #9B3443 #0B3D2E | 49.0 | 18.9 | 6.5 | 1.72 / 2.00 / 1.34
+editorial | Buggy 1 v pick-up on (#167A41) | #244A78 #167A41 | 40.9 | 37.9 | 40.5 | 1.67 / 1.67 / 1.67
+editorial | Buggy 2 v error red (#CF2A2A) | #9B3443 #CF2A2A | 13.9 | 14.6 | 13.6 | 1.35 / 1.44 / 1.19
+editorial | simulated colours | Buggy 1 #244A78 -> deut #294577, prot #364D7A; Buggy 2 #9B3443 -> deut #686040, prot #4D4B43; pine #0B3D2E -> deut #35332F, prot #3B382D
+
+every text pair in a team colour, or on one, is at least 4.5:1

@@ -1,0 +1,484 @@
+PASS  std 360 / home
+FAIL  std 360 / who
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "ACAlexander CholmondeleyBFBa"
+      overlap: [n] "Bartholomew Featherstonehaug" runs into [svg] ""
+      overlap: [n] "Christopher Fitzwilliam-Harr" runs into [svg] ""
+      overlap: [n] "Maximilian Montgomery-Smythe" runs into [svg] ""
+FAIL  std 360 / round-past
+      cut off: [n] "Bartholomew Featherstonehaug" 341x23 in 150x23
+      cut off: ellipsis [n] "Bartholomew Featherstonehaug"
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "1BFBartholomew Featherstoneh"
+      cut off: [n] "Evangeline Braithwaite" 195x23 in 150x23
+      cut off: ellipsis [n] "Evangeline Braithwaite"
+      cut off: [n] "Ultan Featherstonehaugh" 215x23 in 150x23
+      cut off: ellipsis [n] "Ultan Featherstonehaugh"
+      cut off: [n] "Konstantinos Papadopoulos" 242x23 in 150x23
+      cut off: ellipsis [n] "Konstantinos Papadopoulos"
+      cut off: [n] "Konstantinos Papadopoulos" hidden by [card] "1BFBartholomew Featherstoneh"
+      cut off: [n] "Bartholomew Featherstonehaug" 284x23 in 150x23
+      cut off: [n] "Maximilian Montgomery-Smythe" 274x23 in 150x23
+FAIL  std 360 / round-players
+      cut off: [span] "Bartholomew Featherstonehaug" 147x41 in 108x41
+      cut off: [span] "Bartholomew Featherstonehaug" 153x61 in 108x61
+      cut off: [span] "Ultan Featherstonehaugh" 147x41 in 108x41
+      overlap: [span] "Bartholomew Featherstonehaug" runs into [r sub num] "27.0"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into [r sub num] "13.5"
+      overlap: [span] "Ultan Featherstonehaugh" runs into [r sub num] "19.5"
+FAIL  std 360 / round-groups
+      cut off: [pb] "Konstantinos Papadopoulos & " 165x54 in 104x54
+      cut off: [pr] "Maximilian Montgomery-Smythe" 134x70 in 104x70
+      cut off: [pb] "Evangeline Braithwaite & Ult" 136x38 in 104x38
+      cut off: [pr] "Sebastian Marjoribanks & Fio" 137x38 in 104x38
+      cut off: [pb] "Theodore Worthington-Brown &" 136x54 in 104x54
+      cut off: [pr] "Bartholomew Featherstonehaug" 170x38 in 104x38
+      cut off: [pr] "Bartholomew Featherstonehaug" hidden by [card rp-groups] "10:00Thru 14Konstantinos Pap"
+      overlap: [b] "10:00" runs into [pb] "Konstantinos Papadopoulos & "
+      overlap: [pb] "Konstantinos Papadopoulos & " runs into [pr] "Maximilian Montgomery-Smythe"
+      overlap: [pr] "Maximilian Montgomery-Smythe" runs into [svg] ""
+      overlap: [b] "10:08" runs into [pb] "Evangeline Braithwaite & Ult"
+      overlap: [small] "Thru 14" runs into [pb] "Evangeline Braithwaite & Ult"
+FAIL  std 360 / round-group-open
+      cut off: [pb] "Konstantinos Papadopoulos & " 165x54 in 104x54
+      cut off: [pr] "Maximilian Montgomery-Smythe" 134x70 in 104x70
+      cut off: [pb] "Evangeline Braithwaite & Ult" 136x38 in 104x38
+      cut off: [pr] "Sebastian Marjoribanks & Fio" 137x38 in 104x38
+      cut off: [pb] "Theodore Worthington-Brown &" 136x54 in 104x54
+      cut off: [pr] "Bartholomew Featherstonehaug" 170x38 in 104x38
+      cut off: [pr] "Bartholomew Featherstonehaug" hidden by [card rp-groups] "10:00Thru 14Konstantinos Pap"
+      overlap: [b] "10:00" runs into [pb] "Konstantinos Papadopoulos & "
+      overlap: [pb] "Konstantinos Papadopoulos & " runs into [pr] "Maximilian Montgomery-Smythe"
+      overlap: [pr] "Maximilian Montgomery-Smythe" runs into [svg] ""
+      overlap: [b] "10:08" runs into [pb] "Evangeline Braithwaite & Ult"
+      overlap: [small] "Thru 14" runs into [pb] "Evangeline Braithwaite & Ult"
+FAIL  std 360 / round-kb
+      cut off: [pk] "Bartholomew Featherstonehaug" 185x54 in 144x54
+      cut off: [pk] "Bartholomew Featherstonehaug" hidden by [card rp-kbs] "Bartholomew Featherstonehaug"
+      cut off: [pk] "Konstantinos Papadopoulos & " 183x54 in 144x54
+      cut off: [pk] "Konstantinos Papadopoulos & " hidden by [card rp-kbs] "Bartholomew Featherstonehaug"
+      cut off: [pk] "Sebastian Marjoribanks & The" 157x54 in 144x54
+      cut off: [pk] "Maximilian Montgomery-Smythe" 154x54 in 144x54
+      cut off: [pk] "Christopher Fitzwilliam-Harr" 156x54 in 144x54
+      cut off: [pk] "Fionnuala Ní Mhaonaigh & Ale" 160x54 in 144x54
+      cut off: [pk] "Fionnuala Ní Mhaonaigh & Ale" hidden by [card rp-kbs] "Bartholomew Featherstonehaug"
+      overlap: [pk] "Bartholomew Featherstonehaug" runs into [pk] "Konstantinos Papadopoulos & "
+      overlap: [pk] "Sebastian Marjoribanks & The" runs into [pk] "Maximilian Montgomery-Smythe"
+      overlap: [pk] "Christopher Fitzwilliam-Harr" runs into [pk] "Fionnuala Ní Mhaonaigh & Ale"
+FAIL  std 360 / goy
+      cut off: [b] "72" hidden by [leadcard] "LEADINGKonstantinos Papadopo"
+      cut off: [n] "Konstantinos Papadopoulos" 242x23 in 156x23
+      cut off: ellipsis [n] "Konstantinos Papadopoulos"
+      cut off: [n] "Konstantinos Papadopoulos" hidden by [card] "1KPKonstantinos Papadopoulos"
+      cut off: [n] "Evangeline Braithwaite" 195x23 in 156x23
+      cut off: ellipsis [n] "Evangeline Braithwaite"
+      cut off: [n] "Bartholomew Featherstonehaug" 341x23 in 156x23
+      cut off: ellipsis [n] "Bartholomew Featherstonehaug"
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "1KPKonstantinos Papadopoulos"
+      cut off: [n] "Maximilian Montgomery-Smythe" 274x23 in 156x23
+      cut off: ellipsis [n] "Maximilian Montgomery-Smythe"
+      cut off: [n] "Maximilian Montgomery-Smythe" hidden by [card] "1KPKonstantinos Papadopoulos"
+PASS  std 360 / player
+PASS  std 360 / players
+FAIL  std 360 / stats
+      cut off: [n] "Bartholomew Featherstonehaug" 161x45 in 155x45
+      cut off: [n] "Ultan Featherstonehaugh" 161x45 in 155x45
+FAIL  std 360 / trip
+      cut off: [n] "Evangeline Braithwaite" 195x23 in 121x23
+      cut off: ellipsis [n] "Evangeline Braithwaite"
+      cut off: [n] "Konstantinos Papadopoulos" 242x23 in 121x23
+      cut off: ellipsis [n] "Konstantinos Papadopoulos"
+      cut off: [n] "Bartholomew Featherstonehaug" 341x23 in 121x23
+      cut off: ellipsis [n] "Bartholomew Featherstonehaug"
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "D1D2Total T1EBEvangeline Bra"
+      cut off: [n] "Maximilian Montgomery-Smythe" 274x23 in 121x23
+      cut off: ellipsis [n] "Maximilian Montgomery-Smythe"
+      cut off: [n] "Maximilian Montgomery-Smythe" hidden by [card] "D1D2Total T1EBEvangeline Bra"
+      cut off: [n] "Bartholomew Featherstonehaug" 284x23 in 121x23
+      cut off: [n] "Ultan Featherstonehaugh" 215x23 in 121x23
+FAIL  std 360 / board-scores
+      cut off: [n] "Gwendolyn Postlethwaite" 216x23 in 150x23
+      cut off: ellipsis [n] "Gwendolyn Postlethwaite"
+      cut off: [n] "Theodore Worthington-Brown" 253x23 in 150x23
+      cut off: ellipsis [n] "Theodore Worthington-Brown"
+      cut off: [n] "Theodore Worthington-Brown" hidden by [card] "1GPGwendolyn PostlethwaiteLe"
+      cut off: [n] "Alexander Cholmondeley" 214x23 in 150x23
+      cut off: ellipsis [n] "Alexander Cholmondeley"
+      cut off: [n] "Bartholomew Featherstonehaug" 341x23 in 150x23
+      cut off: ellipsis [n] "Bartholomew Featherstonehaug"
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "1GPGwendolyn PostlethwaiteLe"
+      cut off: [n] "Sebastian Marjoribanks" 200x23 in 150x23
+      cut off: ellipsis [n] "Sebastian Marjoribanks"
+PASS  std 360 / board-bw
+FAIL  std 360 / board-ct
+      cut off: [span] "Nearest the pin" 60x66 in 0x66
+      cut off: [sub] "Hole 7" 31x39 in 0x39
+      cut off: [b ct-won] "Bartholomew Featherstonehaug" hidden by [card] "Nearest the pinHole 7Barthol"
+      cut off: [span] "Longest drive" 61x44 in 55x44
+      overlap: [span] "Nearest the pin" runs into [b ct-won] "Bartholomew Featherstonehaug"
+PASS  std 360 / board-st
+FAIL  std 360 / hole-pick
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "ACAlexander CholmondeleyBFBa"
+      overlap: [n] "Bartholomew Featherstonehaug" runs into [svg] ""
+      overlap: [n] "Christopher Fitzwilliam-Harr" runs into [svg] ""
+      overlap: [n] "Maximilian Montgomery-Smythe" runs into [svg] ""
+FAIL  std 360 / hole-intro
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "−"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "+"
+      overlap: [svg] "" runs into control [st] "+"
+      overlap: [span] "Alexander Cholmondeley" runs into control [st] "−"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into control [st] "−"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into control [st] "+"
+      overlap: [span] "Gwendolyn Postlethwaite" runs into control [st] "−"
+FAIL  std 360 / entry
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "−"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "+"
+      overlap: [svg] "" runs into control [st] "+"
+      overlap: [span] "Alexander Cholmondeley" runs into control [st] "−"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into control [st] "−"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into control [st] "+"
+      overlap: [span] "Gwendolyn Postlethwaite" runs into control [st] "−"
+FAIL  std 360 / entry-100
+      overlap: [span] "Theodore Worthington-Brown" runs into [sup] "0"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [stv out] "60Scratch"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "−"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "+"
+      overlap: [svg] "" runs into control [st] "+"
+      overlap: [span] "Alexander Cholmondeley" runs into [sup] "0"
+      overlap: [span] "Alexander Cholmondeley" runs into control [stv out] "60Scratch"
+      overlap: [span] "Alexander Cholmondeley" runs into control [st] "−"
+      overlap: [svg] "" runs into control [stv out] "60Scratch"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into [sup] "0"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into control [stv out] "60Scratch"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into control [st] "−"
+PASS  std 360 / ask
+PASS  std 360 / after
+PASS  std 390 / home
+FAIL  std 390 / who
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "ACAlexander CholmondeleyBFBa"
+      overlap: [n] "Bartholomew Featherstonehaug" runs into [svg] ""
+FAIL  std 390 / round-past
+      cut off: [n] "Bartholomew Featherstonehaug" 341x23 in 180x23
+      cut off: ellipsis [n] "Bartholomew Featherstonehaug"
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "1BFBartholomew Featherstoneh"
+      cut off: [n] "Evangeline Braithwaite" 195x23 in 180x23
+      cut off: ellipsis [n] "Evangeline Braithwaite"
+      cut off: [n] "Ultan Featherstonehaugh" 215x23 in 180x23
+      cut off: ellipsis [n] "Ultan Featherstonehaugh"
+      cut off: [n] "Konstantinos Papadopoulos" 242x23 in 180x23
+      cut off: ellipsis [n] "Konstantinos Papadopoulos"
+      cut off: [n] "Bartholomew Featherstonehaug" 284x23 in 180x23
+      cut off: [n] "Maximilian Montgomery-Smythe" 274x23 in 180x23
+      cut off: ellipsis [n] "Maximilian Montgomery-Smythe"
+FAIL  std 390 / round-players
+      cut off: [span] "Bartholomew Featherstonehaug" 147x41 in 138x41
+      cut off: [span] "Bartholomew Featherstonehaug" 153x61 in 138x61
+      cut off: [span] "Ultan Featherstonehaugh" 147x41 in 138x41
+FAIL  std 390 / round-groups
+      cut off: [pb] "Konstantinos Papadopoulos & " 173x54 in 119x54
+      cut off: [pr] "Maximilian Montgomery-Smythe" 141x70 in 119x70
+      cut off: [pb] "Evangeline Braithwaite & Ult" 144x38 in 119x38
+      cut off: [pr] "Sebastian Marjoribanks & Fio" 145x38 in 119x38
+      cut off: [pb] "Theodore Worthington-Brown &" 143x54 in 119x54
+      cut off: [pr] "Bartholomew Featherstonehaug" 177x38 in 119x38
+      cut off: [pr] "Bartholomew Featherstonehaug" hidden by [card rp-groups] "10:00Thru 14Konstantinos Pap"
+      overlap: [b] "10:00" runs into [pb] "Konstantinos Papadopoulos & "
+      overlap: [pb] "Konstantinos Papadopoulos & " runs into [pr] "Maximilian Montgomery-Smythe"
+      overlap: [pr] "Maximilian Montgomery-Smythe" runs into [svg] ""
+      overlap: [b] "10:08" runs into [pb] "Evangeline Braithwaite & Ult"
+      overlap: [small] "Thru 14" runs into [pb] "Evangeline Braithwaite & Ult"
+FAIL  std 390 / round-group-open
+      cut off: [pb] "Konstantinos Papadopoulos & " 173x54 in 119x54
+      cut off: [pr] "Maximilian Montgomery-Smythe" 141x70 in 119x70
+      cut off: [pb] "Evangeline Braithwaite & Ult" 144x38 in 119x38
+      cut off: [pr] "Sebastian Marjoribanks & Fio" 145x38 in 119x38
+      cut off: [pb] "Theodore Worthington-Brown &" 143x54 in 119x54
+      cut off: [pr] "Bartholomew Featherstonehaug" 177x38 in 119x38
+      cut off: [pr] "Bartholomew Featherstonehaug" hidden by [card rp-groups] "10:00Thru 14Konstantinos Pap"
+      overlap: [b] "10:00" runs into [pb] "Konstantinos Papadopoulos & "
+      overlap: [pb] "Konstantinos Papadopoulos & " runs into [pr] "Maximilian Montgomery-Smythe"
+      overlap: [pr] "Maximilian Montgomery-Smythe" runs into [svg] ""
+      overlap: [b] "10:08" runs into [pb] "Evangeline Braithwaite & Ult"
+      overlap: [small] "Thru 14" runs into [pb] "Evangeline Braithwaite & Ult"
+FAIL  std 390 / round-kb
+      cut off: [pk] "Bartholomew Featherstonehaug" 193x54 in 159x54
+      cut off: [pk] "Bartholomew Featherstonehaug" hidden by [card rp-kbs] "Bartholomew Featherstonehaug"
+      cut off: [pk] "Konstantinos Papadopoulos & " 190x54 in 159x54
+      cut off: [pk] "Konstantinos Papadopoulos & " hidden by [card rp-kbs] "Bartholomew Featherstonehaug"
+      cut off: [pk] "Sebastian Marjoribanks & The" 165x54 in 159x54
+      cut off: [pk] "Maximilian Montgomery-Smythe" 161x54 in 159x54
+      cut off: [pk] "Christopher Fitzwilliam-Harr" 164x54 in 159x54
+      cut off: [pk] "Fionnuala Ní Mhaonaigh & Ale" 167x54 in 159x54
+      overlap: [pk] "Bartholomew Featherstonehaug" runs into [pk] "Konstantinos Papadopoulos & "
+FAIL  std 390 / goy
+      cut off: [n] "Konstantinos Papadopoulos" 242x23 in 186x23
+      cut off: ellipsis [n] "Konstantinos Papadopoulos"
+      cut off: [n] "Evangeline Braithwaite" 195x23 in 186x23
+      cut off: ellipsis [n] "Evangeline Braithwaite"
+      cut off: [n] "Bartholomew Featherstonehaug" 341x23 in 186x23
+      cut off: ellipsis [n] "Bartholomew Featherstonehaug"
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "1KPKonstantinos Papadopoulos"
+      cut off: [n] "Maximilian Montgomery-Smythe" 274x23 in 186x23
+      cut off: ellipsis [n] "Maximilian Montgomery-Smythe"
+      cut off: [n] "Maximilian Montgomery-Smythe" hidden by [card] "1KPKonstantinos Papadopoulos"
+      cut off: [n] "Ultan Featherstonehaugh" 215x23 in 186x23
+      cut off: ellipsis [n] "Ultan Featherstonehaugh"
+PASS  std 390 / player
+PASS  std 390 / players
+PASS  std 390 / stats
+FAIL  std 390 / trip
+      cut off: [n] "Evangeline Braithwaite" 195x23 in 151x23
+      cut off: ellipsis [n] "Evangeline Braithwaite"
+      cut off: [n] "Konstantinos Papadopoulos" 242x23 in 151x23
+      cut off: ellipsis [n] "Konstantinos Papadopoulos"
+      cut off: [n] "Bartholomew Featherstonehaug" 341x23 in 151x23
+      cut off: ellipsis [n] "Bartholomew Featherstonehaug"
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "D1D2Total T1EBEvangeline Bra"
+      cut off: [n] "Maximilian Montgomery-Smythe" 274x23 in 151x23
+      cut off: ellipsis [n] "Maximilian Montgomery-Smythe"
+      cut off: [n] "Bartholomew Featherstonehaug" 284x23 in 151x23
+      cut off: [n] "Ultan Featherstonehaugh" 215x23 in 151x23
+      cut off: ellipsis [n] "Ultan Featherstonehaugh"
+FAIL  std 390 / board-scores
+      cut off: [n] "Gwendolyn Postlethwaite" 216x23 in 180x23
+      cut off: ellipsis [n] "Gwendolyn Postlethwaite"
+      cut off: [n] "Theodore Worthington-Brown" 253x23 in 180x23
+      cut off: ellipsis [n] "Theodore Worthington-Brown"
+      cut off: [n] "Alexander Cholmondeley" 214x23 in 180x23
+      cut off: ellipsis [n] "Alexander Cholmondeley"
+      cut off: [n] "Bartholomew Featherstonehaug" 341x23 in 180x23
+      cut off: ellipsis [n] "Bartholomew Featherstonehaug"
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "1GPGwendolyn PostlethwaiteLe"
+      cut off: [n] "Sebastian Marjoribanks" 200x23 in 180x23
+      cut off: ellipsis [n] "Sebastian Marjoribanks"
+      cut off: [n] "Fionnuala Ní Mhaonaigh" 206x23 in 180x23
+PASS  std 390 / board-bw
+FAIL  std 390 / board-ct
+      cut off: [span] "Nearest the pin" 60x66 in 0x66
+      cut off: [sub] "Hole 7" 31x39 in 0x39
+      overlap: [span] "Nearest the pin" runs into [b ct-won] "Bartholomew Featherstonehaug"
+PASS  std 390 / board-st
+FAIL  std 390 / hole-pick
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "ACAlexander CholmondeleyBFBa"
+      overlap: [n] "Bartholomew Featherstonehaug" runs into [svg] ""
+FAIL  std 390 / hole-intro
+      overlap: [span] "Theodore Worthington-Brown" runs into [pu ] "Pick up"
+      overlap: [span] "Theodore Worthington-Brown" runs into [stv none] "Par 3"
+      overlap: [span] "Theodore Worthington-Brown" runs into [st] "−"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [pu ] "Pick up"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "−"
+      overlap: [svg] "" runs into control [st] "+"
+      overlap: [span] "Alexander Cholmondeley" runs into [pu ] "Pick up"
+      overlap: [span] "Alexander Cholmondeley" runs into [stv none] "Par 3"
+      overlap: [span] "Alexander Cholmondeley" runs into [st] "−"
+      overlap: [span] "Alexander Cholmondeley" runs into control [pu ] "Pick up"
+      overlap: [span] "Alexander Cholmondeley" runs into control [st] "−"
+      overlap: [svg] "" runs into [stv none] "Par 3"
+FAIL  std 390 / entry
+      overlap: [span] "Theodore Worthington-Brown" runs into [pu ] "Pick up"
+      overlap: [span] "Theodore Worthington-Brown" runs into [stv none] "Par 3"
+      overlap: [span] "Theodore Worthington-Brown" runs into [st] "−"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [pu ] "Pick up"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "−"
+      overlap: [svg] "" runs into control [st] "+"
+      overlap: [span] "Alexander Cholmondeley" runs into [pu ] "Pick up"
+      overlap: [span] "Alexander Cholmondeley" runs into [stv none] "Par 3"
+      overlap: [span] "Alexander Cholmondeley" runs into [st] "−"
+      overlap: [span] "Alexander Cholmondeley" runs into control [pu ] "Pick up"
+      overlap: [span] "Alexander Cholmondeley" runs into control [st] "−"
+      overlap: [svg] "" runs into [stv none] "Par 3"
+FAIL  std 390 / entry-100
+      overlap: [span] "Theodore Worthington-Brown" runs into [pu on] "Pick up"
+      overlap: [span] "Theodore Worthington-Brown" runs into [b] "60"
+      overlap: [span] "Theodore Worthington-Brown" runs into [sup] "0"
+      overlap: [span] "Theodore Worthington-Brown" runs into [st] "−"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [pu on] "Pick up"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [stv out] "60Scratch"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "−"
+      overlap: [svg] "" runs into control [st] "+"
+      overlap: [span] "Alexander Cholmondeley" runs into [pu on] "Pick up"
+      overlap: [span] "Alexander Cholmondeley" runs into [st] "−"
+      overlap: [span] "Alexander Cholmondeley" runs into control [pu on] "Pick up"
+      overlap: [span] "Alexander Cholmondeley" runs into control [stv out] "60Scratch"
+PASS  std 390 / ask
+PASS  std 390 / after
+PASS  std 390-135 / home
+FAIL  std 390-135 / who
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "ACAlexander CholmondeleyBFBa"
+      cut off: [n] "Christopher Fitzwilliam-Harr" hidden by [card] "ACAlexander CholmondeleyBFBa"
+      cut off: [n] "Maximilian Montgomery-Smythe" hidden by [card] "ACAlexander CholmondeleyBFBa"
+      overlap: [n] "Bartholomew Featherstonehaug" runs into [svg] ""
+      overlap: [n] "Christopher Fitzwilliam-Harr" runs into [svg] ""
+      overlap: [n] "Konstantinos Papadopoulos" runs into [svg] ""
+      overlap: [n] "Maximilian Montgomery-Smythe" runs into [svg] ""
+      overlap: [n] "Theodore Worthington-Brown" runs into [svg] ""
+FAIL  std 390-135 / round-past
+      cut off: [n] "Bartholomew Featherstonehaug" 433x29 in 165x29
+      cut off: ellipsis [n] "Bartholomew Featherstonehaug"
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "1BFBartholomew Featherstoneh"
+      cut off: [n] "Evangeline Braithwaite" 248x29 in 165x29
+      cut off: ellipsis [n] "Evangeline Braithwaite"
+      cut off: [n] "Ultan Featherstonehaugh" 273x29 in 165x29
+      cut off: ellipsis [n] "Ultan Featherstonehaugh"
+      cut off: [n] "Ultan Featherstonehaugh" hidden by [card] "1BFBartholomew Featherstoneh"
+      cut off: [n] "Konstantinos Papadopoulos" 307x29 in 165x29
+      cut off: ellipsis [n] "Konstantinos Papadopoulos"
+      cut off: [n] "Konstantinos Papadopoulos" hidden by [card] "1BFBartholomew Featherstoneh"
+      cut off: [n] "Bartholomew Featherstonehaug" 360x29 in 165x29
+FAIL  std 390-135 / round-players
+      cut off: [span] "Alexander Cholmondeley" 138x52 in 107x52
+      cut off: [span] "Bartholomew Featherstonehaug" 187x52 in 107x52
+      cut off: [span] "Bartholomew Featherstonehaug" 194x78 in 107x78
+      cut off: [span] "Christopher Fitzwilliam-Harr" 112x78 in 107x78
+      cut off: [span] "Gwendolyn Postlethwaite" 128x52 in 107x52
+      cut off: [span] "Konstantinos Papadopoulos" 138x52 in 107x52
+      cut off: [span] "Maximilian Montgomery-Smythe" 127x78 in 107x78
+      cut off: [span] "Sebastian Marjoribanks" 124x52 in 107x52
+      cut off: [span] "Theodore Worthington-Brown" 123x78 in 107x78
+      cut off: [span] "Ultan Featherstonehaugh" 187x52 in 107x52
+      overlap: [span] "Bartholomew Featherstonehaug" runs into [r sub num] "27.0"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into [r sub num] "13.5"
+FAIL  std 390-135 / round-groups
+      cut off: [pb] "Konstantinos Papadopoulos & " 200x67 in 113x67
+      cut off: [pb] "Konstantinos Papadopoulos & " hidden by [card rp-groups] "10:00Thru 14Konstantinos Pap"
+      cut off: [pr] "Maximilian Montgomery-Smythe" 160x88 in 113x88
+      cut off: [pr] "Maximilian Montgomery-Smythe" hidden by [card rp-groups] "10:00Thru 14Konstantinos Pap"
+      cut off: [pb] "Evangeline Braithwaite & Ult" 163x47 in 113x47
+      cut off: [pr] "Sebastian Marjoribanks & Fio" 165x47 in 113x47
+      cut off: [pr] "Sebastian Marjoribanks & Fio" hidden by [card rp-groups] "10:00Thru 14Konstantinos Pap"
+      cut off: [pb] "Theodore Worthington-Brown &" 163x67 in 113x67
+      cut off: [pr] "Bartholomew Featherstonehaug" 206x47 in 113x47
+      cut off: [pr] "Bartholomew Featherstonehaug" hidden by [card rp-groups] "10:00Thru 14Konstantinos Pap"
+      overlap: [b] "10:00" runs into [pb] "Konstantinos Papadopoulos & "
+      overlap: [pb] "Konstantinos Papadopoulos & " runs into [pr] "Maximilian Montgomery-Smythe"
+FAIL  std 390-135 / round-group-open
+      cut off: [pb] "Konstantinos Papadopoulos & " 200x67 in 113x67
+      cut off: [pb] "Konstantinos Papadopoulos & " hidden by [card rp-groups] "10:00Thru 14Konstantinos Pap"
+      cut off: [pr] "Maximilian Montgomery-Smythe" 160x88 in 113x88
+      cut off: [pr] "Maximilian Montgomery-Smythe" hidden by [card rp-groups] "10:00Thru 14Konstantinos Pap"
+      cut off: [pb] "Evangeline Braithwaite & Ult" 163x47 in 113x47
+      cut off: [pr] "Sebastian Marjoribanks & Fio" 165x47 in 113x47
+      cut off: [pr] "Sebastian Marjoribanks & Fio" hidden by [card rp-groups] "10:00Thru 14Konstantinos Pap"
+      cut off: [pb] "Theodore Worthington-Brown &" 163x67 in 113x67
+      cut off: [pr] "Bartholomew Featherstonehaug" 206x47 in 113x47
+      cut off: [pr] "Bartholomew Featherstonehaug" hidden by [card rp-groups] "10:00Thru 14Konstantinos Pap"
+      overlap: [b] "10:00" runs into [pb] "Konstantinos Papadopoulos & "
+      overlap: [pb] "Konstantinos Papadopoulos & " runs into [pr] "Maximilian Montgomery-Smythe"
+FAIL  std 390-135 / round-kb
+      cut off: [pk] "Bartholomew Featherstonehaug" 223x67 in 159x67
+      cut off: [pk] "Bartholomew Featherstonehaug" hidden by [card rp-kbs] "Bartholomew Featherstonehaug"
+      cut off: [pk] "Konstantinos Papadopoulos & " 220x67 in 159x67
+      cut off: [pk] "Konstantinos Papadopoulos & " hidden by [card rp-kbs] "Bartholomew Featherstonehaug"
+      cut off: [pk] "Sebastian Marjoribanks & The" 188x67 in 159x67
+      cut off: [pk] "Sebastian Marjoribanks & The" hidden by [card rp-kbs] "Bartholomew Featherstonehaug"
+      cut off: [pk] "Maximilian Montgomery-Smythe" 183x67 in 159x67
+      cut off: [pk] "Maximilian Montgomery-Smythe" hidden by [card rp-kbs] "Bartholomew Featherstonehaug"
+      cut off: [pk] "Christopher Fitzwilliam-Harr" 186x67 in 159x67
+      cut off: [pk] "Christopher Fitzwilliam-Harr" hidden by [card rp-kbs] "Bartholomew Featherstonehaug"
+      cut off: [pk] "Fionnuala Ní Mhaonaigh & Ale" 191x67 in 159x67
+      cut off: [pk] "Fionnuala Ní Mhaonaigh & Ale" hidden by [card rp-kbs] "Bartholomew Featherstonehaug"
+FAIL  std 390-135 / goy
+      cut off: [lc-p] "72 pts" hidden by [leadcard] "LEADINGKonstantinos Papadopo"
+      cut off: [b] "72" hidden by [leadcard] "LEADINGKonstantinos Papadopo"
+      cut off: [n] "Konstantinos Papadopoulos" 307x29 in 173x29
+      cut off: ellipsis [n] "Konstantinos Papadopoulos"
+      cut off: [n] "Konstantinos Papadopoulos" hidden by [card] "1KPKonstantinos Papadopoulos"
+      cut off: [n] "Evangeline Braithwaite" 248x29 in 173x29
+      cut off: ellipsis [n] "Evangeline Braithwaite"
+      cut off: [n] "Bartholomew Featherstonehaug" 433x29 in 173x29
+      cut off: ellipsis [n] "Bartholomew Featherstonehaug"
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "1KPKonstantinos Papadopoulos"
+      cut off: [n] "Maximilian Montgomery-Smythe" 348x29 in 173x29
+      cut off: ellipsis [n] "Maximilian Montgomery-Smythe"
+PASS  std 390-135 / player
+PASS  std 390-135 / players
+FAIL  std 390-135 / stats
+      cut off: [n] "Bartholomew Featherstonehaug" 212x86 in 196x86
+      cut off: [n] "Bartholomew Featherstonehaug" 204x57 in 173x57
+      cut off: [n] "Ultan Featherstonehaugh" 204x57 in 173x57
+      overlap: [n] "Bartholomew Featherstonehaug" runs into [sv] "34"
+      overlap: [n] "Bartholomew Featherstonehaug" runs into [sv] "31.5"
+      overlap: [n] "Ultan Featherstonehaugh" runs into [sv] "31.5"
+FAIL  std 390-135 / trip
+      cut off: [n] "Evangeline Braithwaite" 248x29 in 143x29
+      cut off: ellipsis [n] "Evangeline Braithwaite"
+      cut off: [n] "Konstantinos Papadopoulos" 307x29 in 143x29
+      cut off: ellipsis [n] "Konstantinos Papadopoulos"
+      cut off: [n] "Konstantinos Papadopoulos" hidden by [card] "D1D2Total T1EBEvangeline Bra"
+      cut off: [n] "Bartholomew Featherstonehaug" 433x29 in 143x29
+      cut off: ellipsis [n] "Bartholomew Featherstonehaug"
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "D1D2Total T1EBEvangeline Bra"
+      cut off: [n] "Maximilian Montgomery-Smythe" 348x29 in 143x29
+      cut off: ellipsis [n] "Maximilian Montgomery-Smythe"
+      cut off: [n] "Maximilian Montgomery-Smythe" hidden by [card] "D1D2Total T1EBEvangeline Bra"
+      cut off: [n] "Bartholomew Featherstonehaug" 360x29 in 143x29
+FAIL  std 390-135 / board-scores
+      cut off: [n] "Gwendolyn Postlethwaite" 275x29 in 165x29
+      cut off: ellipsis [n] "Gwendolyn Postlethwaite"
+      cut off: [n] "Gwendolyn Postlethwaite" hidden by [card] "1GPGwendolyn PostlethwaiteLe"
+      cut off: [n] "Theodore Worthington-Brown" 322x29 in 165x29
+      cut off: ellipsis [n] "Theodore Worthington-Brown"
+      cut off: [n] "Theodore Worthington-Brown" hidden by [card] "1GPGwendolyn PostlethwaiteLe"
+      cut off: [n] "Alexander Cholmondeley" 272x29 in 165x29
+      cut off: ellipsis [n] "Alexander Cholmondeley"
+      cut off: [n] "Alexander Cholmondeley" hidden by [card] "1GPGwendolyn PostlethwaiteLe"
+      cut off: [n] "Bartholomew Featherstonehaug" 433x29 in 165x29
+      cut off: ellipsis [n] "Bartholomew Featherstonehaug"
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "1GPGwendolyn PostlethwaiteLe"
+PASS  std 390-135 / board-bw
+FAIL  std 390-135 / board-ct
+      cut off: [span] "Nearest the pin" 76x84 in 0x84
+      cut off: [sub] "Hole 7" 39x50 in 0x50
+      cut off: [b ct-won] "Bartholomew Featherstonehaug" hidden by [card] "Nearest the pinHole 7Barthol"
+      cut off: [span] "Longest drive" 77x56 in 30x56
+      cut off: [sub] "Hole 12" 39x50 in 30x50
+      overlap: [span] "Nearest the pin" runs into [b ct-won] "Bartholomew Featherstonehaug"
+      overlap: [span] "Longest drive" runs into [b ct-won] "Ultan Featherstonehaugh"
+PASS  std 390-135 / board-st
+FAIL  std 390-135 / hole-pick
+      cut off: [n] "Bartholomew Featherstonehaug" hidden by [card] "ACAlexander CholmondeleyBFBa"
+      cut off: [n] "Christopher Fitzwilliam-Harr" hidden by [card] "ACAlexander CholmondeleyBFBa"
+      cut off: [n] "Maximilian Montgomery-Smythe" hidden by [card] "ACAlexander CholmondeleyBFBa"
+      overlap: [n] "Bartholomew Featherstonehaug" runs into [svg] ""
+      overlap: [n] "Christopher Fitzwilliam-Harr" runs into [svg] ""
+      overlap: [n] "Konstantinos Papadopoulos" runs into [svg] ""
+      overlap: [n] "Maximilian Montgomery-Smythe" runs into [svg] ""
+      overlap: [n] "Theodore Worthington-Brown" runs into [svg] ""
+FAIL  std 390-135 / hole-intro
+      cut off: [span] "Theodore Worthington-Brown" hidden by [bugs b1] "Theodore Worthington-Brown P"
+      cut off: [span] "Bartholomew Featherstonehaug" hidden by [bugs b2] "Bartholomew Featherstonehaug"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "−"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "+"
+      overlap: [span] "Alexander Cholmondeley" runs into control [st] "−"
+      overlap: [span] "Alexander Cholmondeley" runs into control [st] "+"
+      overlap: [svg] "" runs into control [st] "+"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into control [st] "−"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into control [st] "+"
+      overlap: [span] "Gwendolyn Postlethwaite" runs into control [st] "−"
+      overlap: [span] "Gwendolyn Postlethwaite" runs into control [st] "+"
+FAIL  std 390-135 / entry
+      cut off: [span] "Theodore Worthington-Brown" hidden by [bugs b1] "Theodore Worthington-Brown P"
+      cut off: [span] "Bartholomew Featherstonehaug" hidden by [bugs b2] "Bartholomew Featherstonehaug"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "−"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "+"
+      overlap: [span] "Alexander Cholmondeley" runs into control [st] "−"
+      overlap: [span] "Alexander Cholmondeley" runs into control [st] "+"
+      overlap: [svg] "" runs into control [st] "+"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into control [st] "−"
+      overlap: [span] "Bartholomew Featherstonehaug" runs into control [st] "+"
+      overlap: [span] "Gwendolyn Postlethwaite" runs into control [st] "−"
+      overlap: [span] "Gwendolyn Postlethwaite" runs into control [st] "+"
+FAIL  std 390-135 / entry-100
+      cut off: [span] "Theodore Worthington-Brown" hidden by [bugs b1] "Theodore Worthington-Brown P"
+      cut off: [span] "Bartholomew Featherstonehaug" hidden by [bugs b2] "Bartholomew Featherstonehaug"
+      overlap: [span] "Theodore Worthington-Brown" runs into [b] "60"
+      overlap: [span] "Theodore Worthington-Brown" runs into [sup] "0"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [stv out] "60Scratch"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "−"
+      overlap: [span] "Theodore Worthington-Brown" runs into control [st] "+"
+      overlap: [span] "Alexander Cholmondeley" runs into [b] "60"
+      overlap: [span] "Alexander Cholmondeley" runs into [sup] "0"
+      overlap: [span] "Alexander Cholmondeley" runs into control [stv out] "60Scratch"
+      overlap: [span] "Alexander Cholmondeley" runs into control [st] "−"
+      overlap: [span] "Alexander Cholmondeley" runs into control [st] "+"
+PASS  std 390-135 / ask
+PASS  std 390-135 / after
+44 FAILED (long names)

@@ -28,7 +28,8 @@ const statusPill = r => {
 };
 
 /* ----- Front page: what is on now, what is next, then the past ----- */
-const FLAG_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21V3"/><path d="M7 4l11 4-11 5z" fill="currentColor"/><ellipse cx="7" cy="21" rx="4" ry="1.2"/></svg>';
+/* The NCGS crest (docs/design/assets/ncgs-crest.svg, owner-approved 21 October). A hidden "NCGS" beside it names it for screen readers. */
+const CREST_SVG = '<svg viewBox="98 98 828 828" aria-hidden="true" focusable="false"><circle cx="512" cy="512" r="412" fill="#0B3D2E"/> <circle cx="512" cy="512" r="404" fill="none" stroke="#D4B483" stroke-width="16"/> <circle cx="512" cy="512" r="379" fill="none" stroke="#D4B483" stroke-width="6"/> <path fill="#FAF8F3" stroke="#FAF8F3" stroke-width="5" stroke-linejoin="round" d="M376.24120603015075 393.35966499162475H319.4179229480737V401.8882998324958C328.93132328308207 401.8882998324958 334.58793969849245 402.71365159128976 336.38777219430483 404.3643551088777C341.2730318257956 409.31646566164153 343.5871021775544 416.46951423785595 343.5871021775544 425.8235008375209V535.0450502512563L258.48073701842543 393.35966499162475H207.05695142378556V401.8882998324958H221.45561139028473C226.08375209380233 401.8882998324958 228.6549413735343 404.0892378559464 229.1691792294807 408.21599664991624V550.7267336683417C229.1691792294807 560.355837520938 226.8551088777219 567.5088860971524 221.96984924623112 571.9107621440536C220.17001675041874 573.5614656616416 214.51340033500836 574.3868174204355 204.99999999999997 574.3868174204355V582.9154522613065H261.823283082077V574.3868174204355C251.79564489112227 574.3868174204355 246.13902847571188 573.5614656616416 244.33919597989947 571.6356448911223C239.96817420435508 567.2337688442211 237.9112227805695 560.355837520938 237.9112227805695 550.7267336683417V408.21599664991624L346.6725293132328 587.592445561139H352.58626465661644L352.07202680066996 425.8235008375209C352.07202680066996 416.46951423785595 354.38609715242876 409.31646566164153 358.7571189279732 404.639472361809C360.55695142378556 402.71365159128976 366.213567839196 401.8882998324958 376.24120603015075 401.8882998324958Z M527.4271356783919 547.7004438860971C517.3994974874372 558.4300167504188 508.4003350083751 565.8581825795645 499.9154103852596 569.9849413735343C489.6306532663316 575.2121691792295 477.28894472361804 577.6882244556114 462.8902847571189 577.4131072026801C448.23450586264653 577.1379899497488 436.6641541038525 568.6093551088777 427.92211055276374 552.3774371859297C419.4371859296482 535.8704020100503 415.0661641541038 514.4112562814071 415.0661641541038 488.2751172529313C415.0661641541038 429.1249078726968 431.77889447236174 398.86201005025123 464.9472361809045 397.2113065326633C495.8015075376884 395.83572026800664 507.6289782244555 410.4169346733668 509.9430485762143 442.055418760469H517.6566164154103V398.86201005025123C508.9145728643216 395.28548576214405 502.7437185929648 393.08454773869346 498.8869346733668 392.25919597989946C490.144891122278 390.3333752093802 478.57453936348406 389.2329061976549 464.1758793969849 389.2329061976549C442.0636515912897 389.2329061976549 423.5510887772194 398.03665829145723 408.6381909547738 415.91927973199324C393.21105527638184 434.35213567839196 385.4974874371859 458.5624539363484 385.24036850921266 488.2751172529313C384.9832495812395 515.5117252931324 392.6968174204355 538.8966917922949 408.1239530988274 558.4300167504188C423.5510887772194 577.6882244556114 442.3207705192629 587.3173283082077 464.1758793969849 587.3173283082077C479.34589614740366 587.3173283082077 491.6876046901172 584.8412730318258 501.4581239530988 580.1642797319934C512.2571189279731 574.9370519262982 522.0276381909547 565.5830653266331 531.0268006700167 552.1023199329983Z M691.4690117252932 508.3586767169179H631.8174204355109V517.1624288107203H660.8718592964824V549.9013819095477C660.8718592964824 554.8534924623116 660.6147403685093 558.70513400335 659.5862646566164 560.9060720268006C658.8149078726968 563.9323618090452 653.9296482412061 567.5088860971524 644.9304857621441 570.8102931323283C635.1599664991625 574.9370519262982 625.9036850921274 577.1379899497488 616.9045226130654 576.8628726968175C602.248743718593 576.5877554438861 590.678391959799 568.3342378559464 581.9363484087103 552.1023199329983C573.1943048576214 535.595284757119 568.8232830820771 514.4112562814071 568.8232830820771 488.0C568.8232830820771 430.2253768844221 585.536013400335 399.9624790619765 618.961474036851 397.76154103852593C648.7872696817421 396.110837520938 661.3860971524289 411.24228643216077 663.7001675041877 442.6056532663316H671.4137353433837V399.4122445561139C661.643216080402 395.28548576214405 655.2152428810721 393.08454773869346 652.3869346733669 392.53431323283075C643.9020100502513 390.3333752093802 632.3316582914573 389.2329061976549 617.675879396985 389.2329061976549C595.8207705192631 389.2329061976549 577.5653266331659 398.03665829145723 562.3953098827471 415.91927973199324C547.2252931323284 434.62725293132326 539.5117252931324 458.28733668341704 539.2546063651591 488.0C538.997487437186 515.236608040201 546.4539363484088 538.6215745393635 561.6239530988275 558.1548994974875C577.5653266331659 577.1379899497488 595.8207705192631 586.767093802345 617.675879396985 586.767093802345C632.8458961474038 586.767093802345 645.4447236180905 585.1163902847571 655.9865996649917 582.365217755444C664.9857621440536 579.3389279731994 673.7278056951425 576.0375209380235 682.7269681742044 573.2863484087102V517.1624288107203H691.4690117252932Z M819.0 522.3896566164154C819.0 493.2272278056951 799.7160804020101 476.4450753768844 761.6624790619766 472.0431993299832C734.4078726968174 469.0169095477387 720.7805695142379 456.91175041876045 720.5234505862646 436.00283919597985C720.2663316582915 412.61787269681736 732.3509212730319 400.51271356783917 757.2914572864322 399.9624790619765C782.7462311557789 399.6873618090452 795.3450586264656 410.6920519262982 797.6591289782244 438.20377721943044H805.3726968174204V388.9577889447236H798.1733668341709C797.4020100502513 391.70896147403687 795.6021775544389 393.08454773869346 793.0309882747069 393.08454773869346C787.6314907872697 393.08454773869346 776.3182579564489 388.407554438861 763.2051926298158 388.407554438861C746.2353433835846 388.407554438861 731.8366834170854 392.8094304857621 720.0092127303183 401.61318257956447C706.1247906197655 411.7925209380235 699.1825795644891 426.9239698492462 699.1825795644891 445.9070603015075C699.1825795644891 473.9690201005025 717.4380234505862 490.2009380234506 753.9489112227806 494.87793132328306C767.319095477387 496.528634840871 777.8609715242881 500.38027638190954 785.5745393634841 507.2582077051926C793.8023450586265 514.9614907872697 797.9162479061977 524.590594639866 797.9162479061977 536.6957537688443C797.6591289782244 547.9755611390285 793.2881072026801 557.0544304857622 784.2889447236181 563.9323618090452C775.5469011725294 570.2600586264657 765.0050251256282 573.8365829145729 753.177554438861 574.1117001675042C742.892797319933 574.3868174204355 728.2370184254606 569.709824120603 721.5519262981575 563.9323618090452C714.6097152428811 557.6046649916248 710.4958123953099 547.4253266331658 709.4673366834171 532.5689949748744H701.7537688442211L701.4966499162479 576.3126381909548C717.1809045226131 582.6403350083752 731.322445561139 585.6666247906197 743.4070351758794 585.6666247906197C764.2336683417086 585.6666247906197 781.4606365159129 580.714514237856 795.0879396984925 571.0854103852596C811.0293132328309 559.8056030150753 819.0 543.5736850921273 819.0 522.3896566164154Z"/> <path d="M 413 695 H 611" stroke="#FAF8F3" stroke-width="8" stroke-linecap="round"/></svg>';
 function heroFacts(r) {
   const tee = teeOf(r);
   const bits = [r.trip];
@@ -52,6 +53,24 @@ function miniBoard(r) {
   if (mine && !show.includes(mine)) show = [show[0], show[1], mine];
   return `<div class="mini num">${show.map(x => `<div class="mr${x.id === DB.prefs.me ? ' me' : ''}"><span class="mp">${esc(x.posLabel)}</span><span class="mn">${esc(x.name)}</span><span class="mt">${x.total}</span></div>`).join('')}</div>`;
 }
+/* The friendly line at the top of Home (owner, 21 October). It follows the clock and what is on, never standings or
+   results, and stays the same for the same moment rather than changing at random.
+   Order: round day, then early or late, then a trip coming up within 14 days, then plain time of day. */
+function greeting(me, now = new Date()) {
+  const name = me ? ', ' + me.name.split(' ')[0] : '';
+  const hr = now.getHours(), pad = n => String(n).padStart(2, '0');
+  const today = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const clock = `${pad(hr)}:${pad(now.getMinutes())}`;
+  const rounds = D.rounds().filter(r => r.status !== 'final' && r.date);
+  const todays = rounds.find(r => r.date === today);
+  if (todays) return (todays.first_tee && clock < todays.first_tee ? `First tee at ${todays.first_tee}` : 'Round day') + name;
+  if (hr < 7) return 'Early start' + name;
+  if (hr >= 22) return 'Late one' + name;
+  const soon = rounds.filter(r => r.trip && r.date > today && (new Date(r.date + 'T12:00:00') - now) / 864e5 <= 14).sort((a, b) => a.date < b.date ? -1 : 1)[0];
+  if (soon) return `${soon.trip}${/s$/i.test(soon.trip) ? "'" : "'s"} nearly here` + name;
+  return (hr < 12 ? 'Morning' : hr < 17 ? 'Good afternoon' : 'Evening') + name;
+}
+
 function homeHeadline(feature) {
   if (!feature) return 'No round booked yet';
   const nm = roundName(feature);
@@ -68,6 +87,8 @@ function homeHeadline(feature) {
   if (days > 1) return `${nm} is in ${days} days`;
   return nm;
 }
+// The round name's length, for the CSS that makes a long name smaller (styles.css, --t-display-fit)
+const lenStyle = s => `style="--len:${[...s].length}"`;
 function nowCard(r) {
   const live = r.status === 'live';
   const playable = canScore(r) && (live || !r.date || daysFromToday(r.date) <= 0);
@@ -78,7 +99,7 @@ function nowCard(r) {
   return `<div class="now">
     <button class="now-main" data-act="round" data-rid="${r.id}">
       <span class="now-top"><span class="now-kind">${kind}</span>${statusPill(r)}</span>
-      <span class="now-name">${esc(roundName(r))}</span>
+      <span class="now-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</span>
       ${line2 ? `<span class="now-line">${esc(line2)}</span>` : ''}
       <span class="now-line">${esc(heroFacts(r))}</span>
     </button>
@@ -94,11 +115,10 @@ VIEWS.home = () => {
   const feature = live[0] || next[0] || null;
   const more = [...live.slice(1), ...next.slice(live[0] ? 0 : 1)];
   const me = DB.prefs.me ? D.member(DB.prefs.me) : null;
-  const hr = new Date().getHours();
-  const dateLine = new Date().toLocaleDateString('en-IE', { weekday: 'long', day: 'numeric', month: 'long' }) + (me ? ` · ${hr < 12 ? 'Good morning' : hr < 18 ? 'Good afternoon' : 'Good evening'}, ${esc(me.name.split(' ')[0])}` : '');
-  let html = `<header class="hero home"><div class="brand"><span class="badge">${FLAG_SVG}</span><span class="two"><span class="wordmark">${esc(D.society())}</span></span>
-    <button class="who-chip" data-act="who" aria-label="${me ? 'You are ' + esc(me.name) + '. Change' : 'Who are you?'}">${me ? esc(me.name) + `<span class="who-av">${esc(initialsOf(me))}</span>` : 'Who are you?'}</button></div>
-    <p class="greet">${dateLine}</p><h1 class="vh">${esc(homeHeadline(feature))}</h1>
+  const hello = greeting(me);
+  let html = `<header class="hero home"><div class="brand"><span class="badge crest">${CREST_SVG}</span><span class="vh">${esc(D.society())}</span><p class="greet${hello.length > 22 ? ' long' : ''}">${esc(hello)}</p>
+    <button class="who-chip${me ? ' only-av' : ''}" data-act="who" aria-label="${me ? 'You are ' + esc(me.name) + '. Change' : 'Who are you?'}">${me ? `<span class="who-av">${esc(initialsOf(me))}</span>` : 'Who are you?'}</button></div>
+    <h1 class="vh">${esc(homeHeadline(feature))}</h1>
     ${feature ? nowCard(feature) : '<div class="now"><div class="now-main"><span class="now-name">No round booked</span><span class="now-line">The organiser adds the next one.</span></div></div>'}</header>`;
   const table = goy(season);
   const lead = table[0];
@@ -426,7 +446,7 @@ VIEWS.round = p => {
     go = `<button class="go" data-act="play" data-rid="${r.id}">${lbl}</button>`;
   } else if (live) go = `<button class="go" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>`;
   html = `<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">Stableford</span></div>
-    <h1 class="rp-name">${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
+    <h1 class="rp-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
   if (playable && me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
 
   const tabsAvail = ['players', 'groups', 'kb', 'weather', 'course'];
@@ -442,8 +462,8 @@ VIEWS.round = p => {
   return { html, tabs: 'home' };
 };
 
-/* Names joined so a line only breaks after the "&", never inside a name. */
-const pairNames = list => list.map(pid => esc(D.nameOf(pid)).replace(/ /g, '\u00a0')).join('\u00a0& ');
+/* Names joined so the "&" stays with the name before it. A long name may wrap, so it is never cut off. */
+const pairNames = list => list.map(pid => esc(D.nameOf(pid))).join('\u00a0& ');
 
 /* Groups on the round page: one row per tee time, the two buggies in equal blue and red pills. A row opens to the handicaps. */
 function roundGroups(r) {
@@ -571,7 +591,7 @@ VIEWS.player = p => {
   const row = table.find(x => x.id === m.id);
   const counting = row ? row.countingRids.slice() : [];
   let html = '<header class="hero s">' + navBack('Back');
-  html += `<div class="head"><h1 class="title">${esc(m.name)}</h1></div><p class="sub">${esc([m.full, 'Index ' + fmtIndex(m.index)].filter(Boolean).join(' · '))}</p>`;
+  html += `<div class="head"><h1 class="title is-name">${esc(m.name)}</h1></div><p class="sub">${esc([m.full, 'Index ' + fmtIndex(m.index)].filter(Boolean).join(' · '))}</p>`;
   html += `<div class="tiles"><div class="tile flag"><span class="cap">GOY</span><span class="bignum">${row ? posWord(row.posLabel) : '–'}</span></div>
     <div class="tile"><span class="cap">Best ${D.goyBest()}</span><span class="bignum">${row ? row.total : '–'}</span></div>
     <div class="tile"><span class="cap">To beat</span><span class="bignum">${row && row.toBeat ? row.toBeat : '–'}</span></div></div></header>`;
@@ -639,7 +659,7 @@ VIEWS.card = p => {
   const { F, B, table } = cardParts(r, pl);
   const sub = [r.date ? fmtDate(r.date, true) : roundWhenShort(r), tee ? `${tee.name} · Par ${tee.par}` : '', `Playing hcp ${pl.ph}`].filter(Boolean).join(' · ');
   const html = `<header class="hero s">${navBack('Back')}
-    <div class="head"><h1 class="title">${esc(pl.name)}</h1>${me && r.status === 'final' ? `<span class="sub">${posWord(me.posLabel)}</span>` : ''}</div>
+    <div class="head"><h1 class="title is-name">${esc(pl.name)}</h1>${me && r.status === 'final' ? `<span class="sub">${posWord(me.posLabel)}</span>` : ''}</div>
     <p class="sub"><button class="link inline cardlink" data-act="round" data-rid="${r.id}">${esc(roundName(r))}</button> · ${esc(sub)}</p>
     ${isDemo(r) ? '<div class="note"><span class="pill w">Demo scores</span></div>' : ''}
     <div class="tiles"><div class="tile flag"><span class="cap">Points</span><span class="bignum">${pl.total}</span></div><div class="tile"><span class="cap">Out</span><span class="bignum">${F.pts}</span></div><div class="tile"><span class="cap">In</span><span class="bignum">${B.pts}</span></div></div></header>

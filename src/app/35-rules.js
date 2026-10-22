@@ -194,7 +194,7 @@ VIEWS.rules = () => ({
     <div id="thread" class="thread">${askThread()}</div>
     <form class="askbar" data-form="ask" autocomplete="off">
       <div class="card">
-        <textarea id="askin" rows="1" enterkeyhint="send" maxlength="600" placeholder="What happened?" aria-label="Your rules question">${esc(UI.askDraft)}</textarea>
+        <textarea id="askin" rows="1" enterkeyhint="send" maxlength="600" placeholder="${UI.chat.length ? 'What happened?' : 'Or type it here'}" aria-label="Your rules question">${esc(UI.askDraft)}</textarea>
         <div class="arow">
           <button class="x" type="button" data-act="ask-cancel" aria-label="Cancel">${ICON.x}</button>
           <div class="eq" aria-hidden="true">${eqHtml()}</div>

@@ -1,0 +1,74 @@
+PASS  ed 360 / home
+PASS  ed 360 / who
+PASS  ed 360 / round-past
+PASS  ed 360 / round-players
+PASS  ed 360 / round-groups
+PASS  ed 360 / round-group-open
+PASS  ed 360 / round-kb
+PASS  ed 360 / goy
+PASS  ed 360 / player
+PASS  ed 360 / players
+PASS  ed 360 / stats
+PASS  ed 360 / trip
+PASS  ed 360 / board-scores
+PASS  ed 360 / board-bw
+PASS  ed 360 / board-ct
+PASS  ed 360 / board-st
+PASS  ed 360 / hole-pick
+PASS  ed 360 / hole-intro
+PASS  ed 360 / entry
+PASS  ed 360 / entry-100
+PASS  ed 360 / ask
+PASS  ed 360 / after
+PASS  ed 390 / home
+PASS  ed 390 / who
+PASS  ed 390 / round-past
+PASS  ed 390 / round-players
+PASS  ed 390 / round-groups
+PASS  ed 390 / round-group-open
+PASS  ed 390 / round-kb
+PASS  ed 390 / goy
+PASS  ed 390 / player
+PASS  ed 390 / players
+PASS  ed 390 / stats
+PASS  ed 390 / trip
+PASS  ed 390 / board-scores
+PASS  ed 390 / board-bw
+PASS  ed 390 / board-ct
+PASS  ed 390 / board-st
+PASS  ed 390 / hole-pick
+FAIL  ed 390 / hole-intro
+      overlap: [svg] "" runs into [pu ] "Pick up"
+      overlap: [svg] "" runs into control [pu ] "Pick up"
+FAIL  ed 390 / entry
+      overlap: [svg] "" runs into [pu ] "Pick up"
+      overlap: [svg] "" runs into control [pu ] "Pick up"
+FAIL  ed 390 / entry-100
+      overlap: [span] "Donnacha" runs into control [pu on] "Pick up"
+      overlap: [svg] "" runs into [pu on] "Pick up"
+      overlap: [svg] "" runs into control [pu on] "Pick up"
+PASS  ed 390 / ask
+PASS  ed 390 / after
+PASS  ed 390-135 / home
+PASS  ed 390-135 / who
+PASS  ed 390-135 / round-past
+PASS  ed 390-135 / round-players
+PASS  ed 390-135 / round-groups
+PASS  ed 390-135 / round-group-open
+PASS  ed 390-135 / round-kb
+PASS  ed 390-135 / goy
+PASS  ed 390-135 / player
+PASS  ed 390-135 / players
+PASS  ed 390-135 / stats
+PASS  ed 390-135 / trip
+PASS  ed 390-135 / board-scores
+PASS  ed 390-135 / board-bw
+PASS  ed 390-135 / board-ct
+PASS  ed 390-135 / board-st
+PASS  ed 390-135 / hole-pick
+PASS  ed 390-135 / hole-intro
+PASS  ed 390-135 / entry
+PASS  ed 390-135 / entry-100
+PASS  ed 390-135 / ask
+PASS  ed 390-135 / after
+3 FAILED (normal names)
