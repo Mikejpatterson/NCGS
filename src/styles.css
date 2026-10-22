@@ -1743,3 +1743,20 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .after .afbw { margin: 18px 0 0; justify-content: center; }   /* the 'Buggy Wars' heading above the after-save card, in the section-label serif */
 .after .afbw + .afvs { margin-top: 6px; }
 .after .afbw .sub { font-size: 1.3rem; }
+
+/* Loading screen: the crest, not a placeholder tile (owner, 22 October) */
+.loading .loading-crest { width: 88px; height: 88px; border-radius: 50%; background: none; }
+.loading .loading-crest svg { width: 100%; height: 100%; display: block; }
+
+/* Serif titles at bold, not extra-bold (owner, 22 October: "Marbella" and "Leaderboard" looked chunky). The serif's
+   heaviest weight reads as a blob on a phone, and 700 keeps it crisp. The selectors match the heaviest earlier rules. */
+.hero.c:not(.pine) .hrow2 h1.big, .hrow2 h1.big, h1.big, .hero.s h1.title:not(.is-name), h1.title:not(.is-name), .hero.home .now-name, .rp-name { font-weight: 700; letter-spacing: -.01em; }
+/* Leaderboard and trip totals: still the strongest thing in the row, but bold not black (owner, 22 October: "over chunky"). */
+.lrow .r .b, .lrow.goy .b.r { font-weight: 750; font-size: 1.55rem; letter-spacing: -.02em; }
+
+/* Home: "The season" list (owner chose option C, 22 October) */
+.hs-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 14px; min-height: 66px; text-align: left; }
+.hs-ic { width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: rgba(11, 61, 46, .08); color: var(--pine); }
+.hs-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.hs-t { font-weight: 600; font-size: 1.02rem; color: var(--text); }
+.hs-s { font-size: .86rem; color: var(--sub); line-height: 1.3; overflow-wrap: anywhere; }

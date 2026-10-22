@@ -450,7 +450,7 @@ const tabs = document.getElementById('tabs');
 let renderGuard = 0;
 function render() {
   if (!DB.loaded && !view().members.length) {
-    app.innerHTML = `<div class="loading"><span class="badge">NCGS</span><p class="sub">${DB.online ? 'Loading' : 'No signal. The app will load when there is.'}</p></div>`;
+    app.innerHTML = `<div class="loading"><span class="badge crest loading-crest">${CREST_SVG}</span><span class="vh">NCGS</span><p class="sub">${DB.online ? 'Loading' : 'No signal. The app will load when there is.'}</p></div>`;
     tabs.hidden = true;
     return;
   }

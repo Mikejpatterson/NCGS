@@ -334,6 +334,26 @@ function bwPill(gc, m) {
   const who = st.leader ? `${gc.labels[st.leader === 'A' ? 0 : 1].long} ` : '';
   return `<span class="bw-res ${cls}" aria-label="${esc(who + txt)}">${txt}</span>`;
 }
+/* A nine's holes as a small grid: one column per hole, each buggy's best points, the hole winner's filled in their
+   colour, then holes won. Shared by the Buggy Wars results and the card after saving a hole. */
+function bwBoard(gc, seg, live, canEdit) {
+  const order = gc.matches[seg].order;
+  let wa = 0, wb = 0;
+  const cols = order.map(n => {
+    const hr = gc.holes[n];
+    const isNow = n === gc.nextHole && live;
+    let a = '<span class="bw-c e"></span>', b = '<span class="bw-c e"></span>';
+    if (hr.complete) {
+      const [pa, pb] = hr.best;
+      if (hr.result === 'A') wa++; else if (hr.result === 'B') wb++;
+      a = `<span class="bw-c${hr.result === 'A' ? ' wa' : ''}">${pa}</span>`;
+      b = `<span class="bw-c${hr.result === 'B' ? ' wb' : ''}">${pb}</span>`;
+    }
+    const inner = `<span class="bw-n${isNow ? ' cur' : ''}">${n}</span>${a}${b}`;
+    return canEdit && hr.complete ? `<button class="bw-col" data-act="edit-hole" data-n="${n}" aria-label="Change hole ${n}">${inner}</button>` : `<div class="bw-col">${inner}</div>`;
+  }).join('');
+  return `<div class="bw-board">${cols}<div class="bw-col bw-tot"><span class="bw-n">Holes</span><span class="bw-t a">${wa}</span><span class="bw-t b">${wb}</span></div></div>`;
+}
 /* The two pairs as initials badges, blue v red. */
 const bwBadges = (t, i) => `<span class="bw-pair">${t.map(pid => `<span class="bw-bd ${i ? 'b' : 'a'}" aria-label="${esc(D.nameOf(pid))}">${esc(initialsOf(D.member(pid)) || D.nameOf(pid).slice(0, 2))}</span>`).join('')}</span>`;
 
@@ -363,7 +383,11 @@ VIEWS.after = () => {
     const was = a.before[s];
     const turned = was.text !== 'Not started' && was.leader !== m.status.leader;
     const note = !turned ? '' : m.status.leader ? `Buggy ${m.status.leader === 'A' ? 1 : 2} ${was.leader ? 'take the lead' : 'go ahead'}` : 'Back to all square';
-    return `<div class="bw-row"><span class="bw-l afl">${segName(s)}${note ? `<small class="afnote">${esc(note)}</small>` : ''}</span>${bwPill(gc, m)}<span></span></div>`;
+    const label = `<span class="bw-l afl">${segName(s)}${note ? `<small class="afnote">${esc(note)}</small>` : ''}</span>${bwPill(gc, m)}`;
+    if (s === 'overall') return `<div class="bw-row">${label}<span></span></div>`;
+    // The nine opens to its holes, as on the results page. Closed to begin with, so the card stays short.
+    const key = `bwa-${a.rid}-${a.gid}-${s}`, open = !!UI.open[key];
+    return `<button class="bw-row" data-act="bwseg" data-key="${key}" data-open="${open ? 1 : 0}" aria-expanded="${open}">${label}<span class="chev dn${open ? ' up' : ''}">${chev}</span></button>${open ? bwBoard(gc, s, D.round(a.rid).status === 'live', false) : ''}`;
   }).join('') : gc.teams.flat().map(pid => `<div class="afrow"><span><b>${esc(D.nameOf(pid))}</b></span><span class="afst"><span class="b num">${comp.players[pid].total}</span></span></div>`).join('');
   let next;
   const nine = a.n <= 9 ? 'front' : 'back';
@@ -693,24 +717,7 @@ function buggyView(rid) {
   const badges = bwBadges;
   const pillOf = m => bwPill(gc, m);
   /* A nine's holes: each hole is one column, the winner's best points filled in their colour, then holes won. */
-  const board = seg => {
-    const order = gc.matches[seg].order;
-    let wa = 0, wb = 0;
-    const cols = order.map(n => {
-      const hr = gc.holes[n];
-      const isNow = n === gc.nextHole && live;
-      let a = '<span class="bw-c e"></span>', b = '<span class="bw-c e"></span>';
-      if (hr.complete) {
-        const [pa, pb] = hr.best;
-        if (hr.result === 'A') wa++; else if (hr.result === 'B') wb++;
-        a = `<span class="bw-c${hr.result === 'A' ? ' wa' : ''}">${pa}</span>`;
-        b = `<span class="bw-c${hr.result === 'B' ? ' wb' : ''}">${pb}</span>`;
-      }
-      const inner = `<span class="bw-n${isNow ? ' cur' : ''}">${n}</span>${a}${b}`;
-      return canEdit && hr.complete ? `<button class="bw-col" data-act="edit-hole" data-n="${n}" aria-label="Change hole ${n}">${inner}</button>` : `<div class="bw-col">${inner}</div>`;
-    }).join('');
-    return `<div class="bw-board">${cols}<div class="bw-col bw-tot"><span class="bw-n">Holes</span><span class="bw-t a">${wa}</span><span class="bw-t b">${wb}</span></div></div>`;
-  };
+  const board = seg => bwBoard(gc, seg, live, canEdit);
   /* Front and back open to their holes. The nine being played starts open. */
   const segOf = n => (gc.matches.front.order.includes(n) ? 'front' : 'back');
   const openDefault = live && gc.nextHole ? segOf(gc.nextHole) : null;
@@ -831,19 +838,25 @@ VIEWS.trip = p => {
   return { html };
 };
 
-function tripTable(list) {
+/* The trip's golfers ranked on total points across its rounds (also used for the trip line on Home). */
+function tripRows(list) {
   const ids = new Set();
   list.forEach(r => (r.groups || []).forEach(g => g.teams.flat().forEach(pid => ids.add(pid))));
   const pts = list.map(r => (r.status === 'upcoming' ? {} : pointsOf(r.id)));
-  const rows = E.rankRows([...ids].map(pid => {
+  return E.rankRows([...ids].map(pid => {
     const per = pts.map(p => (p[pid] === undefined ? null : p[pid]));
     return { id: pid, name: D.nameOf(pid), per, total: per.reduce((s, v) => s + (v || 0), 0) };
   }), 'total', 'desc');
+}
+function tripTable(list) {
+  const rows = tripRows(list);
   const allFinal = list.every(r => r.status === 'final');
-  const cols = `grid-template-columns:minmax(2.6ch,auto) minmax(0,1fr) repeat(${list.length},minmax(30px,auto)) minmax(38px,auto)`;
+  /* One row per golfer, like the round leaderboard: place, initials and name, total on the right. Each day's points sit
+     on a small line under the name ("D1 26 · D2 41 · D3 39"), so names never get squeezed by a column per day
+     (owner, 22 October). A trip is at most three rounds. */
+  const dayLine = row => row.per.map((v, i) => `D${list[i].trip_day || list[i].seq} ${v === null ? '–' : v}`).join(' \u00b7 ');
   return sec(`${label(`All ${list.length} rounds count`)}${allFinal ? '<span class="pill g">Final</span>' : '<span class="pill w">In progress</span>'}`,
-    cardOf(`<div class="lrow" style="${cols};min-height:36px"><span></span><span></span>${list.map(r => `<span class="cap r">D${r.trip_day || r.seq}</span>`).join('')}<span class="cap r">Total</span></div>
-    ${rows.map(row => `<button class="lrow" style="${cols}" data-act="player" data-pid="${row.id}"><span class="sub">${row.posLabel}</span>${avName(row, null, row.pos === 1)}${row.per.map(v => `<span class="r sub">${v === null ? '–' : v}</span>`).join('')}<span class="r b">${row.total}</span></button>`).join('')}`), true);
+    cardOf(rows.map(row => `<button class="lrow trip2" data-act="player" data-pid="${row.id}"><span class="sub">${row.posLabel}</span>${avName(row, dayLine(row), row.pos === 1)}<span class="r"><span class="b">${row.total}</span></span></button>`).join('')), true);
 }
 
 /* ----- Results card ----- */

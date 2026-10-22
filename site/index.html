@@ -3,7 +3,7 @@
 <meta name="theme-color" content="#FAF8F3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="NCGS">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
@@ -1753,9 +1753,26 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .after .afbw { margin: 18px 0 0; justify-content: center; }   /* the 'Buggy Wars' heading above the after-save card, in the section-label serif */
 .after .afbw + .afvs { margin-top: 6px; }
 .after .afbw .sub { font-size: 1.3rem; }
+
+/* Loading screen: the crest, not a placeholder tile (owner, 22 October) */
+.loading .loading-crest { width: 88px; height: 88px; border-radius: 50%; background: none; }
+.loading .loading-crest svg { width: 100%; height: 100%; display: block; }
+
+/* Serif titles at bold, not extra-bold (owner, 22 October: "Marbella" and "Leaderboard" looked chunky). The serif's
+   heaviest weight reads as a blob on a phone, and 700 keeps it crisp. The selectors match the heaviest earlier rules. */
+.hero.c:not(.pine) .hrow2 h1.big, .hrow2 h1.big, h1.big, .hero.s h1.title:not(.is-name), h1.title:not(.is-name), .hero.home .now-name, .rp-name { font-weight: 700; letter-spacing: -.01em; }
+/* Leaderboard and trip totals: still the strongest thing in the row, but bold not black (owner, 22 October: "over chunky"). */
+.lrow .r .b, .lrow.goy .b.r { font-weight: 750; font-size: 1.55rem; letter-spacing: -.02em; }
+
+/* Home: "The season" list (owner chose option C, 22 October) */
+.hs-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 14px; min-height: 66px; text-align: left; }
+.hs-ic { width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: rgba(11, 61, 46, .08); color: var(--pine); }
+.hs-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.hs-t { font-weight: 600; font-size: 1.02rem; color: var(--text); }
+.hs-s { font-size: .86rem; color: var(--sub); line-height: 1.3; overflow-wrap: anywhere; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610221007","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610221307","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3830,21 +3847,25 @@ VIEWS.home = () => {
   const pastAll = D.rounds().filter(r => r.status === 'final').reverse();
   const tripFor = feature && feature.trip ? feature : (D.rounds().filter(r => r.trip).slice(-1)[0] || null);
   const tripList = tripFor ? tripRounds(tripFor) : [];
-  const qrow = (act, t, right, rid) => `<button class="row" data-act="${act}"${rid ? ` data-rid="${rid}"` : ''}><span>${t}</span><span class="right">${right}${chev}</span></button>`;
-  const goyRowHome = lead
-    ? qrow('goy', 'Golfer of the Year', `<span class="b">${esc(lead.name)}</span><span class="sub"><span class="num">${lead.total}</span> pts</span>`)
-    : qrow('goy', 'Golfer of the Year', `<span class="sub">Best ${D.goyBest()} scores count</span>`);
   const goyHidden = lead ? `<span class="vh">Golfer of the Year ${esc(lead.name)} leads on ${lead.total}</span>` : '';
   const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
   const lastRound = pastAll.find(r => !isDemo(r));
-  html += `${goyHidden}${sec('', cardOf([
-    !inPlay && lastRound ? qrow('round', 'Last round', `<span class="sub">${esc(roundName(lastRound))}</span>`, lastRound.id) : '',
-    goyRowHome,
-    tripList.length > 1 ? qrow('trip', 'Trip standings', `<span class="sub">${esc(tripFor.trip)}</span>`, tripFor.id) : '',
-    qrow('rounds', 'Past rounds', `<span class="sub">${played.length ? `${played.length} played` : 'None played yet'}</span>`),
-    qrow('stats', 'Stats', '<span class="sub">KBs, birdies, averages</span>'),
-    qrow('players', 'Players', `<span class="sub">${plural(D.regulars().length, 'golfer')}</span>`)
-  ].join('')), true)}`;
+  /* The season block under the round card (owner chose option C, 22 October): one list headed "The season", each row
+     with an icon and a useful second line (who leads, how many rounds played). */
+  const second = table[1];
+  const goyLine = lead ? (second && lead.total > second.total ? `${esc(lead.name)} leads by ${lead.total - second.total}` : `${esc(lead.name)} leads`) : `Best ${D.goyBest()} scores count`;
+  const tRows = tripList.length > 1 ? tripRows(tripList) : [];
+  const tLead = tRows[0] && tRows[0].total ? tRows[0] : null;
+  const tripLine = tripFor && tripList.length > 1 ? (tLead ? `${esc(tripFor.trip)} \u00b7 ${esc(tLead.name)} leads` : esc(tripFor.trip)) : '';
+  const ic = k => `<span class="hs-ic" aria-hidden="true">${sized(ICON[k], 20)}</span>`;
+  const rrow = (act, k, t, sub, rid) => `<button class="row hs-row" data-act="${act}"${rid ? ` data-rid="${rid}"` : ''}>${ic(k)}<span class="hs-txt"><span class="hs-t">${t}</span><span class="hs-s">${sub}</span></span>${chev}</button>`;
+  html += `${goyHidden}${sec(label('The season'), cardOf([
+    !inPlay && lastRound ? rrow('round', 'flagpin', 'Last round', esc(roundName(lastRound)), lastRound.id) : '',
+    rrow('goy', 'trophy', 'Golfer of the Year', goyLine),
+    tripList.length > 1 ? rrow('trip', 'course', 'Trip standings', tripLine, tripFor.id) : '',
+    rrow('rounds', 'history', 'Past rounds', played.length ? `${plural(played.length, 'round')} played` : 'None played yet'),
+    rrow('stats', 'bars', 'Stats', 'KBs, birdies, averages'),
+    rrow('players', 'users', 'Players', plural(D.regulars().length, 'golfer'))].join('')), true)}`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
   html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
   return { html, tabs: 'home' };
@@ -4718,6 +4739,26 @@ function bwPill(gc, m) {
   const who = st.leader ? `${gc.labels[st.leader === 'A' ? 0 : 1].long} ` : '';
   return `<span class="bw-res ${cls}" aria-label="${esc(who + txt)}">${txt}</span>`;
 }
+/* A nine's holes as a small grid: one column per hole, each buggy's best points, the hole winner's filled in their
+   colour, then holes won. Shared by the Buggy Wars results and the card after saving a hole. */
+function bwBoard(gc, seg, live, canEdit) {
+  const order = gc.matches[seg].order;
+  let wa = 0, wb = 0;
+  const cols = order.map(n => {
+    const hr = gc.holes[n];
+    const isNow = n === gc.nextHole && live;
+    let a = '<span class="bw-c e"></span>', b = '<span class="bw-c e"></span>';
+    if (hr.complete) {
+      const [pa, pb] = hr.best;
+      if (hr.result === 'A') wa++; else if (hr.result === 'B') wb++;
+      a = `<span class="bw-c${hr.result === 'A' ? ' wa' : ''}">${pa}</span>`;
+      b = `<span class="bw-c${hr.result === 'B' ? ' wb' : ''}">${pb}</span>`;
+    }
+    const inner = `<span class="bw-n${isNow ? ' cur' : ''}">${n}</span>${a}${b}`;
+    return canEdit && hr.complete ? `<button class="bw-col" data-act="edit-hole" data-n="${n}" aria-label="Change hole ${n}">${inner}</button>` : `<div class="bw-col">${inner}</div>`;
+  }).join('');
+  return `<div class="bw-board">${cols}<div class="bw-col bw-tot"><span class="bw-n">Holes</span><span class="bw-t a">${wa}</span><span class="bw-t b">${wb}</span></div></div>`;
+}
 /* The two pairs as initials badges, blue v red. */
 const bwBadges = (t, i) => `<span class="bw-pair">${t.map(pid => `<span class="bw-bd ${i ? 'b' : 'a'}" aria-label="${esc(D.nameOf(pid))}">${esc(initialsOf(D.member(pid)) || D.nameOf(pid).slice(0, 2))}</span>`).join('')}</span>`;
 
@@ -4747,7 +4788,11 @@ VIEWS.after = () => {
     const was = a.before[s];
     const turned = was.text !== 'Not started' && was.leader !== m.status.leader;
     const note = !turned ? '' : m.status.leader ? `Buggy ${m.status.leader === 'A' ? 1 : 2} ${was.leader ? 'take the lead' : 'go ahead'}` : 'Back to all square';
-    return `<div class="bw-row"><span class="bw-l afl">${segName(s)}${note ? `<small class="afnote">${esc(note)}</small>` : ''}</span>${bwPill(gc, m)}<span></span></div>`;
+    const label = `<span class="bw-l afl">${segName(s)}${note ? `<small class="afnote">${esc(note)}</small>` : ''}</span>${bwPill(gc, m)}`;
+    if (s === 'overall') return `<div class="bw-row">${label}<span></span></div>`;
+    // The nine opens to its holes, as on the results page. Closed to begin with, so the card stays short.
+    const key = `bwa-${a.rid}-${a.gid}-${s}`, open = !!UI.open[key];
+    return `<button class="bw-row" data-act="bwseg" data-key="${key}" data-open="${open ? 1 : 0}" aria-expanded="${open}">${label}<span class="chev dn${open ? ' up' : ''}">${chev}</span></button>${open ? bwBoard(gc, s, D.round(a.rid).status === 'live', false) : ''}`;
   }).join('') : gc.teams.flat().map(pid => `<div class="afrow"><span><b>${esc(D.nameOf(pid))}</b></span><span class="afst"><span class="b num">${comp.players[pid].total}</span></span></div>`).join('');
   let next;
   const nine = a.n <= 9 ? 'front' : 'back';
@@ -5077,24 +5122,7 @@ function buggyView(rid) {
   const badges = bwBadges;
   const pillOf = m => bwPill(gc, m);
   /* A nine's holes: each hole is one column, the winner's best points filled in their colour, then holes won. */
-  const board = seg => {
-    const order = gc.matches[seg].order;
-    let wa = 0, wb = 0;
-    const cols = order.map(n => {
-      const hr = gc.holes[n];
-      const isNow = n === gc.nextHole && live;
-      let a = '<span class="bw-c e"></span>', b = '<span class="bw-c e"></span>';
-      if (hr.complete) {
-        const [pa, pb] = hr.best;
-        if (hr.result === 'A') wa++; else if (hr.result === 'B') wb++;
-        a = `<span class="bw-c${hr.result === 'A' ? ' wa' : ''}">${pa}</span>`;
-        b = `<span class="bw-c${hr.result === 'B' ? ' wb' : ''}">${pb}</span>`;
-      }
-      const inner = `<span class="bw-n${isNow ? ' cur' : ''}">${n}</span>${a}${b}`;
-      return canEdit && hr.complete ? `<button class="bw-col" data-act="edit-hole" data-n="${n}" aria-label="Change hole ${n}">${inner}</button>` : `<div class="bw-col">${inner}</div>`;
-    }).join('');
-    return `<div class="bw-board">${cols}<div class="bw-col bw-tot"><span class="bw-n">Holes</span><span class="bw-t a">${wa}</span><span class="bw-t b">${wb}</span></div></div>`;
-  };
+  const board = seg => bwBoard(gc, seg, live, canEdit);
   /* Front and back open to their holes. The nine being played starts open. */
   const segOf = n => (gc.matches.front.order.includes(n) ? 'front' : 'back');
   const openDefault = live && gc.nextHole ? segOf(gc.nextHole) : null;
@@ -5215,19 +5243,25 @@ VIEWS.trip = p => {
   return { html };
 };
 
-function tripTable(list) {
+/* The trip's golfers ranked on total points across its rounds (also used for the trip line on Home). */
+function tripRows(list) {
   const ids = new Set();
   list.forEach(r => (r.groups || []).forEach(g => g.teams.flat().forEach(pid => ids.add(pid))));
   const pts = list.map(r => (r.status === 'upcoming' ? {} : pointsOf(r.id)));
-  const rows = E.rankRows([...ids].map(pid => {
+  return E.rankRows([...ids].map(pid => {
     const per = pts.map(p => (p[pid] === undefined ? null : p[pid]));
     return { id: pid, name: D.nameOf(pid), per, total: per.reduce((s, v) => s + (v || 0), 0) };
   }), 'total', 'desc');
+}
+function tripTable(list) {
+  const rows = tripRows(list);
   const allFinal = list.every(r => r.status === 'final');
-  const cols = `grid-template-columns:minmax(2.6ch,auto) minmax(0,1fr) repeat(${list.length},minmax(30px,auto)) minmax(38px,auto)`;
+  /* One row per golfer, like the round leaderboard: place, initials and name, total on the right. Each day's points sit
+     on a small line under the name ("D1 26 · D2 41 · D3 39"), so names never get squeezed by a column per day
+     (owner, 22 October). A trip is at most three rounds. */
+  const dayLine = row => row.per.map((v, i) => `D${list[i].trip_day || list[i].seq} ${v === null ? '–' : v}`).join(' \u00b7 ');
   return sec(`${label(`All ${list.length} rounds count`)}${allFinal ? '<span class="pill g">Final</span>' : '<span class="pill w">In progress</span>'}`,
-    cardOf(`<div class="lrow" style="${cols};min-height:36px"><span></span><span></span>${list.map(r => `<span class="cap r">D${r.trip_day || r.seq}</span>`).join('')}<span class="cap r">Total</span></div>
-    ${rows.map(row => `<button class="lrow" style="${cols}" data-act="player" data-pid="${row.id}"><span class="sub">${row.posLabel}</span>${avName(row, null, row.pos === 1)}${row.per.map(v => `<span class="r sub">${v === null ? '–' : v}</span>`).join('')}<span class="r b">${row.total}</span></button>`).join('')}`), true);
+    cardOf(rows.map(row => `<button class="lrow trip2" data-act="player" data-pid="${row.id}"><span class="sub">${row.posLabel}</span>${avName(row, dayLine(row), row.pos === 1)}<span class="r"><span class="b">${row.total}</span></span></button>`).join('')), true);
 }
 
 /* ----- Results card ----- */
@@ -6489,7 +6523,7 @@ const tabs = document.getElementById('tabs');
 let renderGuard = 0;
 function render() {
   if (!DB.loaded && !view().members.length) {
-    app.innerHTML = `<div class="loading"><span class="badge">NCGS</span><p class="sub">${DB.online ? 'Loading' : 'No signal. The app will load when there is.'}</p></div>`;
+    app.innerHTML = `<div class="loading"><span class="badge crest loading-crest">${CREST_SVG}</span><span class="vh">NCGS</span><p class="sub">${DB.online ? 'Loading' : 'No signal. The app will load when there is.'}</p></div>`;
     tabs.hidden = true;
     return;
   }
