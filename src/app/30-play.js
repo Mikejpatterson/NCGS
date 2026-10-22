@@ -336,7 +336,8 @@ function bwPill(gc, m) {
 }
 /* Who has an extra shot on the other buggy on hole n, in the owner's words: "Mike has an extra shot on Buggy 2 on 16".
    teams: [[pid, pid], [pid, pid]] (Buggy 1, Buggy 2); shots(pid): that player's shots on hole n. A player counts only when
-   they get more shots there than anyone in the other buggy. Returns [{ team, text }]; empty when nobody has an edge. */
+   they get more shots there than anyone in the other buggy. Returns [{ team, pids, who, where, text }]; empty when nobody
+   has an edge. The card shows `who` large and `where` underneath; `text` is the whole sentence. */
 function extraShotLines(teams, shots, n, nameOf) {
   const word = k => (k === 1 ? 'an extra shot' : k === 2 ? 'two extra shots' : `${k} extra shots`);
   const out = [];
@@ -348,7 +349,8 @@ function extraShotLines(teams, shots, n, nameOf) {
     const who = diffs.every(d => d === diffs[0])
       ? `${ahead.map(nameOf).join(' and ')} ${ahead.length > 1 ? 'have' : 'has'} ${word(diffs[0])}`
       : ahead.map((pid, k) => `${nameOf(pid)} ${k ? '' : 'has '}${word(diffs[k])}`).join(' and ');
-    out.push({ team: i, text: `${who} on Buggy\u00a0${2 - i} on\u00a0${n}` });   // no-break spaces keep "Buggy 1" and "on 16" together
+    const where = `on Buggy\u00a0${2 - i} on\u00a0${n}`;   // no-break spaces keep "Buggy 1" and "on 16" together
+    out.push({ team: i, pids: ahead, who, where, text: `${who} ${where}` });
   });
   return out;
 }
@@ -412,7 +414,7 @@ VIEWS.after = () => {
   /* Before the next hole: who has an extra shot on the other buggy there, in the owner's words ("Mike has an extra shot on
      Buggy 2 on 16"). Only when a player gets more shots on that hole than anyone in the other buggy; otherwise nothing. */
   const edge = buggies && gc.nextHole ? extraShotLines(gc.teams, pid => (comp.players[pid] && comp.players[pid].holes[gc.nextHole] ? comp.players[pid].holes[gc.nextHole].shots || 0 : 0), gc.nextHole, D.nameOf)
-    .map(x => `<p class="afedge"><i class="afdot ${x.team ? 'b' : 'a'}"></i>${esc(x.text)}</p>`).join('') : '';
+    .map(x => `<div class="afedge ${x.team ? 'b' : 'a'}" role="note"><span class="afedge-bd">${bwBadges(x.pids, x.team)}</span><p><b>${esc(x.who)}</b><span>${esc(x.where)}</span></p></div>`).join('') : '';
   let next;
   const nine = a.n <= 9 ? 'front' : 'back';
   if (D.round(a.rid).status === 'live' && nineComplete(gc, nine) && !D.check(a.rid, a.gid, nine)) {
