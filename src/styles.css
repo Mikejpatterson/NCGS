@@ -1753,3 +1753,39 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .hero.c:not(.pine) .hrow2 h1.big, .hrow2 h1.big, h1.big, .hero.s h1.title:not(.is-name), h1.title:not(.is-name), .hero.home .now-name, .rp-name { font-weight: 700; letter-spacing: -.01em; }
 /* Leaderboard and trip totals: still the strongest thing in the row, but bold not black (owner, 22 October: "over chunky"). */
 .lrow .r .b, .lrow.goy .b.r { font-weight: 750; font-size: 1.55rem; letter-spacing: -.02em; }
+
+/* ----- Home: the season block (three looks on trial, owner 22 October) ----- */
+
+/* A: tiles */
+.hs-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+.hs-tile { display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: 8px; min-height: 124px; padding: 14px 16px 16px; background: #fff; border: 1px solid #E6E2D8; border-radius: 22px; text-align: left; color: var(--text); }
+.hs-tile:active { background: var(--fill); }
+.hs-eb { font-family: var(--font-display); font-size: .82rem; font-weight: 700; color: var(--pine); line-height: 1.2; }
+.hs-who { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; }
+.hs-who .av, .hs-tr .av { width: 30px; height: 30px; font-size: .68rem; flex: none; }
+.hs-nm { font-weight: 700; font-size: 1rem; min-width: 0; overflow-wrap: anywhere; }
+.hs-big { font-family: var(--font-display); font-size: 1.9rem; font-weight: 700; line-height: 1; color: var(--pine); font-variant-numeric: lining-nums tabular-nums; }
+.hs-big small { font-family: var(--font); font-size: .8rem; font-weight: 600; color: var(--sub); }
+.hs-sm { font-size: .85rem; color: var(--sub); line-height: 1.3; }
+.hs-ic2 { color: var(--pine); display: inline-flex; }
+/* B: Golfer of the Year card, then a list */
+.hs-feature { display: flex; flex-direction: column; gap: 10px; width: 100%; margin-bottom: 12px; padding: 18px 18px 14px; background: #fff; border: 1px solid #E6E2D8; border-radius: 22px; text-align: left; color: var(--text); }
+.hs-feature:active { background: var(--fill); }
+.hs-fh { display: flex; flex-direction: column; gap: 2px; }
+.hs-ft { font-family: var(--font-display); font-size: 1.45rem; font-weight: 700; color: var(--text); letter-spacing: -.01em; line-height: 1.15; }
+.hs-fs { font-family: var(--font-display); font-size: .9rem; color: var(--sub); }
+.hs-top { display: flex; flex-direction: column; }
+.hs-tr { display: grid; grid-template-columns: 2.4ch 30px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 46px; border-top: 1px solid #EFEBE1; }
+.hs-pos { color: var(--sub); font-weight: 600; font-variant-numeric: tabular-nums; }
+.hs-pts { font-weight: 750; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+.hs-more { display: flex; align-items: center; justify-content: flex-end; gap: 4px; min-height: 32px; color: var(--pine); font-weight: 600; font-size: .9rem; }
+/* C: a richer list */
+.hs-row { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; align-items: center; gap: 14px; min-height: 66px; text-align: left; }
+.hs-ic { width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: rgba(11, 61, 46, .08); color: var(--pine); }
+.hs-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.hs-t { font-weight: 600; font-size: 1.02rem; color: var(--text); }
+.hs-s { font-size: .86rem; color: var(--sub); line-height: 1.3; overflow-wrap: anywhere; }
+.hs.hs-grid { width: 100%; padding: 0; background: none; border: 0; box-shadow: none; }
+.hs-tile { width: 100%; }
+.hs.hs-feature { align-items: stretch; }
+.hs.hs-feature > * { width: 100%; }
