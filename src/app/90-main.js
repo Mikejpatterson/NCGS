@@ -489,12 +489,17 @@ function render() {
   /* Keep the reader's place when a screen redraws in place (a + or - on the hole screen). Some phones (iOS Safari, and
      the app shown inside another page) can jump to the top when the whole screen's content is swapped, so the scroll
      position is put back unless this redraw asked to go to the top or to the current hole. */
+  if (document.activeElement && document.activeElement.tagName === 'BUTTON' && app.contains(document.activeElement)) document.activeElement.blur();   // a focused button that disappears can make iOS scroll
   const sc = scroller(), keepY = !UI.scrollTop && !UI.scrollCur ? sc.scrollTop : null, keepDocY = window.scrollY;
   app.innerHTML = out.html + overlay;
   if (keepY !== null) {
     if (sc.scrollTop !== keepY) sc.scrollTop = keepY;
     if (window.scrollY !== keepDocY) window.scrollTo(0, keepDocY);
-    requestAnimationFrame(() => { if (Math.abs(sc.scrollTop - keepY) > 1) sc.scrollTop = keepY; });
+    /* iOS can also jump a moment later, when the button that was tapped has gone from the page, so check again
+       on the next frame and shortly after. Only if nothing has scrolled since. */
+    const back = () => { if (Math.abs(sc.scrollTop - keepY) > 1 && !UI.userScrolled) sc.scrollTop = keepY; };
+    UI.userScrolled = false;
+    requestAnimationFrame(back); setTimeout(back, 60); setTimeout(back, 250);
   }
   if (keepFocus) { const el = document.getElementById(keepFocus); if (el) el.focus(); }
   /* The tab bar only shows while a round is in play (live, or booked for today). The rest of the time Home is the hub. */
@@ -687,3 +692,6 @@ if (window.claude && typeof window.claude.use === 'function') {
 })();
 if ('serviceWorker' in navigator && BOOT.mode === 'live' && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
 window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, fmtDate, daysFromToday, todayIso, send, holeOf, computeR, myGroup, liveRid, refreshThread };
+
+/* A finger or wheel scroll after a redraw means the reader moved on purpose, so render() stops putting the old position back. */
+['touchmove', 'wheel'].forEach(t => app.addEventListener(t, () => { UI.userScrolled = true; }, { passive: true }));
