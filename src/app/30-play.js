@@ -376,7 +376,7 @@ VIEWS.after = () => {
   return {
     tabs: 'hole',
     html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
-      ${buggies ? `<div class="bw-vs afvs">${bwBadges(gc.teams[0], 0)}<span class="sub">v</span>${bwBadges(gc.teams[1], 1)}</div>
+      ${buggies ? `<div class="sec-label afbw"><span class="sub">Buggy Wars</span></div><div class="bw-vs afvs">${bwBadges(gc.teams[0], 0)}<span class="sub">v</span>${bwBadges(gc.teams[1], 1)}</div>
       <div class="card bw-card aftercard"><div class="bw-row afres"><span class="bw-l afl">Hole ${a.n}</span>${head}<span></span>${sub ? `<small class="afres-sub">${esc(sub)}</small>` : ''}</div>${rows}</div>` : `<div class="aftercard"><div class="afhead"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>${rows}</div>`}
       ${next}${saveWarning()}</div>`
   };
