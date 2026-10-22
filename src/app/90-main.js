@@ -486,7 +486,16 @@ function render() {
   if (UI.shareImg) overlay += `<div class="full" role="dialog" aria-label="Results image"><img src="${UI.shareImg}" alt="Results"><a class="btn dl" href="${UI.shareImg}" download="results.png">Save image</a><button class="link full-close" data-act="share-close">Close</button></div>`;
   const active = document.activeElement;
   const keepFocus = active && active.id && app.contains(active) && /INPUT|TEXTAREA|SELECT/.test(active.tagName) ? active.id : null;
+  /* Keep the reader's place when a screen redraws in place (a + or - on the hole screen). Some phones (iOS Safari, and
+     the app shown inside another page) can jump to the top when the whole screen's content is swapped, so the scroll
+     position is put back unless this redraw asked to go to the top or to the current hole. */
+  const sc = scroller(), keepY = !UI.scrollTop && !UI.scrollCur ? sc.scrollTop : null, keepDocY = window.scrollY;
   app.innerHTML = out.html + overlay;
+  if (keepY !== null) {
+    if (sc.scrollTop !== keepY) sc.scrollTop = keepY;
+    if (window.scrollY !== keepDocY) window.scrollTo(0, keepDocY);
+    requestAnimationFrame(() => { if (Math.abs(sc.scrollTop - keepY) > 1) sc.scrollTop = keepY; });
+  }
   if (keepFocus) { const el = document.getElementById(keepFocus); if (el) el.focus(); }
   /* The tab bar only shows while a round is in play (live, or booked for today). The rest of the time Home is the hub. */
   const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
