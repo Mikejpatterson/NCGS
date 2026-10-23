@@ -39,3 +39,6 @@ Start with one isolated Home composition and its existing return-to-scoring acti
 If that exploration is taken forward, validate actual 360/390px and enlarged-text layouts, the same existing scoring behaviours and real-phone readability. These conceptual boards have **not** undergone those checks. Further direction or an aesthetic departure still belongs to the human owner.
 
 No automated implementation command or queue entry accompanies these proposals.
+
+
+**Further owner context:** [event lifecycle working notes](event-lifecycle.md) extend the creative brief beyond quiet/live. Requirements are still being explained; these are principles and questions, not an implementation specification.

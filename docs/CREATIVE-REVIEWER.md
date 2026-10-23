@@ -74,3 +74,7 @@ A Codex session can invoke a separate sub-agent with this instruction:
 > Act as the NCGS creative design reviewer. Read docs/CREATIVE-REVIEWER.md and current owner decisions in Issue #1. Independently review the latest released app or the explicitly assigned candidate using genuine fixture renders. Follow the brief's output and boundaries. Return findings to me; do not edit code or post externally.
 
 The sub-agent runs when invoked in an active session. This file preserves the role across sessions; it does not provide autonomous monitoring or a permanent background process.
+
+## Event lifecycle — continuing owner explanation
+
+Read [the working lifecycle notes](creative-concepts/event-lifecycle.md) before proposing further states. Quiet/live are only two views: audience, announcement, arrangements, group progress and trip/round context can differ independently. Preserve confirmed facts and label unconfirmed cases. Wait for the rest of the owner's explanation before fixing a state matrix or inventing attendance/publication workflows.
