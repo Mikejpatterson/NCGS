@@ -36,6 +36,7 @@ const ACT = {
   toggle: el => { UI.open[el.dataset.key] = !UI.open[el.dataset.key]; render(); },
   hcp: el => go('hcp', { pid: el.dataset.pid, rid: el.dataset.rid }),
   tab: el => {
+    ruleClose();
     UI.contestSheet = false;
     const t = el.dataset.tab;
     if (t === 'home') { ACT.home(); return; }
@@ -57,8 +58,10 @@ const ACT = {
   'ask-idea': el => askQuestion(el.dataset.q),
   'ask-read': el => askRead(Number(el.dataset.i)),
   'ask-info': el => askInfo(Number(el.dataset.i)),
+  'rule-open': el => ruleOpen(el.dataset.rule, Number(el.dataset.i)),
+  'rule-close': (el, e) => { if (e && e.target !== el && !el.classList.contains('link')) return; ruleClose(); },
   'ask-more': () => askKeyboard(),
-  'ask-clear': () => { UI.chat = []; UI.chatInfo = {}; UI.chatBusy = false; UI.askDraft = ''; render(); },
+  'ask-clear': () => { ruleClose(); UI.chat = []; UI.chatInfo = {}; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'ask-pick': el => { UI.askPick = { key: el.dataset.key, v: el.dataset.v }; render(); },
   'ask-confirm': () => {
     const rid = playRid(), g = myGroup(rid), comp = computeR(rid);
@@ -570,6 +573,8 @@ tabs.innerHTML = [['home', 'Home'], ['hole', 'Hole'], ['board', 'Results'], ['ru
 document.addEventListener('click', e => {
   const el = e.target.closest('[data-act]');
   if (!el || el.tagName === 'FORM') return;
+  // a plain link inside a tappable area (the official rule page in the rule pop-up) opens as a link
+  const a = e.target.closest('a[href]'); if (a && el.contains(a) && !a.dataset.act) return;
   const fn = ACT[el.dataset.act];
   if (fn) { e.preventDefault(); fn(el, e); }
 });

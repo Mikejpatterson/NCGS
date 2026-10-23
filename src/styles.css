@@ -1838,3 +1838,20 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .after .afedge p { margin: 0; min-width: 0; line-height: 1.25; text-wrap: balance; }
 .after .afedge b { display: block; font-weight: 700; font-size: 1.1rem; color: var(--text); }
 .after .afedge p span { display: block; margin-top: 2px; font-weight: 600; color: var(--edge); }
+
+/* Rule chips under a ruling (owner, 22 October): every rule cited can be tapped to see the rule itself. */
+.rrefs { display: flex; flex-direction: column; gap: 8px; margin: 14px 0 12px; }
+.rref { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 52px; padding: 8px 40px 8px 14px; position: relative; border-radius: 16px; background: var(--bg); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--pine) 22%, transparent); text-align: left; color: var(--text); }
+.rref::after { content: "›"; position: absolute; right: 16px; top: 50%; transform: translateY(-52%); font-size: 1.5rem; line-height: 1; color: var(--pine); }
+.rref:active { background: color-mix(in srgb, var(--pine) 8%, var(--bg)); }
+.rref-n { flex: none; min-width: 4.6em; font-weight: 800; color: var(--pine); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.rref-t { flex: 1; min-width: 0; font-size: .9rem; line-height: 1.3; color: var(--sub); overflow-wrap: anywhere; }
+@container (max-width: 17em) { .rref { flex-direction: column; align-items: flex-start; gap: 2px; } }
+.rulesheet { border-radius: 24px 24px 0 0; padding: 8px 20px calc(20px + env(safe-area-inset-bottom, 0px)); background: var(--card); box-shadow: 0 -10px 40px rgba(0, 0, 0, .25); animation: slideup .22s ease-out; max-height: 88vh; overflow-y: auto; overscroll-behavior: contain; }
+.rulesheet .nav .b { font-weight: 800; color: var(--pine); font-variant-numeric: tabular-nums; }
+.rulesheet .rs-title { font-family: var(--font-display); font-size: 1.45rem; font-weight: 600; line-height: 1.2; margin: 6px 0 14px; color: var(--text); text-wrap: balance; }
+.rulesheet .rs-lab { font-size: .78rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--sub); margin-bottom: 8px; }
+.rulesheet .rs-quote { margin: 0; padding: 2px 0 2px 14px; border-left: 3px solid var(--pine); font-size: 1rem; line-height: 1.5; color: var(--text); overflow-wrap: anywhere; white-space: pre-line; }
+.rulesheet .rs-none { margin: 0; font-size: 1rem; line-height: 1.45; color: var(--text); }
+.rulesheet .rs-go { margin-top: 20px; text-decoration: none; }
+.rulesheet .rs-cap { text-align: center; margin: 10px 0 0; }
