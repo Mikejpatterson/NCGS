@@ -24,6 +24,16 @@ Avoid faux luxury, generic golf templates, ornamental clutter, course photograph
 
 Use judgement rather than copying exploratory mockups. Exact type/spacing/token suggestions may improve within this direction. Identify material departures as options requiring the human's decision.
 
+## Club and matchday refinement (owner direction, 23 October)
+
+Develop two contextual rhythms in the same app: restrained club character between rounds; readable matchday hierarchy during play. Nearest the pin, longest drive and the individual leaderboard matter alongside scoring and Buggy Wars. Avoid both a scoring-only concept and a dashboard of equally loud modules.
+
+Inspect an identified player's live Home and a quiet fixture state before diagnosing them. Continue already exists for a playing group, and the mini-board retains personal rank outside the leaders. Quiet Home currently hides play navigation. Improve composition without misrepresenting those behaviours as missing features.
+
+Contests are introduced before the relevant hole; after saving its scores, the group selects a nominee or Nobody. Results distinguish claimant from confirmed result. Do not invent measured distances or prize-claim actions.
+
+Refine in stages: establish priorities from real evidence, explore coherent visuals, then independently challenge and simplify. Preserve the full field, cross-group KB pairs and lowest-pair treatment, and all three Buggy Wars matches. The [latest refinement record](creative-concepts/refinement-rounds.md) supersedes the initial boards where they differ.
+
 ## Practical boundaries
 
 - Outdoor phone readability, quick score entry and clear hierarchy outrank decorative novelty. Consider 360px, 390px and enlarged text; say which were actually inspected.

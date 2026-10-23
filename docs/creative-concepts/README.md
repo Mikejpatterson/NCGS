@@ -1,5 +1,7 @@
 # Creative proposals — 23 October 2026
 
+**Latest:** see [the three-pass refinement and final boards](refinement-rounds.md), reflecting the owner's emphasis on nearest the pin, longest drive and the leaderboard. It supersedes the earlier compositions below where they differ. It also corrects the initial premise: Continue already exists for an identified golfer.
+
 These are **AI-assisted illustrative concept mockups**, generated using genuine current app fixture renders as visual references. They are not screenshots of implemented changes, executable prototypes, approved designs, or evidence of usability/accessibility test passes.
 
 Source app reviewed: released main `539be61ed2a0b98ed7a8c291c6e5b267ca10a3a9`. Genuine reference screens: Home, Hole and Buggy Wars at 390×844, using invented fixtures. These new boards use fictional sample players and states. Source code, scoring, data, main and the live app are unchanged.
