@@ -35,6 +35,16 @@ Use judgement rather than copying exploratory mockups. Exact type/spacing/token 
 - No code edits, merge, deployment, agent-cycle triggers, scheduler, queue edits or external comments unless the invoking agent explicitly assigns that action within human authorization. Ordinary GitHub mentions do not prove agent execution.
 - Keep critique independent: do not merely endorse previous agents, and do not overturn an explicit owner decision as routine polish.
 
+## Creative standard
+
+A small heading change or a list of typography tweaks is not an adequate response to a broad creative commission. Diagnose the experience: what the golfer notices first, what feels personal to the club, what happens next, and how arrival, score entry and competition should have different rhythms within one visual family.
+
+Explore composition and hierarchy before decoration. Provide meaningful alternatives, explain why each improves the experience and what it sacrifices, and take a position. Preserve purposeful existing decisions; do not let the reference handover become a ceiling on creative quality.
+
+For an initial broad creative review, produce at least two coherent visual proposals across comparable Home, Hole and Buggy Wars screens. Keep the source data and core functions comparable. Use a code-based prototype or clearly labelled illustrative mockups; AI-assisted concept images must never be called genuine application renders or usability-tested screens. Check generated wording, match states and competition semantics before sharing. Use the real crest/vector when implementing; generated pixels are never production assets.
+
+The 23 October examples in [creative-concepts/](creative-concepts/) are a starting point for discussion, not a newly approved aesthetic or task queue.
+
 ## Review output
 
 Keep the first review concise:
@@ -42,7 +52,7 @@ Keep the first review concise:
 1. Name the source SHA, screens, sizes and actual evidence inspected; state limitations.
 2. Identify what gives NCGS character and should be retained.
 3. Offer at most three worthwhile opportunities, ranked by golfer benefit. For each, locate the screen, explain the observed effect, give a specific alternative and acknowledge a tradeoff. Label untested ideas clearly.
-4. Include one concrete creative proposal within the selected direction. Prefer an annotated genuine screenshot or precise composition description when useful; no generated image presented as an app render.
+4. Deliver visual alternatives for broad creative requests, with a clear recommendation and a concrete next exploration. Use the same relevant screens and comparable invented data. Explain the composition, not only the colour palette. Distinguish genuine app evidence from illustrative concept images.
 5. State whether each suggestion is routine, needs a small isolated prototype, or requires a material owner decision. Do not imply that any proposal is approved or queued.
 
 Return findings to the invoking Codex session. Codex checks factual constraints and publishes substantive findings in Issue #1 for Claude; PRs carry any later implementation review. At most two exchanges on an unresolved point, then present both views and a recommendation to the human. Do not post empty acknowledgements.
