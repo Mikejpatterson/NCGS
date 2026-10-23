@@ -117,9 +117,11 @@ function nowCard(r) {
   const playable = canScore(r) && (live || !r.date || daysFromToday(r.date) <= 0);
   const kind = live ? 'Today' : r.date && daysFromToday(r.date) === 0 ? 'Today' : 'Next round';
   const days = r.date ? daysFromToday(r.date) : null;
-  const when = r.date && !live ? (days > 0 ? `${fmtDate(r.date, true)} · ${days === 1 ? 'tomorrow' : 'in ' + plural(days, 'day')}` : fmtDate(r.date, true)) : '';
-  const line2 = when || (!live && !r.date ? 'Date to be confirmed' : '');
   const date = !live && r.date ? parseDay(r.date) : null;
+  // The date box already shows the month and day, so the line beside it gives the weekday and the countdown, not the date again.
+  const weekday = date ? date.toLocaleDateString('en-GB', { weekday: 'long' }) : '';
+  const when = r.date && !live ? (days > 0 ? `${weekday} · ${days === 1 ? 'tomorrow' : 'in ' + plural(days, 'day')}` : weekday) : '';
+  const line2 = when || (!live && !r.date ? 'Date to be confirmed' : '');
   const mine = live && myGroup(r.id);
   const comp = mine && computeR(r.id);
   const group = comp && comp.groups.find(g => g.id === mine.id);
@@ -128,7 +130,7 @@ function nowCard(r) {
     <button class="now-main" data-act="round" data-rid="${r.id}">
       <span class="now-top"><span class="now-kind">${kind}</span>${statusPill(r)}</span>
       <span class="now-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</span>
-      ${date ? `<span class="home-date" aria-hidden="true"><small>${MONTHS[date.getMonth()].slice(0, 3)}</small><b>${date.getDate()}</b></span>` : ''}
+      ${date ? `<span class="home-date" aria-hidden="true"><small>${MONTHS[date.getMonth()].slice(0, 3)}</small><b>${date.getDate()}</b></span><span class="vh">${esc(fmtDate(r.date, true))}</span>` : ''}
       ${line2 ? `<span class="now-line">${esc(line2)}</span>` : ''}
       <span class="now-line">${esc(heroFacts(r))}</span>
       ${thisContest ? `<span class="home-this-hole">${CONTEST[thisContest.type]} · Hole ${thisContest.hole}</span>` : ''}
@@ -157,7 +159,7 @@ function homeMatchday(r) {
 }
 
 function homeSeasonIntro(season, played) {
-  return `<section class="home-season-intro"><p class="home-season-label">The season ahead</p><div class="home-year"><span>${season}</span><i aria-hidden="true"></i></div><p class="home-quiet-title">${played.length ? 'Between rounds.' : 'A fresh scorecard.'}</p><p class="sub">No round booked yet.<br>The next date will appear here when it’s set.</p></section>`;
+  return `<section class="home-season-intro"><p class="home-season-label">This season</p><div class="home-year"><span>${season}</span><i aria-hidden="true"></i></div><p class="home-quiet-title">${played.length ? 'Between rounds.' : 'A fresh scorecard.'}</p><p class="sub">No round booked yet.<br>The next date will appear here when it’s set.</p></section>`;
 }
 VIEWS.home = () => {
   const season = seasonOf();
