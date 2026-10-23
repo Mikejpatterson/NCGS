@@ -393,10 +393,11 @@ function finishedBody(r, res) {
     ((all || !many) && res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : (all || !many) && res.source === 'sheet' ? '<p class="cap note">From the society sheet</p>' : ''));
   const rows = [];
   if (res.kb.length) {
-    const top = res.kb.filter(k => k.posLabel === res.kb[0].posLabel);
+    // The KBs are the last-placed pair (E.kbLowest), the same pair the round's results highlight.
+    const low = E.kbLowest(res.kb);
     const open = !!UI.open['kb-' + r.id];
-    rows.push(`<button class="row" data-act="toggle" data-key="kb-${r.id}" aria-expanded="${open}"><span>KBs</span><span class="right"><b>${esc(top.map(k => k.name).join(', '))} · ${top[0].total}</b><span class="chev dn${open ? ' up' : ''}">${chev}</span></span></button>`);
-    if (open) rows.push(res.kb.map(k => `<div class="lrow"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''));
+    rows.push(`<button class="row" data-act="toggle" data-key="kb-${r.id}" aria-expanded="${open}"><span>KBs</span><span class="right">${low.length ? `<b>${esc(low.map(k => k.name).join(', '))} · ${low[0].total}</b>` : ''}<span class="chev dn${open ? ' up' : ''}">${chev}</span></span></button>`);
+    if (open) rows.push(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''));
   }
   res.contests.filter(c => c.winner !== undefined).forEach(c => rows.push(`<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${c.winner ? `<span class="b ct-won">${esc(D.nameOf(c.winner))}${CUP}</span>` : '<span class="sub">Not awarded</span>'}</div>`));
   if (rows.length) html += sec(label('KBs and contests'), cardOf(rows.join('')));
