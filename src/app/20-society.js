@@ -104,10 +104,9 @@ function homeHeadline(feature) {
 const lenStyle = s => `style="--len:${[...s].length}"`;
 /* The round card's buttons. During a live round that you're playing, the main button takes you back to scoring
    ("Continue · Hole 7"), and Players · Groups · KBs becomes a quieter link underneath (design review, 22 October). */
-function nowActs(r, live) {
+function nowActs(r, live, group) {
   const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">${live ? 'Players · Groups · KBs' : 'View round details'}</button>`;
-  let next = null;
-  try { const mine = live && myGroup(r.id); const gc = mine && computeR(r.id).groups.find(g => g.id === mine.id); next = gc ? gc.nextHole : null; } catch (e) { next = null; }
+  const next = group ? group.nextHole : null;
   if (!next) return `<div class="now-acts one">${groups}</div>`;
   return `<div class="now-acts one"><button class="go" data-act="tab" data-tab="hole">Continue \u00b7 Hole ${next}</button>
     <button class="go-link" data-act="round" data-rid="${r.id}" data-tab="players">Players \u00b7 Groups \u00b7 KBs</button></div>`;
@@ -122,7 +121,8 @@ function nowCard(r) {
   const line2 = when || (!live && !r.date ? 'Date to be confirmed' : '');
   const date = !live && r.date ? parseDay(r.date) : null;
   const mine = live && myGroup(r.id);
-  const group = mine && computeR(r.id) && computeR(r.id).groups.find(g => g.id === mine.id);
+  const comp = mine && computeR(r.id);
+  const group = comp && comp.groups.find(g => g.id === mine.id);
   const thisContest = group && group.nextHole ? contestOn(r.id, group.nextHole) : null;
   return `<div class="now ${live ? 'home-live-ticket' : 'home-announcement'}">
     <button class="now-main" data-act="round" data-rid="${r.id}">
@@ -133,7 +133,7 @@ function nowCard(r) {
       <span class="now-line">${esc(heroFacts(r))}</span>
       ${thisContest ? `<span class="home-this-hole">${CONTEST[thisContest.type]} · Hole ${thisContest.hole}</span>` : ''}
     </button>
-    ${nowActs(r, live)}
+    ${nowActs(r, live, group)}
   </div>`;
 }
 
@@ -150,7 +150,7 @@ function homeMatchday(r) {
       const answered = c.status && c.status.answered;
       const state = confirmed ? 'Confirmed' : who || answered ? 'To be confirmed' : 'Not yet played';
       const name = who ? D.nameOf(who) : confirmed ? 'Nobody' : answered ? 'Nobody yet' : 'No claim yet';
-      return `<div class="home-contest"><span class="hs-ic" aria-hidden="true">${sized(ICON.flagpin, 20)}</span><span class="home-contest-copy"><span class="b">${CONTEST[c.type]}${c.hole ? ` <span class="sub">· ${c.hole}</span>` : ''}</span><span class="sub">${esc(name)}</span></span><span class="home-contest-state">${state}</span></div>`;
+      return `<div class="home-contest"><span class="hs-ic" aria-hidden="true">${sized(ICON.flagpin, 20)}</span><span class="home-contest-copy"><span class="b">${CONTEST[c.type]}${c.hole ? ` <span class="sub">· Hole ${c.hole}</span>` : ''}</span><span class="sub">${esc(name)}</span></span><span class="home-contest-state">${state}</span></div>`;
     }).join('')}</div></section>`;
   }
   return html;

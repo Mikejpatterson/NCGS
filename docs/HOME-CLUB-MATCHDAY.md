@@ -16,8 +16,9 @@ It is proposed on an isolated branch into design. It is not a release or deploym
   Confirmed, pending, Nobody and not-yet-played states remain distinct. A partial set of Nobody responses
   must not be described as an unplayed hole. The next hole's contest is also signalled on the live ticket.
 
-The crest, light navigation, score controls and season-list destinations are retained. The changes are
-in `20-society.js`, Home-scoped styles and a browser regression test; there is no save operation here.
+The crest, light navigation, score controls and season-list destinations are retained. The season-list
+icons intentionally use pine circles for stronger contrast, scoped to Home's sibling sections. The changes
+are in `20-society.js`, Home-scoped styles and browser tests; there is no save operation here.
 
 ## Scope and dependencies
 
@@ -47,6 +48,8 @@ node test/starthole.run.js
 
 The new Home test covers quiet/upcoming/live states, personal rank and navigation, provisional claims,
 partial Nobody responses and fully confirmed Nobody, plus 360px/390px/enlarged-text renders.
+It is invoked by the existing layout entry point after every original layout assertion passes, so the
+existing design CI automatically runs it. Its failure propagates to the job; no workflow changes are needed.
 
 The comparison intentionally reports Home's added words/Full field control and changed composition.
 That is expected; it must not be called an unchanged-content pass. Downstream scoring/competition views

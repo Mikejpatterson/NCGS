@@ -1887,4 +1887,4 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .home-contest-copy > .sub { font-size: .85rem; }
 .home-contest-state { color: var(--sub); font-size: .7rem; max-width: 7rem; text-align: right; }
 .home-contests .hs-ic { color: var(--pine); background: var(--fill); width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: none; }
-.hs-row .hs-ic { color: var(--card); background: var(--pine); }
+.hero.home ~ .sec .hs-row .hs-ic { color: var(--card); background: var(--pine); }
