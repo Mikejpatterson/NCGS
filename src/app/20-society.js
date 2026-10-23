@@ -123,8 +123,10 @@ function nowCard(r) {
   const when = r.date && !live ? (days > 0 ? `${weekday} · ${days === 1 ? 'tomorrow' : 'in ' + plural(days, 'day')}` : weekday) : '';
   const line2 = when || (!live && !r.date ? 'Date to be confirmed' : '');
   const mine = live && myGroup(r.id);
-  const comp = mine && computeR(r.id);
-  const group = comp && comp.groups.find(g => g.id === mine.id);
+  // Your group's progress only adds Continue and the next contest; if it can't be worked out, Home still shows the round.
+  let group = null;
+  try { const comp = mine && computeR(r.id); group = (comp && comp.groups.find(g => g.id === mine.id)) || null; }
+  catch (e) { console.warn('Home: group progress unavailable', e); group = null; }
   const thisContest = group && group.nextHole ? contestOn(r.id, group.nextHole) : null;
   return `<div class="now ${live ? 'home-live-ticket' : 'home-announcement'}">
     <button class="now-main" data-act="round" data-rid="${r.id}">
@@ -158,6 +160,9 @@ function homeMatchday(r) {
   return html;
 }
 
+// Upcoming rounds members can see: only once the organiser has given them a date (owner, 23 October).
+// The organiser's screens still list every upcoming round.
+const announced = () => upcoming().filter(r => r.date);
 function homeSeasonIntro(season, played) {
   return `<section class="home-season-intro"><p class="home-season-label">This season</p><div class="home-year"><span>${season}</span><i aria-hidden="true"></i></div><p class="home-quiet-title">${played.length ? 'Between rounds.' : 'A fresh scorecard.'}</p><p class="sub">No round booked yet.<br>The next date will appear here when it’s set.</p></section>`;
 }

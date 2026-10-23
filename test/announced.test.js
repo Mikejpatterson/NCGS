@@ -1,8 +1,9 @@
-// Upcoming rounds members can see (src/app/10-data.js announced): only once they have a date. Loaded from the source.
+// Upcoming rounds members can see (src/app/20-society.js announced; upcoming in src/app/10-data.js): only once they have a date. Loaded from the source.
 const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
-const src = fs.readFileSync(require('path').join(__dirname, '../src/app/10-data.js'), 'utf8');
+const read = f => fs.readFileSync(require('path').join(__dirname, '../src/app/' + f), 'utf8');
+const src = read('10-data.js') + '\n' + read('20-society.js');
 const pick = name => src.split('\n').find(l => l.startsWith(`const ${name} = `));
 const make = rounds => new Function('D', `${pick('upcoming')}\n${pick('announced')}\nreturn { upcoming, announced };`)({ rounds: () => rounds });
 
