@@ -4,7 +4,7 @@ const ACT = {
   back: () => back(),
   home: () => { UI.org = false; UI.stack = [{ v: 'home', p: {} }]; UI.scrollTop = true; render(); },
   round: el => { if (el.dataset.tab) UI.rtab = el.dataset.tab; go('round', { rid: el.dataset.rid }); },
-  player: el => go('player', { pid: el.dataset.pid }),
+  player: el => go('player', { pid: el.dataset.pid, year: el.dataset.year ? Number(el.dataset.year) : null }),
   card: el => go('card', { rid: el.dataset.rid, pid: el.dataset.pid }),
   goy: () => go('goy'),
   stats: () => go('stats'),
@@ -40,7 +40,7 @@ const ACT = {
     UI.contestSheet = false;
     const t = el.dataset.tab;
     if (t === 'home') { ACT.home(); return; }
-    const rid = playRid() || liveRid() || (upcoming()[0] || {}).id || ((D.rounds().filter(r => r.status === 'final').slice(-1)[0]) || {}).id;
+    const rid = playRid() || liveRid() || (announced()[0] || {}).id || ((D.rounds().filter(r => r.status === 'final').slice(-1)[0]) || {}).id;
     if (!rid) { toast('No round yet'); return; }
     if (cur().v === 'home' && t === 'hole') { ACT.play({ dataset: { rid } }); return; }
     while (UI.stack.length > 1 && !['tee', 'match', 'board', 'rules', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();

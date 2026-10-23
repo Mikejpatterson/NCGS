@@ -30,6 +30,7 @@ function nextChecklist(r) {
   if (!r || r.status === 'final' || r.source === 'imported') return '';
   const tee = teeOf(r), c = courseOf(r);
   const items = [
+    { ok: !!r.date, t: r.date ? 'Date' : 'Date: members see the round once it has one', go: ['details', r.id], need: true },
     { ok: !!(c && c.holes && tee), t: 'Course and tees', go: ['details', r.id], need: true },
     { ok: !!(r.groups && r.groups.length), t: 'Players and groups', go: ['playing', r.id], need: true },
     { ok: !!r.first_tee, t: 'First tee time', go: ['details', r.id], need: true },

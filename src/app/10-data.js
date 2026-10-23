@@ -294,6 +294,8 @@ function computeR(rid) {
 const hasCards = r => r && r.source !== 'imported' && canScore(r);
 const liveRid = () => { const r = D.rounds().find(x => x.status === 'live'); return r ? r.id : null; };
 const upcoming = () => D.rounds().filter(r => r.status === 'upcoming').sort((a, b) => String(a.date || '9').localeCompare(String(b.date || '9')));
+// Upcoming rounds members can see: only once the organiser has given them a date. The organiser still sees all of them.
+const announced = () => upcoming().filter(r => r.date);
 function myGroup(rid) {
   const r = D.round(rid);
   return r && r.groups ? r.groups.find(g => g.teams.flat().includes(DB.prefs.me)) || null : null;
