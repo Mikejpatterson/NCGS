@@ -123,8 +123,10 @@ function nowCard(r) {
   const when = r.date && !live ? (days > 0 ? `${weekday} · ${days === 1 ? 'tomorrow' : 'in ' + plural(days, 'day')}` : weekday) : '';
   const line2 = when || (!live && !r.date ? 'Date to be confirmed' : '');
   const mine = live && myGroup(r.id);
-  const comp = mine && computeR(r.id);
-  const group = comp && comp.groups.find(g => g.id === mine.id);
+  // Your group's progress only adds Continue and the next contest; if it can't be worked out, Home still shows the round.
+  let group = null;
+  try { const comp = mine && computeR(r.id); group = (comp && comp.groups.find(g => g.id === mine.id)) || null; }
+  catch (e) { console.warn('Home: group progress unavailable', e); group = null; }
   const thisContest = group && group.nextHole ? contestOn(r.id, group.nextHole) : null;
   return `<div class="now ${live ? 'home-live-ticket' : 'home-announcement'}">
     <button class="now-main" data-act="round" data-rid="${r.id}">

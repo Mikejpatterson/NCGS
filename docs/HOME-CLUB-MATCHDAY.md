@@ -63,3 +63,42 @@ the invented fixture as ignored seed input; no real seed is read or committed.
 
 Genuine Chromium screenshots and viewport tests do not establish real-iPhone typography, sunlight
 readability or physical iPad behaviour. These remain explicit review limits.
+
+## Follow-up after release (23 October)
+
+Source: design `3646f6fb3032d589623c2da694c482aa863e8f6c` (release merge of PR #34). That already contains the
+Home review fixes in `f14c7c4` (Continue reuses the one group calculation; contests say "Hole N"; the Home test
+runs from the layout entry point) and the owner's later fixes in `175fa61` (the date shows once on the
+next-round card; the season list is labelled "This season"). Both are kept unchanged.
+
+Two remaining review notes, now fixed:
+
+- **Test address.** `test/layout.run.js` reads `LAYOUT_URL`, but the Home test it starts reads `NCGS_TEST_URL`,
+  so a non-default layout address was not passed on. The layout runner now passes its own address to the Home
+  test (an explicitly set `NCGS_TEST_URL` still wins). No assertion changed.
+- **Optional group calculation.** `f14c7c4` removed the old guard around working out your group's progress on
+  the live Home card. A narrow `try` now covers only that calculation (`computeR` and finding your group); on
+  failure Home logs a warning and shows the round without Continue or the next-hole contest. Scoring helpers,
+  the rest of Home and every other screen are not wrapped, so other failures still surface.
+
+### Validation record
+
+| Check | Result in this follow-up |
+|---|---|
+| `node --test test/engine.test.js test/server.test.js` | pass, 53 of 53 |
+| `sh tools/guard.sh 3646f6fb3032d589623c2da694c482aa863e8f6c` | pass |
+| `NCGS_FIXTURE=1 node build.js` | pass (preview only, invented fixture) |
+| layout (with the Home test), screenshot comparison, several phones | run by the agent workflow straight after this change, against `3646f6f`; see the workflow run for the exact head |
+
+Reconciling with the release evidence: the broad Home before/after comparison (released source `1e81df4` to now)
+was **not** re-run in this follow-up. The agent sandbox refused to unpack or build an older commit, and the PR #33
+discussion and its check results could not be read from inside the run, so no earlier result is restated here as
+verified. The workflow's comparison above is against `3646f6f`, so it checks this follow-up only: it should show
+no change to controls, words or pixels on any screen in the fixture, because the guard only changes behaviour when
+the group calculation fails, which the fixture never triggers. Expected Home differences against `1e81df4`
+(added words, the Full field control and the new composition) are intentional and are described under
+Validation above; they are not a downstream change.
+
+Remaining limits: no new test forces the group calculation to fail (test changes here were limited to the
+address wiring); browser timing failures, if the workflow reports any, are recorded on the PR as they happened;
+no real iPhone, sunlight or iPad check has been done.
