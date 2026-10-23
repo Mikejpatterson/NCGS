@@ -104,10 +104,9 @@ function homeHeadline(feature) {
 const lenStyle = s => `style="--len:${[...s].length}"`;
 /* The round card's buttons. During a live round that you're playing, the main button takes you back to scoring
    ("Continue · Hole 7"), and Players · Groups · KBs becomes a quieter link underneath (design review, 22 October). */
-function nowActs(r, live) {
-  const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">Players · Groups · KBs</button>`;
-  let next = null;
-  try { const mine = live && myGroup(r.id); const gc = mine && computeR(r.id).groups.find(g => g.id === mine.id); next = gc ? gc.nextHole : null; } catch (e) { next = null; }
+function nowActs(r, live, group) {
+  const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">${live ? 'Players · Groups · KBs' : 'View round details'}</button>`;
+  const next = group ? group.nextHole : null;
   if (!next) return `<div class="now-acts one">${groups}</div>`;
   return `<div class="now-acts one"><button class="go" data-act="tab" data-tab="hole">Continue \u00b7 Hole ${next}</button>
     <button class="go-link" data-act="round" data-rid="${r.id}" data-tab="players">Players \u00b7 Groups \u00b7 KBs</button></div>`;
@@ -118,18 +117,49 @@ function nowCard(r) {
   const playable = canScore(r) && (live || !r.date || daysFromToday(r.date) <= 0);
   const kind = live ? 'Today' : r.date && daysFromToday(r.date) === 0 ? 'Today' : 'Next round';
   const days = r.date ? daysFromToday(r.date) : null;
-  const when = r.date && !live ? (days > 0 ? `${fmtDate(r.date, true)} · ${days === 1 ? 'tomorrow' : 'in ' + plural(days, 'day')}` : fmtDate(r.date, true)) : '';
+  const date = !live && r.date ? parseDay(r.date) : null;
+  // The date box already shows the month and day, so the line beside it gives the weekday and the countdown, not the date again.
+  const weekday = date ? date.toLocaleDateString('en-GB', { weekday: 'long' }) : '';
+  const when = r.date && !live ? (days > 0 ? `${weekday} · ${days === 1 ? 'tomorrow' : 'in ' + plural(days, 'day')}` : weekday) : '';
   const line2 = when || (!live && !r.date ? 'Date to be confirmed' : '');
-  return `<div class="now">
+  const mine = live && myGroup(r.id);
+  const comp = mine && computeR(r.id);
+  const group = comp && comp.groups.find(g => g.id === mine.id);
+  const thisContest = group && group.nextHole ? contestOn(r.id, group.nextHole) : null;
+  return `<div class="now ${live ? 'home-live-ticket' : 'home-announcement'}">
     <button class="now-main" data-act="round" data-rid="${r.id}">
       <span class="now-top"><span class="now-kind">${kind}</span>${statusPill(r)}</span>
       <span class="now-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</span>
+      ${date ? `<span class="home-date" aria-hidden="true"><small>${MONTHS[date.getMonth()].slice(0, 3)}</small><b>${date.getDate()}</b></span><span class="vh">${esc(fmtDate(r.date, true))}</span>` : ''}
       ${line2 ? `<span class="now-line">${esc(line2)}</span>` : ''}
       <span class="now-line">${esc(heroFacts(r))}</span>
+      ${thisContest ? `<span class="home-this-hole">${CONTEST[thisContest.type]} · Hole ${thisContest.hole}</span>` : ''}
     </button>
-    ${live ? miniBoard(r) : ''}
-    ${nowActs(r, live)}
+    ${nowActs(r, live, group)}
   </div>`;
+}
+
+/* Home borrows the existing result/claim state. It never awards a contest or writes scores. */
+function homeMatchday(r) {
+  const res = resultsOf(r.id);
+  if (!res) return '';
+  const board = miniBoard(r);
+  let html = board ? `<section class="sec home-live-board"><div class="sec-label"><span class="sub">On the leaderboard</span><button class="link" data-act="leaderboard" data-rid="${r.id}">Full field ${chev}</button></div>${board}</section>` : '';
+  if (res.contests.length) {
+    html += `<section class="sec home-contests"><div class="sec-label">${label('Out on the course')}</div><div class="home-contest-list">${res.contests.map(c => {
+      const who = c.winner || (c.lead && c.lead.pid);
+      const confirmed = c.status && c.status.confirmed;
+      const answered = c.status && c.status.answered;
+      const state = confirmed ? 'Confirmed' : who || answered ? 'To be confirmed' : 'Not yet played';
+      const name = who ? D.nameOf(who) : confirmed ? 'Nobody' : answered ? 'Nobody yet' : 'No claim yet';
+      return `<div class="home-contest"><span class="hs-ic" aria-hidden="true">${sized(ICON.flagpin, 20)}</span><span class="home-contest-copy"><span class="b">${CONTEST[c.type]}${c.hole ? ` <span class="sub">· Hole ${c.hole}</span>` : ''}</span><span class="sub">${esc(name)}</span></span><span class="home-contest-state">${state}</span></div>`;
+    }).join('')}</div></section>`;
+  }
+  return html;
+}
+
+function homeSeasonIntro(season, played) {
+  return `<section class="home-season-intro"><p class="home-season-label">This season</p><div class="home-year"><span>${season}</span><i aria-hidden="true"></i></div><p class="home-quiet-title">${played.length ? 'Between rounds.' : 'A fresh scorecard.'}</p><p class="sub">No round booked yet.<br>The next date will appear here when it’s set.</p></section>`;
 }
 VIEWS.home = () => {
   const season = seasonOf();
@@ -140,10 +170,13 @@ VIEWS.home = () => {
   const more = [...live.slice(1), ...next.slice(live[0] ? 0 : 1)];
   const me = DB.prefs.me ? D.member(DB.prefs.me) : null;
   const hello = greeting(me);
-  let html = `<header class="hero home"><div class="brand"><span class="badge crest">${CREST_SVG}</span><span class="vh">${esc(D.society())}</span><p class="greet${hello.length > 22 ? ' long' : ''}">${esc(hello)}</p>
+  const homeState = feature && feature.status === 'live' ? 'matchday' : feature ? 'upcoming' : 'quiet';
+  let html = `<header class="hero home home-${homeState}"><div class="brand"><span class="badge crest">${CREST_SVG}</span><span class="vh">${esc(D.society())}</span><p class="greet${hello.length > 22 ? ' long' : ''}">${esc(hello)}</p>
     <button class="who-chip${me ? ' only-av' : ''}" data-act="who" aria-label="${me ? 'You are ' + esc(me.name) + '. Change' : 'Who are you?'}">${me ? `<span class="who-av">${esc(initialsOf(me))}</span>` : 'Who are you?'}</button></div>
     <h1 class="vh">${esc(homeHeadline(feature))}</h1>
-    ${feature ? nowCard(feature) : '<div class="now"><div class="now-main"><span class="now-name">No round booked</span><span class="now-line">The organiser adds the next one.</span></div></div>'}</header>`;
+    ${homeState === 'upcoming' ? `<p class="home-season-label">The ${season} season</p><p class="home-quiet-title">Next on the card.</p>` : ''}
+    ${feature ? nowCard(feature) : homeSeasonIntro(season, played)}</header>`;
+  if (homeState === 'matchday') html += homeMatchday(feature);
   const table = goy(season);
   const lead = table[0];
   const pastAll = D.rounds().filter(r => r.status === 'final').reverse();

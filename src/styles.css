@@ -1855,3 +1855,36 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .rulesheet .rs-none { margin: 0; font-size: 1rem; line-height: 1.45; color: var(--text); }
 .rulesheet .rs-go { margin-top: 20px; text-decoration: none; }
 .rulesheet .rs-cap { text-align: center; margin: 10px 0 0; }
+/* Club / matchday Home. Scoped to Home so score controls and competition pages retain their layout. */
+.hero.home .home-season-label { font-family: var(--font-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif); font-size: .7rem; line-height: 1.5; font-weight: 650; letter-spacing: .13em; text-transform: uppercase; color: var(--sub); margin: 0 0 12px; }
+.home-year { display: flex; align-items: flex-end; gap: 22px; color: var(--pine); margin: 4px 0 22px; }
+.home-year > span { font: 400 5.3rem/.95 var(--font-display); letter-spacing: -.065em; font-variant-numeric: lining-nums; }
+.home-year > i { flex: 1; height: 3px; background: var(--pine); margin-bottom: 9px; }
+.hero.home .home-quiet-title { font: 400 2.15rem/1.12 var(--font-display); letter-spacing: -.025em; color: var(--pine); margin: 0 0 18px; }
+.home-season-intro { border-bottom: 2px solid var(--pine); padding: 10px 0 24px; }
+.hero.home .home-season-intro > .sub { color: var(--sub); font-family: var(--font-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif); font-size: 1rem; line-height: 1.55; margin: 0; }
+.hero.home.home-upcoming .home-season-label { margin-top: 4px; }
+.home-announcement .now-main { position: relative; }
+.home-announcement .home-date { display: flex; width: auto; min-width: 64px; align-self: flex-start; box-sizing: border-box; flex-direction: column; align-items: center; gap: 2px; border: 1px solid rgba(212,180,131,.55); border-radius: 13px; padding: 8px 12px; margin: 18px 0 10px; }
+.home-date > small { color: var(--on-pine-label); font: 500 .7rem/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; text-transform: uppercase; letter-spacing: .08em; }
+.home-date > b { color: var(--action-inverse); font: 650 2.35rem/1.1 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-variant-numeric: tabular-nums; }
+.hero.home .home-live-ticket .now-name { font-size: min(var(--t-display-fit) / var(--len, 20), 2rem); }
+.home-live-ticket .now-main { padding-bottom: 10px; }
+.home-live-board > .sec-label { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.home-live-board > .sec-label > .sub, .home-contests > .sec-label { color: var(--text); font: 650 1.05rem/1.4 var(--font-display); font-variant-numeric: lining-nums; }
+.home-live-ticket .home-this-hole { font-size: .8rem; line-height: 1.5; color: var(--action-inverse); margin-top: 8px; }
+.home-live-board .link { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; font-size: .8rem; }
+.home-live-board .mini { background: transparent; color: var(--text); border-radius: 0; padding: 0; margin: 0; }
+.home-live-board .mini .mr { border-bottom: 1px solid var(--line); padding: 13px 10px; min-height: 51px; }
+.home-live-board .mini .mr.me { background: var(--action-tint); border-radius: 0; }
+.home-live-board .mini .mp { color: var(--sub); }
+.home-live-board .mini .mn { color: var(--text); min-width: 0; overflow-wrap: anywhere; }
+.home-live-board .mini .mt { color: var(--pine); font-size: 1.25rem; font-weight: 650; }
+.home-contest-list { border-top: 1px solid var(--line); }
+.home-contest { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); padding: 14px 0; }
+.home-contest-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
+.home-contest-copy > .b { font-size: .9rem; }
+.home-contest-copy > .sub { font-size: .85rem; }
+.home-contest-state { color: var(--sub); font-size: .7rem; max-width: 7rem; text-align: right; }
+.home-contests .hs-ic { color: var(--pine); background: var(--fill); width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: none; }
+.hero.home ~ .sec .hs-row .hs-ic { color: var(--card); background: var(--pine); }

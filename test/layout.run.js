@@ -177,4 +177,10 @@ const titleCheck = ({ sel, want, max }) => {
     await ctx.close();
   }
   await b.close(); if (fails) { console.log('SOME FAILED'); process.exit(1); }
+  // Keep the Home claim-state regression in the existing CI entry point. All layout assertions above
+  // remain intact; a failure in this additional suite also fails the layout job.
+  const home = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'home-states.run.js')], { stdio: 'inherit' });
+  if (home.error) console.error(home.error);
+  if (home.status !== 0) process.exit(home.status || 1);
 })();
