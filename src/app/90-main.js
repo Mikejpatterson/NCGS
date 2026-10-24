@@ -281,6 +281,8 @@ const ACT = {
     UI.confirm = null;
     back();
   },
+  scenarios: () => go('scenarios'),
+  'scenario-pick': el => { if (window.NCGS_SCENARIOS) window.NCGS_SCENARIOS.choose(el.dataset.id); },
   'season-next': () => {
     if (liveRid()) return;
     if (UI.confirm !== 'season-next') { UI.confirm = 'season-next'; render(); return; }

@@ -207,7 +207,7 @@ VIEWS.home = () => {
     rrow('stats', 'bars', 'Stats', 'KBs, birdies, averages'),
     rrow('players', 'users', 'Players', plural(D.regulars().length, 'golfer'))].join('')), true)}`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
-  html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
+  html += `<p class="foot"><button class="link" data-act="org">Organiser</button>${window.NCGS_SCENARIOS ? ' <button class="link" data-act="scenarios">Test scenarios</button>' : ''}</p>`;
   return { html, tabs: 'home' };
 };
 
