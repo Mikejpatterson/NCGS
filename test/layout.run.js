@@ -200,4 +200,9 @@ const titleCheck = ({ sel, want, max }) => {
     [...process.execArgv, require('path').join(__dirname, 'scenarios.run.js')], { stdio: 'inherit', env: subEnv });
   if (sc.error) console.error(sc.error);
   if (sc.status !== 0) process.exit(sc.status || 1);
+  // Contest claims in playing order, through Home (owner rule; Codex's counterexample, 24 October).
+  const co = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'contest-order.run.js')], { stdio: 'inherit', env: subEnv });
+  if (co.error) console.error(co.error);
+  if (co.status !== 0) process.exit(co.status || 1);
 })();
