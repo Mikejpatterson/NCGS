@@ -1,6 +1,8 @@
 # Creative proposals — 23 October 2026
 
-**Latest:** see [the three-pass refinement and final boards](refinement-rounds.md), reflecting the owner's emphasis on nearest the pin, longest drive and the leaderboard. It supersedes the earlier compositions below where they differ. It also corrects the initial premise: Continue already exists for an identified golfer.
+**Current owner direction:** read the [consolidated owner brief](../OWNER-CONTEXT-2026-10-23.md), including later creative feedback and the release status of #32–#37. The boards below are historical exploration.
+
+**Historical refinement:** see [the three-pass refinement and final boards](refinement-rounds.md), reflecting the owner's emphasis on nearest the pin, longest drive and the leaderboard. It supersedes the earlier compositions below where they differ. It also corrects the initial premise: Continue already exists for an identified golfer.
 
 These are **AI-assisted illustrative concept mockups**, generated using genuine current app fixture renders as visual references. They are not screenshots of implemented changes, executable prototypes, approved designs, or evidence of usability/accessibility test passes.
 
@@ -41,4 +43,4 @@ If that exploration is taken forward, validate actual 360/390px and enlarged-tex
 No automated implementation command or queue entry accompanies these proposals.
 
 
-**Further owner context:** [event lifecycle working notes](event-lifecycle.md) extend the creative brief beyond quiet/live. Requirements are still being explained; these are principles and questions, not an implementation specification.
+**Further owner context:** [event lifecycle working notes](event-lifecycle.md) extend the creative brief beyond quiet/live. Those notes are historical; the [consolidated owner brief](../OWNER-CONTEXT-2026-10-23.md) records the completed explanation, settled requirements and remaining open cases. Do not wait for answers already recorded there.

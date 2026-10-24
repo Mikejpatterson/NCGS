@@ -1,6 +1,6 @@
 # Released-source assessment — 23 October 2026
 
-> **Historical assessment of `539be61`; status updated 24 October.** The finished KB summary was fixed in #32. Undated-round promotion and archive-to-player season context were fixed in #36. Do not repeat those fixes from the reproductions below. Explicit active-season switching remains open engineering work; its owner-controlled trigger is settled. Read the [consolidated owner brief](../OWNER-CONTEXT-2026-10-23.md), especially §§3 and 9, for current decisions and implementation status. Source references and test evidence below describe the historical baseline, not today's code.
+> **Historical assessment of `539be61`; status updated 24 October.** The finished KB summary was fixed in #32. Undated-round promotion and archive-to-player season context were fixed in #36. Do not repeat those fixes from the reproductions below. Explicit active-season switching was then released in #37; retain it too. The delayed-claim and team/trip observations below remain separate engineering topics. Read the [consolidated owner brief](../OWNER-CONTEXT-2026-10-23.md), especially §§3 and 9, for current decisions and implementation status. Source references and test evidence below describe the historical baseline, not today's code.
 
 Codex stage-one investigation. Baseline: released main and design both
 `539be61ed2a0b98ed7a8c291c6e5b267ca10a3a9`. The old redesign roadmap/queue is complete.
