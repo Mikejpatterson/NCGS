@@ -10,9 +10,9 @@ The human Product Owner alone decides significant direction and releases. Claude
 
 ## Starting point
 
-Read current refs, CLAUDE.md, AGENTS.md, the owner handover at docs/design/NCGS-OWNER-DESIGN-HANDOVER.md and decisions in Issue #1. Resolve stale documents against the latest explicit human decisions and actual released source. Read the whole relevant handover, not only its visual summary.
+Read current refs, CLAUDE.md, AGENTS.md, the owner handover at docs/design/NCGS-OWNER-DESIGN-HANDOVER.md, the complete [consolidated owner brief](OWNER-CONTEXT-2026-10-23.md) and decisions in Issue #1. Resolve stale documents against the latest explicit human decisions and actual released source. Read the whole relevant handover, not only its visual summary.
 
-Start from current main for the released app. Identify the exact source SHA and inspect active work before proposing anything. The redesign and its roadmap are complete: retain completed work and avoid reopening settled choices or filling the queue. The initial assignment starts from released main 539be61ed2a0b98ed7a8c291c6e5b267ca10a3a9, including the 22 October feedback round (#27), not an earlier prototype.
+Start from current main for the released app. Identify the exact source SHA and inspect active work before proposing anything. The redesign and its roadmap are complete: retain completed work and avoid reopening settled choices or filling the queue. Resolve main and the design branch at review time and name those SHAs in the report. The initial 539be61 assessment is historical; later fixes in #32–#36 must be retained rather than proposed again.
 
 Review genuine application renders with invented fixture data. Distinguish current screenshots, historical evidence and exploratory references. If visual access fails, report a provisional source-based assessment; never imply a live-browser or real-device inspection occurred.
 
@@ -71,10 +71,10 @@ Return findings to the invoking Codex session. Codex checks factual constraints 
 
 A Codex session can invoke a separate sub-agent with this instruction:
 
-> Act as the NCGS creative design reviewer. Read docs/CREATIVE-REVIEWER.md and current owner decisions in Issue #1. Independently review the latest released app or the explicitly assigned candidate using genuine fixture renders. Follow the brief's output and boundaries. Return findings to me; do not edit code or post externally.
+> Act as the NCGS creative design reviewer. Read docs/CREATIVE-REVIEWER.md, the full docs/OWNER-CONTEXT-2026-10-23.md and current owner decisions in Issue #1. Independently review the latest released app or the explicitly assigned candidate using genuine fixture renders. Follow the brief's output and boundaries. Return findings to me; do not edit code or post externally.
 
 The sub-agent runs when invoked in an active session. This file preserves the role across sessions; it does not provide autonomous monitoring or a permanent background process.
 
-## Event lifecycle — continuing owner explanation
+## Event lifecycle — consolidated owner direction
 
-Read [the working lifecycle notes](creative-concepts/event-lifecycle.md) before proposing further states. Quiet/live are only two views: audience, announcement, arrangements, group progress and trip/round context can differ independently. Preserve confirmed facts and label unconfirmed cases. Wait for the rest of the owner's explanation before fixing a state matrix or inventing attendance/publication workflows.
+Read the complete [consolidated owner brief](OWNER-CONTEXT-2026-10-23.md) before proposing further states. The [earlier lifecycle notes](creative-concepts/event-lifecycle.md) are historical background. Quiet/live are only two views: audience, announcement, arrangements, group progress and trip/round context can differ independently. The organiser-triggered active-season switch is settled, including an empty new season; the Westport and breakfast-draw requirements are recorded. Use those answers now rather than waiting for another explanation. Distinguish remaining open cases and design recommendations from owner decisions; do not invent attendance/publication workflows.

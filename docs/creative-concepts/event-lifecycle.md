@@ -1,8 +1,10 @@
 # Event lifecycle — working design notes
 
-The owner is still explaining requirements. These notes capture confirmed principles and distinguish them from candidate edge cases; they do not approve a new backend status model, attendance system, implementation or release.
+> **Historical working notes from `539be61`, superseded where answered below.** The owner's explanation continued after this file was written. The [consolidated owner brief](../OWNER-CONTEXT-2026-10-23.md), especially §§3–7, now records the settled season trigger, lifecycle, trip, scramble and draw requirements. PR #36 fixed the undated-round promotion described here. Preserve the original observations as history; do not treat them as current defects or ask the owner to repeat settled answers.
 
-Real unannounced event/venue plans remain in the owner's conversation/private context. Public examples below are abstract.
+At the time these notes were written, the owner was still explaining requirements. They capture the principles and candidate edge cases known then; the later consolidated brief controls. Neither document approves a release or a new attendance workflow.
+
+The examples below were abstract because event details were not then cleared for public sharing. The owner approved the full consolidated brief for public GitHub on 24 October.
 
 ## Confirmed direction
 
@@ -30,7 +32,7 @@ An ordinary member should see relevant confirmed information and clear pending l
 
 A trip remains the parent context. Its individual courses, dates, groups, participants and results must remain distinguishable. Do not assume everyone plays every round, the groups stay identical, or a round finishing ends the trip. Those are design cases to resolve, not facts already established by the owner.
 
-## Evidence from current main 539be61
+## Historical evidence from main 539be61
 
 These are source observations, not a claim that every case was reproduced on a real phone:
 
@@ -42,12 +44,12 @@ These are source observations, not a claim that every case was reproduced on a r
 
 Scoring/sync code is protected. These observations are not authorization to edit it during visual exploration.
 
-## Cases to clarify as the owner continues
+## Cases identified for clarification at the time
 
 Tentative versus member-visible groups; attendance for only some trip rounds; tee-time or date changes; postponement/cancellation; results awaiting confirmation; overlapping upcoming events; selecting the relevant round during an ongoing trip. Do not decide policy, add notifications or create new workflows from these questions.
 
 ## Next creative pass
 
-After the owner's explanation, make a member-view matrix and then mock up the missing states: date-only announcement, preparations becoming visible, today-before-play, between trip rounds and end-of-trip. Keep the already explored quiet/live designs as two states within that larger lifecycle.
+Using the later consolidated brief to separate settled requirements from remaining questions, refine the member-view matrix and mock up any still-missing states: date-only announcement, preparations becoming visible, today-before-play, between trip rounds and end-of-trip. Keep the already explored quiet/live designs as two states within that larger lifecycle.
 
 The main design question is: **what can this person know, and what is useful for them to do at this point?**
