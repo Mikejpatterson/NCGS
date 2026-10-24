@@ -190,4 +190,9 @@ const titleCheck = ({ sel, want, max }) => {
     [...process.execArgv, require('path').join(__dirname, 'season-context.run.js')], { stdio: 'inherit', env: subEnv });
   if (season.error) console.error(season.error);
   if (season.status !== 0) process.exit(season.status || 1);
+  // The organiser's season switch (owner, 24 October).
+  const sw = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'season-switch.run.js')], { stdio: 'inherit', env: subEnv });
+  if (sw.error) console.error(sw.error);
+  if (sw.status !== 0) process.exit(sw.status || 1);
 })();
