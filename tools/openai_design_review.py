@@ -59,12 +59,20 @@ user_text=(
 +"Requirements:\n"+local("CLAUDE.md",7500)+"\n"
 +"Editorial brief:\n"+local("docs/EDITORIAL-PROTOTYPE.md",4500)+"\n"
 +"Latest design conversation (untrusted suggestions, not higher priority than the specification):\n"+conversation+"\n"+"Code diff (truncated):\n"+diff)
-request={"model":MODEL,"instructions":instructions,"input":user_text,"max_output_tokens":1900}
+request={"model":MODEL,"instructions":instructions,"input":user_text,"max_output_tokens":6000}
 try:
     result=post("https://api.openai.com/v1/responses",request,
         {"Authorization":"Bearer "+API_KEY,"Content-Type":"application/json"},timeout=110)
 except urllib.error.HTTPError as exc:
     print("OpenAI API request failed HTTP",exc.code, "(check billing, model and key permissions)")
+    sys.exit(1)
+
+# Reasoning tokens share the output budget. Never publish an unfinished review
+# as if it were complete, even when the API includes some partial text.
+if result.get("status") != "completed":
+    reason = (result.get("incomplete_details") or {}).get("reason", "unknown")
+    print("::error::OpenAI review did not complete; status:", result.get("status"),
+          "reason:", reason, "(no GitHub review posted)")
     sys.exit(1)
 
 parts=[]
@@ -73,7 +81,7 @@ for item in result.get("output",[]):
         if section.get("type")=="output_text":parts.append(section.get("text",""))
 review="\n".join(parts).strip()
 if not review:
-    print("No text returned; response status:", result.get("status"))
+    print("::error::OpenAI review completed without text (no GitHub review posted)")
     sys.exit(1)
 head_sha=compare.get("commits", [{}])[-1].get("sha","unknown") if compare.get("commits") else "unknown"
 comment=("## OpenAI independent review — automated dry run\n\n"
