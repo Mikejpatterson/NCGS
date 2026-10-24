@@ -24,8 +24,10 @@ jobs:
           node-version: 22
       - name: Guard - no scoring, storage, sync, data or published-site changes
         run: sh tools/guard.sh origin/main
-      - name: Engine and server tests
-        run: node --test test/engine.test.js test/server.test.js test/fuzz.engine.test.js test/fuzz.server.test.js
+      - name: Unit tests (engine, server, fuzz and every small test file)
+        run: node --test test/*.test.js
+      - name: Review tool offline tests
+        run: python3 -m unittest discover -s test -p '*_test.py'
       - name: Fixture data is invented and up to date
         run: node tools/make-fixture.js && git diff --exit-code data/fixture-seed.json
       - name: Install browser
