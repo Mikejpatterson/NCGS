@@ -1909,7 +1909,7 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .hero .seg.year button.on { background: #fff; color: var(--pine); font-weight: 700; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610241157","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610242014","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2629,7 +2629,8 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
      settles it). Each group's arrival is worked out from its tee time and starting hole, about 12 minutes a hole; with
      no tee time, groups go out in group order 10 minutes apart. The time a claim reached the server is used only
      between groups that reach the hole together, so a group whose save arrives late (no signal) can't overtake a group
-     that played the hole after it. A claim from a group that's no longer in the round can't overtake anyone. */
+     that played the hole after it. A claim from a group that's no longer in the round is left out altogether: it can't
+     lead, win or count as an answer (found by Codex, 24 October). */
   function claimsInPlayOrder(claims, groups, hole) {
     const mins = t => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(t || '')); return m ? Number(m[1]) * 60 + Number(m[2]) : null; };
     const reach = {};
@@ -2638,8 +2639,7 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
       const holesBefore = playOrder(g.startHole).indexOf(Number(hole));
       reach[g.id] = (start !== null ? start : (g.n || i + 1) * 10) + Math.max(0, holesBefore) * 12;
     });
-    const at = c => (c.gid in reach ? reach[c.gid] : -Infinity);
-    return (claims || []).slice().sort((a, b) => (at(a) - at(b)) || String(a.at || '').localeCompare(String(b.at || '')));
+    return (claims || []).filter(c => c.gid in reach).sort((a, b) => (reach[a.gid] - reach[b.gid]) || String(a.at || '').localeCompare(String(b.at || '')));
   }
 
   function contestStatus(claims, groupIds, winner) {
