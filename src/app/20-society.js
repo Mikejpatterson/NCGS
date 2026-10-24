@@ -376,7 +376,7 @@ function groupsBlock(r, interactive) {
 /* A leaderboard row that drops the player's card down underneath it when tapped. */
 function dropRow(rid, x, inner, cls = 'lrow') {
   const r = D.round(rid), comp = computeR(rid), pl = comp && comp.players[x.id];
-  if (!r || !pl) return `<button class="${cls}" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
+  if (!r || !pl) return `<button class="${cls}" data-act="player" data-pid="${x.id}" data-year="${(r && r.season) || ''}">${inner}</button>`;
   const key = `bd-${rid}-${x.id}`, open = !!UI.open[key];
   const mine = myGroup(rid);
   const fix = r.status === 'live' && !!mine && mine.teams.flat().includes(x.id);
