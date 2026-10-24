@@ -1897,3 +1897,28 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .hero .seg.year { background: var(--press); }
 .hero .seg.year button { color: var(--text); min-height: 44px; font-variant-numeric: tabular-nums; }
 .hero .seg.year button.on { background: #fff; color: var(--pine); font-weight: 700; }
+
+/* Scramble hole (Westport, owner brief §6): one team score, then whose drive. Big targets, readable outdoors. */
+.scr .scr-score { margin-top: 12px; padding: 14px 16px 12px; }
+.scr .scr-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }
+.scr .scr-head .sub { overflow-wrap: anywhere; }
+.scr .scr-step { display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; align-items: center; gap: 10px; }
+.scr .scr-st { height: 64px; border-radius: 16px; background: var(--fill); color: var(--pine); font-size: 2rem; font-weight: 500; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.scr .scr-st:active { background: var(--press); }
+.scr .scr-val { min-height: 64px; border-radius: 16px; font-size: var(--t-num, 2.6rem); font-weight: 800; color: var(--pine); font-variant-numeric: tabular-nums; line-height: 1; }
+.scr .scr-val small { font-size: var(--t-body); font-weight: 600; color: var(--faint); }
+.scr .scr-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px; min-height: 44px; }
+.scr .scr-meta .link { min-height: 44px; padding: 0 4px; font-weight: 700; }
+.scr .scr-drives { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 8px; }
+.scr .scr-drv { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "av nm" "av dc"; column-gap: 10px; align-items: center; text-align: left; min-height: 64px; padding: 10px 12px; border-radius: 16px; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); }
+.scr .scr-drv .av { grid-area: av; }
+.scr .scr-drv .scr-dn { grid-area: nm; font-weight: 700; overflow-wrap: break-word; min-width: 0; }
+.scr .scr-drv .scr-dc { grid-area: dc; font-size: .85rem; color: var(--sub); font-variant-numeric: tabular-nums; }
+.scr .scr-drv.need .scr-dc { color: var(--team-b); font-weight: 600; }
+.scr .scr-drv.on { background: var(--pine); box-shadow: none; }
+.scr .scr-drv.on .scr-dn, .scr .scr-drv.on .scr-dc { color: #fff; }
+.scr .scr-warn { margin: 10px 4px 0; color: var(--team-b); font-weight: 600; }
+.scr-row { align-items: start; }
+.scr-row .scr-team { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.scr-row .scr-team .sub { overflow-wrap: anywhere; }
+.scr-row .scr-note { font-size: .85rem; color: var(--team-b); font-weight: 600; }

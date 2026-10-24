@@ -288,13 +288,41 @@ function roundWhenShort(r) {
 function computeR(rid) {
   return memo('comp:' + rid, () => {
     const r = D.round(rid);
-    if (!canScore(r)) return null;
+    if (!canScore(r) || isScramble(r)) return null;   // a scramble's stored strokes are team scores (scrambleOf)
     const players = {};
     r.groups.forEach(g => g.teams.flat().forEach(pid => { const m = D.member(pid) || { id: pid, name: pid, index: 0 }; players[pid] = m; }));
     return E.computeRound({ groups: r.groups, holes: holesOf(r), tee: teeOf(r), allowance: allowanceOf(r), players, scores: D.scores(rid), phOverride: r.ph });
   });
 }
-const hasCards = r => r && r.source !== 'imported' && canScore(r);
+/* Scramble rounds (Westport day two, owner brief §6). Kept in the settings table so no server change is needed:
+   format:<round> = scramble; teamshots:<round> = {"g1":0,"g2":2} (organiser's manual team allowance, normally 0);
+   tripboard:<season>:<trip> = off for a trip with no combined leaderboard. */
+const isScramble = r => !!r && D.setting('format:' + r.id, '') === 'scramble';
+function teamShotsOf(r) { try { const v = JSON.parse(D.setting('teamshots:' + (r && r.id), '{}')); return v && typeof v === 'object' ? v : {}; } catch (e) { return {}; } }
+const tripBoardOn = r => !(r && r.trip && D.setting(`tripboard:${r.season}:${r.trip}`, '') === 'off');
+/* Each scramble team's holes, read from the row of the player whose drive was used (E.scrambleTeam), plus playing
+   progress shaped like a scoring group (holes[n].complete, nextHole) so the hole picker and contest questions work. */
+function scrambleOf(rid) {
+  return memo('scr:' + rid, () => {
+    const r = D.round(rid);
+    if (!isScramble(r) || !canScore(r)) return null;
+    const holes = holesOf(r).map((h, i) => ({ n: i + 1, par: h.par, si: h.si }));
+    const sc = D.scores(rid), shots = teamShotsOf(r);
+    const groups = r.groups.map(g => {
+      const team = g.teams.flat();
+      const res = E.scrambleTeam(team, holes, (pid, n) => (sc[pid] || {})[n], shots[g.id] || 0);
+      const hs = {};
+      holes.forEach(h => { hs[h.n] = { complete: res.holes[h.n].points !== null, double: res.doubles.includes(h.n) }; });
+      const order = E.playOrder(g.startHole);
+      return Object.assign({}, res, { id: g.id, n: g.n, name: 'Team ' + g.n, teams: g.teams, team, teeTime: g.teeTime, holes: hs, scramble: res.holes, holesDone: res.played, nextHole: order.find(n => !hs[n].complete) || null });
+    });
+    return { groups, standings: E.scrambleStandings(groups) };
+  });
+}
+// Where each group has got to, for either kind of round: groups with id, holes[n].complete, holesDone, nextHole.
+const progressOf = rid => { const r = D.round(rid); return isScramble(r) ? scrambleOf(rid) : computeR(rid); };
+// Individual scorecards don't exist for a scramble: the stored stroke is the team's, not the driver's own.
+const hasCards = r => r && r.source !== 'imported' && canScore(r) && !isScramble(r);
 const liveRid = () => { const r = D.rounds().find(x => x.status === 'live'); return r ? r.id : null; };
 const upcoming = () => D.rounds().filter(r => r.status === 'upcoming').sort((a, b) => String(a.date || '9').localeCompare(String(b.date || '9')));
 function myGroup(rid) {
@@ -324,6 +352,12 @@ function resultsOf(rid) {
       if (c.ntp !== undefined) contests.push({ type: 'ntp', hole: null, winner: c.ntp });
       if (c.ld !== undefined) contests.push({ type: 'ld', hole: null, winner: c.ld });
       return { rows, kb, contests, source: r.results.ordered ? 'recorded' : 'sheet' };
+    }
+    const wins0 = D.winners(rid);
+    const contestsOf = () => (r.contests || []).map(c => ({ type: c.type, hole: c.hole, winner: wins0[c.hole] || null, lead: wins0[c.hole] ? null : claimLeader(rid, c.hole, null), status: E.contestStatus(D.claims(rid)[c.hole], (r.groups || []).map(g => g.id), wins0[c.hole]) }));
+    if (isScramble(r)) {
+      const s = scrambleOf(rid);
+      return { rows: [], kb: [], teams: s ? s.standings : [], contests: contestsOf(), source: 'scramble' };
     }
     const comp = computeR(rid);
     if (!comp) return { rows: [], kb: [], contests: [] };

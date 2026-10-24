@@ -65,7 +65,7 @@ ORG.home = () => {
 };
 
 function finaliseBlockers(r) {
-  const comp = computeR(r.id);
+  const comp = progressOf(r.id);
   if (!comp) return ['no scores'];
   const open = comp.groups.filter(g => !g.complete).length;
   const claims = D.claims(r.id);
@@ -94,9 +94,12 @@ ORG.round = p => {
     <button class="row tall" data-act="org-go" data-v="details" data-rid="${r.id}"><span class="two"><span>Details</span><span class="sub">${esc(details)}</span></span>${chev}</button>
     <button class="row tall" data-act="org-go" data-v="${locked ? 'groupsview' : 'playing'}" data-rid="${r.id}"><span class="two"><span>Groups and buggies</span><span class="sub">${r.groups && r.groups.length ? `${plural(nPlayers, 'player')} · ${plural(r.groups.length, 'group')}` : 'Not drawn'}</span></span>${chev}</button>
     ${r.groups && r.groups.length && r.status !== 'final' ? `<button class="row tall" data-act="org-go" data-v="late" data-rid="${r.id}"><span class="two"><span>Change a player</span><span class="sub">Swap someone in, or let someone drop out</span></span>${chev}</button>` : ''}
-    <button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${E.kbOff(r) ? 'Off' : r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`), true);
+    <button class="row tall" data-act="org-format" data-rid="${r.id}"><span class="two"><span>Format</span><span class="sub">${isScramble(r) ? 'Scramble: one team score per group, drives recorded' : 'Individual Stableford'}</span></span><span class="pill ${isScramble(r) ? 'g' : 'n'}">${isScramble(r) ? 'Scramble' : 'Stableford'}</span></button>
+    ${isScramble(r) ? `<button class="row tall" data-act="org-go" data-v="teamshots" data-rid="${r.id}"><span class="two"><span>Team shots</span><span class="sub">${(r.groups || []).map(g => `Team ${g.n}: ${teamShotsOf(r)[g.id] || 0}`).join(' · ') || 'Draw the teams first'}</span></span>${chev}</button>` : ''}
+    ${r.trip ? `<button class="row tall" data-act="org-tripboard" data-rid="${r.id}"><span class="two"><span>Trip leaderboard</span><span class="sub">${tripBoardOn(r) ? `${esc(r.trip)} adds up the days` : `No combined board for ${esc(r.trip)}: each day has its own results`}</span></span><span class="pill ${tripBoardOn(r) ? 'g' : 'n'}">${tripBoardOn(r) ? 'On' : 'Off'}</span></button>` : ''}
+    ${isScramble(r) ? '' : `<button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${E.kbOff(r) ? 'Off' : r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`}`), true);
   if (c && (!c.holes || !tee)) html += `<div class="banner note">${esc(c.name)} needs ${!c.holes ? 'its par and stroke index for each hole' : 'tee details'} before scores can be entered. <button class="link inline" data-act="org-go" data-v="course" data-cid="${c.id}">Add them</button></div>`;
-  const comp = computeR(r.id);
+  const comp = progressOf(r.id);
   if (comp && r.status !== 'upcoming') {
     html += sec(label('Groups'), cardOf(comp.groups.map(gc => {
       const sub = D.card(r.id, gc.id);
@@ -229,6 +232,15 @@ ORG.kb = p => {
 
 /* ----- Corrections and contests ----- */
 ORG.group = p => {
+  if (isScramble(D.round(p.rid))) {
+    const s = scrambleOf(p.rid), gc = s && s.groups.find(g => g.id === p.gid);
+    if (!gc) return { html: '' };
+    const rows = E.playOrder(gc.teams && D.round(p.rid).groups.find(g => g.id === gc.id).startHole).map(n => {
+      const h = gc.scramble[n], dbl = gc.holes[n].double;
+      return `<button class="row" data-act="org-go" data-v="correct" data-rid="${p.rid}" data-gid="${gc.id}" data-n="${n}" aria-label="Correct hole ${n}"><span class="b num">${n}</span><span class="right">${dbl ? '<span class="pill w">Two drives</span>' : h.driver ? `<span class="sub">${esc(D.nameOf(h.driver))}</span><span class="b num">${h.gross === 'P' ? '–' : h.gross}<sup>${h.points}</sup></span>` : '<span class="sub">–</span>'}${chev}</span></button>`;
+    }).join('');
+    return { html: `<header class="hero s">${navBack('Round')}<div class="head"><h1 class="title">${esc(gc.name)}</h1></div><p class="sub">${esc(gc.team.map(D.nameOf).join(', '))} · ${gc.total} pts</p></header>${sec(label('Holes'), cardOf(rows))}` };
+  }
   const comp = computeR(p.rid);
   const gc = comp.groups.find(g => g.id === p.gid);
   const pids = gc.teams.flat();
@@ -249,6 +261,13 @@ ORG.group = p => {
   };
 };
 ORG.correct = () => VIEWS.entry();
+// Team shots for a scramble (owner brief §6): normally 0; the committee may give some teams 2 or 3 to balance the field.
+ORG.teamshots = p => {
+  const r = D.round(p.rid), cur0 = teamShotsOf(r);
+  return { html: `<header class="hero s">${navBack(esc(roundName(r)))}<div class="head"><h1 class="title">Team shots</h1></div><p class="sub">Shots each team gets, given by stroke index. Usually 0.</p></header>
+    <form data-form="teamshots" autocomplete="off" class="sec near">${(r.groups || []).map(g => field('ts-' + g.id, `Team ${g.n} · ${g.teams.flat().map(D.nameOf).join(', ')}`, String(cur0[g.id] || 0), 'inputmode="numeric"')).join('')}
+    ${formErr()}<button class="btn" type="submit">Save</button></form>` };
+};
 ORG.contest = p => {
   const n = Number(p.n);
   const c = contestOn(p.rid, n);
@@ -427,6 +446,7 @@ function demoFill() {
   const rid = liveRid();
   if (!rid) return;
   const comp = computeR(rid);
+  if (!comp) { toast('Demo scores are for individual rounds only'); return; }
   const mine = myGroup(rid);
   let seed = 7 + view().log.length;
   const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };

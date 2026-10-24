@@ -8,7 +8,7 @@ let downloads = null;
 
 function playHomeView(rid) {
   const g = myGroup(rid);
-  const comp = computeR(rid);
+  const comp = progressOf(rid);
   if (!g || !comp) return 'round';
   const gc = comp.groups.find(x => x.id === g.id);
   return gc.nextHole || askPending(rid, gc, g.id) ? 'tee' : 'finish';
@@ -78,6 +78,7 @@ function myConflicts(rid, gid) { return DB.conflicts.filter(c => c.round === rid
    a hole saved on two phones) shows under the players on that screen. */
 VIEWS.tee = () => {
   const rid = playRid();
+  if (isScramble(D.round(rid))) return VIEWS.scramble();
   const comp = computeR(rid);
   const g = myGroup(rid);
   if (!comp || !g) return VIEWS.round({ rid });
@@ -211,6 +212,7 @@ if (window.ResizeObserver) {
 
 VIEWS.entry = () => {
   const ctx = entryCtx();
+  if (isScramble(D.round(ctx.rid))) return VIEWS.scramble();
   const comp = computeR(ctx.rid);
   const gc = comp.groups.find(x => x.id === ctx.gid);
   const h = holeOf(ctx.rid, ctx.n);
@@ -681,6 +683,7 @@ function applyCheck(seg) {
 /* ----- End of the round for a group ----- */
 VIEWS.finish = () => {
   const rid = playRid();
+  if (isScramble(D.round(rid))) return VIEWS.scrambleFinish();
   const comp = computeR(rid);
   const g = myGroup(rid);
   const gc = comp.groups.find(x => x.id === g.id);
@@ -732,6 +735,7 @@ VIEWS.hcp = p => {
 /* ----- Buggy Wars board ----- */
 function buggyView(rid) {
   const r = D.round(rid);
+  if (isScramble(r)) return { html: '' };   // no Buggy Wars in a scramble
   const comp = computeR(rid);
   if (!comp) return { html: `${sec('', cardOf('<div class="row sub">Groups to be drawn</div>'))}` };
   const groups = comp.groups.filter(g => g.teams.length === 2);
@@ -824,7 +828,7 @@ VIEWS.board = () => {
   const pillSel = avail.includes(UI.res) ? UI.res : 'lb';
   const live0 = r.status === 'live';
   const thru0 = live0 && res0 && res0.rows.length ? Math.max(...res0.rows.map(x => x.thru || 0)) : 0;
-  let html = `<header class="hero c lbhead">${live0 ? `<p class="eyebrow"><span class="pulse"></span>LIVE${thru0 ? ' \u00b7 THRU ' + thru0 : ''}</p>` : ''}<div class="hrow2"><h1 class="big">Leaderboard</h1></div><p class="sub">${esc(roundName(r))} \u00b7 Stableford</p></header>`;
+  let html = `<header class="hero c lbhead">${live0 ? `<p class="eyebrow"><span class="pulse"></span>LIVE${thru0 ? ' \u00b7 THRU ' + thru0 : ''}</p>` : ''}<div class="hrow2"><h1 class="big">Leaderboard</h1></div><p class="sub">${esc(roundName(r))} \u00b7 ${isScramble(r) ? 'Team scramble' : 'Stableford'}</p></header>`;
   if (avail.length > 1) {
     const names = { lb: 'Scores', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
     html += `<div class="seg pills${avail.length > 3 ? ' four' : ''}" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
@@ -848,6 +852,7 @@ VIEWS.board = () => {
   }
 
   const pillTxt = r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r);
+  if (res.source === 'scramble') return { tabs: 'board', html: html + scrambleTable(r, res) };
   html += sec(`${label(esc(roundName(r)))}${pillTxt}`, cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
     return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
@@ -861,7 +866,8 @@ VIEWS.trip = p => {
   const list = tripRounds(D.round(p.rid));
   const r0 = D.round(p.rid);
   let html = `${navBack(backLabel())}<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">${esc(r0.trip || 'Trip standings')}</h1></div></header>`;
-  html += tripTable(list);
+  if (tripBoardOn(r0)) html += tripTable(list);
+  else html += `<p class="cap note" style="margin:8px 4px 0">No combined leaderboard for this trip: each day has its own results.</p>`;
   html += sec(label('Each day'), cardOf(list.map(x => `<button class="row" data-act="leaderboard" data-rid="${x.id}"><span>Day ${x.trip_day || x.seq}</span><span class="right">${x.status === 'upcoming' ? '<span class="sub">Not played</span>' : ''}${chev}</span></button>`).join('')));
   return { html };
 };

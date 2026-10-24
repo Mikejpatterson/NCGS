@@ -32,8 +32,11 @@ test('drive minimum: finished with everyone on 3+ is fine; finished without is t
 test('at risk once the remaining holes are all needed for players short of drives', () => {
   const rows = {}; for (let n = 1; n <= 15; n++) rows[n] = ['a', 4];   // b, c, d need 9 drives, 3 holes left
   assert.equal(play(rows, 0).atRisk, true);
+  assert.equal(play(rows, 0).impossible, true);   // 9 needed, 3 left
   const ok = {}; for (let n = 1; n <= 6; n++) ok[n] = ['a', 4];        // need 9, 12 left
   assert.equal(play(ok, 0).atRisk, false);
+  const tight = {}; for (let n = 1; n <= 9; n++) tight[n] = ['a', 4];   // b, c, d need 9, 9 left: every hole must go to them
+  assert.equal(play(tight, 0).atRisk, true); assert.equal(play(tight, 0).impossible, false);
 });
 test('teams ranked by points with countback; bottom team is KBs; a failed team is KBs whatever its points', () => {
   const mk = (id, strokes, drivers) => Object.assign({ id, name: id }, play(full(strokes, drivers), 0));
@@ -48,4 +51,10 @@ test('level on points: back nine countback decides', () => {
   a[1] = ['a', 3]; a[18] = ['a', 5];   // same total, worse back nine
   const s = E.scrambleStandings([Object.assign({ id: 'A', name: 'A' }, play(a, 0)), Object.assign({ id: 'B', name: 'B' }, play(b, 0))]);
   assert.equal(s[0].total, s[1].total); assert.deepStrictEqual(s.map(t => t.id), ['B', 'A']);
+});
+
+test('nobody is KBs while teams are still playing', () => {
+  const part = {}; for (let n = 1; n <= 9; n++) part[n] = ['a', 5];
+  const s = E.scrambleStandings([Object.assign({ id: 't1', name: 't1' }, play(full(4, team), 0)), Object.assign({ id: 't2', name: 't2' }, play(part, 0))]);
+  assert.deepStrictEqual(s.filter(t => t.kb), []);
 });

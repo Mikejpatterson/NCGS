@@ -64,7 +64,7 @@ const ACT = {
   'ask-clear': () => { ruleClose(); UI.chat = []; UI.chatInfo = {}; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'ask-pick': el => { UI.askPick = { key: el.dataset.key, v: el.dataset.v }; render(); },
   'ask-confirm': () => {
-    const rid = playRid(), g = myGroup(rid), comp = computeR(rid);
+    const rid = playRid(), g = myGroup(rid), comp = progressOf(rid);
     if (!g || !comp) return;
     const gc = comp.groups.find(x => x.id === g.id), c = askPending(rid, gc, g.id);
     const key = c && contestKey(rid, g.id, c.hole);
@@ -78,6 +78,26 @@ const ACT = {
   'intro-go': el => { const rid = playRid(), g = myGroup(rid); (DB.prefs.intro = DB.prefs.intro || {})[contestKey(rid, g.id, Number(el.dataset.n))] = true; savePrefs(); render(); },
   'intro-scrim': () => {},
   save: () => saveHole(),
+  'scr-score': el => scrScore(el.dataset.dir),
+  'scr-pickup': () => scrPickup(),
+  'scr-clear': () => scrClear(),
+  'scr-driver': el => scrDriver(el.dataset.pid),
+  'scr-save': () => scrSave(),
+  'org-format': el => {
+    const r = D.round(el.dataset.rid);
+    if (!r) return;
+    if (Object.values(D.scores(r.id)).some(h => Object.values(h || {}).some(E.isEntered))) { toast('Scores are in, so the format can\'t change now.'); return; }
+    const on = !isScramble(r);
+    put('settings', [{ key: 'format:' + r.id, value: on ? 'scramble' : '' }], { action: 'Round format', detail: `${roundName(r)}: ${on ? 'scramble (team score)' : 'individual Stableford'}` });
+    toast(on ? 'Scramble: one team score per group' : 'Individual Stableford');
+  },
+  'org-tripboard': el => {
+    const r = D.round(el.dataset.rid);
+    if (!r || !r.trip) return;
+    const off = tripBoardOn(r);
+    put('settings', [{ key: `tripboard:${r.season}:${r.trip}`, value: off ? 'off' : '' }], { action: 'Trip leaderboard', detail: `${r.trip} ${r.season}: ${off ? 'off' : 'on'}` });
+    toast(off ? 'No combined trip leaderboard' : 'Trip leaderboard on');
+  },
   'entry-back': () => {
     const ctx = entryCtx(), d = (draftsFor(ctx) || {})[ctx.n];
     if (ctx.mode === 'player' && !ctx.edit && d && Object.keys(d).some(k => k[0] !== '_')) toast('Scores kept. Pick up where you left off.');
@@ -88,7 +108,7 @@ const ACT = {
   'holes-close': () => { UI.holeSheet = false; render(); },
   'holes-scrim': (el, e) => { if (e.target !== el) return; UI.holeSheet = false; render(); },
   'goto-hole': el => {
-    const rid = playRid(), g = myGroup(rid), comp = computeR(rid);
+    const rid = playRid(), g = myGroup(rid), comp = progressOf(rid);
     UI.holeSheet = false;
     if (!g || !comp) { render(); return; }
     const gc = comp.groups.find(x => x.id === g.id), n = Number(el.dataset.n);
@@ -263,9 +283,9 @@ const ACT = {
     const r = D.round(el.dataset.rid);
     const reasons = finaliseBlockers(r);
     if (reasons.length) { toast(`Not yet: ${reasons.join(', ')}`); return; }
-    const comp = computeR(r.id);
+    const comp = computeR(r.id);   // null for a scramble: no individual playing handicaps to keep
     const snapHoles = (holesOf(r) || []).map(h => { const o = Object.assign({}, h); delete o.yards; return o; });
-    put('rounds', [Object.assign({}, r, { status: 'final', ph: Object.fromEntries(Object.values(comp.players).map(p => [p.id, p.ph])), allowance: allowanceOf(r), results: snapHoles.length === 18 && teeOf(r) ? { snap: { holes: snapHoles, tee: teeOf(r) } } : r.results || null })], { action: 'Round finalised', detail: `${roundName(r)}: results, handicaps and the course card fixed` });
+    put('rounds', [Object.assign({}, r, { status: 'final', ph: comp ? Object.fromEntries(Object.values(comp.players).map(p => [p.id, p.ph])) : (r.ph || null), allowance: allowanceOf(r), results: snapHoles.length === 18 && teeOf(r) ? { snap: { holes: snapHoles, tee: teeOf(r) } } : r.results || null })], { action: 'Round finalised', detail: `${roundName(r)}: results, handicaps and the course card fixed` });
     tick();
     toast(`${roundName(r)} is final`);
   },
@@ -431,6 +451,19 @@ const FORMS = {
     toast('Saved');
     back();
   },
+  teamshots: () => {
+    const r = D.round(cur().p.rid);
+    const out = {};
+    for (const g of r.groups || []) {
+      const v = val('ts-' + g.id);
+      const k = v === '' ? 0 : Number(v);
+      if (!(Number.isInteger(k) && k >= 0 && k <= 36)) { UI.formError = `Team ${g.n}: a whole number of shots, 0 to 36.`; render(); return; }
+      out[g.id] = k;
+    }
+    put('settings', [{ key: 'teamshots:' + r.id, value: JSON.stringify(out) }], { action: 'Team shots', detail: `${roundName(r)}: ${(r.groups || []).map(g => `Team ${g.n} ${out[g.id]}`).join(', ')}` });
+    toast('Saved');
+    back();
+  },
   settings: () => {
     const best = num('s-best'), allow = num('s-allow');
     if (!(best >= 1 && best <= 20)) { UI.formError = 'Scores that count: 1 to 20.'; render(); return; }
@@ -536,7 +569,7 @@ function render() {
   if (showTabs) {
     let lbl = 'Hole';
     try {
-      const rid = playRid() || liveRid(), mine = rid && myGroup(rid), comp = mine && computeR(rid);
+      const rid = playRid() || liveRid(), mine = rid && myGroup(rid), comp = mine && progressOf(rid);
       const gc = comp && comp.groups.find(g => g.id === mine.id);
       if (gc) lbl = gc.nextHole ? `Hole ${gc.nextHole}` : 'Card';
     } catch (e) { /* keep "Hole" */ }
