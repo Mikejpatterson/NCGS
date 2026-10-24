@@ -716,7 +716,8 @@
      settles it). Each group's arrival is worked out from its tee time and starting hole, about 12 minutes a hole; with
      no tee time, groups go out in group order 10 minutes apart. The time a claim reached the server is used only
      between groups that reach the hole together, so a group whose save arrives late (no signal) can't overtake a group
-     that played the hole after it. A claim from a group that's no longer in the round can't overtake anyone. */
+     that played the hole after it. A claim from a group that's no longer in the round is left out altogether: it can't
+     lead, win or count as an answer (found by Codex, 24 October). */
   function claimsInPlayOrder(claims, groups, hole) {
     const mins = t => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(t || '')); return m ? Number(m[1]) * 60 + Number(m[2]) : null; };
     const reach = {};
@@ -725,8 +726,7 @@
       const holesBefore = playOrder(g.startHole).indexOf(Number(hole));
       reach[g.id] = (start !== null ? start : (g.n || i + 1) * 10) + Math.max(0, holesBefore) * 12;
     });
-    const at = c => (c.gid in reach ? reach[c.gid] : -Infinity);
-    return (claims || []).slice().sort((a, b) => (at(a) - at(b)) || String(a.at || '').localeCompare(String(b.at || '')));
+    return (claims || []).filter(c => c.gid in reach).sort((a, b) => (reach[a.gid] - reach[b.gid]) || String(a.at || '').localeCompare(String(b.at || '')));
   }
 
   function contestStatus(claims, groupIds, winner) {

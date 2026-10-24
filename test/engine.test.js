@@ -439,7 +439,7 @@ test('contest: no tee times means group order; equal arrival falls back to save 
   assert.deepStrictEqual(E.claimsInPlayOrder([{ gid: 'g2', pid: 'b', at: '1' }, { gid: 'g1', pid: 'a', at: '2' }], groups, 7).map(c => c.gid), ['g1', 'g2']);
   const same = [{ id: 'g1', n: 1, teeTime: '09:00' }, { id: 'g2', n: 2, teeTime: '09:00' }];
   assert.deepStrictEqual(E.claimsInPlayOrder([{ gid: 'g2', pid: 'b', at: '2' }, { gid: 'g1', pid: 'a', at: '1' }], same, 7).map(c => c.gid), ['g1', 'g2']);
-  assert.deepStrictEqual(E.claimsInPlayOrder([{ gid: 'g1', pid: 'a', at: '1' }, { gid: 'gone', pid: 'x', at: '9' }], groups, 7).map(c => c.gid), ['gone', 'g1']);
+  assert.deepStrictEqual(E.claimsInPlayOrder([{ gid: 'g1', pid: 'a', at: '1' }, { gid: 'gone', pid: 'x', at: '9' }], groups, 7).map(c => c.gid), ['g1']);
   assert.deepStrictEqual(E.claimsInPlayOrder([], groups, 7), []);
 });
 
@@ -463,4 +463,22 @@ test('contest: every delivery order gives the same leader and state, for NTP and
   const none = E.claimsInPlayOrder(['g3', 'g1', 'g2'].map((g, k) => ({ gid: g, pid: E.NOBODY, at: String(k) })), groups, 7);
   assert.equal(E.contestStatus(none, ['g1', 'g2', 'g3'], null).leader, null);
   assert.equal(E.contestStatus(none, ['g1', 'g2', 'g3'], null).confirmed, true);
+});
+
+// Codex's counterexample on #39: a removed group's nominee must not win when every current group says Nobody.
+test('contest: a claim from a group no longer in the round is left out entirely', () => {
+  const groups = [{ id: 'g1', n: 1, teeTime: '09:00', startHole: 1 }, { id: 'g2', n: 2, teeTime: '09:10', startHole: 1 }];
+  const claims = [{ gid: 'deleted-group', pid: 'x', at: '1' }, { gid: 'g1', pid: E.NOBODY, at: '2' }, { gid: 'g2', pid: E.NOBODY, at: '3' }];
+  const ordered = E.claimsInPlayOrder(claims, groups, 7);
+  assert.deepStrictEqual(ordered.map(c => c.gid), ['g1', 'g2']);
+  const s = E.contestStatus(ordered, ['g1', 'g2'], null);
+  assert.equal(s.leader, null); assert.equal(s.confirmed, true); assert.equal(s.answered, 2);
+  // only the removed group answered: nothing to show, still provisional
+  const only = E.claimsInPlayOrder([{ gid: 'deleted-group', pid: 'x', at: '1' }], groups, 7);
+  assert.deepStrictEqual(only, []);
+  assert.equal(E.contestStatus(only, ['g1', 'g2'], null).leader, null);
+  assert.equal(E.contestStatus(only, ['g1', 'g2'], null).confirmed, false);
+  // no groups at all: no eligible claims; an organiser's winner still closes it
+  assert.deepStrictEqual(E.claimsInPlayOrder(claims, [], 7), []);
+  assert.equal(E.contestStatus([], [], 'x').confirmed, true);
 });

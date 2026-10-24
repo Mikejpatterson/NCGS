@@ -32,6 +32,15 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
       { grp: 'g3', player: '_nobody', at: '2026-05-14T10:30:00Z' },
       { grp: 'g1', player: info.C, at: '2026-05-14T12:00:00Z' }]);
     check('a group changing its nominee later doesn\'t overtake', await page.evaluate(rid => { const l = window.__ncgs.D.claims(rid)[7].filter(c => c.pid !== '_nobody'); return l[l.length - 1].gid === 'g2'; }, info.rid));
+    // A removed group's nominee can't win when every current group says Nobody (Codex, #39).
+    await setClaims([
+      { grp: 'g-removed', player: info.C, at: '2026-05-14T10:00:00Z' },
+      { grp: 'g1', player: '_nobody', at: '2026-05-14T10:20:00Z' },
+      { grp: 'g2', player: '_nobody', at: '2026-05-14T10:30:00Z' },
+      { grp: 'g3', player: '_nobody', at: '2026-05-14T10:40:00Z' }]);
+    check('a removed group\'s claim is left out', await page.evaluate(rid => window.__ncgs.D.claims(rid)[7].every(c => c.gid !== 'g-removed'), info.rid));
+    const home2 = await page.locator('.home-contests').innerText().catch(() => '');
+    check('Home shows Nobody for hole 7, not the removed group\'s player', !new RegExp(`Hole 7\\s*\\n\\s*${await page.evaluate(id => window.__ncgs.D.nameOf(id), info.C)}`).test(home2));
     check('no script errors', errors.length === 0); if (errors.length) console.log(errors);
   } catch (e) { console.error(e); ok = false; } finally { await browser.close(); }
   console.log(ok ? 'all passed' : 'SOME FAILED'); process.exit(ok ? 0 : 1);
