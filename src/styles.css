@@ -1891,3 +1891,9 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 
 /* A player's page for a past season shows two tiles (no "To beat"). */
 .tiles.two { grid-template-columns: repeat(2, 1fr); }
+
+/* Year picker (GOY, Past rounds): headers are ivory now, so dark text on a light track, and full-size touch targets.
+   It only appears once there is more than one season (first seen with the season switch, 24 October). */
+.hero .seg.year { background: var(--press); }
+.hero .seg.year button { color: var(--text); min-height: 44px; font-variant-numeric: tabular-nums; }
+.hero .seg.year button.on { background: #fff; color: var(--pine); font-weight: 700; }

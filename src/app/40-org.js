@@ -359,6 +359,19 @@ ORG.course = p => {
 };
 
 /* ----- Settings, log, export ----- */
+/* Season (owner, 24 October): the organiser starts each new season by hand, usually in January once the first round's
+   date is set. Golfer of the Year then starts fresh; earlier seasons stay in Past rounds and the year picker. */
+function seasonSection() {
+  const cur = seasonOf(), next = cur + 1, set = !!Number(D.setting('season', 0));
+  const live = !!liveRid();
+  const start = live
+    ? `<div class="row tall"><span class="two"><span>Start the ${next} season</span><span class="sub">After today's round is finished</span></span></div>`
+    : `<button class="row tall" data-act="season-next"><span class="two"><span class="${UI.confirm === 'season-next' ? 'c-b' : ''}">${UI.confirm === 'season-next' ? `Tap again to start the ${next} season` : `Start the ${next} season`}</span><span class="sub">Golfer of the Year starts fresh. ${cur} stays in Past rounds.</span></span>${chev}</button>`;
+  const undo = set && !live && seasonsList().includes(cur - 1)
+    ? `<button class="row" data-act="season-back"><span class="${UI.confirm === 'season-back' ? 'c-b' : 'sub'}">${UI.confirm === 'season-back' ? `Tap again to go back to ${cur - 1}` : `Go back to ${cur - 1}`}</span></button>` : '';
+  return sec(label('Season'), cardOf(`<div class="row"><span>Current season</span><span class="b num">${cur}</span></div>${start}${undo}`));
+}
+
 ORG.settings = () => ({
   html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Settings</h1></div></header>
   <form data-form="settings" autocomplete="off" class="sec near">
@@ -367,6 +380,7 @@ ORG.settings = () => ({
     ${formErr()}
     <button class="btn" type="submit">Save</button>
   </form>
+  ${seasonSection()}
   ${sec(label('About'), cardOf(`<div class="row"><span>App</span><span class="sub num">${esc(String(BOOT.version || 'preview'))}</span></div><div class="row"><span>Server</span><span class="${serverStale() ? 'c-b b' : 'sub'} num">${BOOT.mode !== 'live' ? 'In this preview' : !DB.lastSync ? 'Not checked yet' : DB.serverBuild === 'old' ? 'Old version' : serverStale() ? 'Out of date' : 'Up to date'}</span></div>`))}
   ${sec(label('Testing'), cardOf(`<button class="row tall" data-act="testing-toggle" role="switch" aria-checked="${D.testing()}"><span class="two"><span>Testing mode</span><span class="sub">${D.testing() ? 'On: any round can be deleted, even one with scores. Turn this off before real rounds.' : 'Off: only rounds that have not started can be deleted.'}</span></span><span class="switch${D.testing() ? ' on' : ''}" aria-hidden="true"><i></i></span></button>`))}
   <form data-form="newpin" autocomplete="off" class="sec">

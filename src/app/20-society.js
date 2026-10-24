@@ -185,7 +185,7 @@ VIEWS.home = () => {
   const table = goy(season);
   const lead = table[0];
   const pastAll = D.rounds().filter(r => r.status === 'final').reverse();
-  const tripFor = feature && feature.trip ? feature : (D.rounds().filter(r => r.trip).slice(-1)[0] || null);
+  const tripFor = feature && feature.trip ? feature : (D.rounds().filter(r => r.trip && (r.season || season) === season).slice(-1)[0] || null);
   const tripList = tripFor ? tripRounds(tripFor) : [];
   const goyHidden = lead ? `<span class="vh">Golfer of the Year ${esc(lead.name)} leads on ${lead.total}</span>` : '';
   const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
@@ -241,7 +241,7 @@ VIEWS.goy = () => {
     html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Golfer of the Year</h1></div>
       <p class="sub">${season} · best ${D.goyBest()} scores count</p>${yearPicker()}</header>
       ${table[0] ? `<div class="leadcard"><span class="lc-k">LEADING</span><span class="lc-row"><span class="lc-n">${esc(table[0].name)}</span><span class="lc-p"><b>${table[0].total}</b> pts</span></span>${table[1] ? `<span class="lc-s">${table[0].total - table[1].total === 0 ? 'Level with' : (table[0].total - table[1].total) + ' point' + (table[0].total - table[1].total === 1 ? '' : 's') + ' clear of'} ${esc(table[1].name)}</span>` : ''}</div>` : ''}
-      ${sec('', cardOf(table.map(x => goyRow(x, season)).join('')), false)}`
+      ${table.length ? sec('', cardOf(table.map(x => goyRow(x, season)).join('')), false) : sec('', `<div class="prose">No rounds played in ${season} yet. The table starts with the first round.</div>`, false)}`
   };
 };
 
