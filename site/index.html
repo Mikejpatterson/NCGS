@@ -1903,7 +1903,7 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .tiles.two { grid-template-columns: repeat(2, 1fr); }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610232201","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610240112","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -4229,7 +4229,7 @@ function groupsBlock(r, interactive) {
 /* A leaderboard row that drops the player's card down underneath it when tapped. */
 function dropRow(rid, x, inner, cls = 'lrow') {
   const r = D.round(rid), comp = computeR(rid), pl = comp && comp.players[x.id];
-  if (!r || !pl) return `<button class="${cls}" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
+  if (!r || !pl) return `<button class="${cls}" data-act="player" data-pid="${x.id}" data-year="${(r && r.season) || ''}">${inner}</button>`;
   const key = `bd-${rid}-${x.id}`, open = !!UI.open[key];
   const mine = myGroup(rid);
   const fix = r.status === 'live' && !!mine && mine.teams.flat().includes(x.id);
