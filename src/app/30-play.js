@@ -850,7 +850,7 @@ VIEWS.board = () => {
   const pillTxt = r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r);
   html += sec(`${label(esc(roundName(r)))}${pillTxt}`, cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
-    return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
+    return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
   }).join('')), true);
   if (res.kb.length) { const low = E.kbLowest(res.kb); html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''))); }
   html += `<button class="btn quiet" data-act="results" data-rid="${sel}">Share results</button>`;

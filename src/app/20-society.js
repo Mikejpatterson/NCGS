@@ -123,8 +123,10 @@ function nowCard(r) {
   const when = r.date && !live ? (days > 0 ? `${weekday} · ${days === 1 ? 'tomorrow' : 'in ' + plural(days, 'day')}` : weekday) : '';
   const line2 = when || (!live && !r.date ? 'Date to be confirmed' : '');
   const mine = live && myGroup(r.id);
-  const comp = mine && computeR(r.id);
-  const group = comp && comp.groups.find(g => g.id === mine.id);
+  // Your group's progress only adds Continue and the next contest; if it can't be worked out, Home still shows the round.
+  let group = null;
+  try { const comp = mine && computeR(r.id); group = (comp && comp.groups.find(g => g.id === mine.id)) || null; }
+  catch (e) { console.warn('Home: group progress unavailable', e); group = null; }
   const thisContest = group && group.nextHole ? contestOn(r.id, group.nextHole) : null;
   return `<div class="now ${live ? 'home-live-ticket' : 'home-announcement'}">
     <button class="now-main" data-act="round" data-rid="${r.id}">
@@ -158,6 +160,9 @@ function homeMatchday(r) {
   return html;
 }
 
+// Upcoming rounds members can see: only once the organiser has given them a date (owner, 23 October).
+// The organiser's screens still list every upcoming round.
+const announced = () => upcoming().filter(r => r.date);
 function homeSeasonIntro(season, played) {
   return `<section class="home-season-intro"><p class="home-season-label">This season</p><div class="home-year"><span>${season}</span><i aria-hidden="true"></i></div><p class="home-quiet-title">${played.length ? 'Between rounds.' : 'A fresh scorecard.'}</p><p class="sub">No round booked yet.<br>The next date will appear here when it’s set.</p></section>`;
 }
@@ -165,7 +170,7 @@ VIEWS.home = () => {
   const season = seasonOf();
   const played = seasonRounds(season).filter(r => r.status === 'final');
   const live = D.rounds().filter(r => r.status === 'live');
-  const next = upcoming();
+  const next = announced();   // an upcoming round shows here once the organiser gives it a date (owner, 23 October)
   const feature = live[0] || next[0] || null;
   const more = [...live.slice(1), ...next.slice(live[0] ? 0 : 1)];
   const me = DB.prefs.me ? D.member(DB.prefs.me) : null;
@@ -225,8 +230,8 @@ VIEWS.players = () => {
   };
 };
 
-function goyRow(x) {
-  return `<button class="lrow goy" data-act="player" data-pid="${x.id}"><span class="sub">${x.posLabel}</span>${avName(x, `<span class="chips">${x.counting.map(c => `<i class="chipn">${c.pts}</i>`).join('')}</span>`, false, true)}<span class="b r tot">${x.total}</span></button>`;
+function goyRow(x, season) {
+  return `<button class="lrow goy" data-act="player" data-pid="${x.id}" data-year="${season}"><span class="sub">${x.posLabel}</span>${avName(x, `<span class="chips">${x.counting.map(c => `<i class="chipn">${c.pts}</i>`).join('')}</span>`, false, true)}<span class="b r tot">${x.total}</span></button>`;
 }
 
 VIEWS.goy = () => {
@@ -236,7 +241,7 @@ VIEWS.goy = () => {
     html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Golfer of the Year</h1></div>
       <p class="sub">${season} · best ${D.goyBest()} scores count</p>${yearPicker()}</header>
       ${table[0] ? `<div class="leadcard"><span class="lc-k">LEADING</span><span class="lc-row"><span class="lc-n">${esc(table[0].name)}</span><span class="lc-p"><b>${table[0].total}</b> pts</span></span>${table[1] ? `<span class="lc-s">${table[0].total - table[1].total === 0 ? 'Level with' : (table[0].total - table[1].total) + ' point' + (table[0].total - table[1].total === 1 ? '' : 's') + ' clear of'} ${esc(table[1].name)}</span>` : ''}</div>` : ''}
-      ${sec('', cardOf(table.map(goyRow).join('')), false)}`
+      ${sec('', cardOf(table.map(x => goyRow(x, season)).join('')), false)}`
   };
 };
 
@@ -371,7 +376,7 @@ function groupsBlock(r, interactive) {
 /* A leaderboard row that drops the player's card down underneath it when tapped. */
 function dropRow(rid, x, inner, cls = 'lrow') {
   const r = D.round(rid), comp = computeR(rid), pl = comp && comp.players[x.id];
-  if (!r || !pl) return `<button class="${cls}" data-act="player" data-pid="${x.id}">${inner}</button>`;
+  if (!r || !pl) return `<button class="${cls}" data-act="player" data-pid="${x.id}" data-year="${(r && r.season) || ''}">${inner}</button>`;
   const key = `bd-${rid}-${x.id}`, open = !!UI.open[key];
   const mine = myGroup(rid);
   const fix = r.status === 'live' && !!mine && mine.teams.flat().includes(x.id);
@@ -385,7 +390,7 @@ function resultsBlock(r) {
   const app = res.source === 'app';
   let html = sec(label('Stableford'), cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
-    return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
+    return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
   }).join('')) + (res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : res.source === 'sheet' ? '<p class="cap note">From the society sheet</p>' : ''));
   if (res.kb.length) {
     { const low = E.kbLowest(res.kb); html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''))); }
@@ -421,7 +426,7 @@ function finishedBody(r, res) {
   const shown = all || !many ? res.rows : res.rows.slice(0, 8);
   let html = sec(label('Stableford'), cardOf(shown.map(x => {
     const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
-    return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}">${inner}</button>`;
+    return app ? dropRow(r.id, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
   }).join('') + (many ? `<button class="row finmore" data-act="toggle" data-key="all-${r.id}" aria-expanded="${all}">${all ? 'Show fewer' : `Show all ${res.rows.length}`}</button>` : '')) +
     ((all || !many) && res.source === 'recorded' ? '<p class="cap note">Order as recorded at the time</p>' : (all || !many) && res.source === 'sheet' ? '<p class="cap note">From the society sheet</p>' : ''));
   const rows = [];
@@ -607,9 +612,11 @@ function playerStatsBlock(pid) {
   const entries = playerEntries(pid);
   if (!entries.length) return '';
   const st = E.playerSummary(entries);
-  let html = sec(label('Scores'), `<div class="card chartcard">${scoreChart(entries, st.average)}<p class="cap note">Stableford points in each round. The dashed line is the average, ${fmt1(st.average)}.</p></div>`);
+  // These figures cover every season; say so once there is more than one, so they aren't read as the season shown above.
+  const span = seasonsList().length > 1 ? ' · all seasons' : '';
+  let html = sec(label('Scores' + span), `<div class="card chartcard">${scoreChart(entries, st.average)}<p class="cap note">Stableford points in each round. The dashed line is the average, ${fmt1(st.average)}.</p></div>`);
   const rows = [statRow('Rounds played', st.rounds), statRow('Average', fmt1(st.average)), statRow('Best round', st.best), statRow('Lowest round', st.worst), statRow('Wins', st.wins), statRow('KBs', st.kbs)];
-  html += sec(label('Numbers'), cardOf(rows.join('')));
+  html += sec(label('Numbers' + span), cardOf(rows.join('')));
   if (st.scored) {
     const holeRows = [statRow('Eagles', st.eagles), statRow('Birdies', st.birdies), statRow('Pars', st.pars), statRow('Bogeys', st.bogeys), statRow('Double bogey or worse', st.doubles), statRow('Holes picked up', st.scratches)];
     const par = [3, 4, 5].filter(k => st.byPar[k] !== null).map(k => statRow(`Par ${k}s`, fmt1(st.byPar[k]), 'avg points'));
@@ -649,15 +656,18 @@ VIEWS.stats = () => {
 VIEWS.player = p => {
   const m = D.member(p.pid);
   if (!m) return { html: `${navBack(backLabel())}<div class="head"><h1 class="title">Not found</h1></div>` };
-  const season = seasonOf();
+  // Opened from an archived table or round, the page stays on that season; otherwise it shows the current one.
+  const current = seasonOf();
+  const season = p.year && seasonsList().includes(Number(p.year)) ? Number(p.year) : current;
+  const past = season !== current;
   const table = goy(season);
   const row = table.find(x => x.id === m.id);
   const counting = row ? row.countingRids.slice() : [];
   let html = '<header class="hero s">' + navBack(backLabel());
   html += `<div class="head"><h1 class="title is-name">${esc(m.name)}</h1></div><p class="sub">${esc([m.full, 'Index ' + fmtIndex(m.index)].filter(Boolean).join(' · '))}</p>`;
-  html += `<div class="tiles"><div class="tile flag"><span class="cap">GOY</span><span class="bignum">${row ? posWord(row.posLabel) : '–'}</span></div>
+  html += `<div class="tiles${past ? ' two' : ''}"><div class="tile flag"><span class="cap">GOY${past ? ' ' + season : ''}</span><span class="bignum">${row ? posWord(row.posLabel) : '–'}</span></div>
     <div class="tile"><span class="cap">Best ${D.goyBest()}</span><span class="bignum">${row ? row.total : '–'}</span></div>
-    <div class="tile"><span class="cap">To beat</span><span class="bignum">${row && row.toBeat ? row.toBeat : '–'}</span></div></div></header>`;
+    ${past ? '' : `<div class="tile"><span class="cap">To beat</span><span class="bignum">${row && row.toBeat ? row.toBeat : '–'}</span></div>`}</div></header>`;
   const rowsFor = yr => seasonRounds(yr).filter(r => r.status === 'final' || r.status === 'live').reverse().map(r => {
     const res = resultsOf(r.id);
     const me = res ? res.rows.find(x => x.id === m.id) : null;

@@ -179,8 +179,15 @@ const titleCheck = ({ sel, want, max }) => {
   await b.close(); if (fails) { console.log('SOME FAILED'); process.exit(1); }
   // Keep the Home claim-state regression in the existing CI entry point. All layout assertions above
   // remain intact; a failure in this additional suite also fails the layout job.
+  // The follow-on suites check the same preview address as the layout run.
+  const subEnv = { ...process.env, NCGS_TEST_URL: process.env.NCGS_TEST_URL || process.env.LAYOUT_URL || 'http://localhost:8765/preview.html' };
   const home = require('child_process').spawnSync(process.execPath,
-    [...process.execArgv, require('path').join(__dirname, 'home-states.run.js')], { stdio: 'inherit' });
+    [...process.execArgv, require('path').join(__dirname, 'home-states.run.js')], { stdio: 'inherit', env: subEnv });
   if (home.error) console.error(home.error);
   if (home.status !== 0) process.exit(home.status || 1);
+  // Undated rounds and season context on player pages (owner decisions, 23 October).
+  const season = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'season-context.run.js')], { stdio: 'inherit', env: subEnv });
+  if (season.error) console.error(season.error);
+  if (season.status !== 0) process.exit(season.status || 1);
 })();
