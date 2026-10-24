@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node --test test/engine.test.js test/server.test.js
+      - run: node --test test/*.test.js
   deploy:
     needs: test
     runs-on: ubuntu-latest
