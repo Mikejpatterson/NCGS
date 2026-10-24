@@ -35,7 +35,8 @@ const body = boot => `<main id="app" aria-live="polite"></main>
 <script>window.NCGS_BOOT = ${safe(JSON.stringify(boot))};</script>
 ${boot.mode === 'local' ? `<script>window.NCGS_SEED = ${safe(JSON.stringify(seed))};
 window.NCGS_DEMO = ${safe(JSON.stringify(demo))};
-window.TRIP_CARD_FIXTURES = ${safe(JSON.stringify(fixtures))};</script>` : ''}
+window.TRIP_CARD_FIXTURES = ${safe(JSON.stringify(fixtures))};</script>
+<script>${safe(read('src/preview/scenarios.js'))}</script>` : ''}
 <script>${safe(engine)}</script>
 <script>${safe(server)}</script>
 <script>${safe(appJs)}</script>`;

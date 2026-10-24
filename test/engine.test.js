@@ -413,3 +413,54 @@ test('contest status: confirmed once every group has answered, or the organiser 
   assert.equal(E.contestStatus([], ids, 'b').confirmed, true);
   assert.equal(E.contestStatus([], [], null).confirmed, false);
 });
+
+// Contest claims go in playing order (owner, 24 October: the last group past the contest hole settles it).
+test('contest: a late-saved claim from an earlier group cannot overtake a later group', () => {
+  const groups = [{ id: 'g1', n: 1, teeTime: '09:00', startHole: 1 }, { id: 'g2', n: 2, teeTime: '09:10', startHole: 1 }, { id: 'g3', n: 3, teeTime: '09:20', startHole: 1 }];
+  // g3 played hole 7 last and claimed; g1's claim reached the server later because it had no signal
+  const claims = [{ gid: 'g2', pid: 'b', at: '2026-05-14T10:20:00Z' }, { gid: 'g3', pid: 'c', at: '2026-05-14T10:30:00Z' }, { gid: 'g1', pid: 'a', at: '2026-05-14T11:45:00Z' }];
+  const ordered = E.claimsInPlayOrder(claims, groups, 7);
+  assert.deepStrictEqual(ordered.map(c => c.gid), ['g1', 'g2', 'g3']);
+  assert.equal(E.contestStatus(ordered, ['g1', 'g2', 'g3'], null).leader.pid, 'c');
+});
+test('contest: Nobody from the last group leaves the leader in place, whatever the save order', () => {
+  const groups = [{ id: 'g1', n: 1, teeTime: '09:00', startHole: 1 }, { id: 'g2', n: 2, teeTime: '09:10', startHole: 1 }];
+  const claims = [{ gid: 'g2', pid: E.NOBODY, at: '2026-05-14T10:30:00Z' }, { gid: 'g1', pid: 'a', at: '2026-05-14T11:00:00Z' }];
+  assert.equal(E.contestStatus(E.claimsInPlayOrder(claims, groups, 7), ['g1', 'g2'], null).leader.pid, 'a');
+});
+test('contest: a different starting hole changes who reaches the hole last', () => {
+  // Both tee off at 09:00; g2 starts on 10, so it reaches hole 12 after 2 holes, g1 after 11
+  const groups = [{ id: 'g1', n: 1, teeTime: '09:00', startHole: 1 }, { id: 'g2', n: 2, teeTime: '09:00', startHole: 10 }];
+  const claims = [{ gid: 'g1', pid: 'a', at: '2026-05-14T11:15:00Z' }, { gid: 'g2', pid: 'b', at: '2026-05-14T09:30:00Z' }];
+  assert.deepStrictEqual(E.claimsInPlayOrder(claims, groups, 12).map(c => c.gid), ['g2', 'g1']);
+});
+test('contest: no tee times means group order; equal arrival falls back to save time; unknown groups never overtake', () => {
+  const groups = [{ id: 'g1', n: 1 }, { id: 'g2', n: 2 }];
+  assert.deepStrictEqual(E.claimsInPlayOrder([{ gid: 'g2', pid: 'b', at: '1' }, { gid: 'g1', pid: 'a', at: '2' }], groups, 7).map(c => c.gid), ['g1', 'g2']);
+  const same = [{ id: 'g1', n: 1, teeTime: '09:00' }, { id: 'g2', n: 2, teeTime: '09:00' }];
+  assert.deepStrictEqual(E.claimsInPlayOrder([{ gid: 'g2', pid: 'b', at: '2' }, { gid: 'g1', pid: 'a', at: '1' }], same, 7).map(c => c.gid), ['g1', 'g2']);
+  assert.deepStrictEqual(E.claimsInPlayOrder([{ gid: 'g1', pid: 'a', at: '1' }, { gid: 'gone', pid: 'x', at: '9' }], groups, 7).map(c => c.gid), ['gone', 'g1']);
+  assert.deepStrictEqual(E.claimsInPlayOrder([], groups, 7), []);
+});
+
+// Codex's counterexample (issue #1, 24 October): g1's A beaten by g2's B, g3 says Nobody. Every delivery order gives B.
+test('contest: every delivery order gives the same leader and state, for NTP and LD alike', () => {
+  const groups = [{ id: 'g1', n: 1, teeTime: '09:00', startHole: 1 }, { id: 'g2', n: 2, teeTime: '09:10', startHole: 1 }, { id: 'g3', n: 3, teeTime: '09:20', startHole: 1 }];
+  const answers = [{ gid: 'g1', pid: 'A' }, { gid: 'g2', pid: 'B' }, { gid: 'g3', pid: E.NOBODY }];
+  const perms = [[0, 1, 2], [0, 2, 1], [1, 0, 2], [1, 2, 0], [2, 0, 1], [2, 1, 0]];
+  [7, 12].forEach(hole => perms.forEach(p => {
+    const arrived = p.map((i, k) => Object.assign({ at: '2026-05-14T1' + k + ':00:00Z' }, answers[i]));
+    const s = E.contestStatus(E.claimsInPlayOrder(arrived, groups, hole), ['g1', 'g2', 'g3'], null);
+    assert.equal(s.leader.pid, 'B', `hole ${hole}, order ${p}`);
+    assert.equal(s.confirmed, true);
+  }));
+  // provisional until every group has answered; an organiser's winner closes it regardless
+  const two = E.claimsInPlayOrder([{ gid: 'g2', pid: 'B', at: '1' }, { gid: 'g1', pid: 'A', at: '2' }], groups, 7);
+  assert.equal(E.contestStatus(two, ['g1', 'g2', 'g3'], null).leader.pid, 'B');
+  assert.equal(E.contestStatus(two, ['g1', 'g2', 'g3'], null).confirmed, false);
+  assert.equal(E.contestStatus(two, ['g1', 'g2', 'g3'], 'A').confirmed, true);
+  // all Nobody: no leader, confirmed once everyone has answered
+  const none = E.claimsInPlayOrder(['g3', 'g1', 'g2'].map((g, k) => ({ gid: g, pid: E.NOBODY, at: String(k) })), groups, 7);
+  assert.equal(E.contestStatus(none, ['g1', 'g2', 'g3'], null).leader, null);
+  assert.equal(E.contestStatus(none, ['g1', 'g2', 'g3'], null).confirmed, true);
+});

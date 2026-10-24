@@ -233,10 +233,13 @@ const D = {
     view().scores.forEach(s => { if (s.round === rid) (out[s.player] = out[s.player] || {})[s.hole] = s.strokes; });
     return out;
   }),
+  // Each hole's contest claims in playing order (E.claimsInPlayOrder), so the last group past the hole decides.
   claims: rid => memo('cl:' + rid, () => {
     const out = {};
     view().claims.filter(c => c.round === rid).sort((a, b) => String(a.at).localeCompare(String(b.at)))
       .forEach(c => (out[c.hole] = out[c.hole] || []).push({ pid: c.player, gid: c.grp, at: c.at }));
+    const groups = (D.round(rid) || {}).groups || [];
+    Object.keys(out).forEach(h => { out[h] = E.claimsInPlayOrder(out[h], groups, Number(h)); });
     return out;
   }),
   winners: rid => memo('wn:' + rid, () => Object.fromEntries(view().winners.filter(w => w.round === rid).map(w => [w.hole, w.player]))),

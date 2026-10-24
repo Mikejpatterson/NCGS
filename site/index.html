@@ -1909,7 +1909,7 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .hero .seg.year button.on { background: #fff; color: var(--pine); font-weight: 700; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610240720","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610241157","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2625,6 +2625,23 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
   /* Contests (nearest the pin, longest drive). Each group answers with a player, or NOBODY.
      A contest is confirmed once every group has answered, or the organiser has named a winner. */
   const NOBODY = '_nobody';
+  /* Contest claims in the order the groups reached the hole (owner, 24 October: the last group past the contest hole
+     settles it). Each group's arrival is worked out from its tee time and starting hole, about 12 minutes a hole; with
+     no tee time, groups go out in group order 10 minutes apart. The time a claim reached the server is used only
+     between groups that reach the hole together, so a group whose save arrives late (no signal) can't overtake a group
+     that played the hole after it. A claim from a group that's no longer in the round can't overtake anyone. */
+  function claimsInPlayOrder(claims, groups, hole) {
+    const mins = t => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(t || '')); return m ? Number(m[1]) * 60 + Number(m[2]) : null; };
+    const reach = {};
+    (groups || []).forEach((g, i) => {
+      const start = mins(g.teeTime);
+      const holesBefore = playOrder(g.startHole).indexOf(Number(hole));
+      reach[g.id] = (start !== null ? start : (g.n || i + 1) * 10) + Math.max(0, holesBefore) * 12;
+    });
+    const at = c => (c.gid in reach ? reach[c.gid] : -Infinity);
+    return (claims || []).slice().sort((a, b) => (at(a) - at(b)) || String(a.at || '').localeCompare(String(b.at || '')));
+  }
+
   function contestStatus(claims, groupIds, winner) {
     const by = {};
     (claims || []).forEach(c => { by[c.gid] = c; });
@@ -2637,7 +2654,7 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
   }
 
   return {
-    NOBODY, contestStatus, SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
+    NOBODY, contestStatus, claimsInPlayOrder, SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,
@@ -3667,10 +3684,13 @@ const D = {
     view().scores.forEach(s => { if (s.round === rid) (out[s.player] = out[s.player] || {})[s.hole] = s.strokes; });
     return out;
   }),
+  // Each hole's contest claims in playing order (E.claimsInPlayOrder), so the last group past the hole decides.
   claims: rid => memo('cl:' + rid, () => {
     const out = {};
     view().claims.filter(c => c.round === rid).sort((a, b) => String(a.at).localeCompare(String(b.at)))
       .forEach(c => (out[c.hole] = out[c.hole] || []).push({ pid: c.player, gid: c.grp, at: c.at }));
+    const groups = (D.round(rid) || {}).groups || [];
+    Object.keys(out).forEach(h => { out[h] = E.claimsInPlayOrder(out[h], groups, Number(h)); });
     return out;
   }),
   winners: rid => memo('wn:' + rid, () => Object.fromEntries(view().winners.filter(w => w.round === rid).map(w => [w.hole, w.player]))),
@@ -4068,7 +4088,7 @@ VIEWS.home = () => {
     rrow('stats', 'bars', 'Stats', 'KBs, birdies, averages'),
     rrow('players', 'users', 'Players', plural(D.regulars().length, 'golfer'))].join('')), true)}`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
-  html += '<p class="foot"><button class="link" data-act="org">Organiser</button></p>';
+  html += `<p class="foot"><button class="link" data-act="org">Organiser</button>${window.NCGS_SCENARIOS ? ' <button class="link" data-act="scenarios">Test scenarios</button>' : ''}</p>`;
   return { html, tabs: 'home' };
 };
 
@@ -6371,6 +6391,21 @@ function demoFill() {
   toast(filled.length ? `Group${filled.length > 1 ? 's' : ''} ${filled.join(' and ')} finished` : 'Other groups are already finished');
 }
 
+/* ---- 45-preview.js ---- */
+/* ----- Test scenarios (private preview only; window.NCGS_SCENARIOS comes from src/preview/scenarios.js) ----- */
+VIEWS.scenarios = () => {
+  const S = window.NCGS_SCENARIOS;
+  if (!S) return { html: `${navBack(backLabel())}<div class="head"><h1 class="title">Test scenarios</h1></div><div class="prose">Only in the preview.</div>` };
+  const rows = S.list.map(s => s.soon
+    ? `<div class="row tall"><span class="two"><span class="sub">${esc(s.title)}</span><span class="sub">${esc(s.note)}</span></span><span class="pill n">Soon</span></div>`
+    : `<button class="row tall" data-act="scenario-pick" data-id="${s.id}" aria-current="${s.id === S.current}"><span class="two"><span class="${s.id === S.current ? 'b' : ''}">${esc(s.title)}</span><span class="sub">${esc(s.note)}</span></span>${s.id === S.current ? '<span class="pill g">Showing</span>' : chev}</button>`).join('');
+  return {
+    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Test scenarios</h1></div>
+      <p class="sub">Invented golfers and rounds. Pick one to see the app in that situation; it starts that scenario afresh. Nothing here touches the real app.</p></header>
+      ${sec('', cardOf(rows), false)}`
+  };
+};
+
 /* ---- 90-main.js ---- */
 /* ================= Actions ================= */
 const dataOf = el => el.dataset;
@@ -6655,6 +6690,8 @@ const ACT = {
     UI.confirm = null;
     back();
   },
+  scenarios: () => go('scenarios'),
+  'scenario-pick': el => { if (window.NCGS_SCENARIOS) window.NCGS_SCENARIOS.choose(el.dataset.id); },
   'season-next': () => {
     if (liveRid()) return;
     if (UI.confirm !== 'season-next') { UI.confirm = 'season-next'; render(); return; }
