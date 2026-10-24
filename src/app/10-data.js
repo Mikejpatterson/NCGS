@@ -357,11 +357,13 @@ function playerEntries(pid, season) {
     }).filter(Boolean));
 }
 const playerStats = (pid, season) => E.playerSummary(playerEntries(pid, season));
-/* The season on show: the latest one with a finished round (a round booked for next year does not move it on). */
-const seasonOf = () => { const s = D.rounds().filter(r => r.season && !isDemo(r) && r.status !== 'upcoming').map(r => r.season); return s.length ? Math.max(...s) : new Date().getFullYear(); };
+/* The season on show. The organiser starts each new season by hand in Settings (owner, 24 October: usually in January,
+   once the first round's date is set); that choice wins. Before it is ever set: the latest season with a finished round
+   (a round booked for next year does not move it on). */
+const seasonOf = () => { const set = Number(D.setting('season', 0)); if (set) return set; const s = D.rounds().filter(r => r.season && !isDemo(r) && r.status !== 'upcoming').map(r => r.season); return s.length ? Math.max(...s) : new Date().getFullYear(); };
 const seasonRounds = season => D.rounds().filter(r => r.season === season && !isDemo(r));
 /* Every season that has results, newest first; and the one being looked at (the current season unless a year was picked). */
-const seasonsList = () => [...new Set(D.rounds().filter(r => r.season && !isDemo(r) && (r.status === 'final' || r.status === 'live')).map(r => r.season))].sort((a, b) => b - a);
+const seasonsList = () => [...new Set([seasonOf(), ...D.rounds().filter(r => r.season && !isDemo(r) && (r.status === 'final' || r.status === 'live')).map(r => r.season)])].sort((a, b) => b - a);
 const yearOn = () => (UI.year && seasonsList().includes(UI.year) ? UI.year : seasonOf());
 // A row of years, only once there is more than one season to choose between.
 const yearPicker = () => {

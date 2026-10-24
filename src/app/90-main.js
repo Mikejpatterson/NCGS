@@ -281,6 +281,22 @@ const ACT = {
     UI.confirm = null;
     back();
   },
+  'season-next': () => {
+    if (liveRid()) return;
+    if (UI.confirm !== 'season-next') { UI.confirm = 'season-next'; render(); return; }
+    const next = seasonOf() + 1;
+    UI.confirm = null; UI.year = null;
+    put('settings', [{ key: 'season', value: String(next) }], { action: 'Season started', detail: String(next) });
+    toast(`The ${next} season has started`);
+  },
+  'season-back': () => {
+    if (liveRid()) return;
+    if (UI.confirm !== 'season-back') { UI.confirm = 'season-back'; render(); return; }
+    const prev = seasonOf() - 1;
+    UI.confirm = null; UI.year = null;
+    put('settings', [{ key: 'season', value: String(prev) }], { action: 'Season changed back', detail: String(prev) });
+    toast(`Back to the ${prev} season`);
+  },
   'testing-toggle': () => {
     const on = !D.testing();
     put('settings', [{ key: 'testing', value: on ? '1' : '0' }], { action: 'Testing mode ' + (on ? 'on' : 'off'), detail: on ? 'Any round can be deleted' : 'Only rounds that have not started can be deleted' });

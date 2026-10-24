@@ -1901,9 +1901,15 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 
 /* A player's page for a past season shows two tiles (no "To beat"). */
 .tiles.two { grid-template-columns: repeat(2, 1fr); }
+
+/* Year picker (GOY, Past rounds): headers are ivory now, so dark text on a light track, and full-size touch targets.
+   It only appears once there is more than one season (first seen with the season switch, 24 October). */
+.hero .seg.year { background: var(--press); }
+.hero .seg.year button { color: var(--text); min-height: 44px; font-variant-numeric: tabular-nums; }
+.hero .seg.year button.on { background: #fff; color: var(--pine); font-weight: 700; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610240112","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610240720","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3785,11 +3791,13 @@ function playerEntries(pid, season) {
     }).filter(Boolean));
 }
 const playerStats = (pid, season) => E.playerSummary(playerEntries(pid, season));
-/* The season on show: the latest one with a finished round (a round booked for next year does not move it on). */
-const seasonOf = () => { const s = D.rounds().filter(r => r.season && !isDemo(r) && r.status !== 'upcoming').map(r => r.season); return s.length ? Math.max(...s) : new Date().getFullYear(); };
+/* The season on show. The organiser starts each new season by hand in Settings (owner, 24 October: usually in January,
+   once the first round's date is set); that choice wins. Before it is ever set: the latest season with a finished round
+   (a round booked for next year does not move it on). */
+const seasonOf = () => { const set = Number(D.setting('season', 0)); if (set) return set; const s = D.rounds().filter(r => r.season && !isDemo(r) && r.status !== 'upcoming').map(r => r.season); return s.length ? Math.max(...s) : new Date().getFullYear(); };
 const seasonRounds = season => D.rounds().filter(r => r.season === season && !isDemo(r));
 /* Every season that has results, newest first; and the one being looked at (the current season unless a year was picked). */
-const seasonsList = () => [...new Set(D.rounds().filter(r => r.season && !isDemo(r) && (r.status === 'final' || r.status === 'live')).map(r => r.season))].sort((a, b) => b - a);
+const seasonsList = () => [...new Set([seasonOf(), ...D.rounds().filter(r => r.season && !isDemo(r) && (r.status === 'final' || r.status === 'live')).map(r => r.season)])].sort((a, b) => b - a);
 const yearOn = () => (UI.year && seasonsList().includes(UI.year) ? UI.year : seasonOf());
 // A row of years, only once there is more than one season to choose between.
 const yearPicker = () => {
@@ -4038,7 +4046,7 @@ VIEWS.home = () => {
   const table = goy(season);
   const lead = table[0];
   const pastAll = D.rounds().filter(r => r.status === 'final').reverse();
-  const tripFor = feature && feature.trip ? feature : (D.rounds().filter(r => r.trip).slice(-1)[0] || null);
+  const tripFor = feature && feature.trip ? feature : (D.rounds().filter(r => r.trip && (r.season || season) === season).slice(-1)[0] || null);
   const tripList = tripFor ? tripRounds(tripFor) : [];
   const goyHidden = lead ? `<span class="vh">Golfer of the Year ${esc(lead.name)} leads on ${lead.total}</span>` : '';
   const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
@@ -4094,7 +4102,7 @@ VIEWS.goy = () => {
     html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Golfer of the Year</h1></div>
       <p class="sub">${season} · best ${D.goyBest()} scores count</p>${yearPicker()}</header>
       ${table[0] ? `<div class="leadcard"><span class="lc-k">LEADING</span><span class="lc-row"><span class="lc-n">${esc(table[0].name)}</span><span class="lc-p"><b>${table[0].total}</b> pts</span></span>${table[1] ? `<span class="lc-s">${table[0].total - table[1].total === 0 ? 'Level with' : (table[0].total - table[1].total) + ' point' + (table[0].total - table[1].total === 1 ? '' : 's') + ' clear of'} ${esc(table[1].name)}</span>` : ''}</div>` : ''}
-      ${sec('', cardOf(table.map(x => goyRow(x, season)).join('')), false)}`
+      ${table.length ? sec('', cardOf(table.map(x => goyRow(x, season)).join('')), false) : sec('', `<div class="prose">No rounds played in ${season} yet. The table starts with the first round.</div>`, false)}`
   };
 };
 
@@ -6272,6 +6280,19 @@ ORG.course = p => {
 };
 
 /* ----- Settings, log, export ----- */
+/* Season (owner, 24 October): the organiser starts each new season by hand, usually in January once the first round's
+   date is set. Golfer of the Year then starts fresh; earlier seasons stay in Past rounds and the year picker. */
+function seasonSection() {
+  const cur = seasonOf(), next = cur + 1, set = !!Number(D.setting('season', 0));
+  const live = !!liveRid();
+  const start = live
+    ? `<div class="row tall"><span class="two"><span>Start the ${next} season</span><span class="sub">After today's round is finished</span></span></div>`
+    : `<button class="row tall" data-act="season-next"><span class="two"><span class="${UI.confirm === 'season-next' ? 'c-b' : ''}">${UI.confirm === 'season-next' ? `Tap again to start the ${next} season` : `Start the ${next} season`}</span><span class="sub">Golfer of the Year starts fresh. ${cur} stays in Past rounds.</span></span>${chev}</button>`;
+  const undo = set && !live && seasonsList().includes(cur - 1)
+    ? `<button class="row" data-act="season-back"><span class="${UI.confirm === 'season-back' ? 'c-b' : 'sub'}">${UI.confirm === 'season-back' ? `Tap again to go back to ${cur - 1}` : `Go back to ${cur - 1}`}</span></button>` : '';
+  return sec(label('Season'), cardOf(`<div class="row"><span>Current season</span><span class="b num">${cur}</span></div>${start}${undo}`));
+}
+
 ORG.settings = () => ({
   html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Settings</h1></div></header>
   <form data-form="settings" autocomplete="off" class="sec near">
@@ -6280,6 +6301,7 @@ ORG.settings = () => ({
     ${formErr()}
     <button class="btn" type="submit">Save</button>
   </form>
+  ${seasonSection()}
   ${sec(label('About'), cardOf(`<div class="row"><span>App</span><span class="sub num">${esc(String(BOOT.version || 'preview'))}</span></div><div class="row"><span>Server</span><span class="${serverStale() ? 'c-b b' : 'sub'} num">${BOOT.mode !== 'live' ? 'In this preview' : !DB.lastSync ? 'Not checked yet' : DB.serverBuild === 'old' ? 'Old version' : serverStale() ? 'Out of date' : 'Up to date'}</span></div>`))}
   ${sec(label('Testing'), cardOf(`<button class="row tall" data-act="testing-toggle" role="switch" aria-checked="${D.testing()}"><span class="two"><span>Testing mode</span><span class="sub">${D.testing() ? 'On: any round can be deleted, even one with scores. Turn this off before real rounds.' : 'Off: only rounds that have not started can be deleted.'}</span></span><span class="switch${D.testing() ? ' on' : ''}" aria-hidden="true"><i></i></span></button>`))}
   <form data-form="newpin" autocomplete="off" class="sec">
@@ -6632,6 +6654,22 @@ const ACT = {
     removeRows('rounds', [{ id: r.id }], { action: 'Round deleted', detail: `${roundName(r)}${r.date ? ' ' + r.date : ''}` });
     UI.confirm = null;
     back();
+  },
+  'season-next': () => {
+    if (liveRid()) return;
+    if (UI.confirm !== 'season-next') { UI.confirm = 'season-next'; render(); return; }
+    const next = seasonOf() + 1;
+    UI.confirm = null; UI.year = null;
+    put('settings', [{ key: 'season', value: String(next) }], { action: 'Season started', detail: String(next) });
+    toast(`The ${next} season has started`);
+  },
+  'season-back': () => {
+    if (liveRid()) return;
+    if (UI.confirm !== 'season-back') { UI.confirm = 'season-back'; render(); return; }
+    const prev = seasonOf() - 1;
+    UI.confirm = null; UI.year = null;
+    put('settings', [{ key: 'season', value: String(prev) }], { action: 'Season changed back', detail: String(prev) });
+    toast(`Back to the ${prev} season`);
   },
   'testing-toggle': () => {
     const on = !D.testing();
