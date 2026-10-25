@@ -334,12 +334,14 @@ const ACT = {
   'late-cancel': () => { UI.late = null; UI.confirm = null; render(); },
   'late-replace': el => {
     const r = D.round(el.dataset.rid), pid = el.dataset.pid, np = el.dataset.new;
+    if (rosterLocked(r)) { toast('The teams have scores, so they are fixed now'); return; }
     if (scoresFor(r.id, pid)) { toast('That player already has scores'); return; }
     put('rounds', [withPlayerChanged(r, pid, np)], { action: 'Player swapped', detail: `${roundName(r)}: ${D.nameOf(np)} in for ${D.nameOf(pid)}` });
     UI.late = null; toast(`${D.nameOf(np)} is in`); back();
   },
   'late-drop': el => {
     const r = D.round(el.dataset.rid), pid = el.dataset.pid;
+    if (rosterLocked(r)) { toast('The teams have scores, so they are fixed now'); return; }
     if (scoresFor(r.id, pid)) { toast('That player already has scores'); return; }
     if (UI.confirm !== 'drop-' + pid) { UI.confirm = 'drop-' + pid; render(); return; }
     put('rounds', [withPlayerChanged(r, pid, null)], { action: 'Player dropped out', detail: `${roundName(r)}: ${D.nameOf(pid)}` });

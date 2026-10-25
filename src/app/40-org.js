@@ -93,7 +93,7 @@ ORG.round = p => {
   html += sec('', cardOf(`
     <button class="row tall" data-act="org-go" data-v="details" data-rid="${r.id}"><span class="two"><span>Details</span><span class="sub">${esc(details)}</span></span>${chev}</button>
     <button class="row tall" data-act="org-go" data-v="${locked ? 'groupsview' : 'playing'}" data-rid="${r.id}"><span class="two"><span>Groups and buggies</span><span class="sub">${r.groups && r.groups.length ? `${plural(nPlayers, 'player')} · ${plural(r.groups.length, 'group')}` : 'Not drawn'}</span></span>${chev}</button>
-    ${r.groups && r.groups.length && r.status !== 'final' ? `<button class="row tall" data-act="org-go" data-v="late" data-rid="${r.id}"><span class="two"><span>Change a player</span><span class="sub">Swap someone in, or let someone drop out</span></span>${chev}</button>` : ''}
+    ${r.groups && r.groups.length && r.status !== 'final' ? `<button class="row tall" data-act="org-go" data-v="late" data-rid="${r.id}"><span class="two"><span>Change a player</span><span class="sub">${rosterLocked(r) ? 'Teams are fixed now they have scores' : 'Swap someone in, or let someone drop out'}</span></span>${chev}</button>` : ''}
     <button class="row tall" data-act="org-format" data-rid="${r.id}"><span class="two"><span>Format</span><span class="sub">${isScramble(r) ? 'Scramble: one team score per group, drives recorded' : 'Individual Stableford'}</span></span><span class="pill ${isScramble(r) ? 'g' : 'n'}">${isScramble(r) ? 'Scramble' : 'Stableford'}</span></button>
     ${isScramble(r) ? `<button class="row tall" data-act="org-go" data-v="teamshots" data-rid="${r.id}"><span class="two"><span>Team shots</span><span class="sub">${(r.groups || []).map(g => `Team ${g.n}: ${teamShotsOf(r)[g.id] || 0}`).join(' · ') || 'Draw the teams first'}</span></span>${chev}</button>` : ''}
     ${r.trip ? `<button class="row tall" data-act="org-tripboard" data-rid="${r.id}"><span class="two"><span>Trip leaderboard</span><span class="sub">${tripBoardOn(r) ? `${esc(r.trip)} adds up the days` : `No combined board for ${esc(r.trip)}: each day has its own results`}</span></span><span class="pill ${tripBoardOn(r) ? 'g' : 'n'}">${tripBoardOn(r) ? 'On' : 'Off'}</span></button>` : ''}
@@ -295,11 +295,16 @@ ORG.guest = p => ({
 
 /* ----- A change of player after the groups are saved ----- */
 function scoresFor(rid, pid) { const sc = D.scores(rid)[pid]; return sc ? Object.keys(sc).length : 0; }
+/* A scramble's team scores sit in the rows of whoever drove, so once any team has a score the teams are fixed for the
+   whole round: swapping or removing anyone, even a teammate with no rows, could hide a team's hole and its drive
+   (Codex review of #41). Before the first score, teams can change as usual. */
+const rosterLocked = r => isScramble(r) && Object.values(D.scores(r.id)).some(h => Object.values(h || {}).some(v => v !== null && v !== undefined));
 ORG.late = p => {
   const r = D.round(p.rid);
   const sel = UI.late && UI.late.rid === r.id ? UI.late.pid : null;
   let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Change a player</h1></div><p class="sub names">${sel ? esc(D.nameOf(sel)) : 'Tap the player who is changing'}</p></header>`;
   const inRound = new Set((r.groups || []).flatMap(g => g.teams.flat()));
+  if (rosterLocked(r)) return { html: html + sec('', cardOf(`<div class="row tall"><span class="sub">The teams have started scoring, so players can't be swapped or taken out of this scramble: a team's holes are saved under whoever drove. Correct a hole on the team's screen instead.</span></div>`)) };
   if (!sel) {
     html += (r.groups || []).map((g, gi) => sec(label(`Group ${gi + 1}`), cardOf(g.teams.flat().map(pid => `<button class="row" data-act="late-pick" data-rid="${r.id}" data-pid="${pid}"><span>${esc(D.nameOf(pid))}</span>${scoresFor(r.id, pid) ? `<span class="sub">${plural(scoresFor(r.id, pid), 'score')}</span>` : chev}</button>`).join('')), gi === 0)).join('');
     return { html };

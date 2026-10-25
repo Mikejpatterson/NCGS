@@ -3,7 +3,7 @@
 # Run from the project folder:  sh tools/check.sh
 set -e
 cd "$(dirname "$0")/.."
-node --test test/engine.test.js test/server.test.js test/fuzz.server.test.js test/fuzz.engine.test.js
+node --test test/*.test.js
 if [ ! -f data/seed.json ]; then echo "No data/seed.json here, so the screen tests are skipped."; exit 0; fi
 node build.js > /dev/null
 python3 -m http.server 8765 -d dist > /dev/null 2>&1 &
