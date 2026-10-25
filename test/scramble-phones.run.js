@@ -72,6 +72,19 @@ async function phone(pid) {
     await a.hole(1);
     check('6. the other phone sees the hole as two drives, not counted', /Two drives saved/.test(await a.pg.locator('main').innerText())
       && await a.pg.evaluate(() => { const x = window.__ncgs; x.DB._memo = {}; return x.D.round('scr') && true; }));
+    // Exercise the roster guards BEFORE recovery, while both conflicting driver rows still exist.
+    const org = await phone(A);
+    await org.pg.evaluate(() => { const x = window.__ncgs; x.UI.org = true; x.UI.orgUnlocked = true; x.ORGPIN.pin = '1234'; x.UI.orgStack = [{ v: 'home', p: {} }, { v: 'late', p: { rid: 'scr' } }]; x.render(); });
+    await org.pg.waitForTimeout(150);
+    check('unresolved: the roster screen is locked while both driver rows remain', /can.t be swapped or taken out of this scramble/.test(await org.pg.locator('main').innerText())
+      && !(await org.pg.locator('[data-act="late-replace"], [data-act="late-drop"]').count()) && (await rows()) === [`${A}:6`, `${B}:4`].sort().join(','));
+    const unresolvedGroups = JSON.stringify((await state()).tables.rounds.find(x => x.id === 'scr').groups);
+    const unresolvedRows = await rows();
+    await org.pg.evaluate(([pid, np]) => { const m = document.createElement('button'); m.dataset.act = 'late-replace'; m.dataset.rid = 'scr'; m.dataset.pid = pid; m.dataset.new = np; document.body.appendChild(m); m.click(); m.remove();
+      const d = document.createElement('button'); d.dataset.act = 'late-drop'; d.dataset.rid = 'scr'; d.dataset.pid = pid; document.body.appendChild(d); d.click(); d.click(); d.remove(); }, [T[3], spare]);
+    await org.sync(); await org.pg.waitForTimeout(200);
+    check('unresolved: direct swap/drop actions preserve the team and BOTH saved attempts', JSON.stringify((await state()).tables.rounds.find(x => x.id === 'scr').groups) === unresolvedGroups && (await rows()) === unresolvedRows);
+
     // Recovery on b: it has now seen both rows; it picks B 4 and the other row is cleared with its own value.
     await b.hole(1); await b.set(4, B); await b.sync();
     check('7. picking one drive resolves the hole as one unit', (await rows()) === `${B}:4`, await rows());
@@ -79,7 +92,7 @@ async function phone(pid) {
     check('8. the other phone sees it resolved', !/Two drives saved/.test(await a.pg.locator('main').innerText()));
 
     // Change a player is locked once the scramble has scores, on the screen and in the action itself.
-    const org = await phone(A);
+    await org.sync();
     await org.pg.evaluate(() => { const x = window.__ncgs; x.UI.org = true; x.UI.orgUnlocked = true; x.ORGPIN.pin = '1234'; x.UI.orgStack = [{ v: 'home', p: {} }, { v: 'late', p: { rid: 'scr' } }]; x.render(); });
     await org.pg.waitForTimeout(150);
     check('9. the screen says the teams are fixed and offers no swap', /can.t be swapped or taken out of this scramble/.test(await org.pg.locator('main').innerText()) && !(await org.pg.locator('[data-act="late-replace"], [data-act="late-drop"]').count()));
