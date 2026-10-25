@@ -232,7 +232,7 @@ ORG.group = p => {
   const comp = computeR(p.rid);
   const gc = comp.groups.find(g => g.id === p.gid);
   const pids = gc.teams.flat();
-  const head = `<div class="orow"><span class="cap">Hole</span>${pids.map((pid, i) => `<span class="cap b ${i < 2 ? 'c-a' : 'c-b'}">${esc(D.nameOf(pid))}</span>`).join('')}</div>`;
+  const head = `<div class="orow"><span class="cap">Hole</span>${pids.map((pid, i) => `<span class="cap b ${i < 2 ? 'c-a' : 'c-b'}" title="${esc(D.nameOf(pid))}" aria-label="${esc(D.nameOf(pid))}">${esc(initialsOf(D.member(pid)) || D.nameOf(pid).slice(0, 2))}</span>`).join('')}</div>`;
   const rows = gc.order.map(n => `<button class="orow" data-act="org-go" data-v="correct" data-rid="${p.rid}" data-gid="${p.gid}" data-n="${n}" aria-label="Correct hole ${n}"><span class="b">${n}</span>${pids.map(pid => {
     const hp = comp.players[pid].holes[n];
     return `<span>${hp.gross === null ? '<span class="sub">–</span>' : `${hp.gross === 'P' ? '–' : hp.gross}<sup>${hp.points}</sup>`}</span>`;

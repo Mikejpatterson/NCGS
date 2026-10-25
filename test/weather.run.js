@@ -7,7 +7,9 @@ const fake = (date, code, rain, wind) => { const hours = { time: [], temperature
   const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true }); const pg = await ctx.newPage();
   const errs = []; pg.on('pageerror', e => errs.push(e.message));
   await pg.goto(URL); await pg.evaluate(() => localStorage.clear()); await pg.reload(); await pg.waitForSelector('.brand');
-  const date = await pg.evaluate(() => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const r = n.D.round('demo-cabopino'); n.put('rounds', [Object.assign({}, r, { date: n.todayIso() })]); return n.todayIso(); });
+  const date = await pg.evaluate(() => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const r = n.D.round('demo-cabopino'); n.put('rounds', [Object.assign({}, r, { date: n.todayIso() })]);
+    // The invented fixture course has no map position, and the forecast needs one (made-up point near Marbella).
+    const c = n.DB.server.tables.courses.find(x => x.id === r.course); n.put('courses', [Object.assign({}, c, { lat: 36.49, lon: -4.75 })]); return n.todayIso(); });
   await pg.waitForTimeout(400);
   const show = () => pg.evaluate(() => { const n = window.__ncgs; n.UI.rtab = 'weather'; n.UI.stack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'demo-cabopino' } }]; n.render(); return { skel: !!document.querySelector('.wx-skel'), card: !!document.querySelector('.wx:not(.wx-skel):not(.wx-fail)') }; });
   // 1. nothing remembered: a placeholder holds the space at once
