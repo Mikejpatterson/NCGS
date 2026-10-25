@@ -42,4 +42,3 @@ overflow or script errors. No real phone, sunlight or physical tablet pass is cl
   Home, seasons, scenarios, scramble and contest-order suites. No assertions were relaxed.
 - The local-only runtime adapter selects installed Chromium and loopback HTTP.
   Assertions are unchanged. No production endpoint or real seed is used.
-
