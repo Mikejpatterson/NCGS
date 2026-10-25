@@ -1990,9 +1990,10 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .scr-standings .scr-row .scr-name > b { color: var(--pine); font-size: 1.05rem; font-weight: 650; }
 .scr-standings .scr-row .scr-name small { display: inline-block; margin-left: 5px; font-size: .72rem; }
 .scr-standings .scr-row b.scr-pts { color: var(--pine); font-size: 1.45rem; font-weight: 650; line-height: 1.1; }
-.scr-standings .scr-row .scr-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; margin-top: 10px; }
-.scr-standings .scr-pd { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; }
-.scr-standings .scr-pd b { min-width: 0; color: var(--text); font-size: .78rem; font-weight: 500; letter-spacing: 0; overflow-wrap: anywhere; }
+.scr-standings .scr-row .scr-chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5rem), 1fr)); gap: 8px 16px; margin-top: 10px; }
+/* Long surnames: never split mid-word. The dots drop under the name when the name needs the room. */
+.scr-standings .scr-pd { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 6px; min-width: 0; }
+.scr-standings .scr-pd b { flex: 1 1 auto; min-width: 0; color: var(--text); font-size: .78rem; font-weight: 500; letter-spacing: 0; overflow-wrap: break-word; }
 .scr-standings .scr-dots { flex: none; gap: 3px; }
 .scr-standings .scr-dots i { width: 8px; height: 8px; }
 .scr-standings .scr-row.low { padding-left: 8px; padding-right: 8px; background: var(--lead-tint); }
