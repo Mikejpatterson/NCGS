@@ -1899,7 +1899,9 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .hero .seg.year button.on { background: #fff; color: var(--pine); font-weight: 700; }
 
 /* Scramble hole (Westport, owner brief §6): one team score, then whose drive. Big targets, readable outdoors. */
-.scr .scr-score { margin-top: 12px; padding: 14px 16px 12px; }
+.scr .scr-score { padding: 14px 16px 12px; }
+.scr .scr-team-head { display: flex; flex-direction: column; gap: 2px; margin: 14px 4px 0; }
+.scr .scr-team-head .sub { overflow-wrap: anywhere; }
 .scr .scr-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }
 .scr .scr-head .sub { overflow-wrap: anywhere; }
 .scr .scr-step { display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; align-items: center; gap: 10px; }
@@ -1922,3 +1924,12 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .scr-row .scr-team { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .scr-row .scr-team .sub { overflow-wrap: anywhere; }
 .scr-row .scr-note { font-size: .85rem; color: var(--team-b); font-weight: 600; }
+/* Drive chips on every scramble team (owner, 25 October). */
+.scr-chips { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 4px; }
+.scr-chip { display: inline-flex; align-items: baseline; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--fill); color: var(--text); font-size: .85rem; line-height: 1.35; white-space: nowrap; }
+.scr-chip b { font-weight: 700; font-variant-numeric: tabular-nums; }
+.scr-chip.ok { background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: var(--sub); }
+.scr-chip.warn { background: color-mix(in srgb, var(--team-b) 12%, #fff); color: var(--team-b); }
+.mini .scr-owed { font-size: .78rem; font-weight: 600; color: var(--sub); margin-left: 6px; white-space: nowrap; }
+.mini .scr-owed.warn { color: var(--team-b); }
+.scr-row .scr-thru { font-size: .85rem; color: var(--sub); font-weight: 500; }

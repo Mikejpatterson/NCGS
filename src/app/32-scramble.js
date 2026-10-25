@@ -24,6 +24,18 @@ function scrDraft(ctx, gc) {
   return byGroup[ctx.n];
 }
 
+/* Every player's drives so far, for any team (owner, 25 October: "awesome to know that a group in the lead might still
+   have yet to get 3 tee shots from their weakest player"). A tick once they've done the minimum; red when the team is
+   running out of holes for them. */
+function scrDriveChips(t) {
+  const tight = t.atRisk || t.impossible || t.failed;
+  return `<span class="scr-chips">${t.team.map(pid => {
+    const k = t.drives[pid] || 0, done = k >= t.minDrives;
+    return `<span class="scr-chip${done ? ' ok' : tight ? ' warn' : ''}" aria-label="${esc(D.nameOf(pid))}: ${plural(k, 'drive')}${done ? ', done' : ` of ${t.minDrives}`}">${esc(D.nameOf(pid))} <b class="num">${done ? `${k}\u2713` : `${k}/${t.minDrives}`}</b></span>`;
+  }).join('')}</span>`;
+}
+const scrOwed = t => t.team.reduce((s, pid) => s + Math.max(0, t.minDrives - (t.drives[pid] || 0)), 0);
+
 /* The team results, best first. The KBs are marked; there is no winners' presentation (owner: avoiding last place is
    the drama). Drives under the minimum and holes with two drives saved are shown plainly. */
 function scrambleTable(r, res) {
@@ -33,9 +45,10 @@ function scrambleTable(r, res) {
     const notes = [];
     if (t.doubles.length) notes.push(`Two drives saved on ${t.doubles.join(', ')}`);
     if (t.failed) notes.push(`Short of drives: ${t.short.map(D.nameOf).join(', ')}`);
-    else if (t.atRisk) notes.push(`Needs drives: ${t.short.map(pid => `${D.nameOf(pid)} ${t.minDrives - t.drives[pid]}`).join(', ')}`);
-    const thru = t.complete ? '' : t.played ? ` · thru ${t.played}` : ' · not started';
-    return `<div class="lrow scr-row${t.kb ? ' low' : ''}"><span class="sub">${esc(t.posLabel)}</span><span class="scr-team"><span class="b">${esc(t.name)}${t.kb ? ' <span class="pill w">KBs</span>' : ''}</span><span class="sub">${esc(scrNames(t))}${esc(thru)}</span>${notes.length ? `<span class="scr-note">${esc(notes.join(' · '))}</span>` : ''}</span><span class="b r num">${t.total}</span></div>`;
+    else if (t.impossible) notes.push(`Not enough holes left for everyone's drives: KBs once finished`);
+    else if (t.atRisk) notes.push(`Every drive from here has to come from someone short`);
+    const thru = t.complete ? 'Finished' : t.played ? `Thru ${t.played}` : 'Not started';
+    return `<div class="lrow scr-row${t.kb ? ' low' : ''}"><span class="sub">${esc(t.posLabel)}</span><span class="scr-team"><span class="b">${esc(t.name)}${t.kb ? ' <span class="pill w">KBs</span>' : ''}</span><span class="scr-thru">${esc(thru)}</span>${scrDriveChips(t)}${notes.length ? `<span class="scr-note">${esc(notes.join(' · '))}</span>` : ''}</span><span class="b r num">${t.total}</span></div>`;
   }).join('');
   return sec(label('Teams'), cardOf(rows) + `<p class="cap note">Team Stableford. Every player needs ${teams[0].minDrives} drives; a team that finishes short is KBs whatever its points.</p>`);
 }
@@ -70,18 +83,11 @@ VIEWS.scramble = () => {
   const clash = DB.conflicts.filter(c => c.round === rid && c.grp === gc.id && c.hole === n);
   if (clash.length && st.filled.length <= 1) html += `<div class="banner" style="margin-top:12px">Another phone saved ${clash.map(c => `${esc(D.nameOf(c.player))} ${fmtGross(c.server)}`).join(', ')}</div>`;
 
-  // The team score
-  const v = d.score;
-  const pts = E.isEntered(v) ? E.stablefordPoints(v, h.par, shots) : null;
-  html += `<section class="scr-score card" aria-label="Team score"><div class="scr-head"><span class="b">${esc(gc.name)}</span><span class="sub">${esc(scrNames(gc))}</span></div>
-    <div class="scr-step"><button class="scr-st" data-act="scr-score" data-dir="down" aria-label="One less for the team">−</button>
-    <button class="scr-val num" data-act="scr-clear" aria-label="Team score ${E.isEntered(v) ? (v === 'P' ? 'picked up' : v) : 'not set'}">${E.isEntered(v) ? (v === 'P' ? '–' : v) : `<small>Par ${h.par}</small>`}</button>
-    <button class="scr-st" data-act="scr-score" data-dir="up" aria-label="One more for the team">+</button></div>
-    <div class="scr-meta"><span class="sub">${shots ? `${plural(shots, 'shot')} here` : 'No shots here'}${pts !== null ? ` · ${pts} pts` : ''}</span><button class="link" data-act="scr-pickup">${v === 'P' ? 'Picked up' : 'Pick up'}</button></div></section>`;
-
-  // Whose drive
+  /* In the order it happens (owner, 25 October): whose drive is picked walking off the tee, the score added on holing out.
+     The drive choice is kept on this phone (it survives closing the app) until the score is saved with it. */
+  html += `<div class="scr-team-head"><span class="b">${esc(gc.name)}</span><span class="sub">${esc(scrNames(gc))}</span></div>`;
   const left = gc.left;
-  html += sec(label('Whose drive?'), `<div class="scr-drives" role="radiogroup" aria-label="Whose drive was used">${gc.team.map(pid => {
+  html += sec(label('Off the tee: whose drive?'), `<div class="scr-drives" role="radiogroup" aria-label="Whose drive was used">${gc.team.map(pid => {
     const on = d.driver === pid, k = gc.drives[pid] || 0;
     const need = Math.max(0, gc.minDrives - k);
     return `<button class="scr-drv${on ? ' on' : ''}${need && gc.atRisk ? ' need' : ''}" role="radio" aria-checked="${on}" data-act="scr-driver" data-pid="${pid}"><span class="av" aria-hidden="true">${esc(initialsOf(D.member(pid)))}</span><span class="scr-dn">${esc(D.nameOf(pid))}</span><span class="scr-dc">${scrDriveWord(k)}${need ? ` · needs ${need}` : ''}</span></button>`;
@@ -91,8 +97,17 @@ VIEWS.scramble = () => {
   if (gc.impossible) html += `<p class="scr-warn">${who} need ${owed} more drives with ${plural(left, 'hole')} left, so the team will be KBs.</p>`;
   else if (gc.atRisk) html += `<p class="scr-warn">${who} need ${owed} more drives with ${plural(left, 'hole')} left: every drive from here has to be theirs.</p>`;
 
+  // The team score, on holing out
+  const v = d.score;
+  const pts = E.isEntered(v) ? E.stablefordPoints(v, h.par, shots) : null;
+  html += sec(label('On the green: team score'), `<div class="scr-score card" aria-label="Team score">
+    <div class="scr-step"><button class="scr-st" data-act="scr-score" data-dir="down" aria-label="One less for the team">−</button>
+    <button class="scr-val num" data-act="scr-clear" aria-label="Team score ${E.isEntered(v) ? (v === 'P' ? 'picked up' : v) : 'not set'}">${E.isEntered(v) ? (v === 'P' ? '–' : v) : `<small>Par ${h.par}</small>`}</button>
+    <button class="scr-st" data-act="scr-score" data-dir="up" aria-label="One more for the team">+</button></div>
+    <div class="scr-meta"><span class="sub">${shots ? `${plural(shots, 'shot')} here` : 'No shots here'}${pts !== null ? ` · ${pts} pts` : ''}</span><button class="link" data-act="scr-pickup">${v === 'P' ? 'Picked up' : 'Pick up'}</button></div></div>`);
+
   const ready = E.isEntered(d.score) && d.driver;
-  const lbl = !ready ? (E.isEntered(d.score) ? 'Pick whose drive' : 'Set the team score') : ctx.mode === 'org' ? 'Save correction' : ctx.edit || gc.holes[n].complete ? 'Save changes' : `Save hole ${n}`;
+  const lbl = !ready ? (!d.driver ? 'Pick whose drive' : 'Add the score when you hole out') : ctx.mode === 'org' ? 'Save correction' : ctx.edit || gc.holes[n].complete ? 'Save changes' : `Save hole ${n}`;
   html += `<div class="savebar"><button class="btn ${ready ? '' : 'quiet'}" data-act="scr-save">${lbl}</button>${saveWarning()}</div></div>`;
   if (ctx.mode === 'player') html += holesSheet(rid, gc, n);
   if (ctx.mode === 'player' && !ctx.edit && !UI.holeSheet && !gc.holes[n].complete && r.status === 'live') html += contestIntro(rid, gc, n);
