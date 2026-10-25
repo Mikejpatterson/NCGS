@@ -33,7 +33,7 @@ function scrDriveChips(t) {
   const tight = t.atRisk || t.impossible || t.failed;
   return `<span class="scr-chips">${t.team.map(pid => {
     const k = t.drives[pid] || 0;
-    return `<span class="scr-pd" aria-label="${esc(D.nameOf(pid))}: ${plural(k, 'drive')}"><b>${esc(initialsOf(D.member(pid)))}</b>${scrDots(k, t.minDrives, tight && k < t.minDrives)}</span>`;
+    return `<span class="scr-pd" aria-label="${esc(D.nameOf(pid))}: ${plural(k, 'drive')}"><b>${esc(D.nameOf(pid))}</b>${scrDots(k, t.minDrives, tight && k < t.minDrives)}</span>`;
   }).join('')}</span>`;
 }
 const scrOwed = t => t.team.reduce((s, pid) => s + Math.max(0, t.minDrives - (t.drives[pid] || 0)), 0);
@@ -48,7 +48,7 @@ function scrambleTable(r, res) {
     const flag = t.doubles.length ? ` <span class="pill w" title="Two drives saved">Check ${t.doubles.join(', ')}</span>` : '';
     return `<div class="lrow scr-row${t.kb ? ' low' : ''}"><span class="sub scr-pos">${esc(t.posLabel)}</span><span class="scr-name"><b>${esc(t.name)}</b> <small>${esc(thru)}</small>${t.kb ? ' <span class="pill w">KBs</span>' : ''}${flag}</span><b class="scr-pts num">${t.total}</b>${scrDriveChips(t)}</div>`;
   }).join('');
-  return sec(label('Teams'), cardOf(rows));
+  return `<div class="scr-standings">${sec(label('Teams') + `<span class="scr-legend">Drives · ${teams[0].minDrives} each</span>`, cardOf(rows))}</div>`;
 }
 
 VIEWS.scramble = () => {
@@ -161,7 +161,7 @@ VIEWS.scrambleFinish = () => {
   if (!gc) return VIEWS.round({ rid });
   const t = s.standings.find(x => x.id === gc.id) || gc;
   const drives = gc.team.map(pid => `<div class="row"><span>${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${gc.drives[pid]}</span>${gc.drives[pid] < gc.minDrives ? '<span class="pill w">Short</span>' : ''}</span></div>`).join('');
-  const html = `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>${esc(gc.name.toUpperCase())}</small><b class="entn">${t.total}</b></div><div class="entr"><b>Finished</b><span>Team Stableford</span></div></div></header>
+  const html = `<div class="after scr-finish"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>${esc(gc.name.toUpperCase())}</small><b class="entn">${t.total}</b></div><div class="entr"><b>Finished</b><span>Team Stableford</span></div></div></header>
     ${gc.failed ? `<div class="banner warn" style="margin-top:12px">Not everyone has ${gc.minDrives} drives, so the team is KBs whatever its points.</div>` : ''}
     ${sec(label('Drives used'), cardOf(drives))}
     <button class="btn" data-act="leaderboard" data-rid="${rid}">See the teams</button></div>`;

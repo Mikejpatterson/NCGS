@@ -1961,3 +1961,38 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .scr-row b.scr-pts { font-size: 1.15rem; font-weight: 800; text-align: right; }
 .scr-row .scr-chips { margin-top: 4px; }
 .lrow.scr-row { height: auto; min-height: 0; row-gap: 2px; align-content: start; padding-top: 10px; padding-bottom: 10px; }
+/* Westport presentation: one decision at a time on the hole; named drive ledgers on Results.
+   Existing save actions, counts, warnings and radio semantics are unchanged. */
+.scr .entcard { margin-bottom: 22px; }
+.scr > .sec { margin-top: 20px; }
+.scr > .sec .sec-label, .scr-finish > .sec .sec-label { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.scr > .sec .sec-label::after, .scr-finish > .sec .sec-label::after { content: ""; height: 1px; flex: 1; background: var(--pine); opacity: .3; }
+.scr .scr-drives { gap: 8px; }
+.scr .scr-drv { min-height: 72px; padding: 13px 14px; row-gap: 9px; border-radius: 14px; background: transparent; box-shadow: inset 0 0 0 1px #BCCAC0; }
+.scr .scr-drv .scr-dn { font-size: 1rem; font-weight: 600; }
+.scr .scr-drv.on { background: var(--pine); box-shadow: inset 0 0 0 2px var(--pine); }
+.scr .scr-score { border-radius: 20px; padding: 16px; box-shadow: inset 0 0 0 1px var(--line); }
+.scr .scr-step { grid-template-columns: 60px minmax(0, 1fr) 60px; gap: 14px; }
+.scr .scr-st { width: 60px; height: 60px; border-radius: 50%; background: var(--fill); font-weight: 400; }
+.scr .scr-val { display: grid; place-items: center; text-align: center; min-height: 68px; font-size: 3rem; font-weight: 650; }
+.scr .scr-val small { color: var(--sub); font-weight: 500; font-size: 1.1rem; }
+.scr .scr-meta { margin-top: 4px; }
+.scr .scr-meta .sub { color: var(--pine); font-weight: 600; }
+.scr .scr-meta .link { font-weight: 500; }
+.scr .savebar { margin-top: 20px; }
+.scr .scr-warn { margin: 10px 0 0; font-size: .85rem; line-height: 1.45; font-weight: 600; }
+.scr-standings > .sec { margin-top: 25px; }
+.scr-standings .sec-label { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; padding-bottom: 9px; border-bottom: 2px solid var(--pine); }
+.scr-legend { color: var(--sub); font-size: .75rem; font-weight: 500; }
+.scr-standings .card { border-radius: 0; background: transparent; box-shadow: none; overflow: visible; }
+.scr-standings .lrow.scr-row { grid-template-columns: 1.5rem minmax(0, 1fr) auto; column-gap: 8px; padding: 14px 0 16px; border-bottom: 1px solid #CFD8CF; }
+.scr-standings .scr-row .scr-pos { padding-top: 2px; font-size: .85rem; }
+.scr-standings .scr-row .scr-name > b { color: var(--pine); font-size: 1.05rem; font-weight: 650; }
+.scr-standings .scr-row .scr-name small { display: inline-block; margin-left: 5px; font-size: .72rem; }
+.scr-standings .scr-row b.scr-pts { color: var(--pine); font-size: 1.45rem; font-weight: 650; line-height: 1.1; }
+.scr-standings .scr-row .scr-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; margin-top: 10px; }
+.scr-standings .scr-pd { display: flex; align-items: center; justify-content: space-between; gap: 6px; min-width: 0; }
+.scr-standings .scr-pd b { min-width: 0; color: var(--text); font-size: .78rem; font-weight: 500; letter-spacing: 0; overflow-wrap: anywhere; }
+.scr-standings .scr-dots { flex: none; gap: 3px; }
+.scr-standings .scr-dots i { width: 8px; height: 8px; }
+.scr-standings .scr-row.low { padding-left: 8px; padding-right: 8px; background: var(--lead-tint); }
