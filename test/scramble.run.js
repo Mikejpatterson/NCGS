@@ -33,7 +33,7 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
     // Off the tee: pick the drive first; it stays on this phone (even after closing the app) until the score goes in.
     const next = await page.evaluate(() => window.__ncgs.UI.hole);
     await page.click('[data-act="scr-driver"] >> nth=1'); await page.waitForTimeout(100);
-    check('picking the drive first asks for the score on holing out', /Add the score when you hole out/.test(await page.locator('[data-act="scr-save"]').innerText()));
+    check('with only the drive picked, Save waits for the score', await page.locator('[data-act="scr-save"]').evaluate(b => b.classList.contains('quiet')));
     await page.reload(); await page.waitForFunction(() => window.__ncgs && window.__ncgs.D.round('fx-wp2'));
     await go([{ v: 'home', p: {} }, { v: 'tee', p: { rid: 'fx-wp2' } }]);
     check('the drive picked on the tee is still there after reopening the app', await page.evaluate(n => window.__ncgs.UI.hole === n, next) && (await page.locator('[data-act="scr-driver"][aria-checked="true"]').count()) === 1);
@@ -43,11 +43,11 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
       n.DB.server.tables.scores.push({ round: 'fx-wp2', player: t[2], hole: 3, strokes: 6, by: 'Other phone', at: '2026-01-01T00:00:00Z' }); });
     await go([{ v: 'home', p: {} }, { v: 'entry', p: { rid: 'fx-wp2' } }]);
     await page.evaluate(() => { const n = window.__ncgs; n.UI.hole = 3; n.UI.edit = true; n.render(); });
-    check('a hole with two drives says so and counts for nothing', /Two drives saved for this hole/.test(await text()) && await page.evaluate(() => window.__ncgs.D.round && (function () { const n = window.__ncgs; n.DB._memo = {}; return true; })()));
+    check('a hole with two drives says so and counts for nothing', /Two drives saved/.test(await text()) && await page.evaluate(() => window.__ncgs.D.round && (function () { const n = window.__ncgs; n.DB._memo = {}; return true; })()));
     const res = await page.evaluate(() => { const n = window.__ncgs; n.DB._view = null; n.DB._memo = {}; n.UI.board = 'fx-wp2'; n.UI.res = 'lb'; n.UI.stack = [{ v: 'home', p: {} }, { v: 'board', p: {} }]; n.render(); return document.querySelector('main').innerText; });
-    check('the teams table flags it', /Two drives saved on 3/.test(res));
+    check('the teams table flags it', /Check 3/.test(res));
     check('nobody is KBs while teams are still playing', await page.evaluate(() => ![...document.querySelectorAll('.scr-row .pill')].some(e => /KBs/.test(e.textContent))));
-    check('every team shows each player\'s drives', await page.evaluate(() => [...document.querySelectorAll('.scr-row')].every(r => r.querySelectorAll('.scr-chip').length === 4)));
+    check('every team shows each player\'s drives', await page.evaluate(() => [...document.querySelectorAll('.scr-row')].every(r => r.querySelectorAll('.scr-pd').length === 4)));
 
     // Team strokes are never anyone's own round.
     const personal = await page.evaluate(() => { const n = window.__ncgs, r = n.D.round('fx-wp2'), pid = r.groups[0].teams[0][0];

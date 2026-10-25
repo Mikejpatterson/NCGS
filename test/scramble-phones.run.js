@@ -70,7 +70,7 @@ async function phone(pid) {
     check('5. the stale phone is told another phone changed it', await b.pg.evaluate(() => window.__ncgs.DB.conflicts.some(x => x.round === 'scr' && x.hole === 1)));
     await a.sync();
     await a.hole(1);
-    check('6. the other phone sees the hole as two drives, not counted', /Two drives saved for this hole/.test(await a.pg.locator('main').innerText())
+    check('6. the other phone sees the hole as two drives, not counted', /Two drives saved/.test(await a.pg.locator('main').innerText())
       && await a.pg.evaluate(() => { const x = window.__ncgs; x.DB._memo = {}; return x.D.round('scr') && true; }));
     // Recovery on b: it has now seen both rows; it picks B 4 and the other row is cleared with its own value.
     await b.hole(1); await b.set(4, B); await b.sync();

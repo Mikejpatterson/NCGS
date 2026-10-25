@@ -1933,3 +1933,31 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .mini .scr-owed { font-size: .78rem; font-weight: 600; color: var(--sub); margin-left: 6px; white-space: nowrap; }
 .mini .scr-owed.warn { color: var(--team-b); }
 .scr-row .scr-thru { font-size: .85rem; color: var(--sub); font-weight: 500; }
+
+/* Scramble, simplified (owner, 25 October: fewer words). Drives as dots; one-word headings. */
+.scr-dots { display: inline-flex; gap: 4px; align-items: center; }
+.scr-dots i { width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--line-strong, #B9C4BD); }
+.scr-dots i.on { background: var(--pine); box-shadow: none; }
+.scr-dots.warn i:not(.on) { box-shadow: inset 0 0 0 1.5px var(--team-b); }
+.scr .scr-drv { grid-template-columns: minmax(0, 1fr); grid-template-areas: "nm" "dc"; row-gap: 6px; min-height: 64px; }
+.scr .scr-drv .scr-dots { grid-area: dc; }
+.scr .scr-drv.on .scr-dots i { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.6); }
+.scr .scr-drv.on .scr-dots i.on { background: #fff; box-shadow: none; }
+.scr .scr-warn { margin: 8px 4px 0; font-size: .95rem; }
+.scr-row .scr-chips { gap: 4px 12px; margin-top: 6px; }
+.scr-pd { display: inline-flex; align-items: center; gap: 5px; font-size: .8rem; }
+.scr-pd b { font-weight: 700; color: var(--sub); letter-spacing: .02em; }
+.scr-row .scr-pts { display: flex; flex-direction: column; align-items: flex-end; margin-left: auto; }
+.scr-row .scr-pts b { font-size: 1.15rem; font-weight: 800; }
+.scr-row .scr-pts small { font-size: .78rem; color: var(--sub); }
+
+.lrow.scr-row { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; grid-template-areas: "pos name pts" ". chips chips"; align-items: start; column-gap: 8px; }
+.scr-row .scr-pos { grid-area: pos; }
+.scr-row .scr-name { grid-area: name; min-width: 0; }
+.scr-row .scr-pts { grid-area: pts; }
+.scr-row .scr-chips { grid-area: chips; display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; }
+
+.scr-row .scr-name small { font-size: .8rem; color: var(--sub); font-weight: 500; }
+.scr-row b.scr-pts { font-size: 1.15rem; font-weight: 800; text-align: right; }
+.scr-row .scr-chips { margin-top: 4px; }
+.lrow.scr-row { height: auto; min-height: 0; row-gap: 2px; align-content: start; padding-top: 10px; padding-bottom: 10px; }

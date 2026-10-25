@@ -52,8 +52,7 @@ function miniBoard(r) {
     let show = teams.slice(0, 3);
     const mine = g ? teams.find(t => t.id === g.id) : null;
     if (mine && !show.includes(mine)) show = [show[0], show[1], mine];
-    return `<div class="mini num">${show.map(t => { const owed = scrOwed(t);
-      return `<div class="mr${mine === t ? ' me' : ''}"><span class="mp">${esc(t.posLabel)}</span><span class="mn">${esc(t.name)}${owed ? ` <span class="scr-owed${t.atRisk || t.impossible ? ' warn' : ''}">${owed} ${owed === 1 ? 'drive' : 'drives'} owed</span>` : ''}</span><span class="mt">${t.total}</span></div>`; }).join('')}</div>`;
+    return `<div class="mini num">${show.map(t => `<div class="mr${mine === t ? ' me' : ''}"><span class="mp">${esc(t.posLabel)}</span><span class="mn">${esc(t.name)}</span><span class="mt">${t.total}</span></div>`).join('')}</div>`;
   }
   const rows = res && res.rows ? res.rows : [];
   if (!rows.length) return '';
