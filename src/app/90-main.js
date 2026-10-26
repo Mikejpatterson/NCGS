@@ -231,20 +231,27 @@ const ACT = {
     d.repeats = E.repeatedPartners([...priorTripGroups(D.round(d.rid)), { rid: d.rid, groups: d.groups }]).filter(x => x.rounds.includes(d.rid));
     render();
   },
+  'org-team-move': el => {
+    const d = UI.draft, gi = Number(el.dataset.gi);
+    if (d.selTeam === undefined || d.selTeam === null) { d.selTeam = gi; render(); return; }
+    if (d.selTeam !== gi) { const g = d.groups; [g[d.selTeam], g[gi]] = [g[gi], g[d.selTeam]]; }
+    d.selTeam = null; render();
+  },
   'org-save-groups': () => {
     const r = D.round(cur().p.rid);
     const d = draftFor(r);
     const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
     const allOff = E.kbOff(r);   // KBs switched off for the whole round stays off if the groups are redrawn
-    const groups = d.groups.map((g, i) => Object.assign({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }, allOff ? { noKb: true } : {}));
+    // g.draw (the breakfast draw's mark) is kept: swapping tee times or players doesn't undo the draw.
+    const groups = d.groups.map((g, i) => Object.assign({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }, allOff ? { noKb: true } : {}, g.draw ? { draw: g.draw } : {}));
     const ids = new Set(groups.flatMap(g => g.teams.flat()));
     const kg = E.kbGroups(Object.assign({}, r, { groups }));
     let kb = E.kbValid(kg, r.kb) ? r.kb : null;
-    if (!kb && kg.length > 1) { const res = E.kbPairsFor(kg, (Date.now() % 100000) + 3, priorKbPairs(r.id)); kb = res.pairs.length ? res.pairs : null; }   // every drawn round gets KB pairs, no repeat partners
+    if (!kb && kg.length > 1 && !isScramble(r)) { const res = E.kbPairsFor(kg, (Date.now() % 100000) + 3, priorKbPairs(r.id)); kb = res.pairs.length ? res.pairs : null; }   // every drawn round gets KB pairs, no repeat partners
     put('rounds', [Object.assign({}, r, { groups, kb })], { action: 'Groups saved', detail: `${roundName(r)}: ${groups.map(g => `${g.teeTime} ${g.teams.map(t => t.map(D.nameOf).join(' & ')).join(' v ')}`).join('; ')}` });
     UI.draft = null;
     back();
-    toast('Groups and KB pairs saved');
+    toast(isScramble(r) ? 'Groups saved' : 'Groups and KB pairs saved');
   },
   'org-kb-make': () => { const r = D.round(cur().p.rid); const res = E.kbPairsFor(E.kbGroups(r), (Date.now() % 100000) + 3, priorKbPairs(r.id)); UI.kbDraft = { rid: r.id, pairs: res.pairs, sel: null }; render(); },
   'org-kb-swap': el => {

@@ -189,6 +189,19 @@ ORG.playing = p => {
     return { html };
   }
   const sel = d.sel;
+  // A scramble: each group is one team of four. Tap two teams to swap their tee times (someone running late);
+  // tap two names to swap players. The breakfast draw's teams aren't thrown away by "Draw again" here.
+  if (isScramble(r)) {
+    const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
+    html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups</h1></div><p class="sub">Tap two teams to swap tee times. Tap two names to swap players.</p></header>`;
+    d.groups.forEach((g, gi) => {
+      html += `<section class="sec near"><button class="row tall org-team${d.selTeam === gi ? ' picked' : ''}" data-act="org-team-move" data-gi="${gi}" aria-pressed="${d.selTeam === gi}"><span class="two"><b>${esc(times[gi] || '')}</b><span class="sub">Team ${gi + 1}</span></span>${d.selTeam === gi ? '<span class="pill g">Tap another team</span>' : ''}</button>`
+        + cardOf(g.teams.flat().map(pid => `<button class="row${sel === pid ? ' picked' : ''}" data-act="org-swap" data-pid="${pid}"><span>${esc(D.nameOf(pid))}</span></button>`).join('')) + '</section>';
+    });
+    html += `<button class="btn" data-act="org-save-groups">Save groups</button>`;
+    if (!drawMade(r)) html += `<div class="foot"><button class="link" data-act="org-draw" data-kind="again">Draw again</button><button class="link" data-act="org-draw" data-kind="players">Change players</button></div>`;
+    return { html };
+  }
   html = html.replace('</header>', `<p class="sub head-sub">${plural(d.ids.length, 'player')} · first tee ${esc(r.first_tee || 'not set')}</p></header>`);
   if (d.repeats.length) html += `<div class="banner note">${d.repeats.map(x => `${esc(x.pair.map(D.nameOf).join(' & '))} shared a buggy before`).join('<br>')}</div>`;
   const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
@@ -205,7 +218,7 @@ ORG.playing = p => {
 };
 ORG.groupsview = p => {
   const r = D.round(p.rid);
-  return { html: `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups and buggies</h1></div></header>${groupsBlock(r, false)}` };
+  return { html: `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">${isScramble(r) ? 'Groups' : 'Groups and buggies'}</h1></div></header>${groupsBlock(r, false)}` };
 };
 
 /* Every KB pair from the other rounds (rounds scored in the app, and imported ones), so a new draw can avoid repeat partners */

@@ -49,10 +49,10 @@
         var r1 = finals(seed)[0], y = r1.season;
         // Sixteen golfers: the twelve regulars plus four more invented ones.
         seed.members = seed.members.concat([
-          { id: 'fx-p13', name: 'Malachy', full: 'Malachy Fixture', index: 18.4, active: true },
-          { id: 'fx-p14', name: 'Niall', full: 'Niall Fixture', index: 9.6, active: true },
-          { id: 'fx-p15', name: 'Oisín', full: 'Oisín Fixture', index: 23.1, active: true },
-          { id: 'fx-p16', name: 'Pádraig', full: 'Pádraig Fixture', index: 27.9, active: true }]);
+          { id: 'fx-p13', name: 'Malachy', full: 'Malachy Fagan', index: 18.4, active: true },
+          { id: 'fx-p14', name: 'Niall', full: 'Niall Fay', index: 9.6, active: true },
+          { id: 'fx-p15', name: 'Oisín', full: 'Oisín Fennell', index: 23.1, active: true },
+          { id: 'fx-p16', name: 'Pádraig', full: 'Pádraig Fox', index: 27.9, active: true }]);
         var players = seed.members.filter(function (m) { return m.id.indexOf('guest') !== 0; }).sort(function (a, b) { return a.index - b.index; }).map(function (m) { return m.id; });
         players.splice(players.indexOf(ME), 1); players.unshift(ME);   // you lead pot A, so you're in Team 1
         // Pots A to D by handicap; each team takes one from each pot.
@@ -83,10 +83,10 @@
       make: function (seed) {
         var r1 = finals(seed)[0], y = r1.season;
         seed.members = seed.members.concat([
-          { id: 'fx-p13', name: 'Malachy', full: 'Malachy Fixture', index: 18.4, active: true },
-          { id: 'fx-p14', name: 'Niall', full: 'Niall Fixture', index: 9.6, active: true },
-          { id: 'fx-p15', name: 'Oisín', full: 'Oisín Fixture', index: 23.1, active: true },
-          { id: 'fx-p16', name: 'Pádraig', full: 'Pádraig Fixture', index: 27.9, active: true }]);
+          { id: 'fx-p13', name: 'Malachy', full: 'Malachy Fagan', index: 18.4, active: true },
+          { id: 'fx-p14', name: 'Niall', full: 'Niall Fay', index: 9.6, active: true },
+          { id: 'fx-p15', name: 'Oisín', full: 'Oisín Fennell', index: 23.1, active: true },
+          { id: 'fx-p16', name: 'Pádraig', full: 'Pádraig Fox', index: 27.9, active: true }]);
         var players = seed.members.filter(function (m) { return m.id.indexOf('guest') !== 0; }).sort(function (a, b) { return a.index - b.index; }).map(function (m) { return m.id; });
         var pots = [0, 1, 2, 3].map(function (k) { return players.slice(k * 4, k * 4 + 4); });
         var day1 = Object.assign(clone(r1), { id: 'fx-wp1', name: 'Ballinrobe', trip: 'Westport', trip_day: 1, date: day(-1), season: y });

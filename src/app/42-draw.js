@@ -91,7 +91,7 @@ function stageCell(d, team, p, spin) {
     const pool = d.pots[p].filter(pid => pid === s.pid || d.st.left[p].includes(pid));
     return `<div class="drw-cell spin" data-act="draw-skip">${head}${wheelSvg(pool, s.pid, spin, spinning)}</div>`;
   }
-  if (s.pid) { const m = D.member(s.pid) || {}; const full = m.full && m.full !== m.name ? m.full : ''; return `<div class="drw-cell got">${head}<b class="drw-name" style="--len:${Math.max(6, shortName(s.pid).length)}">${esc(shortName(s.pid))}</b>${full ? `<span class="drw-full">${esc(full)}</span>` : ''}</div>`; }
+  if (s.pid) return `<div class="drw-cell got">${head}<b class="drw-name" style="--len:${Math.max(6, shortName(s.pid).length)}">${esc(shortName(s.pid))}</b></div>`;
   if (!d.st.left[p].length) return `<div class="drw-cell">${head}<b class="drw-none">No one left in pot ${DR.potName(p)}</b></div>`;
   return `<div class="drw-cell wait">${head}${wheelSvg(d.st.left[p], null, null, 0)}</div>`;
 }
@@ -166,16 +166,21 @@ ORG.draw = p => {
 };
 
 /* After the draw: everyone, names first, team numbers as quiet labels. Then the groups. */
-function drawLineup(d) {
-  return `<div class="drw-lineup">${d.st.teams.map(tm => `<section class="drw-lt"><span class="drw-ln">Team ${tm.n}</span><ul>${tm.slots.map(s => `<li>${s.pid ? esc(shortName(s.pid)) : `<span class="sub">${s.conflict ? 'Two devices drew here' : `No one from pot ${DR.potName(s.p)}`}</span>`}</li>`).join('')}</ul></section>`).join('')}</div>`;
+/* The line-up: a pine card, names first. Once the groups are made it shows the saved groups (with tee times), so a later
+   tee-time swap shows here too; before that, the drawn teams. */
+function drawLineup(d, r) {
+  const teams = r && drawMade(r)
+    ? r.groups.map(g => ({ label: `${g.teeTime ? esc(g.teeTime) + ' · ' : ''}Team ${g.n}`, names: g.teams.flat().map(pid => esc(shortName(pid))) }))
+    : d.st.teams.map(tm => ({ label: `Team ${tm.n}`, names: tm.slots.map(s => s.pid ? esc(shortName(s.pid)) : `<span class="drw-gap">${s.conflict ? 'Two devices drew here' : `No one from pot ${DR.potName(s.p)}`}</span>`) }));
+  return `<div class="drw-lineup">${teams.map(t => `<section class="drw-lt"><span class="drw-ln">${t.label}</span><ul>${t.names.map(n => `<li>${n}</li>`).join('')}</ul></section>`).join('')}</div>`;
 }
 ORG.drawlineup = p => {
   const r = D.round(p.rid), d = drawOf(p.rid);
   const why = DR.blockers(d.st, { pending: d.pending, shortOk: d.shortOk });
   const scored = hasScores(r.id);
-  let html = `<header class="hero s">${navBack('Breakfast draw')}<div class="head"><h1 class="title">Line-up</h1></div><p class="sub">${esc(roundName(r))}</p></header>${drawBanner(d)}${drawLineup(d)}`;
+  let html = `<header class="hero s">${navBack('Breakfast draw')}<div class="head"><h1 class="title">${d.made ? 'The groups' : 'Line-up'}</h1></div><p class="sub">${esc(roundName(r))}</p></header>${drawBanner(d)}${drawLineup(d, r)}`;
   if (d.st.short.length) html += sec(label('Short teams'), cardOf(d.st.short.map(n => `<button class="row tall" data-act="draw-short" data-rid="${r.id}" data-n="${n}"><span class="two"><span>Team ${n} plays short</span><span class="sub">Tick once the committee has agreed how</span></span><span class="pill ${d.shortOk.includes(n) ? 'g' : 'n'}">${d.shortOk.includes(n) ? 'Agreed' : 'Not yet'}</span></button>`).join('')), true);
-  if (d.made) html += '<div class="banner note">These teams are the groups for the round.</div>';
+  if (d.made) { /* the title says it */ }
   else if (scored) html += '<div class="banner note">Scores are in, so the groups can\'t change now.</div>';
   else if (why.length) html += why.filter(w => !/not saved to the server/.test(w) || !d.mine).map(w => `<p class="cap note">${esc(w)}</p>`).join('') + (d.pending ? '<p class="cap note">Saving to the server…</p>' : '');
   else if (!d.mine) html += '<p class="cap note">The device running the draw saves these as the groups.</p>';
@@ -188,7 +193,7 @@ ORG.drawlineup = p => {
 /* Members: the pots before the draw, then the teams as they are drawn (names first). */
 function drawMemberView(r) {
   const d = drawOf(r.id);
-  if (d.st.started) return `<p class="cap" style="margin:4px 4px 10px">${d.made ? 'The draw is done.' : d.st.current > -1 ? `Drawing team ${d.st.current + 1}…` : 'All teams drawn.'}</p>${drawLineup(d)}`;
+  if (d.st.started) return `<p class="cap" style="margin:4px 4px 10px">${d.made ? 'The draw is done.' : d.st.current > -1 ? `Drawing team ${d.st.current + 1}…` : 'All teams drawn.'}</p>${drawLineup(d, r)}`;
   return `<div class="drw-potlist">${d.pots.map((x, i) => x.length ? `<section class="card drw-mpot"><div class="drw-mh">Pot ${DR.potName(i)}</div>${x.map(pid => `<div class="row"><span>${esc(D.nameOf(pid))}</span></div>`).join('')}</section>` : '').join('')}</div>`;
 }
 /* Once the draw has made the groups, members just see Groups (owner, 26 October). */
