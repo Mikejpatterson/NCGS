@@ -30,7 +30,7 @@ const ACT = {
   leaderboard: el => { UI.playRid = el.dataset.rid; UI.board = el.dataset.rid; UI.res = 'lb'; go('board', { rid: el.dataset.rid }); },
   'wx-retry': el => { delete UI.wx[el.dataset.cid]; render(); },
   trip: el => go('trip', { rid: el.dataset.rid }),
-  rtab: el => { UI.rtab = el.dataset.t; render(); },
+  rtab: el => { UI.rtab = el.dataset.t; UI.rtabPicked = true; render(); },
   bwseg: el => { UI.open[el.dataset.key] = el.dataset.open !== '1'; render(); },
   respill: el => { UI.res = el.dataset.p; UI.scrollTop = true; render(); },
   toggle: el => { UI.open[el.dataset.key] = !UI.open[el.dataset.key]; render(); },
@@ -362,6 +362,7 @@ const ACT = {
     }).catch(() => toast('Needs signal to restore'));
   }
 };
+Object.assign(ACT, DRAW_ACT);
 
 const FORMS = {
   ask: () => { const i = document.getElementById('askin'); askQuestion(i ? i.value : UI.askDraft); },
@@ -673,7 +674,7 @@ window.addEventListener('online', () => { flush(); sync(); });
 /* Fresh data every 15 seconds while a round is live, every minute otherwise. */
 setInterval(() => {
   if (document.hidden) return;
-  const every = liveRid() ? 15000 : 60000;
+  const every = liveRid() ? 15000 : drawLive() ? 8000 : 60000;
   if (Date.now() - DB.lastSync >= every) sync();
   if (DB.outbox.length && DB.online) flush();
 }, 5000);

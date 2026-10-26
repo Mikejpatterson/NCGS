@@ -13,7 +13,8 @@ const EXPECT = {
   eventday: { has: ['.home-announcement'], text: /Today[\s\S]*Autumn outing/ },
   preseason: { has: ['.home-season-intro'], text: new RegExp(`${year + 1}[\\s\\S]*A fresh scorecard`), not: /Athenry/ },
   'preseason-announced': { has: ['.home-announcement'], text: new RegExp(`The ${year + 1} season[\\s\\S]*Athenry`, 'i') },
-  westport: { has: ['.home-live-ticket'], text: /Westport[\s\S]*Continue/ }
+  westport: { has: ['.home-live-ticket'], text: /Westport[\s\S]*Continue/ },
+  draw: { has: ['.home-announcement'], text: /Today[\s\S]*Westport/ }
 };
 (async () => {
   const browser = await chromium.launch();

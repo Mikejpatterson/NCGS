@@ -210,4 +210,9 @@ const titleCheck = ({ sel, want, max }) => {
     [...process.execArgv, require('path').join(__dirname, 'contest-order.run.js')], { stdio: 'inherit', env: subEnv });
   if (co.error) console.error(co.error);
   if (co.status !== 0) process.exit(co.status || 1);
+  // The breakfast draw (owner brief §7; Codex's review, 26 October): members' pots, the stage, short pots, every size.
+  const dr = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'draw.run.js')], { stdio: 'inherit', env: subEnv });
+  if (dr.error) console.error(dr.error);
+  if (dr.status !== 0) process.exit(dr.status || 1);
 })();

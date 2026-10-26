@@ -78,6 +78,24 @@
         seed.settings = [{ key: 'format:fx-wp2', value: 'scramble' }, { key: 'teamshots:fx-wp2', value: JSON.stringify({ g1: 0, g2: 2, g3: 0, g4: 3 }) },
           { key: 'tripboard:' + y + ':Westport', value: 'off' }];
         return { seed: seed };
+      } },
+    { id: 'draw', title: 'Westport trip: breakfast draw', note: 'Saturday breakfast before the scramble. The pots are set and members can see them; the organiser draws the four teams.',
+      make: function (seed) {
+        var r1 = finals(seed)[0], y = r1.season;
+        seed.members = seed.members.concat([
+          { id: 'fx-p13', name: 'Malachy', full: 'Malachy Fixture', index: 18.4, active: true },
+          { id: 'fx-p14', name: 'Niall', full: 'Niall Fixture', index: 9.6, active: true },
+          { id: 'fx-p15', name: 'Oisín', full: 'Oisín Fixture', index: 23.1, active: true },
+          { id: 'fx-p16', name: 'Pádraig', full: 'Pádraig Fixture', index: 27.9, active: true }]);
+        var players = seed.members.filter(function (m) { return m.id.indexOf('guest') !== 0; }).sort(function (a, b) { return a.index - b.index; }).map(function (m) { return m.id; });
+        var pots = [0, 1, 2, 3].map(function (k) { return players.slice(k * 4, k * 4 + 4); });
+        var day1 = Object.assign(clone(r1), { id: 'fx-wp1', name: 'Ballinrobe', trip: 'Westport', trip_day: 1, date: day(-1), season: y });
+        var day2 = Object.assign(clone(r1), { id: 'fx-wp2', name: 'Westport', trip: 'Westport', trip_day: 2, date: day(0), season: y, status: 'upcoming', first_tee: '10:00', interval: 10, groups: [], kb: null, ph: null, results: null, contests: [{ type: 'ntp', hole: 7 }, { type: 'ld', hole: 12 }] });
+        seed.rounds = finals(seed).filter(function (r) { return r.trip !== 'Westport'; }).concat([day1, day2]);
+        seed.scores = seed.scores.concat(seed.scores.filter(function (x) { return x.round === r1.id; }).map(function (x) { return Object.assign({}, x, { round: 'fx-wp1' }); }));
+        seed.settings = [{ key: 'format:fx-wp2', value: 'scramble' }, { key: 'tripboard:' + y + ':Westport', value: 'off' },
+          { key: 'pots:fx-wp2', value: JSON.stringify({ pots: pots, show: true }) }];
+        return { seed: seed };
       } }
   ];
   var find = function (id) { for (var i = 0; i < LIST.length; i++) if (LIST[i].id === id && !LIST[i].soon) return LIST[i]; return null; };

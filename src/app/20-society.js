@@ -537,12 +537,15 @@ VIEWS.round = p => {
     <h1 class="rp-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
   if (playable && me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
 
-  const tabsAvail = ['players', 'groups', 'kb', 'weather', 'course'];
-  const rt = tabsAvail.includes(UI.rtab) ? UI.rtab : 'players';
-  const tabName = { players: 'Players', groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
+  // Breakfast draw: the pots (then the draw) come first; a scramble has no KB pairs, so no KBs tab.
+  const potsTab = drawTabOn(r);
+  const tabsAvail = (potsTab ? ['pots'] : []).concat(['players', 'groups'], isScramble(r) ? [] : ['kb'], ['weather', 'course']);
+  const rt = potsTab && UI.rtab === 'players' && !UI.rtabPicked ? 'pots' : tabsAvail.includes(UI.rtab) ? UI.rtab : tabsAvail[0];
+  const tabName = { pots: drawOf(r.id).st.started ? 'Draw' : 'Pots', players: 'Players', groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
   html += `<div class="seg pills rtabs" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${tabName[k]}</button>`).join('')}</div>`;
   const quiet = t => cardOf(`<div class="row"><span class="sub">${t}</span></div>`);
-  if (rt === 'players') html += roundPlayers(r);
+  if (rt === 'pots') html += drawMemberView(r);
+  else if (rt === 'players') html += roundPlayers(r);
   else if (rt === 'groups') html += roundGroups(r);
   else if (rt === 'kb') html += r.kb && r.kb.length ? `<div class="card rp-kbs">${r.kb.map(pr => `<span class="pk${pr.includes(me) ? ' me' : ''}">${pairNames(pr)}</span>`).join('')}</div>` : quiet(E.kbOff(r) ? 'No KBs in this round' : 'KB pairs are not drawn yet');
   else if (rt === 'weather') html += forecast(r, true) || quiet(r.date ? 'The forecast appears in the 9 days before the round.' : 'The forecast appears once the round has a date.');
