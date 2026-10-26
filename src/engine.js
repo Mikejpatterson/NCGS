@@ -581,6 +581,48 @@
   /** Golfer of the Year: best N scores count. Ties compare the counting scores best to worst,
    *  then the next best scores in turn. Only identical full records stay tied.
    *  results: [{ rid, scores: { pid: points } }]. */
+  /* Scramble (Westport day two, owner brief §6): four players, one team score per hole. The team's strokes are saved in
+     the scores row of the player whose drive was used, so one row per hole records both. Team shots are the organiser's
+     manual allowance (normally 0). Each player must have at least `minDrives` drives used (normally 3). */
+  function scrambleTeam(team, holes, strokesOf, teamShots, minDrives) {
+    const min = minDrives === undefined ? 3 : minDrives;
+    const ph = Number(teamShots) || 0;
+    const per = {}, drives = {}, doubles = [];
+    team.forEach(p => { drives[p] = 0; });
+    holes.forEach(h => {
+      const shots = shotsOnHole(ph, h.si);
+      const filled = team.filter(p => isEntered(strokesOf(p, h.n)));
+      if (filled.length > 1) doubles.push(h.n);   // two drives recorded (two phones at once): shown, never guessed
+      if (filled.length !== 1) { per[h.n] = { gross: null, driver: null, shots, points: null }; return; }
+      const d = filled[0], gross = strokesOf(d, h.n);
+      drives[d]++;
+      per[h.n] = { gross, driver: d, shots, points: stablefordPoints(gross, h.par, shots) };
+    });
+    const played = holes.filter(h => per[h.n].points !== null).length;
+    const total = holes.reduce((t, h) => t + (per[h.n].points || 0), 0);
+    const left = holes.length - played;
+    const short = team.filter(p => drives[p] < min);
+    const needed = team.reduce((t, p) => t + Math.max(0, min - drives[p]), 0);
+    const complete = played === holes.length && !doubles.length;
+    return { holes: per, total, played, left, complete, drives, doubles, short, minDrives: min,
+      failed: complete && short.length > 0,            // the golden rule: finished without everyone's drives
+      atRisk: !complete && needed > 0 && needed >= left,   // every remaining hole now has to go to someone short
+      impossible: !complete && needed > left };            // can't be done any more: the team will be KBs
+  }
+
+  /* Scramble teams ranked by Stableford with the normal countback. Once every team has finished, the KBs are any team
+     that finished without every player's minimum drives (automatic, whatever its points); otherwise the bottom team,
+     with anyone level. */
+  function scrambleStandings(teams) {
+    const ranked = rankByKey(teams.map(t => Object.assign({}, t, { key: countbackKey(Object.fromEntries(Object.entries(t.holes).map(([n, h]) => [n, h.points]))) })));
+    // Decided only once every team has finished: during play nobody is labelled KBs.
+    const done = ranked.length > 1 && ranked.every(t => t.complete);
+    const failed = ranked.filter(t => t.failed);
+    const last = ranked.length ? ranked[ranked.length - 1] : null;
+    const kbs = !done ? [] : failed.length ? failed : ranked.filter(t => t.pos === last.pos);
+    return ranked.map(t => Object.assign(t, { kb: kbs.includes(t) }));
+  }
+
   function goyStandings(members, results, bestN) {
     const n = bestN || 3;
     const rows = [];
@@ -741,7 +783,7 @@
   }
 
   return {
-    NOBODY, contestStatus, claimsInPlayOrder, SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
+    NOBODY, contestStatus, claimsInPlayOrder, scrambleTeam, scrambleStandings, SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,

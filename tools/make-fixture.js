@@ -14,8 +14,11 @@ const NAMES = {
   'mike-f': 'Ivor', derek: 'Jarlath', brian: 'Kevin', kieran: 'Lorcan'
 };
 const ids = Object.keys(NAMES);
-const members = ids.map((id, i) => ({ id, name: NAMES[id], full: NAMES[id] + ' Fixture', index: +(12 + i * 1.5).toFixed(1), active: true }));
-members.push({ id: 'guest-x', name: 'Ultan', full: 'Ultan Fixture', index: 18.4, active: false });
+// Invented surnames (all starting with F, so the initials badges read AF, BF, ...).
+const SURNAMES = { 'john-w': 'Fahy', 'john-k': 'Flood', colin: 'Furlong', damien: 'Fitzgerald', 'mike-p': 'Feeney', sean: 'Finnegan',
+  peadar: 'Fogarty', dave: 'Fallon', 'mike-f': 'Forde', derek: 'Flynn', brian: 'Fenton', kieran: 'Foley' };
+const members = ids.map((id, i) => ({ id, name: NAMES[id], full: NAMES[id] + ' ' + SURNAMES[id], index: +(12 + i * 1.5).toFixed(1), active: true }));
+members.push({ id: 'guest-x', name: 'Ultan', full: 'Ultan Farrelly', index: 18.4, active: false });
 
 const c = CFG.course;
 const course = { id: 'cabopino', name: c.name, area: 'Marbella', tees: c.tees, holes: c.holes.map(h => ({ n: h.n, par: h.par, si: h.si, m: h.metres })) };

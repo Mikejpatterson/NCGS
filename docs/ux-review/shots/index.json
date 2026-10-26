@@ -1,0 +1,474 @@
+[
+ {
+  "n": 1,
+  "situation": "pots-before",
+  "who": "member",
+  "size": "phone",
+  "file": "01-pots-before-member-phone.png",
+  "caption": "Home on the morning: the Westport card"
+ },
+ {
+  "n": 2,
+  "situation": "pots-before",
+  "who": "member",
+  "size": "phone",
+  "file": "02-pots-before-member-phone.png",
+  "caption": "Round page opens on the pots"
+ },
+ {
+  "n": 3,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "ipad",
+  "file": "03-draw-organiser-ipad.png",
+  "caption": "Organiser home"
+ },
+ {
+  "n": 4,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "ipad",
+  "file": "04-draw-organiser-ipad.png",
+  "caption": "The Westport round, organiser view"
+ },
+ {
+  "n": 5,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "ipad",
+  "file": "05-draw-organiser-ipad.png",
+  "caption": "Breakfast draw page"
+ },
+ {
+  "n": 6,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "ipad",
+  "file": "06-draw-organiser-ipad.png",
+  "caption": "Setting the pots"
+ },
+ {
+  "n": 7,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "ipad",
+  "file": "07-draw-organiser-ipad.png",
+  "caption": "The stage before starting"
+ },
+ {
+  "n": 8,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "ipad",
+  "file": "08-draw-organiser-ipad.png",
+  "caption": "Ready to draw"
+ },
+ {
+  "n": 9,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "ipad",
+  "file": "09-draw-organiser-ipad.png",
+  "caption": "Wheel spinning (pot A)"
+ },
+ {
+  "n": 10,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "ipad",
+  "file": "10-draw-organiser-ipad.png",
+  "caption": "First name drawn"
+ },
+ {
+  "n": 11,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "ipad",
+  "file": "11-draw-organiser-ipad.png",
+  "caption": "Team 1 complete"
+ },
+ {
+  "n": 12,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "ipad",
+  "file": "12-draw-organiser-ipad.png",
+  "caption": "Team 3 complete: the last team is whoever is left"
+ },
+ {
+  "n": 13,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "ipad",
+  "file": "13-draw-organiser-ipad.png",
+  "caption": "The groups (line-up) after the draw"
+ },
+ {
+  "n": 14,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "14-draw-organiser-phone.png",
+  "caption": "Organiser home"
+ },
+ {
+  "n": 15,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "15-draw-organiser-phone.png",
+  "caption": "The Westport round, organiser view"
+ },
+ {
+  "n": 16,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "16-draw-organiser-phone.png",
+  "caption": "Breakfast draw page"
+ },
+ {
+  "n": 17,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "17-draw-organiser-phone.png",
+  "caption": "Setting the pots"
+ },
+ {
+  "n": 18,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "18-draw-organiser-phone.png",
+  "caption": "The stage before starting"
+ },
+ {
+  "n": 19,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "19-draw-organiser-phone.png",
+  "caption": "Ready to draw"
+ },
+ {
+  "n": 20,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "20-draw-organiser-phone.png",
+  "caption": "Wheel spinning (pot A)"
+ },
+ {
+  "n": 21,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "21-draw-organiser-phone.png",
+  "caption": "First name drawn"
+ },
+ {
+  "n": 22,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "22-draw-organiser-phone.png",
+  "caption": "Team 1 complete"
+ },
+ {
+  "n": 23,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "23-draw-organiser-phone.png",
+  "caption": "Team 3 complete: the last team is whoever is left"
+ },
+ {
+  "n": 24,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "24-draw-organiser-phone.png",
+  "caption": "The groups (line-up) after the draw"
+ },
+ {
+  "n": 25,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "25-draw-organiser-phone.png",
+  "caption": "The round after the draw"
+ },
+ {
+  "n": 26,
+  "situation": "draw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "26-draw-organiser-phone.png",
+  "caption": "Groups screen after the draw"
+ },
+ {
+  "n": 27,
+  "situation": "after-draw",
+  "who": "member",
+  "size": "phone",
+  "file": "27-after-draw-member-phone.png",
+  "caption": "Home after the draw"
+ },
+ {
+  "n": 28,
+  "situation": "after-draw",
+  "who": "member",
+  "size": "phone",
+  "file": "28-after-draw-member-phone.png",
+  "caption": "Round page after the draw"
+ },
+ {
+  "n": 29,
+  "situation": "after-draw",
+  "who": "member",
+  "size": "phone",
+  "file": "29-after-draw-member-phone.png",
+  "caption": "Groups tab"
+ },
+ {
+  "n": 30,
+  "situation": "draw-watch",
+  "who": "member",
+  "size": "phone",
+  "file": "30-draw-watch-member-phone.png",
+  "caption": "Home while the draw is on"
+ },
+ {
+  "n": 31,
+  "situation": "draw-watch",
+  "who": "member",
+  "size": "phone",
+  "file": "31-draw-watch-member-phone.png",
+  "caption": "Following the draw"
+ },
+ {
+  "n": 32,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "32-scramble-player-phone.png",
+  "caption": "Home during the scramble"
+ },
+ {
+  "n": 33,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "33-scramble-player-phone.png",
+  "caption": "Contest question on arriving at a hole"
+ },
+ {
+  "n": 34,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "34-scramble-player-phone.png",
+  "caption": "Hole screen: drive, then score"
+ },
+ {
+  "n": 35,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "35-scramble-player-phone.png",
+  "caption": "Drive chosen (walking off the tee)"
+ },
+ {
+  "n": 36,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "36-scramble-player-phone.png",
+  "caption": "Score entered"
+ },
+ {
+  "n": 37,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "37-scramble-player-phone.png",
+  "caption": "After saving the hole"
+ },
+ {
+  "n": 38,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "38-scramble-player-phone.png",
+  "caption": "Results: teams and drives"
+ },
+ {
+  "n": 39,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "39-scramble-player-phone.png",
+  "caption": "Results: contests"
+ },
+ {
+  "n": 40,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "40-scramble-player-phone.png",
+  "caption": "Round page during the scramble"
+ },
+ {
+  "n": 41,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "41-scramble-player-phone.png",
+  "caption": "Trip page"
+ },
+ {
+  "n": 42,
+  "situation": "scramble",
+  "who": "organiser",
+  "size": "phone",
+  "file": "42-scramble-organiser-phone.png",
+  "caption": "Organiser: the live scramble"
+ },
+ {
+  "n": 43,
+  "situation": "scramble",
+  "who": "organiser",
+  "size": "phone",
+  "file": "43-scramble-organiser-phone.png",
+  "caption": "Organiser: Groups during the scramble"
+ },
+ {
+  "n": 44,
+  "situation": "scramble",
+  "who": "organiser",
+  "size": "phone",
+  "file": "44-scramble-organiser-phone.png",
+  "caption": "Organiser: tapping a player during the scramble"
+ },
+ {
+  "n": 45,
+  "situation": "scramble",
+  "who": "organiser",
+  "size": "phone",
+  "file": "45-scramble-organiser-phone.png",
+  "caption": "Organiser: team shots"
+ },
+ {
+  "n": 46,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "46-scramble-player-phone.png",
+  "caption": "Our team finished"
+ },
+ {
+  "n": 47,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "47-scramble-player-phone.png",
+  "caption": "Results when every team has finished (KBs)"
+ },
+ {
+  "n": 48,
+  "situation": "scramble",
+  "who": "player",
+  "size": "phone",
+  "file": "48-scramble-player-phone.png",
+  "caption": "Home when every team has finished"
+ },
+ {
+  "n": 49,
+  "situation": "groups-day",
+  "who": "organiser",
+  "size": "phone",
+  "file": "49-groups-day-organiser-phone.png",
+  "caption": "Round page on the day"
+ },
+ {
+  "n": 50,
+  "situation": "groups-day",
+  "who": "organiser",
+  "size": "phone",
+  "file": "50-groups-day-organiser-phone.png",
+  "caption": "Groups"
+ },
+ {
+  "n": 51,
+  "situation": "groups-day",
+  "who": "organiser",
+  "size": "phone",
+  "file": "51-groups-day-organiser-phone.png",
+  "caption": "Tapped a player"
+ },
+ {
+  "n": 52,
+  "situation": "groups-day",
+  "who": "organiser",
+  "size": "phone",
+  "file": "52-groups-day-organiser-phone.png",
+  "caption": "Moving into a full group: pick who to swap with"
+ },
+ {
+  "n": 53,
+  "situation": "groups-day",
+  "who": "organiser",
+  "size": "phone",
+  "file": "53-groups-day-organiser-phone.png",
+  "caption": "Tapped a group"
+ },
+ {
+  "n": 54,
+  "situation": "groups-day",
+  "who": "organiser",
+  "size": "phone",
+  "file": "54-groups-day-organiser-phone.png",
+  "caption": "Replace with…"
+ },
+ {
+  "n": 55,
+  "situation": "withdraw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "55-withdraw-organiser-phone.png",
+  "caption": "Live round, organiser"
+ },
+ {
+  "n": 56,
+  "situation": "withdraw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "56-withdraw-organiser-phone.png",
+  "caption": "Groups once play has started"
+ },
+ {
+  "n": 57,
+  "situation": "withdraw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "57-withdraw-organiser-phone.png",
+  "caption": "Tapped a player: Withdraw"
+ },
+ {
+  "n": 58,
+  "situation": "withdraw",
+  "who": "organiser",
+  "size": "phone",
+  "file": "58-withdraw-organiser-phone.png",
+  "caption": "After the withdrawal"
+ },
+ {
+  "n": 59,
+  "situation": "withdraw",
+  "who": "player",
+  "size": "phone",
+  "file": "59-withdraw-player-phone.png",
+  "caption": "The group's hole screen with a withdrawn player"
+ }
+]

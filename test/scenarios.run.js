@@ -12,7 +12,9 @@ const EXPECT = {
   ready: { has: ['.home-announcement'], text: /Autumn outing[\s\S]*in 3 days/ },
   eventday: { has: ['.home-announcement'], text: /Today[\s\S]*Autumn outing/ },
   preseason: { has: ['.home-season-intro'], text: new RegExp(`${year + 1}[\\s\\S]*A fresh scorecard`), not: /Athenry/ },
-  'preseason-announced': { has: ['.home-announcement'], text: new RegExp(`The ${year + 1} season[\\s\\S]*Athenry`, 'i') }
+  'preseason-announced': { has: ['.home-announcement'], text: new RegExp(`The ${year + 1} season[\\s\\S]*Athenry`, 'i') },
+  westport: { has: ['.home-live-ticket'], text: /Westport[\s\S]*Continue/ },
+  draw: { has: ['.home-announcement'], text: /Today[\s\S]*Westport/ }
 };
 (async () => {
   const browser = await chromium.launch();
@@ -25,7 +27,7 @@ const EXPECT = {
     check('Home links to the test scenarios in the preview', (await page.locator('[data-act="scenarios"]').count()) === 1);
     await page.click('[data-act="scenarios"]'); await page.waitForTimeout(150);
     const listed = await page.evaluate(() => [...document.querySelectorAll('[data-act="scenario-pick"]')].map(b => b.dataset.id));
-    check('every scenario is listed, Westport marked soon', listed.join() === Object.keys(EXPECT).join() && /Westport trip[\s\S]*Soon/.test(await page.locator('body').innerText()));
+    check('every scenario is listed', listed.join() === Object.keys(EXPECT).join());
     for (const id of Object.keys(EXPECT)) {
       // (In the round-in-progress scenario the app reopens on your hole, so go to the list directly.)
       if (id !== 'today') { await page.goto('about:blank'); await page.goto(URL); await page.waitForSelector('main .hero, main header');

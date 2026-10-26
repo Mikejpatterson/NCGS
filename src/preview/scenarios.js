@@ -44,7 +44,59 @@
         seed.settings = [{ key: 'season', value: String(thisYear + 1) }];
         return { seed: seed };
       } },
-    { id: 'westport', title: 'Westport trip', note: 'Coming with the scramble scoring and the breakfast draw.', soon: true }
+    { id: 'westport', title: 'Westport trip: scramble day', note: 'Day one at Ballinrobe played; the Westport scramble under way, 4 teams of 4. Your team is short of drives.',
+      make: function (seed) {
+        var r1 = finals(seed)[0], y = r1.season;
+        // Sixteen golfers: the twelve regulars plus four more invented ones.
+        seed.members = seed.members.concat([
+          { id: 'fx-p13', name: 'Malachy', full: 'Malachy Fagan', index: 18.4, active: true },
+          { id: 'fx-p14', name: 'Niall', full: 'Niall Fay', index: 9.6, active: true },
+          { id: 'fx-p15', name: 'Oisín', full: 'Oisín Fennell', index: 23.1, active: true },
+          { id: 'fx-p16', name: 'Pádraig', full: 'Pádraig Fox', index: 27.9, active: true }]);
+        var players = seed.members.filter(function (m) { return m.id.indexOf('guest') !== 0; }).sort(function (a, b) { return a.index - b.index; }).map(function (m) { return m.id; });
+        players.splice(players.indexOf(ME), 1); players.unshift(ME);   // you lead pot A, so you're in Team 1
+        // Pots A to D by handicap; each team takes one from each pot.
+        var pots = [0, 1, 2, 3].map(function (k) { return players.slice(k * 4, k * 4 + 4); });
+        var groups = [0, 1, 2, 3].map(function (t) {
+          return { id: 'g' + (t + 1), n: t + 1, teeTime: '10:' + String(t * 10).padStart(2, '0'), startHole: 1, teams: [[pots[0][t], pots[1][t]], [pots[2][t], pots[3][t]]] };
+        });
+        var day1 = Object.assign(clone(r1), { id: 'fx-wp1', name: 'Ballinrobe', trip: 'Westport', trip_day: 1, date: day(-1), season: y });
+        var day2 = Object.assign(clone(r1), { id: 'fx-wp2', name: 'Westport', trip: 'Westport', trip_day: 2, date: day(0), season: y, status: 'live', groups: groups, kb: null, ph: null, results: null, contests: [{ type: 'ntp', hole: 7 }, { type: 'ld', hole: 12 }] });
+        seed.rounds = finals(seed).filter(function (r) { return r.trip !== 'Westport'; }).concat([day1, day2]);
+        seed.scores = seed.scores.concat(seed.scores.filter(function (x) { return x.round === r1.id; }).map(function (x) { return Object.assign({}, x, { round: 'fx-wp1' }); }));
+        // Team scores, each saved under the player whose drive was used. Team 1 (yours) has leaned on two drivers.
+        var thru = [14, 7, 6, 5], strokes = [4, 5, 3, 4, 4, 5, 3, 4, 4, 4, 5, 3, 4, 4, 5, 3, 4, 4];
+        groups.forEach(function (g, t) {
+          var team = g.teams[0].concat(g.teams[1]);
+          for (var n = 1; n <= thru[t]; n++) {
+            var driver = t === 0 ? team[n % 3 === 0 ? 1 : 0] : team[(n + t) % 4];
+            seed.scores.push({ round: 'fx-wp2', player: driver, hole: n, strokes: strokes[(n + t) % 18], by: 'Fixture', at: day(0) + 'T1' + t + ':00:00Z' });
+          }
+        });
+        seed.claims = [{ round: 'fx-wp2', hole: 7, grp: 'g1', player: groups[0].teams[0][0], at: day(0) + 'T11:00:00Z' },
+          { round: 'fx-wp2', hole: 7, grp: 'g2', player: '_nobody', at: day(0) + 'T11:10:00Z' }];
+        seed.settings = [{ key: 'format:fx-wp2', value: 'scramble' }, { key: 'teamshots:fx-wp2', value: JSON.stringify({ g1: 0, g2: 2, g3: 0, g4: 3 }) },
+          { key: 'tripboard:' + y + ':Westport', value: 'off' }];
+        return { seed: seed };
+      } },
+    { id: 'draw', title: 'Westport trip: breakfast draw', note: 'Saturday breakfast before the scramble. The pots are set and members can see them; the organiser draws the four teams.',
+      make: function (seed) {
+        var r1 = finals(seed)[0], y = r1.season;
+        seed.members = seed.members.concat([
+          { id: 'fx-p13', name: 'Malachy', full: 'Malachy Fagan', index: 18.4, active: true },
+          { id: 'fx-p14', name: 'Niall', full: 'Niall Fay', index: 9.6, active: true },
+          { id: 'fx-p15', name: 'Oisín', full: 'Oisín Fennell', index: 23.1, active: true },
+          { id: 'fx-p16', name: 'Pádraig', full: 'Pádraig Fox', index: 27.9, active: true }]);
+        var players = seed.members.filter(function (m) { return m.id.indexOf('guest') !== 0; }).sort(function (a, b) { return a.index - b.index; }).map(function (m) { return m.id; });
+        var pots = [0, 1, 2, 3].map(function (k) { return players.slice(k * 4, k * 4 + 4); });
+        var day1 = Object.assign(clone(r1), { id: 'fx-wp1', name: 'Ballinrobe', trip: 'Westport', trip_day: 1, date: day(-1), season: y });
+        var day2 = Object.assign(clone(r1), { id: 'fx-wp2', name: 'Westport', trip: 'Westport', trip_day: 2, date: day(0), season: y, status: 'upcoming', first_tee: '10:00', interval: 10, groups: [], kb: null, ph: null, results: null, contests: [{ type: 'ntp', hole: 7 }, { type: 'ld', hole: 12 }] });
+        seed.rounds = finals(seed).filter(function (r) { return r.trip !== 'Westport'; }).concat([day1, day2]);
+        seed.scores = seed.scores.concat(seed.scores.filter(function (x) { return x.round === r1.id; }).map(function (x) { return Object.assign({}, x, { round: 'fx-wp1' }); }));
+        seed.settings = [{ key: 'format:fx-wp2', value: 'scramble' }, { key: 'tripboard:' + y + ':Westport', value: 'off' },
+          { key: 'pots:fx-wp2', value: JSON.stringify({ pots: pots, show: true }) }];
+        return { seed: seed };
+      } }
   ];
   var find = function (id) { for (var i = 0; i < LIST.length; i++) if (LIST[i].id === id && !LIST[i].soon) return LIST[i]; return null; };
   var start = function (id) { LS.set(FLAG, id); KEYS.forEach(LS.del); };

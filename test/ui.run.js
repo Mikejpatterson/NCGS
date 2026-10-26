@@ -291,21 +291,23 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   t = await text();
   check('new round created', /Cabopino/.test(t) && /Not drawn/.test(t));
   const newRid = await page.evaluate(() => window.__ncgs.UI.orgStack.slice(-1)[0].p.rid);
-  await tap('[data-act="org-go"][data-v="playing"]');
+  await tap('[data-act="org-go"][data-v="groups"]');
   const ten = (await page.$$eval('[data-act="org-toggle-player"]', els => els.map(e => e.dataset.pid))).slice(0, 10);
   for (const pid of ten) await tap(`[data-act="org-toggle-player"][data-pid="${pid}"]`);
   await tap('[data-act="org-draw"][data-kind="random"]');
   t = await text();
   check('draw: 10 players make groups of 4, 3 and 3 with tee times', /Group 1/.test(t) && /Group 3/.test(t) && /09:30/.test(t) && /09:46/.test(t));
-  // swap two players
-  const order = await page.$$eval('[data-act="org-swap"]', els => els.map(e => e.dataset.pid));
+  check('the draw is saved straight away: no Save step', !(await page.$('[data-act="org-save-groups"]')) && await page.evaluate(rid => (window.__ncgs.D.round(rid).groups || []).length === 3, newRid));
+  // swap two players: tap one, Swap with…, tap the other
+  const order = await page.$$eval('[data-act="grp-pick"]', els => els.map(e => e.dataset.pid));
   const a = order[0], b = order[5];
-  await tap(`[data-act="org-swap"][data-pid="${a}"]`);
-  await tap(`[data-act="org-swap"][data-pid="${b}"]`);
-  const firstNow = await page.$eval('[data-act="org-swap"]', el => el.dataset.pid);
-  check('tap two players to swap them', firstNow === b && a !== b);
+  await tap(`[data-act="grp-pick"][data-pid="${a}"]`);
+  await tap(`[data-act="grp-swap"][data-pid="${a}"]`);
+  await tap(`[data-act="grp-pick"][data-pid="${b}"]`);
+  const firstNow = await page.$eval('[data-act="grp-pick"]', el => el.dataset.pid);
+  check('swap two players', firstNow === b && a !== b);
   await shot('13-org-groups', true);
-  await tap('[data-act="org-save-groups"]');
+  await tap('[data-act="back"]');
   await page.waitForTimeout(200);
   t = await text();
   check('groups saved on the round', /10 players · 3 groups/.test(t));

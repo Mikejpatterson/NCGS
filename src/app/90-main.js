@@ -30,7 +30,7 @@ const ACT = {
   leaderboard: el => { UI.playRid = el.dataset.rid; UI.board = el.dataset.rid; UI.res = 'lb'; go('board', { rid: el.dataset.rid }); },
   'wx-retry': el => { delete UI.wx[el.dataset.cid]; render(); },
   trip: el => go('trip', { rid: el.dataset.rid }),
-  rtab: el => { UI.rtab = el.dataset.t; render(); },
+  rtab: el => { UI.rtab = el.dataset.t; UI.rtabPicked = true; render(); },
   bwseg: el => { UI.open[el.dataset.key] = el.dataset.open !== '1'; render(); },
   respill: el => { UI.res = el.dataset.p; UI.scrollTop = true; render(); },
   toggle: el => { UI.open[el.dataset.key] = !UI.open[el.dataset.key]; render(); },
@@ -64,7 +64,7 @@ const ACT = {
   'ask-clear': () => { ruleClose(); UI.chat = []; UI.chatInfo = {}; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'ask-pick': el => { UI.askPick = { key: el.dataset.key, v: el.dataset.v }; render(); },
   'ask-confirm': () => {
-    const rid = playRid(), g = myGroup(rid), comp = computeR(rid);
+    const rid = playRid(), g = myGroup(rid), comp = progressOf(rid);
     if (!g || !comp) return;
     const gc = comp.groups.find(x => x.id === g.id), c = askPending(rid, gc, g.id);
     const key = c && contestKey(rid, g.id, c.hole);
@@ -78,6 +78,26 @@ const ACT = {
   'intro-go': el => { const rid = playRid(), g = myGroup(rid); (DB.prefs.intro = DB.prefs.intro || {})[contestKey(rid, g.id, Number(el.dataset.n))] = true; savePrefs(); render(); },
   'intro-scrim': () => {},
   save: () => saveHole(),
+  'scr-score': el => scrScore(el.dataset.dir),
+  'scr-pickup': () => scrPickup(),
+  'scr-clear': () => scrClear(),
+  'scr-driver': el => scrDriver(el.dataset.pid),
+  'scr-save': () => scrSave(),
+  'org-format': el => {
+    const r = D.round(el.dataset.rid);
+    if (!r) return;
+    if (Object.values(D.scores(r.id)).some(h => Object.values(h || {}).some(E.isEntered))) { toast('Scores are in, so the format can\'t change now.'); return; }
+    const on = !isScramble(r);
+    put('settings', [{ key: 'format:' + r.id, value: on ? 'scramble' : '' }], { action: 'Round format', detail: `${roundName(r)}: ${on ? 'scramble (team score)' : 'individual Stableford'}` });
+    toast(on ? 'Scramble: one team score per group' : 'Individual Stableford');
+  },
+  'org-tripboard': el => {
+    const r = D.round(el.dataset.rid);
+    if (!r || !r.trip) return;
+    const off = tripBoardOn(r);
+    put('settings', [{ key: `tripboard:${r.season}:${r.trip}`, value: off ? 'off' : '' }], { action: 'Trip leaderboard', detail: `${r.trip} ${r.season}: ${off ? 'off' : 'on'}` });
+    toast(off ? 'No combined trip leaderboard' : 'Trip leaderboard on');
+  },
   'entry-back': () => {
     const ctx = entryCtx(), d = (draftsFor(ctx) || {})[ctx.n];
     if (ctx.mode === 'player' && !ctx.edit && d && Object.keys(d).some(k => k[0] !== '_')) toast('Scores kept. Pick up where you left off.');
@@ -88,7 +108,7 @@ const ACT = {
   'holes-close': () => { UI.holeSheet = false; render(); },
   'holes-scrim': (el, e) => { if (e.target !== el) return; UI.holeSheet = false; render(); },
   'goto-hole': el => {
-    const rid = playRid(), g = myGroup(rid), comp = computeR(rid);
+    const rid = playRid(), g = myGroup(rid), comp = progressOf(rid);
     UI.holeSheet = false;
     if (!g || !comp) { render(); return; }
     const gc = comp.groups.find(x => x.id === g.id), n = Number(el.dataset.n);
@@ -178,53 +198,29 @@ const ACT = {
   'org-new-round': () => { UI.formState = null; go('details', {}); },
   'org-toggle-player': el => { const d = UI.draft; const i = d.ids.indexOf(el.dataset.pid); if (i >= 0) d.ids.splice(i, 1); else d.ids.push(el.dataset.pid); render(); },
   'org-draw': el => {
+    // Draws and saves at once; the Groups screen then shows the groups to change. "again" redraws the same players.
     const r = D.round(cur().p.rid);
-    const d = draftFor(r);
     const kind = el.dataset.kind;
-    if (kind === 'players') { d.groups = null; d.sel = null; render(); return; }
+    const again = kind === 'again';
+    if (again) {
+      if (grStarted(r) || drawMade(r) || (r.groups || []).some(g => g.teams.flat().some(pid => scoresFor(r.id, pid)))) { toast('These groups can no longer be redrawn.'); return; }
+      if (UI.confirm !== 'redraw-' + r.id) { UI.confirm = 'redraw-' + r.id; render(); return; }
+      UI.confirm = null;
+    }
+    const ids = again ? r.groups.flatMap(g => g.teams.flat()) : draftFor(r).ids;
     const prior = priorTripGroups(r);
     let res;
-    if (kind === 'standings' || (kind === 'again' && d.kind === 'standings')) {
-      const done = D.rounds().filter(x => x.trip === r.trip && x.season === r.season && x.status === 'final' && x.id !== r.id && (x.trip_day || 0) < (r.trip_day || 99));
-      const pts = done.map(x => pointsOf(x.id));
-      const standings = E.rankRows(d.ids.map(pid => ({ id: pid, name: D.nameOf(pid), total: pts.reduce((s, p) => s + (p[pid] || 0), 0) })), 'total', 'desc');
+    if (kind === 'standings') {
+      const pts = priorFinalDays(r).map(x => pointsOf(x.id));
+      const standings = E.rankRows(ids.map(pid => ({ id: pid, name: D.nameOf(pid), total: pts.reduce((s, p) => s + (p[pid] || 0), 0) })), 'total', 'desc');
       res = E.proposeDraw(standings, prior, []);
-      d.kind = 'standings';
     } else {
-      d.seed = (d.seed || Date.now() % 100000) + 17;
-      res = E.randomDraw(d.ids, [], d.seed, prior);
-      d.kind = 'random';
+      res = E.randomDraw(ids, [], (Date.now() % 100000) + 17, prior);
     }
-    d.groups = res.groups;
-    d.repeats = res.repeats;
-    d.sel = null;
+    saveDraw(r, res.groups, again ? 'Groups redrawn' : 'Groups drawn');
+    UI.draft = null; UI.gsel = null;
     render();
-  },
-  'org-swap': el => {
-    const d = UI.draft;
-    const pid = el.dataset.pid;
-    if (!d.sel) { d.sel = pid; render(); return; }
-    if (d.sel === pid) { d.sel = null; render(); return; }
-    const a = d.sel, b = pid;
-    d.groups.forEach(g => g.teams.forEach(t => t.forEach((x, i) => { if (x === a) t[i] = b; else if (x === b) t[i] = a; })));
-    d.sel = null;
-    d.repeats = E.repeatedPartners([...priorTripGroups(D.round(d.rid)), { rid: d.rid, groups: d.groups }]).filter(x => x.rounds.includes(d.rid));
-    render();
-  },
-  'org-save-groups': () => {
-    const r = D.round(cur().p.rid);
-    const d = draftFor(r);
-    const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
-    const allOff = E.kbOff(r);   // KBs switched off for the whole round stays off if the groups are redrawn
-    const groups = d.groups.map((g, i) => Object.assign({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }, allOff ? { noKb: true } : {}));
-    const ids = new Set(groups.flatMap(g => g.teams.flat()));
-    const kg = E.kbGroups(Object.assign({}, r, { groups }));
-    let kb = E.kbValid(kg, r.kb) ? r.kb : null;
-    if (!kb && kg.length > 1) { const res = E.kbPairsFor(kg, (Date.now() % 100000) + 3, priorKbPairs(r.id)); kb = res.pairs.length ? res.pairs : null; }   // every drawn round gets KB pairs, no repeat partners
-    put('rounds', [Object.assign({}, r, { groups, kb })], { action: 'Groups saved', detail: `${roundName(r)}: ${groups.map(g => `${g.teeTime} ${g.teams.map(t => t.map(D.nameOf).join(' & ')).join(' v ')}`).join('; ')}` });
-    UI.draft = null;
-    back();
-    toast('Groups and KB pairs saved');
+    toast(isScramble(r) ? 'Teams drawn' : 'Groups drawn, KB pairs made');
   },
   'org-kb-make': () => { const r = D.round(cur().p.rid); const res = E.kbPairsFor(E.kbGroups(r), (Date.now() % 100000) + 3, priorKbPairs(r.id)); UI.kbDraft = { rid: r.id, pairs: res.pairs, sel: null }; render(); },
   'org-kb-swap': el => {
@@ -251,21 +247,13 @@ const ACT = {
     tick(); render();
   },
   'org-unwin': el => { removeRows('winners', [{ round: el.dataset.rid, hole: Number(el.dataset.n) }], { action: 'Contest winner cleared', detail: `${roundName(D.round(el.dataset.rid))} · hole ${el.dataset.n}` }); render(); },
-  'start-round': el => {
-    const r = D.round(el.dataset.rid);
-    if (!r.groups || !r.groups.length) { toast('Draw the groups first'); return; }
-    if (!canScore(r)) { toast('The course needs its par, index and tees first'); return; }
-    if (liveRid()) { toast('Finalise the live round first'); return; }
-    put('rounds', [Object.assign({}, r, { status: 'live' })], { action: 'Round started', detail: roundName(r) });
-    toast(`${roundName(r)} is live`);
-  },
   finalise: el => {
     const r = D.round(el.dataset.rid);
     const reasons = finaliseBlockers(r);
     if (reasons.length) { toast(`Not yet: ${reasons.join(', ')}`); return; }
-    const comp = computeR(r.id);
+    const comp = computeR(r.id);   // null for a scramble: no individual playing handicaps to keep
     const snapHoles = (holesOf(r) || []).map(h => { const o = Object.assign({}, h); delete o.yards; return o; });
-    put('rounds', [Object.assign({}, r, { status: 'final', ph: Object.fromEntries(Object.values(comp.players).map(p => [p.id, p.ph])), allowance: allowanceOf(r), results: snapHoles.length === 18 && teeOf(r) ? { snap: { holes: snapHoles, tee: teeOf(r) } } : r.results || null })], { action: 'Round finalised', detail: `${roundName(r)}: results, handicaps and the course card fixed` });
+    put('rounds', [Object.assign({}, r, { status: 'final', ph: comp ? Object.fromEntries(Object.values(comp.players).map(p => [p.id, p.ph])) : (r.ph || null), allowance: allowanceOf(r), results: snapHoles.length === 18 && teeOf(r) ? { snap: { holes: snapHoles, tee: teeOf(r) } } : r.results || null })], { action: 'Round finalised', detail: `${roundName(r)}: results, handicaps and the course card fixed` });
     tick();
     toast(`${roundName(r)} is final`);
   },
@@ -314,12 +302,14 @@ const ACT = {
   'late-cancel': () => { UI.late = null; UI.confirm = null; render(); },
   'late-replace': el => {
     const r = D.round(el.dataset.rid), pid = el.dataset.pid, np = el.dataset.new;
+    if (rosterLocked(r)) { toast('The teams have scores, so they are fixed now'); return; }
     if (scoresFor(r.id, pid)) { toast('That player already has scores'); return; }
     put('rounds', [withPlayerChanged(r, pid, np)], { action: 'Player swapped', detail: `${roundName(r)}: ${D.nameOf(np)} in for ${D.nameOf(pid)}` });
     UI.late = null; toast(`${D.nameOf(np)} is in`); back();
   },
   'late-drop': el => {
     const r = D.round(el.dataset.rid), pid = el.dataset.pid;
+    if (rosterLocked(r)) { toast('The teams have scores, so they are fixed now'); return; }
     if (scoresFor(r.id, pid)) { toast('That player already has scores'); return; }
     if (UI.confirm !== 'drop-' + pid) { UI.confirm = 'drop-' + pid; render(); return; }
     put('rounds', [withPlayerChanged(r, pid, null)], { action: 'Player dropped out', detail: `${roundName(r)}: ${D.nameOf(pid)}` });
@@ -340,6 +330,7 @@ const ACT = {
     }).catch(() => toast('Needs signal to restore'));
   }
 };
+Object.assign(ACT, DRAW_ACT, GROUP_ACT);
 
 const FORMS = {
   ask: () => { const i = document.getElementById('askin'); askQuestion(i ? i.value : UI.askDraft); },
@@ -428,6 +419,19 @@ const FORMS = {
     Object.values(tees).forEach(t => { if (par) t.par = par; });
     const id = c ? c.id : (D.course(slug(name)) ? slug(name) + '-' + Date.now().toString(36).slice(-3) : slug(name));
     put('courses', [{ id, name, area: val('c-area') || null, about: val('c-about') || null, lat: num('c-lat'), lon: num('c-lon'), tees, holes: holeData }], { action: c ? 'Course changed' : 'Course added', detail: name });
+    toast('Saved');
+    back();
+  },
+  teamshots: () => {
+    const r = D.round(cur().p.rid);
+    const out = {};
+    for (const g of r.groups || []) {
+      const v = val('ts-' + g.id);
+      const k = v === '' ? 0 : Number(v);
+      if (!(Number.isInteger(k) && k >= 0 && k <= 36)) { UI.formError = `Team ${g.n}: a whole number of shots, 0 to 36.`; render(); return; }
+      out[g.id] = k;
+    }
+    put('settings', [{ key: 'teamshots:' + r.id, value: JSON.stringify(out) }], { action: 'Team shots', detail: `${roundName(r)}: ${(r.groups || []).map(g => `Team ${g.n} ${out[g.id]}`).join(', ')}` });
     toast('Saved');
     back();
   },
@@ -536,9 +540,9 @@ function render() {
   if (showTabs) {
     let lbl = 'Hole';
     try {
-      const rid = playRid() || liveRid(), mine = rid && myGroup(rid), comp = mine && computeR(rid);
+      const rid = playRid() || liveRid(), mine = rid && myGroup(rid), comp = mine && progressOf(rid);
       const gc = comp && comp.groups.find(g => g.id === mine.id);
-      if (gc) lbl = gc.nextHole ? `Hole ${gc.nextHole}` : 'Card';
+      if (gc) lbl = gc.nextHole ? `Hole ${gc.nextHole}` : isScramble(D.round(rid)) ? 'Team' : 'Card';
     } catch (e) { /* keep "Hole" */ }
     const span = tabs.querySelector('.tab[data-tab="hole"] span');
     if (span && span.textContent !== lbl) span.textContent = lbl;
@@ -623,7 +627,7 @@ document.addEventListener('mousedown', e => { if (e.target.closest && e.target.c
 if (window.visualViewport) { window.visualViewport.addEventListener('resize', placeAskBar); window.visualViewport.addEventListener('scroll', placeAskBar); }
 document.addEventListener('change', e => {
   const t = e.target;
-  if (t.dataset && t.dataset.change === 'start-hole' && UI.draft && UI.draft.groups) { UI.draft.groups[Number(t.dataset.gi)].startHole = Number(t.value); render(); return; }
+  if (t.dataset && t.dataset.change === 'grp-start') { grStart(t.dataset.rid, Number(t.dataset.gi), Number(t.value)); return; }
   if (t.dataset && t.dataset.change === 'details-course') { UI.formState = Object.assign({}, UI.formState, { course: t.value }); render(); return; }
   const el = t.closest && t.closest('input[data-photo]');
   if (!el || !el.files || !el.files[0]) return;
@@ -638,7 +642,7 @@ window.addEventListener('online', () => { flush(); sync(); });
 /* Fresh data every 15 seconds while a round is live, every minute otherwise. */
 setInterval(() => {
   if (document.hidden) return;
-  const every = liveRid() ? 15000 : 60000;
+  const every = liveRid() ? 15000 : drawLive() ? 8000 : 60000;
   if (Date.now() - DB.lastSync >= every) sync();
   if (DB.outbox.length && DB.online) flush();
 }, 5000);

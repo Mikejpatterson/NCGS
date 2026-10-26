@@ -1,4 +1,6 @@
 /* ================= SOCIETY SCREENS ================= */
+/* A contest answer of "nobody" is stored as '_nobody'; every screen shows it as "Nobody" (journey 6 review). */
+{ const nameOf0 = D.nameOf; D.nameOf = id => (id === '_nobody' ? 'Nobody' : nameOf0(id)); }
 const VIEWS = {};
 
 function roundRow(r, right) {
@@ -40,12 +42,20 @@ function heroFacts(r) {
 function playLabel(r) {
   const mine = myGroup(r.id);
   if (!DB.prefs.me || !mine) return 'Play now';
-  const gc = computeR(r.id).groups.find(g => g.id === mine.id);
+  const gc = progressOf(r.id).groups.find(g => g.id === mine.id);
   return gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now';
 }
 /* The top three of a live round, and you if you are lower down. Taken from the same leaderboard as the Results tab. */
 function miniBoard(r) {
   const res = resultsOf(r.id);
+  if (res && res.source === 'scramble') {
+    const g = myGroup(r.id), teams = res.teams || [];
+    if (!teams.length) return '';
+    let show = teams.slice(0, 3);
+    const mine = g ? teams.find(t => t.id === g.id) : null;
+    if (mine && !show.includes(mine)) show = [show[0], show[1], mine];
+    return `<div class="mini num">${show.map(t => `<div class="mr${mine === t ? ' me' : ''}"><span class="mp">${esc(t.posLabel)}</span><span class="mn">${esc(t.name)}</span><span class="mt">${t.total}</span></div>`).join('')}</div>`;
+  }
   const rows = res && res.rows ? res.rows : [];
   if (!rows.length) return '';
   let show = rows.slice(0, 3);
@@ -105,13 +115,67 @@ const lenStyle = s => `style="--len:${[...s].length}"`;
 /* The round card's buttons. During a live round that you're playing, the main button takes you back to scoring
    ("Continue · Hole 7"), and Players · Groups · KBs becomes a quieter link underneath (design review, 22 October). */
 function nowActs(r, live, group) {
-  const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">${live ? 'Players · Groups · KBs' : 'View round details'}</button>`;
+  // Everyone has finished: the results are what people want now (UX review F20). Provisional until the organiser finalises.
+  if (live && allIn(r)) {
+    const kb = kbLine(r);
+    return `<div class="now-acts one"><button class="go" data-act="leaderboard" data-rid="${r.id}">See the results</button>${kb ? `<p class="now-kb">${esc(kb)}</p>` : ''}</div>`;
+  }
+  const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">${live ? (isScramble(r) ? 'Players · Groups' : 'Players · Groups · KBs') : drawTabOn(r) ? (drawOf(r.id).st.started ? 'Follow the draw' : 'See the pots') : 'View round details'}</button>`;
   const next = group ? group.nextHole : null;
   if (!next) return `<div class="now-acts one">${groups}</div>`;
   return `<div class="now-acts one"><button class="go" data-act="tab" data-tab="hole">Continue \u00b7 Hole ${next}</button>
-    <button class="go-link" data-act="round" data-rid="${r.id}" data-tab="players">Players \u00b7 Groups \u00b7 KBs</button></div>`;
+    <button class="go-link" data-act="round" data-rid="${r.id}" data-tab="players">Players \u00b7 Groups${isScramble(r) ? '' : ' \u00b7 KBs'}</button></div>`;
 }
 
+/* Your tee time and who you're out with, once the groups are out and until your group starts (journeys 2/20, 5). */
+function youreOff(r, group) {
+  const me = DB.prefs.me;
+  if (!me || !r.groups || !r.groups.length || (group && group.holesDone)) return '';
+  const g = r.groups.find(x => x.teams.flat().includes(me));
+  if (!g) return '';
+  const others = g.teams.flat().filter(pid => pid !== me).map(pid => D.nameOf(pid));
+  const list = others.length > 1 ? others.slice(0, -1).join(', ') + ' and ' + others[others.length - 1] : others.join('');
+  const when = g.teeTime ? `You're off at ${g.teeTime}` : `You're in ${isScramble(r) ? 'Team' : 'Group'} ${g.n}`;
+  return `${isScramble(r) && g.teeTime ? `Team ${g.n} · ` : ''}${when}${list ? ' with ' + list : ''}${g.startHole && g.startHole !== 1 ? ` · from hole ${g.startHole}` : ''}`;
+}
+/* A trip without a combined board: each day in a few words, e.g. "Day 1: Aidan won · Day 2: live" (journeys 5/12). */
+function tripDays(list) {
+  return list.map((x, i) => {
+    const w = x.status === 'final' ? (() => { const res = resultsOf(x.id); if (!res) return 'played'; const top = isScramble(x) ? (res.teams || []).filter(t => t.pos === 1).map(t => t.name) : (res.rows || []).filter(t => t.pos === 1).map(t => t.name); return top.length ? `${top.join(' & ')} won` : 'played'; })() : x.status === 'live' ? 'live' : 'to play';
+    return `Day ${x.trip_day || i + 1}: ${w}`;
+  }).join(' \u00b7 ');
+}
+/* Today's finished round: who won, and the way to the results. */
+function winnersOf(r) {
+  const res = resultsOf(r.id);
+  if (!res) return '';
+  if (isScramble(r)) { const t = (res.teams || []).filter(x => x.pos === 1); return t.length ? `${t.map(x => x.name).join(' and ')} won` : ''; }
+  const top = (res.rows || []).filter(x => x.pos === 1);
+  return top.length ? `${top.map(x => x.name).join(' and ')} won on ${top[0].total} points` : '';
+}
+function resultCard(r) {
+  const won = winnersOf(r), kb = isScramble(r) ? kbLine(r) : (() => { const low = kbLowOf(r.id); return low && low.length ? `KBs: ${low.map(k => k.name).join(' and ')}` : ''; })();
+  return `<div class="now home-live-ticket">
+    <button class="now-main" data-act="leaderboard" data-rid="${r.id}">
+      <span class="now-top"><span class="now-kind">Today</span><span class="pill g">Final</span></span>
+      <span class="now-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</span>
+      ${won ? `<span class="now-you">${esc(won)}</span>` : ''}
+      ${kb ? `<span class="now-line">${esc(kb)}</span>` : ''}
+    </button>
+    <div class="now-acts one"><button class="go" data-act="leaderboard" data-rid="${r.id}">See the results</button></div>
+  </div>`;
+}
+/* Every group has finished all its holes (the round may still be waiting for the organiser to finalise). */
+function allIn(r) {
+  try { const p = progressOf(r.id); return !!(p && p.groups.length && p.groups.every(g => g.complete)); } catch (e) { return false; }
+}
+/* Who's KBs once everyone is in, said plainly; provisional until the round is final. */
+function kbLine(r) {
+  const res = resultsOf(r.id);
+  if (!res) return '';
+  if (isScramble(r)) { const t = (res.teams || []).filter(x => x.kb); return t.length ? `KBs: ${t.map(x => x.name).join(' and ')}${r.status === 'final' ? '' : ' (to be confirmed)'}` : ''; }
+  return '';
+}
 function nowCard(r) {
   const live = r.status === 'live';
   const playable = canScore(r) && (live || !r.date || daysFromToday(r.date) <= 0);
@@ -125,22 +189,29 @@ function nowCard(r) {
   const mine = live && myGroup(r.id);
   // Your group's progress only adds Continue and the next contest; if it can't be worked out, Home still shows the round.
   let group = null;
-  try { const comp = mine && computeR(r.id); group = (comp && comp.groups.find(g => g.id === mine.id)) || null; }
+  try { const comp = mine && progressOf(r.id); group = (comp && comp.groups.find(g => g.id === mine.id)) || null; }
   catch (e) { console.warn('Home: group progress unavailable', e); group = null; }
   const thisContest = group && group.nextHole ? contestOn(r.id, group.nextHole) : null;
+  const you = youreOff(r, group);
   return `<div class="now ${live ? 'home-live-ticket' : 'home-announcement'}">
     <button class="now-main" data-act="round" data-rid="${r.id}">
-      <span class="now-top"><span class="now-kind">${kind}</span>${statusPill(r)}</span>
+      <span class="now-top"><span class="now-kind">${kind}</span>${live && allIn(r) ? '<span class="pill w">All in</span>' : statusPill(r)}</span>
       <span class="now-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</span>
       ${date ? `<span class="home-date" aria-hidden="true"><small>${MONTHS[date.getMonth()].slice(0, 3)}</small><b>${date.getDate()}</b></span><span class="vh">${esc(fmtDate(r.date, true))}</span>` : ''}
       ${line2 ? `<span class="now-line">${esc(line2)}</span>` : ''}
       <span class="now-line">${esc(heroFacts(r))}</span>
+      ${you ? `<span class="now-you">${esc(you)}</span>` : ''}
       ${thisContest ? `<span class="home-this-hole">${CONTEST[thisContest.type]} · Hole ${thisContest.hole}</span>` : ''}
     </button>
     ${nowActs(r, live, group)}
   </div>`;
 }
 
+/* A group has played past this contest hole: "not yet played" would be wrong, the result is waiting for reports (UX review F11). */
+function contestPassed(rid, hole) {
+  const pr = hole ? progressOf(rid) : null;
+  return !!(pr && pr.groups.some(g => g.holes && g.holes[hole] && g.holes[hole].complete));
+}
 /* Home borrows the existing result/claim state. It never awards a contest or writes scores. */
 function homeMatchday(r) {
   const res = resultsOf(r.id);
@@ -152,8 +223,9 @@ function homeMatchday(r) {
       const who = c.winner || (c.lead && c.lead.pid);
       const confirmed = c.status && c.status.confirmed;
       const answered = c.status && c.status.answered;
-      const state = confirmed ? 'Confirmed' : who || answered ? 'To be confirmed' : 'Not yet played';
-      const name = who ? D.nameOf(who) : confirmed ? 'Nobody' : answered ? 'Nobody yet' : 'No claim yet';
+      const passed = contestPassed(r.id, c.hole);
+      const state = confirmed ? 'Confirmed' : who || answered ? 'To be confirmed' : passed ? 'Waiting for groups' : 'Not yet played';
+      const name = who ? D.nameOf(who) : confirmed ? 'Nobody' : answered ? 'Nobody yet' : passed ? 'No report yet' : 'No claim yet';
       return `<div class="home-contest"><span class="hs-ic" aria-hidden="true">${sized(ICON.flagpin, 20)}</span><span class="home-contest-copy"><span class="b">${CONTEST[c.type]}${c.hole ? ` <span class="sub">· Hole ${c.hole}</span>` : ''}</span><span class="sub">${esc(name)}</span></span><span class="home-contest-state">${state}</span></div>`;
     }).join('')}</div></section>`;
   }
@@ -171,16 +243,18 @@ VIEWS.home = () => {
   const played = seasonRounds(season).filter(r => r.status === 'final');
   const live = D.rounds().filter(r => r.status === 'live');
   const next = announced();   // an upcoming round shows here once the organiser gives it a date (owner, 23 October)
+  // On the day a round is finalised, its result leads Home; the next round moves down to "Also on" (journeys 6/18).
+  const doneToday = live[0] ? null : D.rounds().filter(r => r.status === 'final' && !isDemo(r) && r.date && daysFromToday(r.date) === 0).slice(-1)[0] || null;
   const feature = live[0] || next[0] || null;
-  const more = [...live.slice(1), ...next.slice(live[0] ? 0 : 1)];
+  const more = doneToday ? next : [...live.slice(1), ...next.slice(live[0] ? 0 : 1)];
   const me = DB.prefs.me ? D.member(DB.prefs.me) : null;
   const hello = greeting(me);
-  const homeState = feature && feature.status === 'live' ? 'matchday' : feature ? 'upcoming' : 'quiet';
+  const homeState = feature && feature.status === 'live' ? 'matchday' : doneToday ? 'result' : feature ? 'upcoming' : 'quiet';
   let html = `<header class="hero home home-${homeState}"><div class="brand"><span class="badge crest">${CREST_SVG}</span><span class="vh">${esc(D.society())}</span><p class="greet${hello.length > 22 ? ' long' : ''}">${esc(hello)}</p>
     <button class="who-chip${me ? ' only-av' : ''}" data-act="who" aria-label="${me ? 'You are ' + esc(me.name) + '. Change' : 'Who are you?'}">${me ? `<span class="who-av">${esc(initialsOf(me))}</span>` : 'Who are you?'}</button></div>
-    <h1 class="vh">${esc(homeHeadline(feature))}</h1>
+    <h1 class="vh">${esc(doneToday ? `${roundName(doneToday)}: the result` : homeHeadline(feature))}</h1>
     ${homeState === 'upcoming' ? `<p class="home-season-label">The ${season} season</p><p class="home-quiet-title">Next on the card.</p>` : ''}
-    ${feature ? nowCard(feature) : homeSeasonIntro(season, played)}</header>`;
+    ${doneToday ? resultCard(doneToday) : feature ? nowCard(feature) : homeSeasonIntro(season, played)}</header>`;
   if (homeState === 'matchday') html += homeMatchday(feature);
   const table = goy(season);
   const lead = table[0];
@@ -200,9 +274,9 @@ VIEWS.home = () => {
   const ic = k => `<span class="hs-ic" aria-hidden="true">${sized(ICON[k], 20)}</span>`;
   const rrow = (act, k, t, sub, rid) => `<button class="row hs-row" data-act="${act}"${rid ? ` data-rid="${rid}"` : ''}>${ic(k)}<span class="hs-txt"><span class="hs-t">${t}</span><span class="hs-s">${sub}</span></span>${chev}</button>`;
   html += `${goyHidden}${sec(label('The season'), cardOf([
-    !inPlay && lastRound ? rrow('round', 'flagpin', 'Last round', esc(roundName(lastRound)), lastRound.id) : '',
+    !inPlay && lastRound && lastRound !== doneToday ? rrow('round', 'flagpin', 'Last round', esc(roundName(lastRound)), lastRound.id) : '',
     rrow('goy', 'trophy', 'Golfer of the Year', goyLine),
-    tripList.length > 1 ? rrow('trip', 'course', 'Trip standings', tripLine, tripFor.id) : '',
+    tripList.length > 1 ? (tripBoardOn(tripFor) ? rrow('trip', 'course', 'Trip standings', tripLine, tripFor.id) : rrow('trip', 'course', esc(tripFor.trip), esc(tripDays(tripList)), tripFor.id)) : '',
     rrow('rounds', 'history', 'Past rounds', played.length ? `${plural(played.length, 'round')} played` : 'None played yet'),
     rrow('stats', 'bars', 'Stats', 'KBs, birdies, averages'),
     rrow('players', 'users', 'Players', plural(D.regulars().length, 'golfer'))].join('')), true)}`;
@@ -361,7 +435,7 @@ function groupsBlock(r, interactive) {
       (tee ? `<p class="cap note">${esc(tee.name)} tees · Slope ${tee.slope} · Rating ${tee.rating} · Par ${tee.par} · ${Math.round(allowanceOf(r) * 100)}%</p>` : ''));
   }
   const others = r.groups.filter(g => !mine || g.id !== mine.id);
-  const live = r.status === 'live' ? computeR(r.id) : null;
+  const live = r.status === 'live' ? progressOf(r.id) : null;
   html += sec(label(mine ? 'Other groups' : 'Groups'), cardOf(others.map(g => {
     const key = r.id + g.id;
     const open = !!UI.open[key];
@@ -384,9 +458,14 @@ function dropRow(rid, x, inner, cls = 'lrow') {
 }
 const dropChev = `<span class="chev dn">${chev}</span>`;
 
+function contestsBlock(res) {
+  const contests = res.contests.filter(c => c.winner !== undefined);
+  return contests.length ? sec(label('Contests'), cardOf(contests.map(c => `<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${c.winner ? `<span class="b ct-won">${esc(D.nameOf(c.winner))}${CUP}</span>` : '<span class="sub">Nobody</span>'}</div>`).join(''))) : '';
+}
 function resultsBlock(r) {
   const res = resultsOf(r.id);
   if (!res) return '';
+  if (res.source === 'scramble') return scrambleTable(r, res) + contestsBlock(res);
   const app = res.source === 'app';
   let html = sec(label('Stableford'), cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
@@ -414,6 +493,13 @@ function resultsBlock(r) {
 
 /* The page for a finished round: the winner first, then the table, then one small card for KBs and contests. */
 function finishedCard(r, res) {
+  if (res.source === 'scramble') {
+    // No winners' presentation for a scramble (owner): the KBs are the story.
+    const kb = (res.teams || []).filter(t => t.kb);
+    const sub = [roundName(r), r.date ? fmtDate(r.date, true) : ''].filter(Boolean).join(' · ');
+    return `<div class="fincard"><div class="finrow"><span class="fink">KBS</span><span class="finfinal">Final</span></div>
+      <div class="finwin"><div class="finwho"><b class="finname">${esc(kb.map(t => t.name).join(' & ') || '–')}</b><h1 class="finsub">${esc(kb.map(scrNames).join(' · ') || sub)}</h1></div><b class="finpts">${kb.length ? kb[0].total : ''}</b></div></div>`;
+  }
   const top = res.rows.filter(x => x.pos === 1);
   const names = top.map(x => D.nameOf(x.id)).join(' & ');
   const sub = [roundName(r), r.date ? fmtDate(r.date, true) : ''].filter(Boolean).join(' · ');
@@ -421,6 +507,7 @@ function finishedCard(r, res) {
     <div class="finwin"><div class="finwho"><b class="finname">${esc(names)}${CUP}</b><h1 class="finsub">${esc(sub)}</h1></div><b class="finpts">${top[0].total}</b></div></div>`;
 }
 function finishedBody(r, res) {
+  if (res.source === 'scramble') return scrambleTable(r, res) + contestsBlock(res) + `<button class="btn" data-act="results" data-rid="${r.id}">Share results</button>`;
   const app = res.source === 'app';
   const all = !!UI.open['all-' + r.id], many = res.rows.length > 8;
   const shown = all || !many ? res.rows : res.rows.slice(0, 8);
@@ -461,7 +548,8 @@ VIEWS.round = p => {
   const holes = holesOf(r);
   const inPlay = UI.stack.some(e => ['tee', 'match', 'board', 'rules'].includes(e.v));
   const prev = UI.stack[UI.stack.length - 2];
-  let html = '<header class="hero s">' + navBack(prev && prev.v === 'tee' ? `Hole ${UI.hole || ''}`.trim() : prev && prev.v === 'player' ? D.nameOf(prev.p.pid) : prev && prev.v === 'card' ? 'Card' : D.society());
+  // The back link names where it goes (journey 1: it used to say "NCGS" coming from Past rounds).
+  let html = '<header class="hero s">' + navBack(prev && prev.v === 'tee' ? `Hole ${UI.hole || ''}`.trim() : prev && prev.v === 'card' ? 'Card' : backLabel());
   html += `<div class="head"><h1 class="title">${esc(roundName(r))}</h1>${statusPill(r)}</div>`;
   const when = roundWhen(r);
   if (when) html += `<p class="sub">${esc(when)}</p>`;
@@ -497,7 +585,8 @@ VIEWS.round = p => {
     const kbPair = (r.kb || []).find(pr => pr.includes(me));
     const kbWith = kbPair ? kbPair.filter(pid => pid !== me) : [];
     const names = pairNames;
-    const dl = [
+    // A scramble team is the whole group: no "against", no KB partner.
+    const dl = isScramble(r) ? `<dt>Team</dt><dd>${mine.teams.flat().filter(pid => pid !== me).map(pid => esc(D.nameOf(pid))).join(', ')}</dd>` : [
       partner.length ? `<dt>With</dt><dd>${names(partner)}</dd>` : '',
       other ? `<dt>Against</dt><dd>${names(other)}</dd>` : (!partner.length ? `<dt>With</dt><dd>${names(mine.teams.flat().filter(pid => pid !== me))}</dd>` : ''),
       kbWith.length ? `<dt>KB with</dt><dd>${names(kbWith)}</dd>` : ''
@@ -509,19 +598,22 @@ VIEWS.round = p => {
   let go = '';
   if (playable) {
     let lbl = 'Play now';
-    if (me && mine) { const gc = computeR(r.id).groups.find(g => g.id === mine.id); lbl = inPlay || gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now'; }
+    if (me && mine) { const gc = progressOf(r.id).groups.find(g => g.id === mine.id); lbl = inPlay || gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now'; }
     go = `<button class="go" data-act="play" data-rid="${r.id}">${lbl}</button>`;
   } else if (live) go = `<button class="go" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>`;
-  html = `<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">Stableford</span></div>
+  html = `<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">${isScramble(r) ? 'Scramble' : 'Stableford'}</span></div>
     <h1 class="rp-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
   if (playable && me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
 
-  const tabsAvail = ['players', 'groups', 'kb', 'weather', 'course'];
-  const rt = tabsAvail.includes(UI.rtab) ? UI.rtab : 'players';
-  const tabName = { players: 'Players', groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
+  // Breakfast draw: the pots (then the draw) come first; a scramble has no KB pairs, so no KBs tab.
+  const potsTab = drawTabOn(r);
+  const tabsAvail = (potsTab ? ['pots'] : []).concat(['players', 'groups'], isScramble(r) ? [] : ['kb'], ['weather', 'course']);
+  const rt = potsTab && UI.rtab === 'players' && !UI.rtabPicked ? 'pots' : tabsAvail.includes(UI.rtab) ? UI.rtab : tabsAvail[0];
+  const tabName = { pots: drawOf(r.id).st.started ? 'Draw' : 'Pots', players: 'Players', groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
   html += `<div class="seg pills rtabs" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${tabName[k]}</button>`).join('')}</div>`;
   const quiet = t => cardOf(`<div class="row"><span class="sub">${t}</span></div>`);
-  if (rt === 'players') html += roundPlayers(r);
+  if (rt === 'pots') html += drawMemberView(r);
+  else if (rt === 'players') html += roundPlayers(r);
   else if (rt === 'groups') html += roundGroups(r);
   else if (rt === 'kb') html += r.kb && r.kb.length ? `<div class="card rp-kbs">${r.kb.map(pr => `<span class="pk${pr.includes(me) ? ' me' : ''}">${pairNames(pr)}</span>`).join('')}</div>` : quiet(E.kbOff(r) ? 'No KBs in this round' : 'KB pairs are not drawn yet');
   else if (rt === 'weather') html += forecast(r, true) || quiet(r.date ? 'The forecast appears in the 9 days before the round.' : 'The forecast appears once the round has a date.');
@@ -544,6 +636,12 @@ function roundGroups(r) {
     return `<${can ? 'button' : 'div'} class="hrow"${can ? ` data-act="hcp" data-pid="${pid}" data-rid="${r.id}"` : ''}><span class="nm">${g.teams.length > 1 ? dot(i) : ''}<span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span></span><span class="r sub">${m ? fmtIndex(m.index) : ''}</span><span class="r b">${ph === null ? '' : ph}</span>${can ? chev : '<span></span>'}</${can ? 'button' : 'div'}>`;
   }).join('')).join('');
   const mine = myGroup(r.id);
+  // A scramble group is one team of four: names together, no buggy pairs, no handicap working.
+  if (isScramble(r)) return `<div class="card rp-groups">${r.groups.map(g => {
+    const gc = live ? live.groups.find(x => x.id === g.id) : null;
+    const prog = gc ? (gc.complete ? 'Finished' : gc.holesDone ? 'Thru ' + gc.holesDone : '') : '';
+    return `<div class="rg${mine && mine.id === g.id ? ' me' : ''}"><span class="rg-t"><b>${esc(g.teeTime || 'G' + g.n)}</b>${prog ? `<small>${prog}</small>` : ''}</span><span class="rg-team"><span class="cap">Team ${g.n}</span><span>${g.teams.flat().map(pid => pid === DB.prefs.me ? `<b>${esc(D.nameOf(pid))}</b>` : esc(D.nameOf(pid))).join(', ')}</span></span><span></span></div>`;
+  }).join('')}</div>`;
   return `<div class="card rp-groups">${r.groups.map(g => {
     const key = 'rg' + r.id + g.id, open = !!UI.open[key];
     const gc = live ? live.groups.find(x => x.id === g.id) : null;
@@ -562,10 +660,11 @@ function roundPlayers(r) {
   const phOf = pid => (r.ph && r.ph[pid] !== undefined ? r.ph[pid] : comp ? comp.players[pid].ph : tee && D.member(pid) ? E.playingHandicap(D.member(pid).index, tee, allowanceOf(r)) : null);
   const ids = r.groups.flatMap(g => g.teams.flat().map(pid => ({ pid, g })));
   ids.sort((a, b) => D.nameOf(a.pid).localeCompare(D.nameOf(b.pid)));
-  const cols = '<div class="pl-row cols"><span></span><span></span><span class="r cap">Index</span><span class="r cap">Playing</span><span></span></div>';
-  return `<div class="card rp-players">${cols}${ids.map(({ pid, g }) => {
-    const m = D.member(pid), ph = phOf(pid), can = tee && m;
-    const inner = `${avBadge(pid)}<span class="pl-n"><span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span><span class="cap">${esc(g.teeTime ? g.teeTime : 'Group ' + g.n)}</span></span><span class="r sub num">${m ? fmtIndex(m.index) : ''}</span><span class="r b num">${ph === null ? '' : ph}</span>${can ? chev : '<span></span>'}`;
+  const scr = isScramble(r);   // a scramble plays off team shots: no personal playing handicap
+  const cols = `<div class="pl-row cols"><span></span><span></span>${scr ? '' : '<span class="r cap">Index</span><span class="r cap">Playing</span>'}<span></span></div>`;
+  return `<div class="card rp-players${scr ? ' scr' : ''}">${cols}${ids.map(({ pid, g }) => {
+    const m = D.member(pid), ph = scr ? null : phOf(pid), can = tee && m && !scr;
+    const inner = `${avBadge(pid)}<span class="pl-n"><span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span><span class="cap">${esc(scr ? `Team ${g.n}${g.teeTime ? ' · ' + g.teeTime : ''}` : g.teeTime ? g.teeTime : 'Group ' + g.n)}</span></span>${scr ? '' : `<span class="r sub num">${m ? fmtIndex(m.index) : ''}</span><span class="r b num">${ph === null ? '' : ph}</span>`}${can ? chev : '<span></span>'}`;
     return can ? `<button class="pl-row${pid === DB.prefs.me ? ' me' : ''}" data-act="hcp" data-pid="${pid}" data-rid="${r.id}">${inner}</button>` : `<div class="pl-row">${inner}</div>`;
   }).join('')}</div>`;
 }
@@ -667,7 +766,7 @@ VIEWS.player = p => {
   html += `<div class="head"><h1 class="title is-name">${esc(m.name)}</h1></div><p class="sub">${esc([m.full, 'Index ' + fmtIndex(m.index)].filter(Boolean).join(' · '))}</p>`;
   html += `<div class="tiles${past ? ' two' : ''}"><div class="tile flag"><span class="cap">GOY${past ? ' ' + season : ''}</span><span class="bignum">${row ? posWord(row.posLabel) : '–'}</span></div>
     <div class="tile"><span class="cap">Best ${D.goyBest()}</span><span class="bignum">${row ? row.total : '–'}</span></div>
-    ${past ? '' : `<div class="tile"><span class="cap">To beat</span><span class="bignum">${row && row.toBeat ? row.toBeat : '–'}</span></div>`}</div></header>`;
+    ${past || !(row && row.toBeat) ? '' : `<div class="tile"><span class="cap">To beat</span><span class="bignum">${row.toBeat}</span></div>`}</div></header>`;
   const rowsFor = yr => seasonRounds(yr).filter(r => r.status === 'final' || r.status === 'live').reverse().map(r => {
     const res = resultsOf(r.id);
     const me = res ? res.rows.find(x => x.id === m.id) : null;
