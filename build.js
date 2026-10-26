@@ -28,6 +28,7 @@ const css = read('src/styles.css');
 const previewCss = css;   // one look since 21 October 2026: the preview and the live app use the same styles
 const engine = read('src/engine.js');
 const drawJs = read('src/draw.js');
+const groupsJs = read('src/groups.js');
 const serverBuild = require('crypto').createHash('sha1').update(read('src/server.js')).digest('hex').slice(0, 8);
 const server = read('src/server.js').replace(/__BUILD__/g, serverBuild);
 
@@ -40,6 +41,7 @@ window.TRIP_CARD_FIXTURES = ${safe(JSON.stringify(fixtures))};</script>
 <script>${safe(read('src/preview/scenarios.js'))}</script>` : ''}
 <script>${safe(engine)}</script>
 <script>${safe(drawJs)}</script>
+<script>${safe(groupsJs)}</script>
 <script>${safe(server)}</script>
 <script>${safe(appJs)}</script>`;
 

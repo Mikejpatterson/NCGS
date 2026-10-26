@@ -2069,3 +2069,21 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .drw-lt li { color: #FAF8F3; font-size: 1.15rem; }
 .drw-gap { color: #CFE0D6; font-size: .85rem; font-weight: 500; }
 .org-team.picked, .row.picked { box-shadow: inset 0 0 0 2px var(--pine); }
+/* Groups screen (owner, 26 October): tap a name or a group; its choices open underneath. */
+.grp .grp-head { border-radius: 16px; background: var(--card, #fff); box-shadow: 0 0 0 1px var(--line); margin-bottom: 8px; }
+.grp .grp-head b { font-size: 1.25rem; }
+.grp-panel { margin: 0 0 10px; padding: 12px 14px 14px; border-radius: 16px; background: var(--fill); }
+.grp-panel .cap { margin: 0 0 8px; }
+.grp-panel .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.chipb { min-height: 44px; min-width: 64px; padding: 0 14px; border: 0; border-radius: 22px; background: #fff; color: var(--pine); font: inherit; font-weight: 650; font-variant-numeric: tabular-nums; box-shadow: inset 0 0 0 1.5px var(--pine); }
+.chipb:disabled { opacity: .4; }
+.grp-acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: 8px; margin-bottom: 8px; }
+.grp-acts .btn { margin: 0; min-height: 44px; }
+.grp-people { margin: 8px 0; max-height: 50vh; overflow-y: auto; }
+.grp-out { display: block; margin: 6px auto 0; min-height: 44px; }
+.ptile.wd { opacity: .75; }
+.ptile.wd .cap { margin: 4px 0 0; }
+.grp-swapbar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0; padding: 10px 14px; border-radius: 16px; background: var(--pine); color: #fff; font-weight: 600; }
+.grp-swapbar .link { color: #fff; min-height: 44px; }
+.grp .card .grp-head { border-radius: 0; background: transparent; box-shadow: none; margin: 0; border-bottom: 1px solid var(--line); }
+.grp .card .grp-panel { margin: 0; border-radius: 0; }

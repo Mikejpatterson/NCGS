@@ -215,4 +215,9 @@ const titleCheck = ({ sel, want, max }) => {
     [...process.execArgv, require('path').join(__dirname, 'draw.run.js')], { stdio: 'inherit', env: subEnv });
   if (dr.error) console.error(dr.error);
   if (dr.status !== 0) process.exit(dr.status || 1);
+  // One Groups screen for every round (owner, 26 October): move, swap, add, replace, take out, order, withdraw.
+  const gr = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'groups.run.js')], { stdio: 'inherit', env: subEnv });
+  if (gr.error) console.error(gr.error);
+  if (gr.status !== 0) process.exit(gr.status || 1);
 })();

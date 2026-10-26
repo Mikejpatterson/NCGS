@@ -218,6 +218,9 @@ VIEWS.entry = () => {
   const h = holeOf(ctx.rid, ctx.n);
   const d = ensureDraft(ctx);
   const pids = gc.teams.flat();
+  // A withdrawn player picks up (scratch) on every hole from their withdrawal: filled in here, saved with the group.
+  const wdHere = pids.filter(pid => { const w = wdOf(ctx.rid, pid); return w && ctx.n >= w; });
+  wdHere.forEach(pid => { if (d[pid] !== 'P') { d[pid] = 'P'; savePrefs(); } });
   if (ctx.mode === 'player' && !ctx.edit) { const ask = askPending(ctx.rid, gc, ctx.gid); if (ask) return VIEWS.ask(ctx.rid, gc, ask); }
   const missing = pids.filter(pid => !E.isEntered(d[pid]));
   const final = D.round(ctx.rid).status === 'final';
@@ -231,7 +234,9 @@ VIEWS.entry = () => {
   const clash = DB.conflicts.filter(c => c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n);
   if (clash.length) html += `<div class="banner" style="margin-top:12px">Another phone saved ${clash.map(c => `${esc(D.nameOf(c.player))} ${fmtGross(c.server)}`).join(', ')}</div>`;
   html += gc.teams.map((t, i) => {
-    const rows = t.map(pid => entryRow(pid, d[pid], comp.players[pid].holes[ctx.n].shots, h.par, ctx.rid));
+    const rows = t.map(pid => wdHere.includes(pid)
+      ? { tile: `<div class="pr ptile wd"><div class="pr-top"><span class="nm"><span>${esc(D.nameOf(pid))}</span></span><span class="pill n">Withdrawn</span></div><p class="cap">Picked up (scratch) from hole ${wdOf(ctx.rid, pid)}</p></div>`, drop: '' }
+      : entryRow(pid, d[pid], comp.players[pid].holes[ctx.n].shots, h.par, ctx.rid));
     return `<div class="bugs ${buggies ? 'b' + (i + 1) : 'b0'}"${buggies ? ` role="group" aria-label="Buggy ${i + 1}"` : ''}>${rows.map(r => r.tile + r.drop).join('')}</div>`;
   }).join('');
   if (ctx.mode === 'player' && !ctx.edit) html += needsAttention(ctx.rid, gc, ctx.gid);

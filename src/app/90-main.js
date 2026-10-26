@@ -369,7 +369,7 @@ const ACT = {
     }).catch(() => toast('Needs signal to restore'));
   }
 };
-Object.assign(ACT, DRAW_ACT);
+Object.assign(ACT, DRAW_ACT, GROUP_ACT);
 
 const FORMS = {
   ask: () => { const i = document.getElementById('askin'); askQuestion(i ? i.value : UI.askDraft); },
