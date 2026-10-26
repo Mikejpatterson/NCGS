@@ -19,10 +19,12 @@ async function fresh(b, w, h) {
 const org = (p, v) => p.evaluate(v => { const n = window.__ncgs; n.UI.org = true; n.UI.orgUnlocked = true; n.ORGPIN.pin = '1234'; n.UI.orgStack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'fx-wp2' } }, { v, p: { rid: 'fx-wp2' } }]; n.render(); }, v).then(() => p.waitForTimeout(200));
 const member = p => p.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.rtabPicked = false; n.UI.rtab = 'players'; n.UI.stack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'fx-wp2' } }]; n.render(); }).then(() => p.waitForTimeout(200));
 const act = (p, a, data) => p.evaluate(([a, data]) => { const b = document.createElement('button'); b.dataset.act = a; Object.assign(b.dataset, data); document.body.appendChild(b); b.click(); b.remove(); }, [a, data]).then(() => p.waitForTimeout(150));
+let lastStage = '';
 async function drawAll(p) {
   for (let i = 0; i < 60; i++) {
     const what = await p.evaluate(() => { const n = document.querySelector('[data-act="draw-next"]'); return n ? 'next:' + n.innerText : document.querySelector('[data-act="draw-go"]') ? 'go' : document.querySelector('[data-act="draw-make"]') || /Line-up/.test(document.querySelector('main').innerText) ? 'done' : 'wait'; });
     if (what === 'done') return;
+    if (what.startsWith('next') && /line-up/i.test(what)) lastStage = await p.locator('main').innerText();
     if (what.startsWith('next')) await p.click('[data-act="draw-next"]', { timeout: 2000 }).catch(() => {});
     else if (what === 'go') { await p.click('[data-act="draw-go"]', { timeout: 2000 }).catch(() => {}); await p.click('[data-act="draw-skip"]', { timeout: 800 }).catch(() => {}); }
     await p.waitForTimeout(250);
@@ -69,6 +71,7 @@ const audit = p => p.evaluate(() => {
     check('members following the draw see "Not drawn yet", never "No one from pot" for a pot that still has names', /Not drawn yet/.test(watch) && !/No one from pot/.test(watch) && !/TEAM 3/i.test(watch));
     await org(p, 'draw');
     await drawAll(p);
+    check('the last stage says the last team is the players left (UX review F06)', /Team 4 is the players left in each pot/.test(lastStage), lastStage.replace(/\s+/g, ' ').slice(0, 160));
     await org(p, 'drawlineup');
     check('line-up: names first, every team listed', (await p.$$('.drw-lt')).length === 4 && (await p.$$('.drw-lt li')).length === 16);
     await p.waitForTimeout(1500);

@@ -2121,3 +2121,4 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .drw-counts { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin: 0 0 12px; padding: 10px 14px; border-radius: 14px; background: var(--pine); color: #FAF8F3; font-variant-numeric: tabular-nums; }
 .drw-counts b { color: #D4B483; font-weight: 700; }
 .drw-saved { margin-left: auto; font-size: .85rem; color: #CFE0D6; }
+.drw-left { margin: 0 0 12px; text-align: center; font-size: 1rem; }
