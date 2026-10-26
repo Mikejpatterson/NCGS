@@ -77,18 +77,20 @@ const audit = p => p.evaluate(() => {
     check('the last team is not drawn (12 picks for 16 players), and the teams become the groups by themselves', made.picks === 12 && made.groups === 4 && made.marked, JSON.stringify(made));
     await member(p);
     check('members: once the groups are made there is no Draw tab, just Groups', !(await p.$('.rtabs [data-t="pots"]')) && !!(await p.$('.rtabs [data-t="groups"]')));
-    // Someone running late: swap their team's tee time with the last team's (owner, 26 October).
+    // Someone running late: their team goes out last (owner, 26 October). One Groups screen, each change saves.
     const before = await p.evaluate(() => window.__ncgs.D.round('fx-wp2').groups.map(g => g.teams.flat().join(',')));
-    await org(p, 'playing');
-    check('organiser Groups: a scramble shows teams of four with tee times, no buggies', /Tap two teams to swap tee times/.test(await p.locator('main').innerText()) && !/Buggy/.test(await p.locator('main').innerText()) && (await p.$$('[data-act="org-team-move"]')).length === 4);
-    await p.click('[data-act="org-team-move"][data-gi="0"]'); await p.click('[data-act="org-team-move"][data-gi="3"]'); await p.click('[data-act="org-save-groups"]'); await p.waitForTimeout(400);
+    await org(p, 'groups');
+    const gtext = await p.locator('main').innerText();
+    check('organiser Groups: a scramble shows teams with tee times, no buggies, no Save step', /Team 1/.test(gtext) && !/Buggy/.test(gtext) && !(await p.$('[data-act="org-save-groups"]')) && (await p.$$('[data-act="grp-group"]')).length === 4);
+    await p.click('[data-act="grp-group"][data-gi="0"]'); await p.click('[data-act="grp-order"][data-to="3"]'); await p.waitForTimeout(400);
     const after = await p.evaluate(() => { const r = window.__ncgs.D.round('fx-wp2'); return { teams: r.groups.map(g => g.teams.flat().join(',')), times: r.groups.map(g => g.teeTime), marked: r.groups.every(g => g.draw) }; });
-    check('team 1 now tees off last and team 4 first; the teams themselves are unchanged', after.teams[0] === before[3] && after.teams[3] === before[0] && after.times[0] === '10:00' && after.times[3] === '10:30', JSON.stringify(after));
-    check('saving the groups keeps the draw done (no Draw tab, no restart)', after.marked);
+    check('team 1 now tees off last; the others move up; the teams themselves are unchanged', after.teams[3] === before[0] && after.teams[0] === before[1] && after.times[0] === '10:00' && after.times[3] === '10:30', JSON.stringify(after));
+    check('changing the groups keeps the draw done (no Draw tab, no restart)', after.marked);
+    check('no "Draw again" once the breakfast draw has made the teams', !(await p.$('[data-act="org-draw"]')));
     await org(p, 'drawlineup');
     const first = await p.$eval('.drw-lt', e => e.innerText);
-    const want = await p.evaluate(ids => ids.split(',').map(id => window.__ncgs.D.nameOf(id)), before[3]);
-    check('the line-up shows the swapped tee times', /10:00 · Team 1/i.test(first) && want.every(n => first.includes(n)), first.replace(/\s+/g, ' '));
+    const want = await p.evaluate(ids => ids.split(',').map(id => window.__ncgs.D.nameOf(id)), before[1]);
+    check('the line-up shows the new tee times', /10:00 · Team 1/i.test(first) && want.every(n => first.includes(n)), first.replace(/\s+/g, ' '));
     await p.close();
 
     // Short pot: fifteen players; the last team has nobody from pot D, and the groups wait for the committee.

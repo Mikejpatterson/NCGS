@@ -2079,6 +2079,9 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .chipb:disabled { opacity: .4; }
 .grp-acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: 8px; margin-bottom: 8px; }
 .grp-acts .btn { margin: 0; min-height: 44px; }
+.grp-start { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
+.grp-start .cap { margin: 0; }
+.grp-start .field { margin: 0; }
 .grp-people { margin: 8px 0; max-height: 50vh; overflow-y: auto; }
 .grp-out { display: block; margin: 6px auto 0; min-height: 44px; }
 .pr.wdrow { display: grid; gap: 2px; padding-block: 12px; min-height: 44px; }

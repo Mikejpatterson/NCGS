@@ -28,11 +28,11 @@ Each frame is the screen as it looked straight after the action in its caption (
    ![](11-org.png)
 12. **Organiser phone**: Guest saved, back to the list  
    ![](12-org.png)
-13. **Organiser phone**: Draws groups  
+13. **Organiser phone**: Draws groups: saved at once, KB pairs made  
    ![](13-org.png)
 14. **Organiser phone**: Drawn groups (scrolled)  
    ![](14-org.png)
-15. **Organiser phone**: Saves groups (KB pairs made too)  
+15. **Organiser phone**: Opens a group: order, add a player, start hole  
    ![](15-org.png)
 16. **Organiser phone**: Looks at the KB pairs  
    ![](16-org.png)

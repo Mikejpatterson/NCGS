@@ -198,60 +198,29 @@ const ACT = {
   'org-new-round': () => { UI.formState = null; go('details', {}); },
   'org-toggle-player': el => { const d = UI.draft; const i = d.ids.indexOf(el.dataset.pid); if (i >= 0) d.ids.splice(i, 1); else d.ids.push(el.dataset.pid); render(); },
   'org-draw': el => {
+    // Draws and saves at once; the Groups screen then shows the groups to change. "again" redraws the same players.
     const r = D.round(cur().p.rid);
-    const d = draftFor(r);
     const kind = el.dataset.kind;
-    if (kind === 'players') { d.groups = null; d.sel = null; render(); return; }
+    const again = kind === 'again';
+    if (again) {
+      if (grStarted(r) || drawMade(r) || (r.groups || []).some(g => g.teams.flat().some(pid => scoresFor(r.id, pid)))) { toast('These groups can no longer be redrawn.'); return; }
+      if (UI.confirm !== 'redraw-' + r.id) { UI.confirm = 'redraw-' + r.id; render(); return; }
+      UI.confirm = null;
+    }
+    const ids = again ? r.groups.flatMap(g => g.teams.flat()) : draftFor(r).ids;
     const prior = priorTripGroups(r);
     let res;
-    if (kind === 'standings' || (kind === 'again' && d.kind === 'standings')) {
-      const done = D.rounds().filter(x => x.trip === r.trip && x.season === r.season && x.status === 'final' && x.id !== r.id && (x.trip_day || 0) < (r.trip_day || 99));
-      const pts = done.map(x => pointsOf(x.id));
-      const standings = E.rankRows(d.ids.map(pid => ({ id: pid, name: D.nameOf(pid), total: pts.reduce((s, p) => s + (p[pid] || 0), 0) })), 'total', 'desc');
+    if (kind === 'standings') {
+      const pts = priorFinalDays(r).map(x => pointsOf(x.id));
+      const standings = E.rankRows(ids.map(pid => ({ id: pid, name: D.nameOf(pid), total: pts.reduce((s, p) => s + (p[pid] || 0), 0) })), 'total', 'desc');
       res = E.proposeDraw(standings, prior, []);
-      d.kind = 'standings';
     } else {
-      d.seed = (d.seed || Date.now() % 100000) + 17;
-      res = E.randomDraw(d.ids, [], d.seed, prior);
-      d.kind = 'random';
+      res = E.randomDraw(ids, [], (Date.now() % 100000) + 17, prior);
     }
-    d.groups = res.groups;
-    d.repeats = res.repeats;
-    d.sel = null;
+    saveDraw(r, res.groups, again ? 'Groups redrawn' : 'Groups drawn');
+    UI.draft = null; UI.gsel = null;
     render();
-  },
-  'org-swap': el => {
-    const d = UI.draft;
-    const pid = el.dataset.pid;
-    if (!d.sel) { d.sel = pid; render(); return; }
-    if (d.sel === pid) { d.sel = null; render(); return; }
-    const a = d.sel, b = pid;
-    d.groups.forEach(g => g.teams.forEach(t => t.forEach((x, i) => { if (x === a) t[i] = b; else if (x === b) t[i] = a; })));
-    d.sel = null;
-    d.repeats = E.repeatedPartners([...priorTripGroups(D.round(d.rid)), { rid: d.rid, groups: d.groups }]).filter(x => x.rounds.includes(d.rid));
-    render();
-  },
-  'org-team-move': el => {
-    const d = UI.draft, gi = Number(el.dataset.gi);
-    if (d.selTeam === undefined || d.selTeam === null) { d.selTeam = gi; render(); return; }
-    if (d.selTeam !== gi) { const g = d.groups; [g[d.selTeam], g[gi]] = [g[gi], g[d.selTeam]]; }
-    d.selTeam = null; render();
-  },
-  'org-save-groups': () => {
-    const r = D.round(cur().p.rid);
-    const d = draftFor(r);
-    const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
-    const allOff = E.kbOff(r);   // KBs switched off for the whole round stays off if the groups are redrawn
-    // g.draw (the breakfast draw's mark) is kept: swapping tee times or players doesn't undo the draw.
-    const groups = d.groups.map((g, i) => Object.assign({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }, allOff ? { noKb: true } : {}, g.draw ? { draw: g.draw } : {}));
-    const ids = new Set(groups.flatMap(g => g.teams.flat()));
-    const kg = E.kbGroups(Object.assign({}, r, { groups }));
-    let kb = E.kbValid(kg, r.kb) ? r.kb : null;
-    if (!kb && kg.length > 1 && !isScramble(r)) { const res = E.kbPairsFor(kg, (Date.now() % 100000) + 3, priorKbPairs(r.id)); kb = res.pairs.length ? res.pairs : null; }   // every drawn round gets KB pairs, no repeat partners
-    put('rounds', [Object.assign({}, r, { groups, kb })], { action: 'Groups saved', detail: `${roundName(r)}: ${groups.map(g => `${g.teeTime} ${g.teams.map(t => t.map(D.nameOf).join(' & ')).join(' v ')}`).join('; ')}` });
-    UI.draft = null;
-    back();
-    toast(isScramble(r) ? 'Groups saved' : 'Groups and KB pairs saved');
+    toast(isScramble(r) ? 'Teams drawn' : 'Groups drawn, KB pairs made');
   },
   'org-kb-make': () => { const r = D.round(cur().p.rid); const res = E.kbPairsFor(E.kbGroups(r), (Date.now() % 100000) + 3, priorKbPairs(r.id)); UI.kbDraft = { rid: r.id, pairs: res.pairs, sel: null }; render(); },
   'org-kb-swap': el => {
@@ -278,14 +247,6 @@ const ACT = {
     tick(); render();
   },
   'org-unwin': el => { removeRows('winners', [{ round: el.dataset.rid, hole: Number(el.dataset.n) }], { action: 'Contest winner cleared', detail: `${roundName(D.round(el.dataset.rid))} · hole ${el.dataset.n}` }); render(); },
-  'start-round': el => {
-    const r = D.round(el.dataset.rid);
-    if (!r.groups || !r.groups.length) { toast('Draw the groups first'); return; }
-    if (!canScore(r)) { toast('The course needs its par, index and tees first'); return; }
-    if (liveRid()) { toast('Finalise the live round first'); return; }
-    put('rounds', [Object.assign({}, r, { status: 'live' })], { action: 'Round started', detail: roundName(r) });
-    toast(`${roundName(r)} is live`);
-  },
   finalise: el => {
     const r = D.round(el.dataset.rid);
     const reasons = finaliseBlockers(r);
@@ -666,7 +627,7 @@ document.addEventListener('mousedown', e => { if (e.target.closest && e.target.c
 if (window.visualViewport) { window.visualViewport.addEventListener('resize', placeAskBar); window.visualViewport.addEventListener('scroll', placeAskBar); }
 document.addEventListener('change', e => {
   const t = e.target;
-  if (t.dataset && t.dataset.change === 'start-hole' && UI.draft && UI.draft.groups) { UI.draft.groups[Number(t.dataset.gi)].startHole = Number(t.value); render(); return; }
+  if (t.dataset && t.dataset.change === 'grp-start') { grStart(t.dataset.rid, Number(t.dataset.gi), Number(t.value)); return; }
   if (t.dataset && t.dataset.change === 'details-course') { UI.formState = Object.assign({}, UI.formState, { course: t.value }); render(); return; }
   const el = t.closest && t.closest('input[data-photo]');
   if (!el || !el.files || !el.files[0]) return;

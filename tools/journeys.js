@@ -111,9 +111,9 @@ J[2] = async () => {
   await o.tap('[data-act="org-go"][data-v="guest"]'); await j.frame(o, 'Adds a guest');
   await o.pg.fill('#g-name', 'Visitor Vince').catch(() => {}); await o.pg.fill('#g-index', '22.5').catch(() => {});
   await o.tap('form[data-form="guest"] button'); await j.frame(o, 'Guest saved, back to the list');
-  await o.tap('[data-act="org-draw"][data-kind="random"]'); await j.frame(o, 'Draws groups'); await j.scroll(o, 'Drawn groups');
-  await o.tap('[data-act="org-save-groups"]'); await j.frame(o, 'Saves groups (KB pairs made too)');
-  await o.tap('[data-act="org-go"][data-v="kb"]'); await j.frame(o, 'Looks at the KB pairs'); await o.tap('[data-act="back"]');
+  await o.tap('[data-act="org-draw"][data-kind="random"]'); await j.frame(o, 'Draws groups: saved at once, KB pairs made'); await j.scroll(o, 'Drawn groups');
+  await o.tap('[data-act="grp-group"][data-gi="0"]'); await j.frame(o, 'Opens a group: order, add a player, start hole'); await o.tap('[data-act="grp-group"][data-gi="0"]');
+  await o.tap('[data-act="back"]'); await o.tap('[data-act="org-go"][data-v="kb"]'); await j.frame(o, 'Looks at the KB pairs'); await o.tap('[data-act="back"]');
   await o.tap('[data-act="org-go"][data-v="groups"]'); await j.frame(o, 'Opens Groups to change something before play');
   const p0 = await o.pg.$$eval('[data-act="grp-pick"]', e => e.map(x => x.dataset.pid));
   await o.tap(`[data-act="grp-pick"][data-pid="${p0[0]}"]`); await j.frame(o, 'Taps a player who will be late');

@@ -62,6 +62,11 @@ ORG.groups = p => {
     }).join('')).join('');
     html += `<section class="sec near grp"><div class="card">${head}${gOpen ? grGroupPanel(r, gi) : ''}${rows}</div></section>`;
   });
+  // A trip: say if anyone shares a buggy again with someone from an earlier day.
+  const repeats = live || scr ? [] : E.repeatedPartners([...priorTripGroups(r), { rid: r.id, groups: r.groups }]).filter(x => x.rounds.includes(r.id));
+  if (repeats.length) html = html.replace('</header>', `</header><div class="banner note">${repeats.map(x => `${esc(x.pair.map(D.nameOf).join(' & '))} shared a buggy before`).join('<br>')}</div>`);
+  const anyScores = r.groups.some(g => g.teams.flat().some(pid => scoresFor(r.id, pid)));
+  if (!live && !drawMade(r) && !anyScores) html += `<div class="foot"><button class="link" data-act="org-draw" data-kind="again">${UI.confirm === 'redraw-' + r.id ? 'Tap again: new groups from the same players' : `Draw ${scr ? 'teams' : 'groups'} again`}</button></div>`;
   return { html };
 };
 
@@ -89,7 +94,21 @@ function grGroupPanel(r, gi) {
   const g = r.groups[gi], full = g.teams.flat().length >= GR.MAX, last = r.groups.length - 1;
   return `<div class="grp-panel">
     <div class="grp-acts">${gi > 0 ? `<button class="btn quiet" data-act="grp-order" data-rid="${r.id}" data-gi="${gi}" data-to="${gi - 1}">Earlier</button>` : ''}${gi < last ? `<button class="btn quiet" data-act="grp-order" data-rid="${r.id}" data-gi="${gi}" data-to="${gi + 1}">Later</button>` : ''}${gi < last - 1 ? `<button class="btn quiet" data-act="grp-order" data-rid="${r.id}" data-gi="${gi}" data-to="${last}">Out last</button>` : ''}${gi > 1 ? `<button class="btn quiet" data-act="grp-order" data-rid="${r.id}" data-gi="${gi}" data-to="0">Out first</button>` : ''}</div>
-    ${full ? `<p class="cap">This ${isScramble(r) ? 'team' : 'group'} has ${GR.MAX}.</p>` : `<p class="cap">Add a player</p>${grPeople(r, 'grp-add', `data-to="${gi}"`)}`}</div>`;
+    ${full ? `<p class="cap">This ${isScramble(r) ? 'team' : 'group'} has ${GR.MAX}.</p>` : `<p class="cap">Add a player</p>${grPeople(r, 'grp-add', `data-to="${gi}"`)}`}
+    ${grStartRow(r, gi)}</div>`;
+}
+/* Starting hole lives in the group's options: shotgun starts are rare (journeys 2/13). */
+function grStartRow(r, gi) {
+  const sh = r.groups[gi].startHole || 1, n = (holesOf(r) || []).length || 18;
+  return `<div class="grp-start"><label class="cap" for="sh-${gi}">Starts on hole</label><select id="sh-${gi}" class="field short" data-change="grp-start" data-rid="${r.id}" data-gi="${gi}">${Array.from({ length: n }, (_, k) => `<option value="${k + 1}"${sh === k + 1 ? ' selected' : ''}>${k + 1}</option>`).join('')}</select></div>`;
+}
+function grStart(rid, gi, hole) {
+  const r = D.round(rid);
+  if (!r || grStarted(r) || !r.groups[gi]) return;
+  const groups = r.groups.map((g, i) => i === gi ? Object.assign({}, g, { startHole: hole }) : g);
+  put('rounds', [Object.assign({}, r, { groups })], { action: 'Groups changed', detail: `${roundName(r)}: ${r.groups[gi].teeTime || 'Group ' + r.groups[gi].n} starts on hole ${hole}` });
+  toast(`${r.groups[gi].teeTime || 'Group ' + r.groups[gi].n} starts on hole ${hole}`);
+  render();
 }
 /* Members not playing (and guests), plus a way to add a new guest. */
 function grPeople(r, act, extra) {
