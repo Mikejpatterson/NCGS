@@ -124,7 +124,7 @@ ORG.round = p => {
   }
   if (r.status === 'live') {
     const reasons = finaliseBlockers(r);
-    html += reasons.length ? `<button class="btn quiet" data-act="finalise" data-rid="${r.id}">Finalise<small style="color:var(--sub)">${esc(reasons.join(' · '))}</small></button>`
+    html += reasons.length ? `<div class="fin-wait"><p class="b">Before you can finalise</p><ul>${reasons.map(x => `<li>${esc(x.charAt(0).toUpperCase() + x.slice(1))}</li>`).join('')}</ul></div><button class="btn quiet" data-act="finalise" data-rid="${r.id}" aria-disabled="true">Finalise</button>`
       : `<button class="btn" data-act="finalise" data-rid="${r.id}">Finalise</button>`;
   } else if (r.status === 'final') {
     html += `<button class="btn quiet" data-act="reopen" data-rid="${r.id}">Reopen round</button>`;

@@ -127,7 +127,8 @@ ORG.pots = p => {
   const probs = d.pots.some(x => x.length) ? DR.potProblems(d.pots.filter(x => x.length)) : [];
   const people = D.members().filter(m => m.active !== false || at[m.id] !== undefined);
   const rows = people.map(m => `<div class="row drw-prow"><span class="drw-pn">${esc(m.name)}</span><span class="drw-pb" role="group" aria-label="Pot for ${esc(m.name)}">${[0, 1, 2, 3].map(i => `<button class="${at[m.id] === i ? 'on' : ''}" data-act="draw-pot" data-rid="${r.id}" data-pid="${m.id}" data-p="${i}" aria-pressed="${at[m.id] === i}"${d.st.started ? ' disabled' : ''}>${DR.potName(i)}</button>`).join('')}</span></div>`).join('');
-  return { html: `<header class="hero s">${navBack('Breakfast draw')}<div class="head"><h1 class="title">Pots</h1></div><p class="sub">${d.pots.map((x, i) => `${DR.potName(i)} ${x.length}`).join(' · ')}</p></header>
+  return { html: `<header class="hero s">${navBack('Breakfast draw')}<div class="head"><h1 class="title">Pots</h1></div></header>
+    <div class="drw-counts" aria-live="polite">${d.pots.map((x, i) => `<span><b>${DR.potName(i)}</b> <span class="num">${x.length}</span></span>`).join('')}<span class="drw-saved">${DB.outbox.length ? 'Saving…' : 'Saved'}</span></div>
     ${d.st.started ? '<div class="banner note">The draw has started, so the pots are fixed.</div>' : ''}${probs.map(w => `<div class="banner warn">${esc(w)}</div>`).join('')}
     ${sec('', cardOf(rows), true)}` };
 };
@@ -143,7 +144,7 @@ ORG.draw = p => {
   if (ti < 0) {
     if (d.pending) drawConfirmSoon();
     else if (d.mine && !d.made && !(r.groups && r.groups.length) && !DR.blockers(d.st, { shortOk: d.shortOk }).length) drawAutoSoon(r.id);
-    return { html: `${top}<div class="drw-stage done"><p class="drw-kicker">Breakfast draw</p><h1 class="drw-team">${d.made ? 'These are the groups' : `All ${T} teams drawn`}</h1>${drawBanner(d)}
+    return { html: `${top}<div class="drw-stage done"><p class="drw-kicker">Breakfast draw</p><h1 class="drw-team">${d.made ? 'These are the groups' : `All ${T} teams drawn`}</h1>${drawBanner(d)}${T > 1 && d.st.teams[T - 1].slots.some(x => x.auto) ? `<p class="drw-watch">Team ${T} is the players left in each pot.</p>` : ''}
       <button class="btn" data-act="org-go" data-v="drawlineup" data-rid="${r.id}">See the line-up</button></div>` };
   }
   const team = d.st.teams[ti];
@@ -156,7 +157,7 @@ ORG.draw = p => {
     const online = DB.online && !DB.outbox.length;
     act = `${d.holder ? '<p class="drw-watch">The draw is running on another device.</p>' : ''}
       ${online ? (d.holder ? `<button class="btn quiet" data-act="draw-claim" data-rid="${r.id}">${UI.confirm === 'dclaim-' + r.id ? 'Tap again to take over the draw here' : 'Take over the draw here'}</button>` : `<button class="btn drw-go" data-act="draw-claim" data-rid="${r.id}">Start the draw</button>`) : '<p class="drw-watch">Connect to the internet to run the draw here.</p>'}`;
-  } else if (spin) act = '<p class="drw-watch">Tap a wheel to stop it</p>';
+  } else if (spin) act = `<p class="drw-watch">${spin.slots.length === 1 ? `Tap pot ${DR.potName(spin.slots[0].p)} to stop it` : 'Tap a wheel to stop it'}</p>`;
   else if (DB.prefs.drawBusy && DB.prefs.drawBusy.rid === r.id && Date.now() - DB.prefs.drawBusy.at < 8000) act = '<button class="btn drw-go" disabled>Checking…</button>';
   else if (teamOpen) act = `<button class="btn drw-go" data-act="draw-go" data-rid="${r.id}">${d.pace === 'all' ? `Draw team ${ti + 1}` : `Draw pot ${DR.potName(d.st.next[0].p)}`}</button>`;
   else if (d.st.current > -1) act = `<button class="btn drw-go" data-act="draw-next" data-rid="${r.id}">Next team</button>`;

@@ -90,7 +90,7 @@ const kbOk = p => p.evaluate(rid => { const n = window.__ncgs, r = n.D.round(rid
     const wd = lg[1].ids[0];
     await p.tap(`[data-act="grp-pick"][data-pid="${wd}"]`);
     const t = await p.locator('main').innerText();
-    check('once play has started, the only change offered is Withdraw', /Withdraw from hole \d+/.test(t) && !(await p.$('[data-act="grp-move"], [data-act="grp-remove"], [data-act="grp-replace"]')));
+    check('once play has started, the only change offered is Withdraw', /Withdraw \S.* from hole \d+/.test(t) && !(await p.$('[data-act="grp-move"], [data-act="grp-remove"], [data-act="grp-replace"]')));
     const from = Number(await p.$eval('[data-act="grp-withdraw"]', e => e.dataset.from));
     await p.tap('[data-act="grp-withdraw"]'); await p.tap('[data-act="grp-withdraw"]');
     check('the withdrawal is saved and logged', await p.evaluate(([rid, pid]) => window.__ncgs.D.setting(`wd:${rid}:${pid}`, '') !== '' && window.__ncgs.view().log.some(l => l.action === 'Player withdrew'), [p.rid, wd]));

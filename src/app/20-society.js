@@ -640,7 +640,7 @@ function roundGroups(r) {
   if (isScramble(r)) return `<div class="card rp-groups">${r.groups.map(g => {
     const gc = live ? live.groups.find(x => x.id === g.id) : null;
     const prog = gc ? (gc.complete ? 'Finished' : gc.holesDone ? 'Thru ' + gc.holesDone : '') : '';
-    return `<div class="rg${mine && mine.id === g.id ? ' me' : ''}"><span class="rg-t"><b>${esc(g.teeTime || 'G' + g.n)}</b>${prog ? `<small>${prog}</small>` : ''}</span><span class="pk wide">${esc(g.teams.flat().map(D.nameOf).join(', '))}</span><span></span></div>`;
+    return `<div class="rg${mine && mine.id === g.id ? ' me' : ''}"><span class="rg-t"><b>${esc(g.teeTime || 'G' + g.n)}</b>${prog ? `<small>${prog}</small>` : ''}</span><span class="rg-team"><span class="cap">Team ${g.n}</span><span>${g.teams.flat().map(pid => pid === DB.prefs.me ? `<b>${esc(D.nameOf(pid))}</b>` : esc(D.nameOf(pid))).join(', ')}</span></span><span></span></div>`;
   }).join('')}</div>`;
   return `<div class="card rp-groups">${r.groups.map(g => {
     const key = 'rg' + r.id + g.id, open = !!UI.open[key];
@@ -661,10 +661,10 @@ function roundPlayers(r) {
   const ids = r.groups.flatMap(g => g.teams.flat().map(pid => ({ pid, g })));
   ids.sort((a, b) => D.nameOf(a.pid).localeCompare(D.nameOf(b.pid)));
   const scr = isScramble(r);   // a scramble plays off team shots: no personal playing handicap
-  const cols = `<div class="pl-row cols"><span></span><span></span><span class="r cap">Index</span><span class="r cap">${scr ? '' : 'Playing'}</span><span></span></div>`;
-  return `<div class="card rp-players">${cols}${ids.map(({ pid, g }) => {
+  const cols = `<div class="pl-row cols"><span></span><span></span>${scr ? '' : '<span class="r cap">Index</span><span class="r cap">Playing</span>'}<span></span></div>`;
+  return `<div class="card rp-players${scr ? ' scr' : ''}">${cols}${ids.map(({ pid, g }) => {
     const m = D.member(pid), ph = scr ? null : phOf(pid), can = tee && m && !scr;
-    const inner = `${avBadge(pid)}<span class="pl-n"><span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span><span class="cap">${esc(scr ? `Team ${g.n}${g.teeTime ? ' · ' + g.teeTime : ''}` : g.teeTime ? g.teeTime : 'Group ' + g.n)}</span></span><span class="r sub num">${m ? fmtIndex(m.index) : ''}</span><span class="r b num">${ph === null ? '' : ph}</span>${can ? chev : '<span></span>'}`;
+    const inner = `${avBadge(pid)}<span class="pl-n"><span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span><span class="cap">${esc(scr ? `Team ${g.n}${g.teeTime ? ' · ' + g.teeTime : ''}` : g.teeTime ? g.teeTime : 'Group ' + g.n)}</span></span>${scr ? '' : `<span class="r sub num">${m ? fmtIndex(m.index) : ''}</span><span class="r b num">${ph === null ? '' : ph}</span>`}${can ? chev : '<span></span>'}`;
     return can ? `<button class="pl-row${pid === DB.prefs.me ? ' me' : ''}" data-act="hcp" data-pid="${pid}" data-rid="${r.id}">${inner}</button>` : `<div class="pl-row">${inner}</div>`;
   }).join('')}</div>`;
 }

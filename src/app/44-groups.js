@@ -49,18 +49,18 @@ ORG.groups = p => {
   const fixed = live && scr;
   const sub = fixed ? 'Play has started: the teams are fixed' : live ? 'Play has started: tap a player to withdraw them' : `${plural(n, 'player')} · tap a name or a group to change it`;
   let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups</h1></div><p class="sub">${esc(sub)}</p></header>`;
-  if (sel && sel.mode === 'swap') html += `<div class="grp-swapbar"><span>${sel.only !== undefined ? `${esc(r.groups[sel.only].teeTime || 'That group')} is full. Tap who ${esc(D.nameOf(sel.pid))} swaps with.` : `Tap who ${esc(D.nameOf(sel.pid))} swaps with.`}</span><button class="link" data-act="grp-cancel">Cancel</button></div>`;
+  if (sel && sel.mode === 'swap') html += `<div class="grp-swapbar"><span>${sel.only !== undefined ? `${esc(grName(r, sel.only))} is full. Tap who ${esc(D.nameOf(sel.pid))} swaps with.` : `Tap who ${esc(D.nameOf(sel.pid))} swaps with.`}</span><button class="link" data-act="grp-cancel">Cancel</button></div>`;
   r.groups.forEach((g, gi) => {
     const gOpen = sel && sel.gi === gi && !sel.pid;
     const head = `<button class="row tall grp-head${gOpen ? ' picked' : ''}" data-act="grp-group" data-rid="${r.id}" data-gi="${gi}" aria-expanded="${gOpen}"${live ? ' disabled' : ''}><span class="two"><b class="num">${esc(g.teeTime || '')}</b><span class="sub">${scr ? 'Team' : 'Group'} ${g.n}${g.teams.flat().length !== GR.MAX ? ` · ${plural(g.teams.flat().length, 'player')}` : ''}${g.startHole && g.startHole !== 1 ? ` · starts hole ${g.startHole}` : ''}</span></span></button>`;
     const rows = g.teams.map((t, i) => t.map(pid => {
       const on = sel && sel.pid === pid, wd = wdOf(r.id, pid), sc = scoresFor(r.id, pid);
-      const note = wd ? `<span class="pill n">Withdrawn · hole ${wd}</span>` : sc && !live ? '<span class="sub">Has scores</span>' : '';
+      const note = wd ? `<span class="pill n">Withdrawn · hole ${wd}</span>` : sc && !live ? '<span class="sub">Has scores</span>' : !scr && g.teams.length > 1 ? `<span class="cap">Buggy ${i + 1}</span>` : '';
       const inner = `<span style="display:flex;align-items:center;gap:8px">${!scr && g.teams.length > 1 ? dot(i) : ''}${esc(D.nameOf(pid))}</span>${note}`;
       const row = fixed ? `<div class="row">${inner}</div>` : `<button class="row${on ? ' picked' : ''}" data-act="grp-pick" data-rid="${r.id}" data-pid="${pid}" aria-expanded="${!!on}">${inner}</button>`;
       return row + (on && sel.mode !== 'swap' ? grPlayerPanel(r, pid, gi) : '');
     }).join('')).join('');
-    html += `<section class="sec near grp"><div class="card">${head}${gOpen ? grGroupPanel(r, gi) : ''}${rows}</div></section>`;
+    html += `<section class="sec near grp${sel && sel.only !== undefined && sel.only !== gi ? ' grp-dim' : ''}" id="grp-${gi}"><div class="card">${head}${gOpen ? grGroupPanel(r, gi) : ''}${rows}</div></section>`;
   });
   // A trip: say if anyone shares a buggy again with someone from an earlier day.
   const repeats = live || scr ? [] : E.repeatedPartners([...priorTripGroups(r), { rid: r.id, groups: r.groups }]).filter(x => x.rounds.includes(r.id));
@@ -70,6 +70,7 @@ ORG.groups = p => {
   return { html };
 };
 
+const grName = (r, gi) => { const g = r.groups[gi]; return `${isScramble(r) ? 'Team' : 'Group'} ${g.n}${g.teeTime ? ' (' + g.teeTime + ')' : ''}`; };
 /* What can happen to a player: before play, move / swap / replace / take out; once play has started, withdraw. */
 function grPlayerPanel(r, pid, gi) {
   const name = esc(D.nameOf(pid));
@@ -78,16 +79,16 @@ function grPlayerPanel(r, pid, gi) {
     const wd = wdOf(r.id, pid);
     if (wd) return `<div class="grp-panel"><p class="cap">${name} picks up on every hole from ${wd}.</p><button class="btn quiet" data-act="grp-unwithdraw" data-rid="${r.id}" data-pid="${pid}">${UI.confirm === 'unwd-' + pid ? 'Tap again: back in' : 'Undo the withdrawal'}</button></div>`;
     const from = grNextHole(r, pid);
-    return `<div class="grp-panel"><p class="cap">${name} picks up (scratch) on every hole from ${from}.</p><button class="btn" data-act="grp-withdraw" data-rid="${r.id}" data-pid="${pid}" data-from="${from}">${UI.confirm === 'wd-' + pid ? `Tap again to withdraw ${name}` : `Withdraw from hole ${from}`}</button></div>`;
+    return `<div class="grp-panel"><p class="cap">${name} picks up (scratch) on every hole from ${from}.</p><button class="btn" data-act="grp-withdraw" data-rid="${r.id}" data-pid="${pid}" data-from="${from}">${UI.confirm === 'wd-' + pid ? `Tap again to withdraw ${name}` : `Withdraw ${name} from hole ${from}`}</button></div>`;
   }
   if (scoresFor(r.id, pid)) return `<div class="grp-panel"><p class="cap">${name} already has scores in this round, so they stay where they are.</p></div>`;
   // A full group still takes them: tapping it asks who in that group they swap with.
   const moves = r.groups.map((g, j) => j === gi ? '' : `<button class="chipb" data-act="grp-move" data-rid="${r.id}" data-pid="${pid}" data-to="${j}">${esc(g.teeTime || (isScramble(r) ? 'Team ' : 'Group ') + g.n)}</button>`).join('');
+  if (UI.gsel && UI.gsel.mode === 'replace') return `<div class="grp-panel"><p class="cap b">Who plays instead of ${name}?</p>${grPeople(r, 'grp-replace-with', `data-pid="${pid}"`)}<button class="btn quiet" data-act="grp-replace" data-rid="${r.id}" data-pid="${pid}">Cancel</button></div>`;
   return `<div class="grp-panel">
     <p class="cap">Move ${name} to</p><div class="chips">${moves}<button class="chipb" data-act="grp-move" data-rid="${r.id}" data-pid="${pid}" data-to="${r.groups.length}">New group</button></div>
     <div class="grp-acts"><button class="btn quiet" data-act="grp-swap" data-rid="${r.id}" data-pid="${pid}">Swap with…</button><button class="btn quiet" data-act="grp-replace" data-rid="${r.id}" data-pid="${pid}">Replace with…</button></div>
-    ${UI.gsel && UI.gsel.mode === 'replace' ? grPeople(r, 'grp-replace-with', `data-pid="${pid}"`) : ''}
-    <button class="link c-b grp-out" data-act="grp-remove" data-rid="${r.id}" data-pid="${pid}">${UI.confirm === 'out-' + pid ? `Tap again to take ${name} out` : 'Take out of the round'}</button></div>`;
+    <div class="grp-outzone"><button class="link c-b grp-out" data-act="grp-remove" data-rid="${r.id}" data-pid="${pid}">${UI.confirm === 'out-' + pid ? `Tap again to take ${name} out` : `Take ${name} out of the round`}</button></div></div>`;
 }
 /* What can happen to a group: add a player, go out earlier or later. */
 function grGroupPanel(r, gi) {
@@ -132,7 +133,7 @@ const GROUP_ACT = {
   'grp-group': el => { const rid = el.dataset.rid, gi = Number(el.dataset.gi), sel = grSel(rid); UI.gsel = sel && !sel.pid && sel.gi === gi ? null : { rid, gi }; UI.confirm = null; render(); },
   'grp-cancel': () => { UI.gsel = null; render(); },
   'grp-move': el => { const r = D.round(el.dataset.rid), to = Number(el.dataset.to), g = r.groups[to];
-    if (g && g.teams.flat().length >= GR.MAX) { UI.gsel = { rid: r.id, pid: el.dataset.pid, mode: 'swap', only: to }; render(); return; }
+    if (g && g.teams.flat().length >= GR.MAX) { UI.gsel = { rid: r.id, pid: el.dataset.pid, mode: 'swap', only: to }; render(); const t = document.getElementById('grp-' + to); if (t && t.scrollIntoView) t.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
     grChange(r.id, { type: 'move', pid: el.dataset.pid, to }, `${D.nameOf(el.dataset.pid)} moved to ${g ? (g.teeTime || 'group ' + g.n) : 'a new group at the end'}`); },
   'grp-swap': el => { UI.gsel = { rid: el.dataset.rid, pid: el.dataset.pid, mode: 'swap' }; render(); },
   'grp-replace': el => { const s = grSel(el.dataset.rid); UI.gsel = { rid: el.dataset.rid, pid: el.dataset.pid, mode: s && s.mode === 'replace' ? null : 'replace' }; render(); },
