@@ -1,0 +1,80 @@
+<title>NCGS Finish Plan</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one narrow reading column; the ask first, then what's done, what's next, how it ends. */
+:root{
+  --bg:#FAF8F3; --fg:#17231E; --sub:#5B6862; --line:#E4DFD3; --card:#FFFFFF;
+  --pine:#0B3D2E; --onpine:#FAF8F3; --gold:#D4B483; --ok:#2E6B4F; --wait:#8A5A12;
+  --serif: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1714; --fg:#ECE8DE; --sub:#A3AEA8; --line:#26332D; --card:#16211C;
+  --pine:#123F31; --onpine:#FAF8F3; --gold:#D4B483; --ok:#7CC4A0; --wait:#E0B062; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1714; --fg:#ECE8DE; --sub:#A3AEA8; --line:#26332D; --card:#16211C;
+  --pine:#123F31; --onpine:#FAF8F3; --gold:#D4B483; --ok:#7CC4A0; --wait:#E0B062; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font:16px/1.5 var(--sans)}
+.wrap{max-width:40rem;margin:0 auto;padding-block:24px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
+h1{font:600 2rem/1.15 var(--serif);margin:0;text-wrap:balance}
+h2{font:600 1.15rem/1.3 var(--sans);margin:0 0 10px}
+p{margin:0}
+.sub{color:var(--sub)}
+.ask{background:var(--pine);color:var(--onpine);border-radius:20px;padding:20px;display:flex;flex-direction:column;gap:8px}
+.ask .k{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.ask p.big{font-size:1.25rem;font-weight:600}
+.list{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.item{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:14px 0;border-bottom:1px solid var(--line)}
+.item>div{min-width:0}
+.item b{font-weight:600}
+.item ul{margin:6px 0 0;padding-left:1.1rem;color:var(--sub)}
+.item li{margin:2px 0}
+.pill{align-self:start;font-size:.78rem;font-weight:600;padding:3px 10px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.done{color:var(--ok)} .next{color:var(--wait)} .you{color:var(--fg)}
+.who{font-size:.85rem;color:var(--sub);margin-top:4px}
+.note{border-left:3px solid var(--line);padding-left:12px;color:var(--sub)}
+</style>
+<div class="wrap">
+  <header style="display:flex;flex-direction:column;gap:6px">
+    <h1>NCGS: plan to finish Westport, draw and groups</h1>
+    <p class="sub">Monday 26 October 2026 · Claude with Codex</p>
+  </header>
+
+  <section class="ask">
+    <span class="k">Your sign-off</span>
+    <p class="big">Reply "Yes" and we carry this through to the end.</p>
+    <p>After that you'll hear from us twice: once for the phone check (5 minutes, step by step), and once with before-and-after screens to approve going live. Nothing goes live without your Yes.</p>
+  </section>
+
+  <section>
+    <h2>Done today</h2>
+    <div class="list">
+      <div class="item"><div><b>Clear wording and back links</b>
+        <ul><li>"Nobody" instead of "_nobody"</li><li>Every results page has a back link to where you came from</li><li>"3 groups still playing" instead of "cards open"</li><li>"On this phone · sends when there's signal" until a score is sent</li><li>"Live" instead of "Thru 5"</li></ul></div><span class="pill done">Done</span></div>
+      <div class="item"><div><b>One Groups screen</b>
+        <ul><li>Draw, and the groups are saved. No separate Save step</li><li>Move, swap, replace, add or take out anyone before play; withdraw only after play starts</li><li>Start hole sits inside a group's options</li><li>Start round button gone: a round goes live with its first score</li></ul></div><span class="pill done">Done</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Still to do</h2>
+    <div class="list">
+      <div class="item"><div><b>Home shows your day</b>
+        <ul><li>"You're off at 10:08 with Aidan, Cathal and Hugh"</li><li>When a round is finalised, its result leads Home that day</li><li>On a trip: a strip with each day's course and winner, and today's round live</li></ul>
+        <p class="who">Claude: the data. Codex: the layout.</p></div><span class="pill next">Next</span></div>
+      <div class="item"><div><b>Visual tidy-up (from Codex's review)</b>
+        <ul><li>Draw: pot counts stay in view; name the pot being spun; Team 4 is "the players left"</li><li>Member screens: team names wrap instead of squashing; less room for index</li><li>Groups: buggy pairs labelled, not colour only; "Take out" set apart; "Withdraw Eoghan from hole 15"</li><li>Finalise: what's still outstanding is as clear as the button</li></ul>
+        <p class="who">Codex leads; Claude checks it against the tests.</p></div><span class="pill next">Next</span></div>
+      <div class="item"><div><b>Release</b>
+        <ul><li>Westport, the breakfast draw and Groups combined into one update</li><li>Every test passes, and all seven journeys are re-recorded</li><li>Phone check: you open the app with no signal, enter a score, then turn signal back on. We guide each step</li></ul>
+        <p class="who">Claude prepares it. You approve, then merge.</p></div><span class="pill you">Your Yes</span></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>What stays as it is</h2>
+    <p class="sub">Scoring through lost signal, the breakfast draw on the iPad, KB pairs made and repaired automatically, finalise and reopen, contests confirmed by you. Pots stay manual. A scramble finishes only when every team is in and the contests are confirmed.</p>
+  </section>
+
+  <p class="note">Codex hasn't replied since lunchtime. Anything it raises will be folded in. It won't come back to you unless it changes what you'd see.</p>
+</div>
