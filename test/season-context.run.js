@@ -52,7 +52,8 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
     await redraw(() => { const n = window.__ncgs; n.UI.stack = [{ v: 'home', p: {} }, { v: 'players', p: {} }]; n.render(); });
     await page.click('.prow'); await page.waitForTimeout(200);
     const current = await page.evaluate(() => ({ cap: document.querySelector('.tiles .tile.flag .cap').textContent, n: document.querySelectorAll('.tiles .tile').length }));
-    check('from the Players list it shows the current season, with To beat', current.cap === 'GOY' && current.n === 3);
+    // "To beat" shows only when there is someone to beat (journey 4 review), so the leader has two tiles.
+    check('from the Players list it shows the current season', current.cap === 'GOY' && current.n >= 2);
 
     check('nothing runs off the side', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     check('no script errors', errors.length === 0); if (errors.length) console.log(errors);

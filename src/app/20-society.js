@@ -1,4 +1,6 @@
 /* ================= SOCIETY SCREENS ================= */
+/* A contest answer of "nobody" is stored as '_nobody'; every screen shows it as "Nobody" (journey 6 review). */
+{ const nameOf0 = D.nameOf; D.nameOf = id => (id === '_nobody' ? 'Nobody' : nameOf0(id)); }
 const VIEWS = {};
 
 function roundRow(r, right) {
@@ -504,7 +506,8 @@ VIEWS.round = p => {
   const holes = holesOf(r);
   const inPlay = UI.stack.some(e => ['tee', 'match', 'board', 'rules'].includes(e.v));
   const prev = UI.stack[UI.stack.length - 2];
-  let html = '<header class="hero s">' + navBack(prev && prev.v === 'tee' ? `Hole ${UI.hole || ''}`.trim() : prev && prev.v === 'player' ? D.nameOf(prev.p.pid) : prev && prev.v === 'card' ? 'Card' : D.society());
+  // The back link names where it goes (journey 1: it used to say "NCGS" coming from Past rounds).
+  let html = '<header class="hero s">' + navBack(prev && prev.v === 'tee' ? `Hole ${UI.hole || ''}`.trim() : prev && prev.v === 'card' ? 'Card' : backLabel());
   html += `<div class="head"><h1 class="title">${esc(roundName(r))}</h1>${statusPill(r)}</div>`;
   const when = roundWhen(r);
   if (when) html += `<p class="sub">${esc(when)}</p>`;
@@ -721,7 +724,7 @@ VIEWS.player = p => {
   html += `<div class="head"><h1 class="title is-name">${esc(m.name)}</h1></div><p class="sub">${esc([m.full, 'Index ' + fmtIndex(m.index)].filter(Boolean).join(' · '))}</p>`;
   html += `<div class="tiles${past ? ' two' : ''}"><div class="tile flag"><span class="cap">GOY${past ? ' ' + season : ''}</span><span class="bignum">${row ? posWord(row.posLabel) : '–'}</span></div>
     <div class="tile"><span class="cap">Best ${D.goyBest()}</span><span class="bignum">${row ? row.total : '–'}</span></div>
-    ${past ? '' : `<div class="tile"><span class="cap">To beat</span><span class="bignum">${row && row.toBeat ? row.toBeat : '–'}</span></div>`}</div></header>`;
+    ${past || !(row && row.toBeat) ? '' : `<div class="tile"><span class="cap">To beat</span><span class="bignum">${row.toBeat}</span></div>`}</div></header>`;
   const rowsFor = yr => seasonRounds(yr).filter(r => r.status === 'final' || r.status === 'live').reverse().map(r => {
     const res = resultsOf(r.id);
     const me = res ? res.rows.find(x => x.id === m.id) : null;

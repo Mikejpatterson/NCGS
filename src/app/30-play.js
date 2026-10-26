@@ -434,7 +434,7 @@ VIEWS.after = () => {
   } else next = `<button class="btn" data-act="to-finish">See the card</button>`;
   return {
     tabs: 'hole',
-    html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><b>Par ${ah.par}</b><span>Index ${ah.si}${ah.yards ? ` · ${ah.yards} yds` : ''}</span></div></div><div class="afsaved"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
+    html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><b>Par ${ah.par}</b><span>Index ${ah.si}${ah.yards ? ` · ${ah.yards} yds` : ''}</span></div></div><div class="afsaved"><span class="savedchip">${sized(ICON.check, 18)} ${DB.outbox.some(i => i.req && i.req.op === 'saveHole' && i.req.round === a.rid && Number(i.req.hole) === a.n) ? 'On this phone · sends when there\'s signal' : 'Saved'}</span><button class="undochip" data-act="undo">Undo</button></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
       ${buggies ? `<div class="sec-label afbw"><span class="sub">Buggy Wars</span></div><div class="bw-vs afvs">${bwBadges(gc.teams[0], 0)}<span class="sub">v</span>${bwBadges(gc.teams[1], 1)}</div>
       <div class="card bw-card aftercard"><div class="bw-row afres"><span class="bw-l afl">Hole ${a.n}</span>${head}<span></span>${sub ? `<small class="afres-sub">${esc(sub)}</small>` : ''}</div>${rows}</div>` : `<div class="aftercard"><div class="afhead"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>${rows}</div>`}
       ${edge}${next}${saveWarning()}</div>`
@@ -833,7 +833,10 @@ VIEWS.board = () => {
   const pillSel = avail.includes(UI.res) ? UI.res : 'lb';
   const live0 = r.status === 'live';
   const thru0 = live0 && res0 && res0.rows.length ? Math.max(...res0.rows.map(x => x.thru || 0)) : 0;
-  let html = `<header class="hero c lbhead">${live0 ? `<p class="eyebrow"><span class="pulse"></span>LIVE${thru0 ? ' \u00b7 THRU ' + thru0 : ''}</p>` : ''}<div class="hrow2"><h1 class="big">Leaderboard</h1></div><p class="sub">${esc(roundName(r))} \u00b7 ${isScramble(r) ? 'Team scramble' : 'Stableford'}</p></header>`;
+  // Opened from somewhere (a trip day, a round, Home's "See the results"): a back link, so it isn't a dead end (journey 4).
+  const fromSt = typeof stackOf === 'function' ? stackOf() : UI.stack;
+  const backTo = fromSt && fromSt.length > 1 && fromSt[fromSt.length - 1].v === 'board' ? navBack(backLabel()) : '';
+  let html = `${backTo}<header class="hero c lbhead">${live0 ? `<p class="eyebrow"><span class="pulse"></span>LIVE${thru0 ? ' \u00b7 THRU ' + thru0 : ''}</p>` : ''}<div class="hrow2"><h1 class="big">Leaderboard</h1></div><p class="sub">${esc(roundName(r))} \u00b7 ${isScramble(r) ? 'Team scramble' : 'Stableford'}</p></header>`;
   if (avail.length > 1) {
     const names = { lb: 'Scores', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
     html += `<div class="seg pills${avail.length > 3 ? ' four' : ''}" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;

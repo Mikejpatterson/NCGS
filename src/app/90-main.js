@@ -581,7 +581,7 @@ function render() {
     try {
       const rid = playRid() || liveRid(), mine = rid && myGroup(rid), comp = mine && progressOf(rid);
       const gc = comp && comp.groups.find(g => g.id === mine.id);
-      if (gc) lbl = gc.nextHole ? `Hole ${gc.nextHole}` : 'Card';
+      if (gc) lbl = gc.nextHole ? `Hole ${gc.nextHole}` : isScramble(D.round(rid)) ? 'Team' : 'Card';
     } catch (e) { /* keep "Hole" */ }
     const span = tabs.querySelector('.tab[data-tab="hole"] span');
     if (span && span.textContent !== lbl) span.textContent = lbl;

@@ -74,7 +74,7 @@ function finaliseBlockers(r) {
   const wins = D.winners(r.id);
   const toConfirm = (r.contests || []).filter(c => (claims[c.hole] || []).length && !wins[c.hole]).length;
   const reasons = [];
-  if (open) reasons.push(`${plural(open, 'card')} open`);
+  if (open) reasons.push(`${plural(open, isScramble(r) ? 'team' : 'group')} still playing`);
   if (toConfirm) reasons.push(`${plural(toConfirm, 'contest')} to confirm`);
   return reasons;
 }
