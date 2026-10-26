@@ -113,11 +113,11 @@ const lenStyle = s => `style="--len:${[...s].length}"`;
 /* The round card's buttons. During a live round that you're playing, the main button takes you back to scoring
    ("Continue · Hole 7"), and Players · Groups · KBs becomes a quieter link underneath (design review, 22 October). */
 function nowActs(r, live, group) {
-  const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">${live ? 'Players · Groups · KBs' : 'View round details'}</button>`;
+  const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">${live ? (isScramble(r) ? 'Players · Groups' : 'Players · Groups · KBs') : 'View round details'}</button>`;
   const next = group ? group.nextHole : null;
   if (!next) return `<div class="now-acts one">${groups}</div>`;
   return `<div class="now-acts one"><button class="go" data-act="tab" data-tab="hole">Continue \u00b7 Hole ${next}</button>
-    <button class="go-link" data-act="round" data-rid="${r.id}" data-tab="players">Players \u00b7 Groups \u00b7 KBs</button></div>`;
+    <button class="go-link" data-act="round" data-rid="${r.id}" data-tab="players">Players \u00b7 Groups${isScramble(r) ? '' : ' \u00b7 KBs'}</button></div>`;
 }
 
 function nowCard(r) {
@@ -518,7 +518,8 @@ VIEWS.round = p => {
     const kbPair = (r.kb || []).find(pr => pr.includes(me));
     const kbWith = kbPair ? kbPair.filter(pid => pid !== me) : [];
     const names = pairNames;
-    const dl = [
+    // A scramble team is the whole group: no "against", no KB partner.
+    const dl = isScramble(r) ? `<dt>Team</dt><dd>${mine.teams.flat().filter(pid => pid !== me).map(pid => esc(D.nameOf(pid))).join(', ')}</dd>` : [
       partner.length ? `<dt>With</dt><dd>${names(partner)}</dd>` : '',
       other ? `<dt>Against</dt><dd>${names(other)}</dd>` : (!partner.length ? `<dt>With</dt><dd>${names(mine.teams.flat().filter(pid => pid !== me))}</dd>` : ''),
       kbWith.length ? `<dt>KB with</dt><dd>${names(kbWith)}</dd>` : ''
@@ -533,7 +534,7 @@ VIEWS.round = p => {
     if (me && mine) { const gc = progressOf(r.id).groups.find(g => g.id === mine.id); lbl = inPlay || gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now'; }
     go = `<button class="go" data-act="play" data-rid="${r.id}">${lbl}</button>`;
   } else if (live) go = `<button class="go" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>`;
-  html = `<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">Stableford</span></div>
+  html = `<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">${isScramble(r) ? 'Scramble' : 'Stableford'}</span></div>
     <h1 class="rp-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
   if (playable && me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
 
@@ -568,6 +569,12 @@ function roundGroups(r) {
     return `<${can ? 'button' : 'div'} class="hrow"${can ? ` data-act="hcp" data-pid="${pid}" data-rid="${r.id}"` : ''}><span class="nm">${g.teams.length > 1 ? dot(i) : ''}<span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span></span><span class="r sub">${m ? fmtIndex(m.index) : ''}</span><span class="r b">${ph === null ? '' : ph}</span>${can ? chev : '<span></span>'}</${can ? 'button' : 'div'}>`;
   }).join('')).join('');
   const mine = myGroup(r.id);
+  // A scramble group is one team of four: names together, no buggy pairs, no handicap working.
+  if (isScramble(r)) return `<div class="card rp-groups">${r.groups.map(g => {
+    const gc = live ? live.groups.find(x => x.id === g.id) : null;
+    const prog = gc ? (gc.complete ? 'Finished' : gc.holesDone ? 'Thru ' + gc.holesDone : '') : '';
+    return `<div class="rg${mine && mine.id === g.id ? ' me' : ''}"><span class="rg-t"><b>${esc(g.teeTime || 'G' + g.n)}</b>${prog ? `<small>${prog}</small>` : ''}</span><span class="pk wide">${esc(g.teams.flat().map(D.nameOf).join(', '))}</span><span></span></div>`;
+  }).join('')}</div>`;
   return `<div class="card rp-groups">${r.groups.map(g => {
     const key = 'rg' + r.id + g.id, open = !!UI.open[key];
     const gc = live ? live.groups.find(x => x.id === g.id) : null;
@@ -586,10 +593,11 @@ function roundPlayers(r) {
   const phOf = pid => (r.ph && r.ph[pid] !== undefined ? r.ph[pid] : comp ? comp.players[pid].ph : tee && D.member(pid) ? E.playingHandicap(D.member(pid).index, tee, allowanceOf(r)) : null);
   const ids = r.groups.flatMap(g => g.teams.flat().map(pid => ({ pid, g })));
   ids.sort((a, b) => D.nameOf(a.pid).localeCompare(D.nameOf(b.pid)));
-  const cols = '<div class="pl-row cols"><span></span><span></span><span class="r cap">Index</span><span class="r cap">Playing</span><span></span></div>';
+  const scr = isScramble(r);   // a scramble plays off team shots: no personal playing handicap
+  const cols = `<div class="pl-row cols"><span></span><span></span><span class="r cap">Index</span><span class="r cap">${scr ? '' : 'Playing'}</span><span></span></div>`;
   return `<div class="card rp-players">${cols}${ids.map(({ pid, g }) => {
-    const m = D.member(pid), ph = phOf(pid), can = tee && m;
-    const inner = `${avBadge(pid)}<span class="pl-n"><span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span><span class="cap">${esc(g.teeTime ? g.teeTime : 'Group ' + g.n)}</span></span><span class="r sub num">${m ? fmtIndex(m.index) : ''}</span><span class="r b num">${ph === null ? '' : ph}</span>${can ? chev : '<span></span>'}`;
+    const m = D.member(pid), ph = scr ? null : phOf(pid), can = tee && m && !scr;
+    const inner = `${avBadge(pid)}<span class="pl-n"><span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span><span class="cap">${esc(scr ? `Team ${g.n}${g.teeTime ? ' · ' + g.teeTime : ''}` : g.teeTime ? g.teeTime : 'Group ' + g.n)}</span></span><span class="r sub num">${m ? fmtIndex(m.index) : ''}</span><span class="r b num">${ph === null ? '' : ph}</span>${can ? chev : '<span></span>'}`;
     return can ? `<button class="pl-row${pid === DB.prefs.me ? ' me' : ''}" data-act="hcp" data-pid="${pid}" data-rid="${r.id}">${inner}</button>` : `<div class="pl-row">${inner}</div>`;
   }).join('')}</div>`;
 }

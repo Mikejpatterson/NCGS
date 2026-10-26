@@ -70,6 +70,20 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
     await go([{ v: 'home', p: {} }]);
     check('Home doesn\'t offer Westport trip standings', !/Trip standings[\s\S]{0,40}Westport/.test(await text()));
 
+    // Members' screens describe a team of four, not Stableford pairs (owner walk-through, 26 October).
+    await page.evaluate(() => { const n = window.__ncgs; n.UI.rtab = 'groups'; n.UI.rtabPicked = true; });
+    await go([{ v: 'home', p: {} }, { v: 'round', p: { rid: 'fx-wp2' } }]);
+    const card = await page.$eval('.rp-card', e => e.innerText);
+    check('the round card says Scramble and lists the team, with no "against" or KB partner', /Scramble/.test(card) && /Team/.test(card) && !/Against|KB with|Stableford/.test(card));
+    check('no KBs tab in a scramble', !(await page.locator('.rtabs [data-t="kb"]').count()));
+    check('groups show each team of four together, no buggy pairs', (await page.locator('.rp-groups .rg').count()) === 4 && !(await page.locator('.rp-groups .pb, .rp-groups .pr').count())
+      && (await page.$$eval('.rp-groups .pk', es => es.every(e => e.textContent.split(',').length === 4))));
+    await page.evaluate(() => { const n = window.__ncgs; n.UI.rtab = 'players'; });
+    await go([{ v: 'home', p: {} }, { v: 'round', p: { rid: 'fx-wp2' } }]);
+    check('players show their team, not a playing handicap', /Team \d/.test(await page.$eval('.rp-players', e => e.innerText)) && !/Playing/.test(await page.$eval('.rp-players', e => e.innerText)));
+    await go([{ v: 'home', p: {} }]);
+    check('Home\'s round card link leaves out KBs', !/Groups\s*·\s*KBs/.test(await text()));
+
     check('nothing runs off the side', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     check('no script errors', errors.length === 0); if (errors.length) console.log(errors);
   } catch (e) { console.error(e); ok = false; } finally { await browser.close(); }
