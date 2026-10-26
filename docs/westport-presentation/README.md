@@ -1,8 +1,9 @@
 # Westport presentation study — actual application renders
 
 Based on PR #41 head `ce5e8ca3efc06232663b33940f1d13e200229265`.
-This isolated contribution changes presentation only. Claude owns integration;
-nothing has been merged into #41, design or main, and nothing has been deployed.
+This contribution (PR #42) changes presentation only. It was integrated into #41
+(`claude/westport`) at `6fc0ab2` on 25 October, with a long-names fix (`a3f11ba`);
+nothing has been merged into design or main, and nothing has been deployed.
 
 ## Design decision
 
