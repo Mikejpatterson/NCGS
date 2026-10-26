@@ -138,6 +138,33 @@ function youreOff(r, group) {
   const when = g.teeTime ? `You're off at ${g.teeTime}` : `You're in ${isScramble(r) ? 'Team' : 'Group'} ${g.n}`;
   return `${isScramble(r) && g.teeTime ? `Team ${g.n} · ` : ''}${when}${list ? ' with ' + list : ''}${g.startHole && g.startHole !== 1 ? ` · from hole ${g.startHole}` : ''}`;
 }
+/* A trip without a combined board: each day in a few words, e.g. "Day 1: Aidan won · Day 2: live" (journeys 5/12). */
+function tripDays(list) {
+  return list.map((x, i) => {
+    const w = x.status === 'final' ? (() => { const res = resultsOf(x.id); if (!res) return 'played'; const top = isScramble(x) ? (res.teams || []).filter(t => t.pos === 1).map(t => t.name) : (res.rows || []).filter(t => t.pos === 1).map(t => t.name); return top.length ? `${top.join(' & ')} won` : 'played'; })() : x.status === 'live' ? 'live' : 'to play';
+    return `Day ${x.trip_day || i + 1}: ${w}`;
+  }).join(' \u00b7 ');
+}
+/* Today's finished round: who won, and the way to the results. */
+function winnersOf(r) {
+  const res = resultsOf(r.id);
+  if (!res) return '';
+  if (isScramble(r)) { const t = (res.teams || []).filter(x => x.pos === 1); return t.length ? `${t.map(x => x.name).join(' and ')} won` : ''; }
+  const top = (res.rows || []).filter(x => x.pos === 1);
+  return top.length ? `${top.map(x => x.name).join(' and ')} won on ${top[0].total} points` : '';
+}
+function resultCard(r) {
+  const won = winnersOf(r), kb = isScramble(r) ? kbLine(r) : (() => { const low = kbLowOf(r.id); return low && low.length ? `KBs: ${low.map(k => k.name).join(' and ')}` : ''; })();
+  return `<div class="now home-live-ticket">
+    <button class="now-main" data-act="leaderboard" data-rid="${r.id}">
+      <span class="now-top"><span class="now-kind">Today</span><span class="pill g">Final</span></span>
+      <span class="now-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</span>
+      ${won ? `<span class="now-you">${esc(won)}</span>` : ''}
+      ${kb ? `<span class="now-line">${esc(kb)}</span>` : ''}
+    </button>
+    <div class="now-acts one"><button class="go" data-act="leaderboard" data-rid="${r.id}">See the results</button></div>
+  </div>`;
+}
 /* Every group has finished all its holes (the round may still be waiting for the organiser to finalise). */
 function allIn(r) {
   try { const p = progressOf(r.id); return !!(p && p.groups.length && p.groups.every(g => g.complete)); } catch (e) { return false; }
@@ -216,16 +243,18 @@ VIEWS.home = () => {
   const played = seasonRounds(season).filter(r => r.status === 'final');
   const live = D.rounds().filter(r => r.status === 'live');
   const next = announced();   // an upcoming round shows here once the organiser gives it a date (owner, 23 October)
+  // On the day a round is finalised, its result leads Home; the next round moves down to "Also on" (journeys 6/18).
+  const doneToday = live[0] ? null : D.rounds().filter(r => r.status === 'final' && !isDemo(r) && r.date && daysFromToday(r.date) === 0).slice(-1)[0] || null;
   const feature = live[0] || next[0] || null;
-  const more = [...live.slice(1), ...next.slice(live[0] ? 0 : 1)];
+  const more = doneToday ? next : [...live.slice(1), ...next.slice(live[0] ? 0 : 1)];
   const me = DB.prefs.me ? D.member(DB.prefs.me) : null;
   const hello = greeting(me);
-  const homeState = feature && feature.status === 'live' ? 'matchday' : feature ? 'upcoming' : 'quiet';
+  const homeState = feature && feature.status === 'live' ? 'matchday' : doneToday ? 'result' : feature ? 'upcoming' : 'quiet';
   let html = `<header class="hero home home-${homeState}"><div class="brand"><span class="badge crest">${CREST_SVG}</span><span class="vh">${esc(D.society())}</span><p class="greet${hello.length > 22 ? ' long' : ''}">${esc(hello)}</p>
     <button class="who-chip${me ? ' only-av' : ''}" data-act="who" aria-label="${me ? 'You are ' + esc(me.name) + '. Change' : 'Who are you?'}">${me ? `<span class="who-av">${esc(initialsOf(me))}</span>` : 'Who are you?'}</button></div>
-    <h1 class="vh">${esc(homeHeadline(feature))}</h1>
+    <h1 class="vh">${esc(doneToday ? `${roundName(doneToday)}: the result` : homeHeadline(feature))}</h1>
     ${homeState === 'upcoming' ? `<p class="home-season-label">The ${season} season</p><p class="home-quiet-title">Next on the card.</p>` : ''}
-    ${feature ? nowCard(feature) : homeSeasonIntro(season, played)}</header>`;
+    ${doneToday ? resultCard(doneToday) : feature ? nowCard(feature) : homeSeasonIntro(season, played)}</header>`;
   if (homeState === 'matchday') html += homeMatchday(feature);
   const table = goy(season);
   const lead = table[0];
@@ -245,9 +274,9 @@ VIEWS.home = () => {
   const ic = k => `<span class="hs-ic" aria-hidden="true">${sized(ICON[k], 20)}</span>`;
   const rrow = (act, k, t, sub, rid) => `<button class="row hs-row" data-act="${act}"${rid ? ` data-rid="${rid}"` : ''}>${ic(k)}<span class="hs-txt"><span class="hs-t">${t}</span><span class="hs-s">${sub}</span></span>${chev}</button>`;
   html += `${goyHidden}${sec(label('The season'), cardOf([
-    !inPlay && lastRound ? rrow('round', 'flagpin', 'Last round', esc(roundName(lastRound)), lastRound.id) : '',
+    !inPlay && lastRound && lastRound !== doneToday ? rrow('round', 'flagpin', 'Last round', esc(roundName(lastRound)), lastRound.id) : '',
     rrow('goy', 'trophy', 'Golfer of the Year', goyLine),
-    tripList.length > 1 && tripBoardOn(tripFor) ? rrow('trip', 'course', 'Trip standings', tripLine, tripFor.id) : '',
+    tripList.length > 1 ? (tripBoardOn(tripFor) ? rrow('trip', 'course', 'Trip standings', tripLine, tripFor.id) : rrow('trip', 'course', esc(tripFor.trip), esc(tripDays(tripList)), tripFor.id)) : '',
     rrow('rounds', 'history', 'Past rounds', played.length ? `${plural(played.length, 'round')} played` : 'None played yet'),
     rrow('stats', 'bars', 'Stats', 'KBs, birdies, averages'),
     rrow('players', 'users', 'Players', plural(D.regulars().length, 'golfer'))].join('')), true)}`;

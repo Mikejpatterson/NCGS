@@ -220,4 +220,9 @@ const titleCheck = ({ sel, want, max }) => {
     [...process.execArgv, require('path').join(__dirname, 'groups.run.js')], { stdio: 'inherit', env: subEnv });
   if (gr.error) console.error(gr.error);
   if (gr.status !== 0) process.exit(gr.status || 1);
+  // Home tells you your day: your tee time and group, and today's result once it's final (plan batch B, 26 October).
+  const hd = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'home-day.run.js')], { stdio: 'inherit', env: subEnv });
+  if (hd.error) console.error(hd.error);
+  if (hd.status !== 0) process.exit(hd.status || 1);
 })();
