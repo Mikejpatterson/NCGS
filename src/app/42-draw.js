@@ -1,10 +1,14 @@
 /* ----- Breakfast draw (owner brief §7; design agreed with Codex on issue #1, 26 October) -----
    The committee sets four pots; at breakfast one device draws one name from each pot per team, without replacement.
    The drawn team is the playing group. Rules and checks live in src/draw.js (window.Draw); storage is the settings table:
-     pots:<rid>  drawdev:<rid>  drawepoch:<rid>  draw:<rid>:<epoch>:<team>:<pot>:<device>  drawshort:<rid>:<epoch>  drawdone:<rid>  drawpace:<rid>
+     pots:<rid>  drawdev:<rid>  drawepoch:<rid>  draw:<rid>:<epoch>:<team>:<pot>:<device>  drawshort:<rid>:<epoch>  drawpace:<rid>
+   The draw is finished when the round's own groups carry the draw's mark (group.draw = epoch): the groups and "finished"
+   are one row written in one request, so no phone can ever see one without the other (Codex review of #45, 26 October).
    Guarantees:
-   - One device runs the draw. Becoming that device needs the server to confirm it (online), so two phones cannot both
-     start drawing; once confirmed it may carry on offline (each pick waits in the outbox, stored on the device).
+   - One device runs the draw. Becoming that device needs the server to confirm it (online); once confirmed it may carry
+     on offline (each pick waits in the outbox, stored on the device). The server has no compare-and-set, so two phones
+     claiming at the same moment can both briefly be confirmed: online, each pick first checks the server again, which
+     narrows that to a moment, and if both still draw, their picks are a visible clash that blocks the groups.
    - Each pick is saved before its wheel turns, so a reload replays the result and never redraws.
    - Each pick's key includes the device, so nothing is overwritten: a clash shows and blocks the groups.
    - No undo: a mistake means a logged restart, only before the groups are made and before any score.
@@ -24,6 +28,7 @@ function pendingSettingKeys() {
   [...DB.outbox, ...(DB.sent || [])].forEach(i => { const q = i.req; if (q && q.op === 'put' && q.table === 'settings') (q.rows || []).forEach(r => ks.add(r.key)); });
   return ks;
 }
+const drawMade = r => !!r && (r.groups || []).some(g => g && g.draw);
 const hasScores = rid => Object.values(D.scores(rid) || {}).some(h => Object.values(h || {}).some(E.isEntered));
 const potsOf = rid => { const v = jsonSetting('pots:' + rid, null); const ps = v && Array.isArray(v.pots) ? v.pots : []; return { pots: [0, 1, 2, 3].map(i => (Array.isArray(ps[i]) ? ps[i] : [])), show: !!(v && v.show) }; };
 const hasPots = rid => potsOf(rid).pots.some(x => x.length);
@@ -41,7 +46,7 @@ function drawOf(rid) {
   const mine = !!holder && holder.dev === drawDev() && !!onServer && onServer.dev === drawDev() && !pend.has('drawdev:' + rid);
   const shortOk = (jsonSetting(`drawshort:${rid}:${ep}`, { teams: [] }).teams || []).map(Number);
   return { rid, pots, show, ep, holder, mine, st, pending, shortOk,
-    made: D.setting('drawdone:' + rid, '') === String(ep), pace: D.setting('drawpace:' + rid, 'one') === 'all' ? 'all' : 'one' };
+    made: drawMade(D.round(rid)), pace: D.setting('drawpace:' + rid, 'one') === 'all' ? 'all' : 'one' };
 }
 /* A draw in progress: phones check for news more often so people further away can follow it. */
 const drawLive = () => D.rounds().some(r => r.status !== 'final' && hasPots(r.id) && (() => { const d = drawOf(r.id); return d.st.started && !d.made; })());
@@ -149,6 +154,7 @@ ORG.draw = p => {
     act = `<p class="drw-watch">${d.holder ? 'Watching: the draw is running on another device.' : 'Choose the device that runs the draw.'}</p>
       ${online ? `<button class="btn quiet" data-act="draw-claim" data-rid="${r.id}">${UI.confirm === 'dclaim-' + r.id ? (d.holder ? 'Tap again to take over the draw here' : 'Tap again to run the draw here') : 'Run the draw on this device'}</button>` : '<p class="drw-watch">Connect to the internet to run the draw here.</p>'}`;
   } else if (spin) act = '<p class="drw-watch">Tap a wheel to stop it</p>';
+  else if (DB.prefs.drawBusy && DB.prefs.drawBusy.rid === r.id && Date.now() - DB.prefs.drawBusy.at < 8000) act = '<button class="btn drw-go" disabled>Checking…</button>';
   else if (teamOpen) act = `<button class="btn drw-go" data-act="draw-go" data-rid="${r.id}">${d.pace === 'all' ? `Draw team ${ti + 1}` : `Draw pot ${DR.potName(d.st.next[0].p)}`}</button>`;
   else if (d.st.current > -1) act = `<button class="btn drw-go" data-act="draw-next" data-rid="${r.id}">Next team</button>`;
   else act = `<button class="btn drw-go" data-act="draw-next" data-rid="${r.id}">See the line-up</button>`;
@@ -182,9 +188,20 @@ function drawMemberView(r) {
 const drawTabOn = r => !!r && r.status !== 'final' && hasPots(r.id) && (potsOf(r.id).show || drawOf(r.id).st.started);
 
 /* ----- Actions ----- */
+/* Online, a pick first checks the server (is this still the draw device? has anything changed?); offline it goes ahead.
+   The check is marked in prefs, so a double tap while it runs draws nothing. */
 function drawPick(rid) {
+  const busy = DB.prefs.drawBusy;
+  if (busy && busy.rid === rid && Date.now() - busy.at < 8000) return;
+  const d0 = drawOf(rid);
+  if (!d0.mine || spinOf(rid)) return;
+  if (!DB.online || DB.outbox.length) { drawPickNow(rid); return; }
+  DB.prefs.drawBusy = { rid, at: Date.now() }; savePrefs(); render();
+  sync().catch(() => {}).then(() => { DB.prefs.drawBusy = null; savePrefs(); drawPickNow(rid); });
+}
+function drawPickNow(rid) {
   const d = drawOf(rid);
-  if (!d.mine || spinOf(rid) || !d.st.next.length || d.made || hasScores(rid) || d.st.conflicts.length) return;
+  if (!d.mine || spinOf(rid) || !d.st.next.length || d.made || hasScores(rid) || d.st.conflicts.length) { render(); return; }
   const slots = d.pace === 'all' ? d.st.next : d.st.next.slice(0, 1);
   const rand = () => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0]; };
   const picks = DR.draw(d.st, slots, rand), dev = drawDev(), at = new Date().toISOString();
@@ -265,13 +282,14 @@ const DRAW_ACT = {
   'draw-make': el => {
     const rid = el.dataset.rid, r = D.round(rid), d = drawOf(rid);
     if (hasScores(rid)) { toast('Scores are in, so the groups can\'t change now.'); return; }
+    if (d.made) { toast('The groups are already made from this draw.'); return; }
     const why = DR.blockers(d.st, { pending: d.pending, shortOk: d.shortOk });
     if (why.length) { toast(why[0]); return; }
     if (UI.confirm !== 'dmake-' + rid) { UI.confirm = 'dmake-' + rid; render(); return; }
     UI.confirm = null;
     const groups = DR.groupsFrom(d.st, r.first_tee || '', r.interval || 10, E.addMinutes);
-    put('rounds', [Object.assign({}, r, { groups, kb: null })], { action: 'Groups saved', detail: `${roundName(r)}: ${plural(groups.length, 'team')} from the breakfast draw` });
-    put('settings', [{ key: 'drawdone:' + rid, value: String(d.ep) }]);
+    // One request: the groups and the draw's "finished" mark travel in the same round row.
+    put('rounds', [Object.assign({}, r, { groups: groups.map(g => Object.assign(g, { draw: d.ep })), kb: null })], { action: 'Groups saved', detail: `${roundName(r)}: ${plural(groups.length, 'team')} from the breakfast draw` });
     toast('The groups are made');
     render();
   }

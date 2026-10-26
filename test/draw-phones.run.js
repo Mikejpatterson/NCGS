@@ -20,7 +20,7 @@ async function device(name, w, h) {
   await pg.goto(BASE + '/'); await pg.waitForSelector('.brand');
   const d = { ctx, pg, name };
   d.sync = () => pg.evaluate(() => window.__ncgs.flush().then(() => window.__ncgs.sync())).catch(() => {});
-  d.open = async (v = 'draw') => { await pg.evaluate(v => { const x = window.__ncgs; x.UI.org = true; x.UI.orgUnlocked = true; x.ORGPIN.pin = '1234'; x.UI.orgStack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'drw' } }, { v, p: { rid: 'drw' } }]; x.render(); }, v); await pg.waitForTimeout(150); };
+  d.open = async (v = 'draw', rid = 'drw') => { await pg.evaluate(([v, rid]) => { const x = window.__ncgs; x.UI.org = true; x.UI.orgUnlocked = true; x.ORGPIN.pin = '1234'; x.UI.orgStack = [{ v: 'home', p: {} }, { v: 'round', p: { rid } }, { v, p: { rid } }]; x.render(); }, [v, rid]); await pg.waitForTimeout(150); };
   d.has = sel => pg.locator(sel).count().then(n => n > 0);
   d.text = () => pg.locator('main').innerText();
   d.act = (act, data) => pg.evaluate(([act, data]) => { const b = document.createElement('button'); b.dataset.act = act; Object.assign(b.dataset, data); document.body.appendChild(b); b.click(); b.remove(); }, [act, data || {}]);
@@ -61,7 +61,7 @@ async function device(name, w, h) {
     check('   the draw action on the phone draws nothing', (await pickRows()).length === 0);
 
     // 3. A pick is saved before the wheel turns; a reload mid-spin replays it and never draws again.
-    await A.tap('[data-act="draw-go"]');
+    await A.tap('[data-act="draw-go"]'); await A.pg.waitForSelector('.drw-cell.spin', { timeout: 5000 }).catch(() => {});
     const queued = await A.pg.evaluate(() => window.__ncgs.view().settings.filter(s => s.key.indexOf('draw:drw:1:') === 0).map(s => s.key + '=' + s.value));
     const spinning = await A.has('.drw-cell.spin');
     check('3. the pick is saved on the device before its wheel turns', queued.length === 1 && spinning);
@@ -74,7 +74,7 @@ async function device(name, w, h) {
 
     // 4. A double tap draws once.
     await A.pg.evaluate(() => { const b = document.querySelector('[data-act="draw-go"]'); b.click(); b.click(); document.querySelector('[data-act="draw-go"]') && document.querySelector('[data-act="draw-go"]').click(); });
-    await A.pg.waitForTimeout(300); await A.sync();
+    await A.pg.waitForTimeout(1500); await A.sync();
     check('4. a double tap draws one name, not two', (await pickRows()).length === 2);
     await A.skip();
 
@@ -90,7 +90,7 @@ async function device(name, w, h) {
 
     // 7. Offline: the draw device carries on; the pick waits on the device and reaches the server later.
     await A.ctx.setOffline(true);
-    await A.tap('[data-act="draw-go"]'); await A.skip();
+    await A.tap('[data-act="draw-go"]'); await A.pg.waitForTimeout(800); await A.skip();
     check('7. offline, the iPad still draws (the pick waits on the device)', (await pickRows()).length === 2 && await A.pg.evaluate(() => window.__ncgs.DB.outbox.length) === 1);
     await A.ctx.setOffline(false); await A.sync(); await A.pg.waitForTimeout(300);
     check('   back online, the pick reaches the server', (await pickRows()).length === 3);
@@ -100,7 +100,7 @@ async function device(name, w, h) {
     await B.sync(); await B.open(); await B.claim();
     check('8. the phone takes over online; the server confirms it', JSON.parse(await setting('drawdev:drw')).dev === await B.dev() && await B.has('[data-act="draw-go"]'));
     check('   the takeover is in the change log', (await state()).tables.log.some(l => /taken over/.test(l.detail || '')));
-    await A.tap('[data-act="draw-go"]'); await A.skip();   // the iPad still thinks it is the draw device
+    await A.tap('[data-act="draw-go"]'); await A.pg.waitForTimeout(800); await A.skip();   // the iPad still thinks it is the draw device
     await A.ctx.setOffline(false); await A.sync(); await A.pg.waitForTimeout(300);
     await B.sync(); await B.open();
     check('   the iPad\'s late pick reaches the server but shows as a clash, not a result', (await pickRows()).length === 4 && /Two devices drew/.test(await B.text()));
@@ -123,7 +123,7 @@ async function device(name, w, h) {
       const what = await B.pg.evaluate(() => { const n = document.querySelector('[data-act="draw-next"]'); return n ? 'next:' + n.innerText : document.querySelector('[data-act="draw-go"]') ? 'go' : 'wait'; });
       if (what.startsWith('next:See')) { await B.tap('[data-act="draw-next"]'); break; }
       if (what.startsWith('next')) await B.tap('[data-act="draw-next"]');
-      else if (what === 'go') { await B.tap('[data-act="draw-go"]'); await B.skip(); }
+      else if (what === 'go') { await B.tap('[data-act="draw-go"]'); await B.pg.waitForTimeout(400); await B.skip(); }
       else await B.pg.waitForTimeout(400);
     }
     await B.sync(); await B.pg.waitForTimeout(200); await B.open('drawlineup');
@@ -136,10 +136,39 @@ async function device(name, w, h) {
       && groups.every(g => pots.every(pt => g.teams.flat().filter(pid => pt.includes(pid)).length === 1))
       && groups.map(g => g.teeTime).join(',') === '10:00,10:10,10:20,10:30', JSON.stringify(groups.map(g => g.teams)));
 
+    // 10b. Finishing is one write: the groups carry the draw's mark, so no phone sees groups with the draw still open.
+    check('   the groups and "finished" are one row: every group carries the draw\'s mark', groups.every(g => g.draw === 2));
+    await A.sync(); await A.open('drawhome');
+    check('   the other device sees the draw finished, with no restart offered', !(await A.has('[data-act="draw-restart"]')) && await A.pg.evaluate(() => (window.__ncgs.D.round('drw').groups || []).length === 4));
+    const savedBefore = (await state()).tables.log.filter(l => /from the breakfast draw/.test(l.detail || '')).length;
+    await B.open('drawlineup'); await B.act('draw-make', { rid: 'drw' }); await B.act('draw-make', { rid: 'drw' }); await B.sync();
+    check('   making the groups again is refused (one "Groups saved")', savedBefore === 1 && (await state()).tables.log.filter(l => /from the breakfast draw/.test(l.detail || '')).length === 1);
+
     // 11. Once the groups are made the draw is closed.
     await B.act('draw-restart', { rid: 'drw' }); await B.act('draw-restart', { rid: 'drw' });
     await A.act('draw-claim', { rid: 'drw' }); await A.act('draw-claim', { rid: 'drw' }); await A.sync(); await B.sync();
     check('11. after the groups are made, no restart and no takeover', (await setting('drawepoch:drw')) === '2' && JSON.parse(await setting('drawdev:drw')).dev === await B.dev());
+
+    // 12. Two devices claim the draw at the same moment. The server has no compare-and-set, so both may briefly be
+    //     confirmed; each pick checks the server first, and anything both still draw is a visible clash, never a result.
+    const r2 = Object.assign({}, r, { id: 'drw2', name: 'Draw test 2', groups: [] });
+    await api({ op: 'put', table: 'rounds', rows: [r2], pin: '1234' });
+    await api({ op: 'put', table: 'settings', rows: [{ key: 'format:drw2', value: 'scramble' }, { key: 'pots:drw2', value: JSON.stringify({ pots, show: false }) }], pin: '1234' });
+    await A.sync(); await B.sync(); await A.open('draw', 'drw2'); await B.open('draw', 'drw2');
+    await A.tap('[data-act="draw-claim"]'); await B.tap('[data-act="draw-claim"]');
+    await Promise.all([A.pg.click('[data-act="draw-claim"]'), B.pg.click('[data-act="draw-claim"]')]);
+    await A.pg.waitForTimeout(1800); await A.sync(); await B.sync(); await A.open('draw', 'drw2'); await B.open('draw', 'drw2');
+    await Promise.all([A.pg.click('[data-act="draw-go"]', { timeout: 1500 }).catch(() => {}), B.pg.click('[data-act="draw-go"]', { timeout: 1500 }).catch(() => {})]);
+    await A.pg.waitForTimeout(1500); await A.sync(); await B.sync(); await A.sync();
+    const holder = JSON.parse(await setting('drawdev:drw2')).dev, devs = [await A.dev(), await B.dev()];
+    const rows2 = (await state()).tables.settings.filter(x => x.key.indexOf('draw:drw2:1:') === 0);
+    const fromDevs = new Set(rows2.map(x => x.key.split(':').slice(5).join(':')));
+    const H = holder === devs[0] ? A : B, O = holder === devs[0] ? B : A;
+    await H.open('draw', 'drw2'); await O.open('draw', 'drw2');
+    check('12. two devices claiming at once: one holder on the server; the other only watches', devs.includes(holder) && !(await O.has('[data-act="draw-go"]')));
+    const clashShown = /Two devices drew/.test(await H.text());
+    check('   any picks are from one device, or both show as a clash that blocks the groups', fromDevs.size <= 1 || clashShown, `${rows2.length} rows from ${fromDevs.size} devices`);
+    console.log('      (this run: ' + rows2.length + ' pick(s) from ' + fromDevs.size + ' device(s))');
 
     await A.ctx.close(); await B.ctx.close();
     check('no script errors', errs.length === 0, errs.join(' | '));
