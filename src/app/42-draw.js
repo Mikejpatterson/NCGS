@@ -161,7 +161,7 @@ ORG.draw = p => {
   else if (DB.prefs.drawBusy && DB.prefs.drawBusy.rid === r.id && Date.now() - DB.prefs.drawBusy.at < 8000) act = '<button class="btn drw-go" disabled>Checking…</button>';
   else if (teamOpen) act = `<button class="btn drw-go" data-act="draw-go" data-rid="${r.id}">${d.pace === 'all' ? `Draw team ${ti + 1}` : `Draw pot ${DR.potName(d.st.next[0].p)}`}</button>`;
   else if (d.st.current > -1) act = `<button class="btn drw-go" data-act="draw-next" data-rid="${r.id}">Next team</button>`;
-  else act = `<button class="btn drw-go" data-act="draw-next" data-rid="${r.id}">See the line-up</button>`;
+  else act = `${T > 1 && d.st.teams[T - 1].slots.some(x => x.auto) ? `<p class="drw-watch drw-left">Team ${T} is the players left in each pot.</p>` : ''}<button class="btn drw-go" data-act="draw-next" data-rid="${r.id}">See the line-up</button>`;
   return { html: `${top}<div class="drw-stage"><p class="drw-kicker">Breakfast draw · ${T} teams</p><h1 class="drw-team">Team ${ti + 1}</h1>${drawBanner(d)}
     <div class="drw-cells">${cells}</div><div class="drw-act">${act}</div>${d.pending ? '<p class="drw-sync">Saving to the server…</p>' : ''}</div>` };
 };
