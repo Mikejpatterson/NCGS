@@ -26,7 +26,9 @@ async function device(name, w, h) {
   d.act = (act, data) => pg.evaluate(([act, data]) => { const b = document.createElement('button'); b.dataset.act = act; Object.assign(b.dataset, data); document.body.appendChild(b); b.click(); b.remove(); }, [act, data || {}]);
   d.tap = async sel => { await pg.click(sel, { timeout: 3000 }); await pg.waitForTimeout(120); };
   d.skip = () => pg.click('[data-act="draw-skip"]', { timeout: 800 }).catch(() => {});
-  d.claim = async () => { await d.tap('[data-act="draw-claim"]'); await d.tap('[data-act="draw-claim"]'); await pg.waitForTimeout(1500); await d.sync(); await pg.waitForTimeout(200); };
+  // Starting the draw is one tap; taking over from another device asks for a second.
+  d.claim = async () => { await d.tap('[data-act="draw-claim"]'); if (/Tap again/.test(await pg.locator('[data-act="draw-claim"]').innerText().catch(() => ''))) await d.tap('[data-act="draw-claim"]');
+    await pg.waitForTimeout(1500); await d.sync(); await pg.waitForTimeout(200); };
   d.dev = () => pg.evaluate(() => window.__ncgs.DB.prefs.dev);
   return d;
 }
@@ -146,7 +148,7 @@ async function device(name, w, h) {
 
     // 11. Once the groups are made the draw is closed.
     await B.act('draw-restart', { rid: 'drw' }); await B.act('draw-restart', { rid: 'drw' });
-    await A.act('draw-claim', { rid: 'drw' }); await A.act('draw-claim', { rid: 'drw' }); await A.sync(); await B.sync();
+    await A.act('draw-claim', { rid: 'drw' }); await A.act('draw-claim', { rid: 'drw' }); await A.pg.waitForTimeout(800); await A.sync(); await B.sync();
     check('11. after the groups are made, no restart and no takeover', (await setting('drawepoch:drw')) === '2' && JSON.parse(await setting('drawdev:drw')).dev === await B.dev());
 
     // 12. Two devices claim the draw at the same moment. The server has no compare-and-set, so both may briefly be
@@ -155,7 +157,6 @@ async function device(name, w, h) {
     await api({ op: 'put', table: 'rounds', rows: [r2], pin: '1234' });
     await api({ op: 'put', table: 'settings', rows: [{ key: 'format:drw2', value: 'scramble' }, { key: 'pots:drw2', value: JSON.stringify({ pots, show: false }) }], pin: '1234' });
     await A.sync(); await B.sync(); await A.open('draw', 'drw2'); await B.open('draw', 'drw2');
-    await A.tap('[data-act="draw-claim"]'); await B.tap('[data-act="draw-claim"]');
     await Promise.all([A.pg.click('[data-act="draw-claim"]'), B.pg.click('[data-act="draw-claim"]')]);
     await A.pg.waitForTimeout(1800); await A.sync(); await B.sync(); await A.open('draw', 'drw2'); await B.open('draw', 'drw2');
     await Promise.all([A.pg.click('[data-act="draw-go"]', { timeout: 1500 }).catch(() => {}), B.pg.click('[data-act="draw-go"]', { timeout: 1500 }).catch(() => {})]);

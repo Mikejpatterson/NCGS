@@ -113,7 +113,7 @@ const lenStyle = s => `style="--len:${[...s].length}"`;
 /* The round card's buttons. During a live round that you're playing, the main button takes you back to scoring
    ("Continue · Hole 7"), and Players · Groups · KBs becomes a quieter link underneath (design review, 22 October). */
 function nowActs(r, live, group) {
-  const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">${live ? (isScramble(r) ? 'Players · Groups' : 'Players · Groups · KBs') : 'View round details'}</button>`;
+  const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">${live ? (isScramble(r) ? 'Players · Groups' : 'Players · Groups · KBs') : drawTabOn(r) ? (drawOf(r.id).st.started ? 'Follow the draw' : 'See the pots') : 'View round details'}</button>`;
   const next = group ? group.nextHole : null;
   if (!next) return `<div class="now-acts one">${groups}</div>`;
   return `<div class="now-acts one"><button class="go" data-act="tab" data-tab="hole">Continue \u00b7 Hole ${next}</button>

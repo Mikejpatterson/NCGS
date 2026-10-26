@@ -28,7 +28,7 @@ async function drawAll(p) {
     await p.waitForTimeout(250);
   }
 }
-const claim = async p => { await org(p, 'draw'); await p.click('[data-act="draw-claim"]'); await p.click('[data-act="draw-claim"]'); await p.waitForTimeout(1500); await p.evaluate(() => window.__ncgs.render()); };
+const claim = async p => { await org(p, 'draw'); await p.click('[data-act="draw-claim"]'); await p.waitForTimeout(1500); await p.evaluate(() => window.__ncgs.render()); };
 
 // Text cut off or overflowing, anything off the side of the screen, and touch targets under 44px.
 const audit = p => p.evaluate(() => {
@@ -56,6 +56,10 @@ const audit = p => p.evaluate(() => {
     check('members: the round opens on the pots, A to D', /Pot A/.test(t) && /Pot D/.test(t) && await p.$eval('.rtabs button.on', e => e.textContent) === 'Pots');
     check('members: no handicaps beside the names', !/\d+\.\d/.test(await p.$eval('.drw-potlist', e => e.innerText)));
     check('members: a scramble has no KBs tab', !(await p.$('.rtabs [data-t="kb"]')));
+    await p.evaluate(() => { const n = window.__ncgs; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); }); await p.waitForTimeout(150);
+    check('members: Home says See the pots', /See the pots/.test(await p.locator('main').innerText()));
+    await org(p, 'draw');
+    check('starting the draw is one tap (no device chosen yet)', /Start the draw/.test(await p.locator('main').innerText()));
     // The stage shows only the team being drawn.
     await claim(p);
     await p.click('[data-act="draw-go"]'); await p.click('[data-act="draw-skip"]').catch(() => {}); await p.waitForTimeout(200);

@@ -106,13 +106,14 @@ ORG.drawhome = p => {
   const r = D.round(p.rid), d = drawOf(p.rid);
   const counts = d.pots.map((x, i) => `${DR.potName(i)} ${x.length}`).join(' · ');
   const uneven = new Set(d.pots.filter(x => x.length).map(x => x.length)).size > 1;
-  const who = !d.holder ? 'No device yet' : d.mine ? 'This device' : d.holder.dev === drawDev() ? 'This device, waiting for the server' : 'Another device';
+  if (d.made) return { html: `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Breakfast draw</h1></div><p class="sub">Done. The teams are the groups.</p></header>
+    <button class="btn" data-act="org-go" data-v="drawlineup" data-rid="${r.id}">Line-up</button>` };
+  const elsewhere = d.holder && d.holder.dev !== drawDev();
   let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Breakfast draw</h1></div><p class="sub">${esc(counts)}${uneven ? ' · pots are uneven' : ''}</p></header>${drawBanner(d)}`;
   html += sec('', cardOf(`
     <button class="row tall" data-act="org-go" data-v="pots" data-rid="${r.id}"><span class="two"><span>Pots</span><span class="sub">${d.st.started ? 'Fixed now the draw has started' : 'Put each player in pot A, B, C or D'}</span></span>${chev}</button>
     <button class="row tall" data-act="draw-show" data-rid="${r.id}"><span class="two"><span>Members can see the pots</span><span class="sub">On the round page, names only</span></span><span class="pill ${d.show ? 'g' : 'n'}">${d.show ? 'On' : 'Off'}</span></button>
-    <div class="row tall"><span class="two"><span>Pace</span><span class="sub">${d.pace === 'all' ? 'All four pots together' : 'One pot at a time'}</span></span><span class="seg sm drw-pace"><button class="${d.pace === 'one' ? 'on' : ''}" data-act="draw-pace" data-rid="${r.id}" data-v="one" aria-pressed="${d.pace === 'one'}">One</button><button class="${d.pace === 'all' ? 'on' : ''}" data-act="draw-pace" data-rid="${r.id}" data-v="all" aria-pressed="${d.pace === 'all'}">All four</button></span></div>
-    <div class="row tall"><span class="two"><span>Drawing on</span><span class="sub">${esc(who)}</span></span></div>`), true);
+    <div class="row tall"><span class="two"><span>Pace</span><span class="sub">${d.pace === 'all' ? 'All four pots together' : 'One pot at a time'}</span></span><span class="seg sm drw-pace"><button class="${d.pace === 'one' ? 'on' : ''}" data-act="draw-pace" data-rid="${r.id}" data-v="one" aria-pressed="${d.pace === 'one'}">One</button><button class="${d.pace === 'all' ? 'on' : ''}" data-act="draw-pace" data-rid="${r.id}" data-v="all" aria-pressed="${d.pace === 'all'}">All four</button></span></div>${elsewhere ? '\n    <div class="row tall"><span class="sub">Another device is running the draw</span></div>' : ''}`), true);
   html += `<button class="btn" data-act="org-go" data-v="draw" data-rid="${r.id}">${d.st.started ? 'Back to the draw' : 'Open the draw'}</button>`;
   if (d.st.started) html += `<button class="btn quiet" data-act="org-go" data-v="drawlineup" data-rid="${r.id}">Line-up</button>`;
   if (d.st.started && !d.made && !hasScores(r.id)) html += `<div class="foot"><button class="link c-b" data-act="draw-restart" data-rid="${r.id}">${UI.confirm === 'drestart-' + r.id ? 'Tap again to restart: everyone goes back in their pots' : 'Restart the draw'}</button></div>`;
@@ -153,8 +154,8 @@ ORG.draw = p => {
   if (!d.mine && d.holder && d.holder.dev === drawDev()) act = '<p class="drw-watch">Waiting for the server to confirm this device…</p>';
   else if (!d.mine) {
     const online = DB.online && !DB.outbox.length;
-    act = `<p class="drw-watch">${d.holder ? 'Watching: the draw is running on another device.' : 'Choose the device that runs the draw.'}</p>
-      ${online ? `<button class="btn quiet" data-act="draw-claim" data-rid="${r.id}">${UI.confirm === 'dclaim-' + r.id ? (d.holder ? 'Tap again to take over the draw here' : 'Tap again to run the draw here') : 'Run the draw on this device'}</button>` : '<p class="drw-watch">Connect to the internet to run the draw here.</p>'}`;
+    act = `${d.holder ? '<p class="drw-watch">The draw is running on another device.</p>' : ''}
+      ${online ? (d.holder ? `<button class="btn quiet" data-act="draw-claim" data-rid="${r.id}">${UI.confirm === 'dclaim-' + r.id ? 'Tap again to take over the draw here' : 'Take over the draw here'}</button>` : `<button class="btn drw-go" data-act="draw-claim" data-rid="${r.id}">Start the draw</button>`) : '<p class="drw-watch">Connect to the internet to run the draw here.</p>'}`;
   } else if (spin) act = '<p class="drw-watch">Tap a wheel to stop it</p>';
   else if (DB.prefs.drawBusy && DB.prefs.drawBusy.rid === r.id && Date.now() - DB.prefs.drawBusy.at < 8000) act = '<button class="btn drw-go" disabled>Checking…</button>';
   else if (teamOpen) act = `<button class="btn drw-go" data-act="draw-go" data-rid="${r.id}">${d.pace === 'all' ? `Draw team ${ti + 1}` : `Draw pot ${DR.potName(d.st.next[0].p)}`}</button>`;
@@ -239,7 +240,8 @@ const DRAW_ACT = {
     const rid = el.dataset.rid, d = drawOf(rid);
     if (!DB.online || DB.outbox.length) { toast('Connect to the internet first.'); return; }
     if (d.made || hasScores(rid)) { toast('The groups are made, so the draw is closed.'); return; }
-    if (UI.confirm !== 'dclaim-' + rid) { UI.confirm = 'dclaim-' + rid; render(); return; }
+    // Starting the draw is one tap; taking it over from another device is two.
+    if (d.holder && UI.confirm !== 'dclaim-' + rid) { UI.confirm = 'dclaim-' + rid; render(); return; }
     UI.confirm = null;
     // Check with the server first: a device that has been asleep must not take over a draw that is already finished.
     sync().then(() => {
