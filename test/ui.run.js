@@ -32,6 +32,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   // Society overview, against the invented fixture (tools/make-fixture.js): two Marbella trip rounds, 12 golfers.
   check('home: Past rounds, Golfer of the Year, Players tiles, a quiet Organiser link, and no year in the header', !/2026 season/.test(t) && /Past rounds\s*2 rounds played/.test(t) && /Golfer of the Year\s*Aidan leads/.test(t) && /Players\s*12 golfers/.test(t) && !!(await page.$('.foot [data-act="org"]')) && !(await page.$('.links [data-act="org"]')));
   check('home: the list of past rounds is not on the front page', !/long-named second day/.test(t));
+  check('home: no "Thru N" badge (the slowest group\'s holes read as your own)', !/Thru \d/.test(t));
   await tap('[data-act="trip"]');
   t = await text();
   check('home: Trip standings tile opens the whole-trip table with a link to each day', /Marbella/.test(t) && /All 2 rounds count/.test(t) && (await page.$$('[data-act="leaderboard"]')).length === 2);
