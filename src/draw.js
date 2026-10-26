@@ -53,8 +53,14 @@
     }) }));
     const left = pots.map(x => x.filter(pid => !used[pid]));
     // A slot is open while its pot still has someone in it; an empty pot means "nobody from this pot".
-    const open = [];
+    let open = [];
     teams.forEach(tm => tm.slots.forEach(s => { if (!s.pid && !s.conflict && left[s.p].length) open.push({ t: tm.n - 1, p: s.p }); }));
+    // The last team is not drawn: it is whoever is left in each pot (owner, 26 October). Worked out from the saved
+    // picks, so nothing extra is stored and every device agrees. Not while there is a clash to sort out.
+    if (open.length && !conflicts.length && open.every(x => x.t === T - 1 && left[x.p].length === 1)) {
+      open.forEach(x => { const sl = teams[x.t].slots[x.p]; sl.pid = left[x.p][0]; sl.auto = true; left[x.p] = []; });
+      open = [];
+    }
     // Fill team by team: the current team is the first one with an open slot; slots in pot order.
     const current = open.length ? open[0].t : -1;
     const next = open.filter(s => s.t === current);

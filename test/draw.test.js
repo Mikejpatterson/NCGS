@@ -55,7 +55,7 @@ test('a restart (new epoch) ignores the old picks but keeps them stored', () => 
   const st = D.state(pots, D.picksFrom(rows, 'r', 2));
   assert.ok(!st.started);
   assert.strictEqual(st.next.length, 4);
-  assert.strictEqual(Object.keys(D.picksFrom(rows, 'r', 1)).length, 16, 'epoch 1 still readable');
+  assert.strictEqual(Object.keys(D.picksFrom(rows, 'r', 1)).length, 12, 'epoch 1 still readable (three teams drawn; the last is the leftovers)');
 });
 
 test('two devices drawing the same place keep both rows and block the groups (never a silent winner)', () => {
@@ -143,4 +143,23 @@ test('after a handover, a late pick from the old device for a new place is a con
   // the new holder's own picks are fine
   const ok = D.state(pots, D.picksFrom([row('r', 1, 0, 0, 'ipad', 'a1'), row('r', 1, 0, 1, 'phone', 'b2')], 'r', 1), { holder: 'phone', keep: ['0:0'] });
   assert.strictEqual(ok.conflicts.length, 0);
+});
+
+test('the last team is not drawn: it is whoever is left in each pot (owner, 26 October)', () => {
+  const rows = [];
+  // draw teams 1 to 3 only
+  for (let i = 0; i < 12; i++) {
+    const st = D.state(pots, D.picksFrom(rows, 'r', 1));
+    D.draw(st, st.next.slice(0, 1), seeded(21 + i)).forEach(x => rows.push(row('r', 1, x.t, x.p, 'ipad', x.pid)));
+  }
+  assert.strictEqual(rows.length, 12);
+  const st = D.state(pots, D.picksFrom(rows, 'r', 1));
+  assert.ok(st.done, 'done after three teams');
+  assert.deepStrictEqual(st.next, []);
+  assert.ok(st.teams[3].slots.every(s => s.pid && s.auto));
+  assert.strictEqual(new Set(st.teams.flatMap(t => t.slots.map(s => s.pid))).size, 16);
+  assert.deepStrictEqual(D.blockers(st), []);
+  // with a clash anywhere, nothing is filled in by itself
+  const clash = D.state(pots, D.picksFrom(rows.concat([row('r', 1, 0, 0, 'phone', 'a4')]), 'r', 1));
+  assert.ok(!clash.teams[3].slots.some(s => s.auto));
 });

@@ -127,11 +127,11 @@ async function device(name, w, h) {
       else await B.pg.waitForTimeout(400);
     }
     await B.sync(); await B.pg.waitForTimeout(200); await B.open('drawlineup');
-    check('10. all sixteen drawn, four at a time', (await pickRows(2)).length === 16 && await B.has('[data-act="draw-make"]'));
-    await B.tap('[data-act="draw-make"]'); await B.tap('[data-act="draw-make"]'); await B.sync();
+    await B.pg.waitForTimeout(1500); await B.sync(); await B.open('drawlineup'); await B.pg.waitForTimeout(800); await B.sync();
+    check('10. twelve drawn four at a time; the last team is whoever is left, not drawn', (await pickRows(2)).length === 12);
     const groups = (await state()).tables.rounds.find(x => x.id === 'drw').groups || [];
     const all = groups.flatMap(g => g.teams.flat());
-    check('   the teams are the groups: four of four, everyone once, one from each pot, tee times in draw order',
+    check('   the teams become the groups by themselves: four of four, everyone once, one from each pot, tee times in draw order',
       groups.length === 4 && groups.every(g => g.teams.flat().length === 4) && new Set(all).size === 16
       && groups.every(g => pots.every(pt => g.teams.flat().filter(pid => pt.includes(pid)).length === 1))
       && groups.map(g => g.teeTime).join(',') === '10:00,10:10,10:20,10:30', JSON.stringify(groups.map(g => g.teams)));

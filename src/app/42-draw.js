@@ -140,7 +140,9 @@ ORG.draw = p => {
   const top = `<header class="hero s drw-top">${navBack('Breakfast draw', 'back')}</header>`;
   if (!T) return { html: top + cardOf('<div class="row"><span class="sub">Set the pots first.</span></div>') };
   if (ti < 0) {
-    return { html: `${top}<div class="drw-stage done"><p class="drw-kicker">Breakfast draw</p><h1 class="drw-team">All ${T} teams drawn</h1>${drawBanner(d)}
+    if (d.pending) drawConfirmSoon();
+    else if (d.mine && !d.made && !(r.groups && r.groups.length) && !DR.blockers(d.st, { shortOk: d.shortOk }).length) drawAutoSoon(r.id);
+    return { html: `${top}<div class="drw-stage done"><p class="drw-kicker">Breakfast draw</p><h1 class="drw-team">${d.made ? 'These are the groups' : `All ${T} teams drawn`}</h1>${drawBanner(d)}
       <button class="btn" data-act="org-go" data-v="drawlineup" data-rid="${r.id}">See the line-up</button></div>` };
   }
   const team = d.st.teams[ti];
@@ -174,8 +176,11 @@ ORG.drawlineup = p => {
   if (d.st.short.length) html += sec(label('Short teams'), cardOf(d.st.short.map(n => `<button class="row tall" data-act="draw-short" data-rid="${r.id}" data-n="${n}"><span class="two"><span>Team ${n} plays short</span><span class="sub">Tick once the committee has agreed how</span></span><span class="pill ${d.shortOk.includes(n) ? 'g' : 'n'}">${d.shortOk.includes(n) ? 'Agreed' : 'Not yet'}</span></button>`).join('')), true);
   if (d.made) html += '<div class="banner note">These teams are the groups for the round.</div>';
   else if (scored) html += '<div class="banner note">Scores are in, so the groups can\'t change now.</div>';
-  else if (why.length) html += why.map(w => `<p class="cap note">${esc(w)}</p>`).join('');
-  else html += `<button class="btn" data-act="draw-make" data-rid="${r.id}">${UI.confirm === 'dmake-' + r.id ? (r.groups && r.groups.length ? 'Tap again: these replace the current groups' : 'Tap again to make the groups') : 'Make these the groups'}</button>`;
+  else if (why.length) html += why.filter(w => !/not saved to the server/.test(w) || !d.mine).map(w => `<p class="cap note">${esc(w)}</p>`).join('') + (d.pending ? '<p class="cap note">Saving to the server…</p>' : '');
+  else if (!d.mine) html += '<p class="cap note">The device running the draw saves these as the groups.</p>';
+  else if (r.groups && r.groups.length) html += `<button class="btn" data-act="draw-make" data-rid="${r.id}">${UI.confirm === 'dmake-' + r.id ? 'Tap again: these replace the current groups' : 'Make these the groups'}</button>`;
+  else drawAutoSoon(r.id);
+  if (d.pending) drawConfirmSoon();
   return { html };
 };
 
@@ -185,7 +190,8 @@ function drawMemberView(r) {
   if (d.st.started) return `<p class="cap" style="margin:4px 4px 10px">${d.made ? 'The draw is done.' : d.st.current > -1 ? `Drawing team ${d.st.current + 1}…` : 'All teams drawn.'}</p>${drawLineup(d)}`;
   return `<div class="drw-potlist">${d.pots.map((x, i) => x.length ? `<section class="card drw-mpot"><div class="drw-mh">Pot ${DR.potName(i)}</div>${x.map(pid => `<div class="row"><span>${esc(D.nameOf(pid))}</span></div>`).join('')}</section>` : '').join('')}</div>`;
 }
-const drawTabOn = r => !!r && r.status !== 'final' && hasPots(r.id) && (potsOf(r.id).show || drawOf(r.id).st.started);
+/* Once the draw has made the groups, members just see Groups (owner, 26 October). */
+const drawTabOn = r => !!r && r.status !== 'final' && hasPots(r.id) && !drawMade(r) && (potsOf(r.id).show || drawOf(r.id).st.started);
 
 /* ----- Actions ----- */
 /* Online, a pick first checks the server (is this still the draw device? has anything changed?); offline it goes ahead.
@@ -279,18 +285,26 @@ const DRAW_ACT = {
     put('settings', [{ key: `drawshort:${rid}:${d.ep}`, value: JSON.stringify({ teams }) }], { action: 'Breakfast draw', detail: `Team ${n} plays short: ${teams.includes(n) ? 'agreed by the committee' : 'not agreed'}` });
     render();
   },
+  // Only needed when the round already had groups made another way: replacing them takes two taps.
   'draw-make': el => {
-    const rid = el.dataset.rid, r = D.round(rid), d = drawOf(rid);
-    if (hasScores(rid)) { toast('Scores are in, so the groups can\'t change now.'); return; }
-    if (d.made) { toast('The groups are already made from this draw.'); return; }
-    const why = DR.blockers(d.st, { pending: d.pending, shortOk: d.shortOk });
-    if (why.length) { toast(why[0]); return; }
+    const rid = el.dataset.rid;
     if (UI.confirm !== 'dmake-' + rid) { UI.confirm = 'dmake-' + rid; render(); return; }
     UI.confirm = null;
-    const groups = DR.groupsFrom(d.st, r.first_tee || '', r.interval || 10, E.addMinutes);
-    // One request: the groups and the draw's "finished" mark travel in the same round row.
-    put('rounds', [Object.assign({}, r, { groups: groups.map(g => Object.assign(g, { draw: d.ep })), kb: null })], { action: 'Groups saved', detail: `${roundName(r)}: ${plural(groups.length, 'team')} from the breakfast draw` });
-    toast('The groups are made');
-    render();
+    drawMakeGroups(rid, true);
   }
 };
+/* The drawn teams are the groups (owner, 26 October): as soon as the draw is finished and every pick is confirmed by the
+   server, the draw device saves them. One request: the groups and the draw's "finished" mark travel in the same round row. */
+function drawMakeGroups(rid, replace) {
+  const r = D.round(rid), d = drawOf(rid);
+  if (!r || !d.mine || d.made || hasScores(rid)) return false;
+  if (DR.blockers(d.st, { pending: d.pending, shortOk: d.shortOk }).length) return false;
+  if (r.groups && r.groups.length && !replace) return false;   // groups made by hand: the organiser chooses
+  const groups = DR.groupsFrom(d.st, r.first_tee || '', r.interval || 10, E.addMinutes);
+  put('rounds', [Object.assign({}, r, { groups: groups.map(g => Object.assign(g, { draw: d.ep })), kb: null })], { action: 'Groups saved', detail: `${roundName(r)}: ${plural(groups.length, 'team')} from the breakfast draw` });
+  toast('The teams are the groups');
+  render();
+  return true;
+}
+let drawAutoT = null;
+const drawAutoSoon = rid => { if (drawAutoT) return; drawAutoT = setTimeout(() => { drawAutoT = null; drawMakeGroups(rid, false); }, 0); };

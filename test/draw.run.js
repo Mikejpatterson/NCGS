@@ -63,6 +63,12 @@ const audit = p => p.evaluate(() => {
     await drawAll(p);
     await org(p, 'drawlineup');
     check('line-up: names first, every team listed', (await p.$$('.drw-lt')).length === 4 && (await p.$$('.drw-lt li')).length === 16);
+    await p.waitForTimeout(1500);
+    const made = await p.evaluate(() => { const n = window.__ncgs, r = n.D.round('fx-wp2'), rows = n.view().settings.filter(s => s.key.indexOf('draw:fx-wp2:1:') === 0);
+      return { groups: (r.groups || []).length, marked: (r.groups || []).every(g => g.draw), picks: rows.length }; });
+    check('the last team is not drawn (12 picks for 16 players), and the teams become the groups by themselves', made.picks === 12 && made.groups === 4 && made.marked, JSON.stringify(made));
+    await member(p);
+    check('members: once the groups are made there is no Draw tab, just Groups', !(await p.$('.rtabs [data-t="pots"]')) && !!(await p.$('.rtabs [data-t="groups"]')));
     await p.close();
 
     // Short pot: fifteen players; the last team has nobody from pot D, and the groups wait for the committee.
@@ -73,13 +79,12 @@ const audit = p => p.evaluate(() => {
     const lt = await p.locator('main').innerText();
     check('short pot: team 4 has nobody from pot D and says so', /No one from pot D/.test(lt) && /Team 4 plays short/.test(lt));
     check('short pot: no Make the groups until the committee agrees', !(await p.$('[data-act="draw-make"]')) && /committee decides/.test(lt));
-    await act(p, 'draw-make', { rid: 'fx-wp2' }); await act(p, 'draw-make', { rid: 'fx-wp2' });
+    await act(p, 'draw-make', { rid: 'fx-wp2' }); await act(p, 'draw-make', { rid: 'fx-wp2' }); await p.waitForTimeout(300);
     check('short pot: the make-groups action itself refuses', !(await p.evaluate(() => (window.__ncgs.D.round('fx-wp2').groups || []).length)));
     await p.click('[data-act="draw-short"]'); await p.waitForTimeout(1500); await p.evaluate(() => window.__ncgs.render());
-    check('short pot: once agreed (and logged), the groups can be made', !!(await p.$('[data-act="draw-make"]')) && await p.evaluate(() => window.__ncgs.view().log.some(l => /Team 4 plays short: agreed/.test(l.detail || ''))));
-    await p.click('[data-act="draw-make"]'); await p.click('[data-act="draw-make"]'); await p.waitForTimeout(300);
+    check('short pot: the committee\'s agreement is logged', await p.evaluate(() => window.__ncgs.view().log.some(l => /Team 4 plays short: agreed/.test(l.detail || ''))));
     const g = await p.evaluate(() => window.__ncgs.D.round('fx-wp2').groups.map(x => x.teams.flat().length));
-    check('short pot: four groups, the last of three', JSON.stringify(g) === '[4,4,4,3]', JSON.stringify(g));
+    check('short pot: once agreed, the groups are made: four, the last of three', JSON.stringify(g) === '[4,4,4,3]', JSON.stringify(g));
     check('no script errors', !p.errs.length, p.errs.join(' | '));
     await p.close();
 
