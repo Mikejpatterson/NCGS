@@ -127,6 +127,17 @@ function nowActs(r, live, group) {
     <button class="go-link" data-act="round" data-rid="${r.id}" data-tab="players">Players \u00b7 Groups${isScramble(r) ? '' : ' \u00b7 KBs'}</button></div>`;
 }
 
+/* Your tee time and who you're out with, once the groups are out and until your group starts (journeys 2/20, 5). */
+function youreOff(r, group) {
+  const me = DB.prefs.me;
+  if (!me || !r.groups || !r.groups.length || (group && group.holesDone)) return '';
+  const g = r.groups.find(x => x.teams.flat().includes(me));
+  if (!g) return '';
+  const others = g.teams.flat().filter(pid => pid !== me).map(pid => D.nameOf(pid));
+  const list = others.length > 1 ? others.slice(0, -1).join(', ') + ' and ' + others[others.length - 1] : others.join('');
+  const when = g.teeTime ? `You're off at ${g.teeTime}` : `You're in ${isScramble(r) ? 'Team' : 'Group'} ${g.n}`;
+  return `${isScramble(r) && g.teeTime ? `Team ${g.n} · ` : ''}${when}${list ? ' with ' + list : ''}${g.startHole && g.startHole !== 1 ? ` · from hole ${g.startHole}` : ''}`;
+}
 /* Every group has finished all its holes (the round may still be waiting for the organiser to finalise). */
 function allIn(r) {
   try { const p = progressOf(r.id); return !!(p && p.groups.length && p.groups.every(g => g.complete)); } catch (e) { return false; }
@@ -154,6 +165,7 @@ function nowCard(r) {
   try { const comp = mine && progressOf(r.id); group = (comp && comp.groups.find(g => g.id === mine.id)) || null; }
   catch (e) { console.warn('Home: group progress unavailable', e); group = null; }
   const thisContest = group && group.nextHole ? contestOn(r.id, group.nextHole) : null;
+  const you = youreOff(r, group);
   return `<div class="now ${live ? 'home-live-ticket' : 'home-announcement'}">
     <button class="now-main" data-act="round" data-rid="${r.id}">
       <span class="now-top"><span class="now-kind">${kind}</span>${live && allIn(r) ? '<span class="pill w">All in</span>' : statusPill(r)}</span>
@@ -161,6 +173,7 @@ function nowCard(r) {
       ${date ? `<span class="home-date" aria-hidden="true"><small>${MONTHS[date.getMonth()].slice(0, 3)}</small><b>${date.getDate()}</b></span><span class="vh">${esc(fmtDate(r.date, true))}</span>` : ''}
       ${line2 ? `<span class="now-line">${esc(line2)}</span>` : ''}
       <span class="now-line">${esc(heroFacts(r))}</span>
+      ${you ? `<span class="now-you">${esc(you)}</span>` : ''}
       ${thisContest ? `<span class="home-this-hole">${CONTEST[thisContest.type]} · Hole ${thisContest.hole}</span>` : ''}
     </button>
     ${nowActs(r, live, group)}

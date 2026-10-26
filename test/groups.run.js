@@ -37,6 +37,9 @@ const kbOk = p => p.evaluate(rid => { const n = window.__ncgs, r = n.D.round(rid
     let g = await p.groups();
     check('the late player is in the last group, the other in the first, in the same buggy seats', g[lastG].ids.includes(late) && g[0].ids.includes(other) && g[0].teams[0][0] === other);
     check('KB pairs are still valid after the swap', await kbOk(p));
+    // Home tells the late player their new tee time and who they're with (plan batch B).
+    const homeLine = await p.evaluate(([rid, pid]) => { const n = window.__ncgs; n.DB.prefs.me = pid; n.UI.org = false; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); const el = document.querySelector('.now-you'); const g = n.D.round(rid).groups.find(x => x.teams.flat().includes(pid)); const t = el ? el.innerText : ''; n.UI.org = true; n.render(); return { t, ok: !!el && t.includes(g.teeTime) && g.teams.flat().filter(x => x !== pid).every(x => t.includes(n.D.nameOf(x))) }; }, [p.rid, late]);
+    check('Home: "You\'re off at <their tee time> with <their group>"', homeLine.ok, homeLine.t);
 
     // Take someone out: the group gets smaller, buggies redo themselves.
     const out = g[1].ids[1];

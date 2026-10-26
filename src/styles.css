@@ -425,6 +425,7 @@ button.btn:has(> svg) { flex-direction: row; }
 .now-kind { font-size: var(--t-sub); font-weight: 600; color: var(--award); }
 .now-name { font-size: var(--t-head); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; margin-top: 2px; text-wrap: balance; }
 .now-line { font-size: var(--t-body); color: #CFE2D6; }
+.now-you { display: block; margin-top: 10px; font-size: var(--t-body); font-weight: 600; color: #FAF8F3; text-wrap: pretty; }
 .now-acts { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-top: 20px; }
 .go { min-height: 54px; border-radius: 14px; background: var(--action-inverse); color: var(--on-action-inverse); font-weight: 700; font-size: var(--t-body); text-align: center; }
 .go.alt { background: rgba(255,255,255,.16); color: #fff; font-weight: 600; }
