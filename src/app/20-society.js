@@ -22,7 +22,7 @@ function pastRow(r) {
 }
 const statusPill = r => {
   if (isDemo(r)) return '<span class="pill w">Demo</span>';
-  if (r.status === 'live') { const c = progressOf(r.id); const thru = c ? Math.min(...c.groups.map(g => g.holesDone)) : 0; return `<span class="pill w">${thru ? 'Thru ' + thru : 'Live'}</span>`; }
+  if (r.status === 'live') return '<span class="pill w">Live</span>';   // not 'Thru N': the slowest group's count read as your own (owner, 26 October)
   if (r.status === 'final') return '<span class="pill g">Final</span>';
   return '';
 };

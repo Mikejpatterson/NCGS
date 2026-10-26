@@ -83,6 +83,7 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
     check('players show their team, not a playing handicap', /Team \d/.test(await page.$eval('.rp-players', e => e.innerText)) && !/Playing/.test(await page.$eval('.rp-players', e => e.innerText)));
     await go([{ v: 'home', p: {} }]);
     check('Home\'s round card link leaves out KBs', !/Groups\s*·\s*KBs/.test(await text()));
+    check('Home\'s live badge says Live, not "Thru N" (the slowest group read as your own)', !/Thru \d/.test(await page.$eval('.now', e => e.innerText)));
 
     check('nothing runs off the side', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     check('no script errors', errors.length === 0); if (errors.length) console.log(errors);
