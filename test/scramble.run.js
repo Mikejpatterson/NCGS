@@ -85,6 +85,17 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
     check('Home\'s round card link leaves out KBs', !/Groups\s*·\s*KBs/.test(await text()));
     check('Home\'s live badge says Live, not "Thru N" (the slowest group read as your own)', !/Thru \d/.test(await page.$eval('.now', e => e.innerText)));
 
+    // UX review fixes (Claude + Codex, 26 October).
+    await go([{ v: 'home', p: {} }, { v: 'tee', p: { rid: 'fx-wp2' } }]);
+    if (await page.locator('[data-act="ask-pick"]').count()) { await page.click('[data-act="ask-pick"] >> nth=-1'); await page.click('[data-act="ask-confirm"]'); await page.waitForTimeout(200); }
+    const warn = await page.locator('.scr-warn').innerText().catch(() => '');
+    check('the drive warning says what it means, not just "KBs"', warn && !/·\s*KBs$/.test(warn) && /drives each|needs?|need/.test(warn), warn);
+    await go([{ v: 'home', p: {} }, { v: 'round', p: { rid: 'fx-wp2' } }], true);
+    const orgRound = await text();
+    check('during play the organiser\'s round page no longer offers the breakfast draw', !/Set the pots, then draw the teams/.test(orgRound) && /Teams/.test(orgRound));
+    await go([{ v: 'home', p: {} }, { v: 'round', p: { rid: 'fx-wp2' } }, { v: 'groups', p: { rid: 'fx-wp2' } }], true);
+    check('during play a scramble\'s Groups says the teams are fixed, with nothing to tap', /teams are fixed/.test(await text()) && !(await page.locator('[data-act="grp-pick"]').count()));
+
     check('nothing runs off the side', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     check('no script errors', errors.length === 0); if (errors.length) console.log(errors);
   } catch (e) { console.error(e); ok = false; } finally { await browser.close(); }

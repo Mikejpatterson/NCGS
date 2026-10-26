@@ -45,7 +45,9 @@ ORG.groups = p => {
   if (!r.groups || !r.groups.length) return ORG.playing(p);   // nobody drawn yet: pick players, then draw
   const scr = isScramble(r), live = grStarted(r), sel = grSel(r.id);
   const n = r.groups.reduce((s, g) => s + g.teams.flat().length, 0);
-  const sub = live ? 'Play has started: tap a player to withdraw them' : `${plural(n, 'player')} · tap a name or a group to change it`;
+  // A scramble in play: teams are fixed and there's nothing to tap (UX review F18).
+  const fixed = live && scr;
+  const sub = fixed ? 'Play has started: the teams are fixed' : live ? 'Play has started: tap a player to withdraw them' : `${plural(n, 'player')} · tap a name or a group to change it`;
   let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups</h1></div><p class="sub">${esc(sub)}</p></header>`;
   if (sel && sel.mode === 'swap') html += `<div class="grp-swapbar"><span>${sel.only !== undefined ? `${esc(r.groups[sel.only].teeTime || 'That group')} is full. Tap who ${esc(D.nameOf(sel.pid))} swaps with.` : `Tap who ${esc(D.nameOf(sel.pid))} swaps with.`}</span><button class="link" data-act="grp-cancel">Cancel</button></div>`;
   r.groups.forEach((g, gi) => {
@@ -54,7 +56,8 @@ ORG.groups = p => {
     const rows = g.teams.map((t, i) => t.map(pid => {
       const on = sel && sel.pid === pid, wd = wdOf(r.id, pid), sc = scoresFor(r.id, pid);
       const note = wd ? `<span class="pill n">Withdrawn · hole ${wd}</span>` : sc && !live ? '<span class="sub">Has scores</span>' : '';
-      const row = `<button class="row${on ? ' picked' : ''}" data-act="grp-pick" data-rid="${r.id}" data-pid="${pid}" aria-expanded="${!!on}"><span style="display:flex;align-items:center;gap:8px">${!scr && g.teams.length > 1 ? dot(i) : ''}${esc(D.nameOf(pid))}</span>${note}</button>`;
+      const inner = `<span style="display:flex;align-items:center;gap:8px">${!scr && g.teams.length > 1 ? dot(i) : ''}${esc(D.nameOf(pid))}</span>${note}`;
+      const row = fixed ? `<div class="row">${inner}</div>` : `<button class="row${on ? ' picked' : ''}" data-act="grp-pick" data-rid="${r.id}" data-pid="${pid}" aria-expanded="${!!on}">${inner}</button>`;
       return row + (on && sel.mode !== 'swap' ? grPlayerPanel(r, pid, gi) : '');
     }).join('')).join('');
     html += `<section class="sec near grp"><div class="card">${head}${gOpen ? grGroupPanel(r, gi) : ''}${rows}</div></section>`;

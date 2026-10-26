@@ -2081,9 +2081,25 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .grp-acts .btn { margin: 0; min-height: 44px; }
 .grp-people { margin: 8px 0; max-height: 50vh; overflow-y: auto; }
 .grp-out { display: block; margin: 6px auto 0; min-height: 44px; }
-.ptile.wd { opacity: .75; }
-.ptile.wd .cap { margin: 4px 0 0; }
+.pr.wdrow { display: grid; gap: 2px; padding-block: 12px; min-height: 44px; }
+.wdrow .wd-n { font-size: 1.1rem; font-weight: 650; color: var(--sub); overflow-wrap: break-word; }
+.wdrow .wd-s { color: var(--sub); font-size: .9rem; }
 .grp-swapbar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0; padding: 10px 14px; border-radius: 16px; background: var(--pine); color: #fff; font-weight: 600; }
 .grp-swapbar .link { color: #fff; min-height: 44px; }
 .grp .card .grp-head { border-radius: 0; background: transparent; box-shadow: none; margin: 0; border-bottom: 1px solid var(--line); }
 .grp .card .grp-panel { margin: 0; border-radius: 0; }
+.right.sub.nowrap { white-space: nowrap; }
+/* Drive warning: amber while the minimum can still be met, red once it can't (UX review F13). */
+.scr .scr-warn { color: #8A5A00; }
+.scr .scr-warn.bad { color: var(--team-b); }
+.now-kb { margin: 10px 0 0; text-align: center; color: #F2EFE7; font-weight: 600; }
+/* iPad line-up held up to the room: two teams by two, names large (UX review F07). */
+@media (min-width: 700px) {
+  .drw-lineup { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 24px; gap: 18px; }
+  .drw-lt { padding: 18px 22px 20px; }
+  .drw-lt .drw-ln { font-size: 1rem; }
+  .drw-lt li { font-size: 2.1rem; padding: 4px 0; }
+}
+@media (min-width: 1200px) { .drw-lineup { grid-template-columns: repeat(4, minmax(0, 1fr)); } .drw-lt li { font-size: 1.8rem; } }
+.entry .pr.wdrow, .entry .bugs .pr.wdrow { display: flex; flex-direction: column; justify-content: center; gap: 2px; grid-template-columns: none; grid-template-areas: none; min-height: 64px; padding: 10px 14px 10px 18px; }
+.entry .pr.wdrow, .entry .bugs .pr.wdrow { align-items: flex-start; text-align: left; border: 0; box-shadow: none; background: none; border-radius: 0; margin: 0; }

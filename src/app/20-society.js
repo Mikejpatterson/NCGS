@@ -113,6 +113,11 @@ const lenStyle = s => `style="--len:${[...s].length}"`;
 /* The round card's buttons. During a live round that you're playing, the main button takes you back to scoring
    ("Continue · Hole 7"), and Players · Groups · KBs becomes a quieter link underneath (design review, 22 October). */
 function nowActs(r, live, group) {
+  // Everyone has finished: the results are what people want now (UX review F20). Provisional until the organiser finalises.
+  if (live && allIn(r)) {
+    const kb = kbLine(r);
+    return `<div class="now-acts one"><button class="go" data-act="leaderboard" data-rid="${r.id}">See the results</button>${kb ? `<p class="now-kb">${esc(kb)}</p>` : ''}</div>`;
+  }
   const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">${live ? (isScramble(r) ? 'Players · Groups' : 'Players · Groups · KBs') : drawTabOn(r) ? (drawOf(r.id).st.started ? 'Follow the draw' : 'See the pots') : 'View round details'}</button>`;
   const next = group ? group.nextHole : null;
   if (!next) return `<div class="now-acts one">${groups}</div>`;
@@ -120,6 +125,17 @@ function nowActs(r, live, group) {
     <button class="go-link" data-act="round" data-rid="${r.id}" data-tab="players">Players \u00b7 Groups${isScramble(r) ? '' : ' \u00b7 KBs'}</button></div>`;
 }
 
+/* Every group has finished all its holes (the round may still be waiting for the organiser to finalise). */
+function allIn(r) {
+  try { const p = progressOf(r.id); return !!(p && p.groups.length && p.groups.every(g => g.complete)); } catch (e) { return false; }
+}
+/* Who's KBs once everyone is in, said plainly; provisional until the round is final. */
+function kbLine(r) {
+  const res = resultsOf(r.id);
+  if (!res) return '';
+  if (isScramble(r)) { const t = (res.teams || []).filter(x => x.kb); return t.length ? `KBs: ${t.map(x => x.name).join(' and ')}${r.status === 'final' ? '' : ' (to be confirmed)'}` : ''; }
+  return '';
+}
 function nowCard(r) {
   const live = r.status === 'live';
   const playable = canScore(r) && (live || !r.date || daysFromToday(r.date) <= 0);
@@ -138,7 +154,7 @@ function nowCard(r) {
   const thisContest = group && group.nextHole ? contestOn(r.id, group.nextHole) : null;
   return `<div class="now ${live ? 'home-live-ticket' : 'home-announcement'}">
     <button class="now-main" data-act="round" data-rid="${r.id}">
-      <span class="now-top"><span class="now-kind">${kind}</span>${statusPill(r)}</span>
+      <span class="now-top"><span class="now-kind">${kind}</span>${live && allIn(r) ? '<span class="pill w">All in</span>' : statusPill(r)}</span>
       <span class="now-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</span>
       ${date ? `<span class="home-date" aria-hidden="true"><small>${MONTHS[date.getMonth()].slice(0, 3)}</small><b>${date.getDate()}</b></span><span class="vh">${esc(fmtDate(r.date, true))}</span>` : ''}
       ${line2 ? `<span class="now-line">${esc(line2)}</span>` : ''}
@@ -149,6 +165,11 @@ function nowCard(r) {
   </div>`;
 }
 
+/* A group has played past this contest hole: "not yet played" would be wrong, the result is waiting for reports (UX review F11). */
+function contestPassed(rid, hole) {
+  const pr = hole ? progressOf(rid) : null;
+  return !!(pr && pr.groups.some(g => g.holes && g.holes[hole] && g.holes[hole].complete));
+}
 /* Home borrows the existing result/claim state. It never awards a contest or writes scores. */
 function homeMatchday(r) {
   const res = resultsOf(r.id);
@@ -160,8 +181,9 @@ function homeMatchday(r) {
       const who = c.winner || (c.lead && c.lead.pid);
       const confirmed = c.status && c.status.confirmed;
       const answered = c.status && c.status.answered;
-      const state = confirmed ? 'Confirmed' : who || answered ? 'To be confirmed' : 'Not yet played';
-      const name = who ? D.nameOf(who) : confirmed ? 'Nobody' : answered ? 'Nobody yet' : 'No claim yet';
+      const passed = contestPassed(r.id, c.hole);
+      const state = confirmed ? 'Confirmed' : who || answered ? 'To be confirmed' : passed ? 'Waiting for groups' : 'Not yet played';
+      const name = who ? D.nameOf(who) : confirmed ? 'Nobody' : answered ? 'Nobody yet' : passed ? 'No report yet' : 'No claim yet';
       return `<div class="home-contest"><span class="hs-ic" aria-hidden="true">${sized(ICON.flagpin, 20)}</span><span class="home-contest-copy"><span class="b">${CONTEST[c.type]}${c.hole ? ` <span class="sub">· Hole ${c.hole}</span>` : ''}</span><span class="sub">${esc(name)}</span></span><span class="home-contest-state">${state}</span></div>`;
     }).join('')}</div></section>`;
   }

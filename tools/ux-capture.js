@@ -91,7 +91,7 @@ const member = (p, stack) => p.evaluate(s => { const n = window.__ncgs; n.UI.org
     p = await session(b, 'westport', 'phone');
     await shot(p, 'player', 'Home during the scramble');
     await tap(p, '.now [data-act="tab"][data-tab="hole"], [data-act="tab"][data-tab="hole"]');
-    if (await p.$('[data-act="ask-pick"]')) { await shot(p, 'player', 'Contest question on arriving at a hole'); await tap(p, '[data-act="ask-pick"] >> nth=-1'); await tap(p, '[data-act="ask-confirm"]'); }
+    if (await p.$('[data-act="ask-pick"]')) { await shot(p, 'player', 'Contest question after the group saved the contest hole'); await tap(p, '[data-act="ask-pick"] >> nth=-1'); await tap(p, '[data-act="ask-confirm"]'); }
     if (await p.$('[data-act="intro-go"]')) { await shot(p, 'player', 'Contest hole pop-up'); await tap(p, '[data-act="intro-go"]'); }
     await shot(p, 'player', 'Hole screen: drive, then score');
     await tap(p, '[data-act="scr-driver"] >> nth=1'); await shot(p, 'player', 'Drive chosen (walking off the tee)');
@@ -111,7 +111,11 @@ const member = (p, stack) => p.evaluate(s => { const n = window.__ncgs; n.UI.org
       r.groups.forEach(g => { const team = g.teams.flat(); for (let h = 1; h <= 18; h++) if (!sc.some(s => s.round === 'fx-wp2' && s.hole === h && team.includes(s.player))) sc.push({ round: 'fx-wp2', player: team[h % 4], hole: h, strokes: 4, by: 'Phone', at: '2026-10-26T15:00:00Z' }); });
       n.DB._view = null; n.DB._memo = {}; });
     await member(p, [{ v: 'home', p: {} }, { v: 'scrambleFinish', p: { rid: 'fx-wp2' } }]); await shot(p, 'player', 'Our team finished');
-    await member(p, [{ v: 'home', p: {} }, { v: 'board', p: {} }]); await shot(p, 'player', 'Results when every team has finished (KBs)');
+    await p.evaluate(() => { window.__ncgs.UI.res = 'lb'; });
+    await member(p, [{ v: 'home', p: {} }, { v: 'board', p: {} }]);
+    if (!(await p.$('.pills button.on')) || !/Scores/.test(await p.$eval('.pills button.on', e => e.textContent))) await tap(p, '[data-act="respill"][data-p="lb"]');
+    if (!/Scores/.test(await p.$eval('.pills button.on', e => e.textContent).catch(() => ''))) throw new Error('capture: Scores tab not showing for the finished results');
+    await shot(p, 'player', 'Results (Scores) when every team has finished: KBs');
     await member(p, [{ v: 'home', p: {} }]); await shot(p, 'player', 'Home when every team has finished');
     console.log('scramble errors:', p.errs.join(' | ') || 'none');
     await p.close();

@@ -88,8 +88,16 @@ VIEWS.scramble = () => {
     const on = d.driver === pid, k = gc.drives[pid] || 0;
     return `<button class="scr-drv${on ? ' on' : ''}" role="radio" aria-checked="${on}" data-act="scr-driver" data-pid="${pid}" aria-label="${esc(D.nameOf(pid))}, ${plural(k, 'drive')}"><span class="scr-dn">${esc(D.nameOf(pid))}</span>${scrDots(k, gc.minDrives, tight && k < gc.minDrives)}</button>`;
   }).join('')}</div>`);
-  const owed = gc.short.reduce((t, pid) => t + gc.minDrives - gc.drives[pid], 0);
-  if (tight) html += `<p class="scr-warn">${owed} drives owed · ${plural(left, 'hole')} left${gc.impossible ? ' · KBs' : ''}</p>`;
+  // Say who still needs drives (UX review F13): amber while it can still be done, red once it can't.
+  if (tight) {
+    const by = {};
+    gc.short.forEach(pid => { const k = gc.minDrives - gc.drives[pid]; (by[k] = by[k] || []).push(D.nameOf(pid)); });
+    const and = a => a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1] : a[0];
+    const who = Object.keys(by).sort((a, b) => b - a).map(k => `${esc(and(by[k]))} ${by[k].length > 1 ? 'need' : 'needs'} ${plural(Number(k), 'more drive')}${by[k].length > 1 ? ' each' : ''}`).join('; ');
+    html += gc.impossible
+      ? `<p class="scr-warn bad">Not enough holes left for ${gc.minDrives} drives each: the team will be KBs.</p>`
+      : `<p class="scr-warn">${who} · ${plural(left, 'hole')} left</p>`;
+  }
 
   const v = d.score;
   const pts = E.isEntered(v) ? E.stablefordPoints(v, h.par, shots) : null;

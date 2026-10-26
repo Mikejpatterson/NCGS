@@ -64,6 +64,10 @@ const audit = p => p.evaluate(() => {
     await claim(p);
     await p.click('[data-act="draw-go"]'); await p.click('[data-act="draw-skip"]').catch(() => {}); await p.waitForTimeout(200);
     check('stage: one team at a time (four pots, no other teams)', (await p.$$('.drw-cell')).length === 4 && !/Team 2/.test(await p.locator('main').innerText()));
+    await member(p);
+    const watch = await p.locator('main').innerText();
+    check('members following the draw see "Not drawn yet", never "No one from pot" for a pot that still has names', /Not drawn yet/.test(watch) && !/No one from pot/.test(watch) && !/TEAM 3/i.test(watch));
+    await org(p, 'draw');
     await drawAll(p);
     await org(p, 'drawlineup');
     check('line-up: names first, every team listed', (await p.$$('.drw-lt')).length === 4 && (await p.$$('.drw-lt li')).length === 16);

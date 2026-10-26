@@ -32,11 +32,13 @@ function nextChecklist(r) {
   const items = [
     { ok: !!r.date, t: r.date ? 'Date' : 'Date: members see the round once it has one', go: ['details', r.id], need: true },
     { ok: !!(c && c.holes && tee), t: 'Course and tees', go: ['details', r.id], need: true },
-    { ok: !!(r.groups && r.groups.length), t: 'Players and groups', go: ['playing', r.id], need: true },
+    // A scramble's teams come from the breakfast draw, and it has no KB pairs to set up (UX review F01).
+    isScramble(r)
+      ? { ok: !!(r.groups && r.groups.length), t: !hasPots(r.id) ? 'Breakfast draw: set the pots' : r.groups && r.groups.length ? 'Teams drawn' : 'Breakfast draw', go: ['drawhome', r.id], need: true }
+      : { ok: !!(r.groups && r.groups.length), t: 'Players and groups', go: ['groups', r.id], need: true },
     { ok: !!r.first_tee, t: 'First tee time', go: ['details', r.id], need: true },
-    { ok: !!(r.contests && r.contests.length), t: 'Contests', go: ['details', r.id], need: false },
-    { ok: !!(E.kbOff(r) || (r.kb && r.kb.length)), t: 'KBs', go: ['kb', r.id], need: false }
-  ];
+    { ok: !!(r.contests && r.contests.length), t: 'Contests', go: ['details', r.id], need: false }
+  ].concat(isScramble(r) ? [] : [{ ok: !!(E.kbOff(r) || (r.kb && r.kb.length)), t: 'KBs', go: ['kb', r.id], need: false }]);
   const left = items.filter(i => i.need && !i.ok).length;
   const head = `<span class="two"><span>${esc(roundName(r))}</span><span class="sub">${left ? `${plural(left, 'thing')} to do` : 'Ready to go'}</span></span>`;
   return sec(label('Next up'), cardOf(`<div class="row tall">${head}<span class="pill ${left ? 'w' : 'g'}">${left ? 'To do' : 'Ready'}</span></div>` +
@@ -91,10 +93,11 @@ ORG.round = p => {
   const details = [c ? c.name : 'No course', tee ? tee.name : '', r.date ? fmtDate(r.date, true) : '', r.first_tee || ''].filter(Boolean).join(' · ');
   const locked = r.status !== 'upcoming';
   // The breakfast draw sits just above Groups: it is how a scramble's groups get made.
-  const drawRow = isScramble(r) || hasPots(r.id) ? `<button class="row tall" data-act="org-go" data-v="drawhome" data-rid="${r.id}"><span class="two"><span>Breakfast draw</span><span class="sub">${!hasPots(r.id) ? 'Set the pots, then draw the teams' : drawMade(r) ? 'Done' : drawOf(r.id).st.started ? 'Under way' : 'Pots set'}</span></span>${chev}</button>` : '';
+  // Once play starts the draw is history, so the row goes (UX review F16).
+  const drawRow = r.status === 'upcoming' && (isScramble(r) || hasPots(r.id)) ? `<button class="row tall" data-act="org-go" data-v="drawhome" data-rid="${r.id}"><span class="two"><span>Breakfast draw</span><span class="sub">${!hasPots(r.id) ? 'Set the pots, then draw the teams' : drawMade(r) ? 'Done' : drawOf(r.id).st.started ? 'Under way' : 'Pots set'}</span></span>${chev}</button>` : '';
   html += sec('', cardOf(`
     <button class="row tall" data-act="org-go" data-v="details" data-rid="${r.id}"><span class="two"><span>Details</span><span class="sub">${esc(details)}</span></span>${chev}</button>
-    ${drawRow}<button class="row tall" data-act="org-go" data-v="${r.status === 'final' ? 'groupsview' : 'groups'}" data-rid="${r.id}"><span class="two"><span>Groups</span><span class="sub">${r.groups && r.groups.length ? `${plural(nPlayers, 'player')} · ${plural(r.groups.length, isScramble(r) ? 'team' : 'group')}${locked && r.status !== 'final' ? ' · withdraw only now' : ''}` : hasPots(r.id) ? 'Made by the breakfast draw' : 'Not drawn'}</span></span>${chev}</button>
+    ${drawRow}<button class="row tall" data-act="org-go" data-v="${r.status === 'final' ? 'groupsview' : 'groups'}" data-rid="${r.id}"><span class="two"><span>Groups</span><span class="sub">${r.groups && r.groups.length ? `${plural(nPlayers, 'player')} · ${plural(r.groups.length, isScramble(r) ? 'team' : 'group')}${locked && r.status !== 'final' ? ' · withdraw only now' : ''}` : isScramble(r) || hasPots(r.id) ? 'Teams not drawn yet' : 'Not drawn'}</span></span>${chev}</button>
     <button class="row tall" data-act="org-format" data-rid="${r.id}"><span class="two"><span>Format</span><span class="sub">${isScramble(r) ? 'Scramble: one team score per group, drives recorded' : 'Individual Stableford'}</span></span><span class="pill ${isScramble(r) ? 'g' : 'n'}">${isScramble(r) ? 'Scramble' : 'Stableford'}</span></button>
     ${isScramble(r) ? `<button class="row tall" data-act="org-go" data-v="teamshots" data-rid="${r.id}"><span class="two"><span>Team shots</span><span class="sub">${(r.groups || []).map(g => `Team ${g.n}: ${teamShotsOf(r)[g.id] || 0}`).join(' · ') || 'Draw the teams first'}</span></span>${chev}</button>` : ''}
     ${r.trip ? `<button class="row tall" data-act="org-tripboard" data-rid="${r.id}"><span class="two"><span>Trip leaderboard</span><span class="sub">${tripBoardOn(r) ? `${esc(r.trip)} adds up the days` : `No combined board for ${esc(r.trip)}: each day has its own results`}</span></span><span class="pill ${tripBoardOn(r) ? 'g' : 'n'}">${tripBoardOn(r) ? 'On' : 'Off'}</span></button>` : ''}
@@ -102,10 +105,10 @@ ORG.round = p => {
   if (c && (!c.holes || !tee)) html += `<div class="banner note">${esc(c.name)} needs ${!c.holes ? 'its par and stroke index for each hole' : 'tee details'} before scores can be entered. <button class="link inline" data-act="org-go" data-v="course" data-cid="${c.id}">Add them</button></div>`;
   const comp = progressOf(r.id);
   if (comp && r.status !== 'upcoming') {
-    html += sec(label('Groups'), cardOf(comp.groups.map(gc => {
+    html += sec(label(isScramble(r) ? 'Teams' : 'Groups'), cardOf(comp.groups.map(gc => {
       const sub = D.card(r.id, gc.id);
       const prog = gc.complete ? (sub ? 'Submitted' : 'Finished') : gc.holesDone ? `Thru ${gc.holesDone}` : 'Not started';
-      return `<button class="row" data-act="org-go" data-v="group" data-rid="${r.id}" data-gid="${gc.id}"><span>Group ${gc.n}</span><span class="right sub"><span class="bar"><i style="width:${Math.round(gc.holesDone / 18 * 100)}%"></i></span>${prog}${chev}</span></button>`;
+      return `<button class="row" data-act="org-go" data-v="group" data-rid="${r.id}" data-gid="${gc.id}"><span>${isScramble(r) ? 'Team' : 'Group'} ${gc.n}</span><span class="right sub nowrap"><span class="bar"><i style="width:${Math.round(gc.holesDone / 18 * 100)}%"></i></span>${prog}${chev}</span></button>`;
     }).join('')));
     const contests = r.contests || [];
     if (contests.length) {
@@ -126,7 +129,7 @@ ORG.round = p => {
   } else if (r.status === 'final') {
     html += `<button class="btn quiet" data-act="reopen" data-rid="${r.id}">Reopen round</button>`;
   } else {
-    const why = !canScore(r) ? (r.groups && r.groups.length ? 'Course details needed' : 'Draw the groups first') : liveRid() ? 'Another round is live' : '';
+    const why = !canScore(r) ? (r.groups && r.groups.length ? 'Course details needed' : isScramble(r) ? 'Do the breakfast draw first' : 'Draw the groups first') : liveRid() ? 'Another round is live' : '';
     html += `<button class="btn ${why ? 'quiet' : ''}" data-act="start-round" data-rid="${r.id}">Start round${why ? `<small style="color:var(--sub)">${esc(why)}</small>` : ''}</button>`;
   }
   if (r.status === 'upcoming' || isDemo(r) || D.testing()) {

@@ -92,7 +92,7 @@ const kbOk = p => p.evaluate(rid => { const n = window.__ncgs, r = n.D.round(rid
     await p.tap('[data-act="grp-withdraw"]'); await p.tap('[data-act="grp-withdraw"]');
     check('the withdrawal is saved and logged', await p.evaluate(([rid, pid]) => window.__ncgs.D.setting(`wd:${rid}:${pid}`, '') !== '' && window.__ncgs.view().log.some(l => l.action === 'Player withdrew'), [p.rid, wd]));
     const entry = await p.evaluate(([rid, pid, n]) => { const x = window.__ncgs; x.UI.org = false; x.DB.prefs.me = pid; x.UI.hole = n; x.UI.edit = true; x.UI.stack = [{ v: 'home', p: {} }, { v: 'entry', p: { rid } }]; x.render();
-      const tile = [...document.querySelectorAll('.ptile.wd')].map(e => e.innerText).join(' ');
+      const tile = [...document.querySelectorAll('.wdrow')].map(e => e.innerText).join(' ');
       return { tile, steppers: document.querySelectorAll(`.stepper [data-pid="${pid}"]`).length }; }, [p.rid, wd, from]);
     check('on the group\'s hole screen the player shows as Withdrawn, picked up, with no buttons', /Withdrawn/.test(entry.tile) && entry.steppers === 0, JSON.stringify(entry));
     check('no script errors (live)', !p.errs.length, p.errs.join(' | '));

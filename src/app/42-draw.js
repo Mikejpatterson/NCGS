@@ -168,10 +168,12 @@ ORG.draw = p => {
 /* After the draw: everyone, names first, team numbers as quiet labels. Then the groups. */
 /* The line-up: a pine card, names first. Once the groups are made it shows the saved groups (with tee times), so a later
    tee-time swap shows here too; before that, the drawn teams. */
-function drawLineup(d, r) {
+function drawLineup(d, r, upTo) {
+  // A place not drawn yet says so; "No one from pot X" only when that pot has really run out (UX review F10).
+  const gap = s => `<span class="drw-gap">${s.conflict ? 'Two devices drew here' : d.st.left[s.p].length ? 'Not drawn yet' : `No one from pot ${DR.potName(s.p)}`}</span>`;
   const teams = r && drawMade(r)
     ? r.groups.map(g => ({ label: `${g.teeTime ? esc(g.teeTime) + ' · ' : ''}Team ${g.n}`, names: g.teams.flat().map(pid => esc(shortName(pid))) }))
-    : d.st.teams.map(tm => ({ label: `Team ${tm.n}`, names: tm.slots.map(s => s.pid ? esc(shortName(s.pid)) : `<span class="drw-gap">${s.conflict ? 'Two devices drew here' : `No one from pot ${DR.potName(s.p)}`}</span>`) }));
+    : d.st.teams.filter((tm, i) => upTo === undefined || upTo < 0 || i <= upTo).map(tm => ({ label: `Team ${tm.n}`, names: tm.slots.map(s => s.pid ? esc(shortName(s.pid)) : gap(s)) }));
   return `<div class="drw-lineup">${teams.map(t => `<section class="drw-lt"><span class="drw-ln">${t.label}</span><ul>${t.names.map(n => `<li>${n}</li>`).join('')}</ul></section>`).join('')}</div>`;
 }
 ORG.drawlineup = p => {
@@ -193,7 +195,8 @@ ORG.drawlineup = p => {
 /* Members: the pots before the draw, then the teams as they are drawn (names first). */
 function drawMemberView(r) {
   const d = drawOf(r.id);
-  if (d.st.started) return `<p class="cap" style="margin:4px 4px 10px">${d.made ? 'The draw is done.' : d.st.current > -1 ? `Drawing team ${d.st.current + 1}…` : 'All teams drawn.'}</p>${drawLineup(d, r)}`;
+  // While drawing: the teams done so far and the one being drawn; later teams appear as they're drawn (UX review F10).
+  if (d.st.started) return `<p class="cap" style="margin:4px 4px 10px">${d.made ? 'The draw is done.' : d.st.current > -1 ? `Drawing team ${d.st.current + 1} of ${d.st.teams.length}…` : 'All teams drawn.'}</p>${drawLineup(d, r, d.st.current)}`;
   return `<div class="drw-potlist">${d.pots.map((x, i) => x.length ? `<section class="card drw-mpot"><div class="drw-mh">Pot ${DR.potName(i)}</div>${x.map(pid => `<div class="row"><span>${esc(D.nameOf(pid))}</span></div>`).join('')}</section>` : '').join('')}</div>`;
 }
 /* Once the draw has made the groups, members just see Groups (owner, 26 October). */
