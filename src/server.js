@@ -28,6 +28,8 @@ var NCGS = (function () {
   };
   var TABLES = Object.keys(SCHEMA);
   var PLAYER_TABLES = { checks: 1, cards: 1, log: 1 };
+  // Settings keyed "<kind>:<round id>[:…]" that belong to one round and go when it is deleted.
+  var ROUND_SETTINGS = { wd: 1, format: 1, teamshots: 1, pots: 1, draw: 1, drawdev: 1, drawepoch: 1, drawshort: 1, drawpace: 1 };
   var DEFAULT_PIN = '1234';
   // Stamped by build.js with a fingerprint of this file, so the app can tell whether the live server is the latest.
   var BUILD = '__BUILD__';
@@ -423,8 +425,13 @@ var NCGS = (function () {
       if (!SCHEMA[t] || t === 'deleted' || t === 'log') throw err('bad', 'Unknown table');
       if (!pinOk(req.pin)) throw err('pin', 'Organiser PIN needed.');
       return store.lock(function () {
-        var v = bump();
         var keys = (req.rows || []).map(function (r) { return keyOf(t, r); });
+        // A round with scores is only deleted when the request says so: two taps on the wrong round must not wipe a
+        // day's scores (structural review M4). The app sends withScores after saying how many scores go with it.
+        if (t === 'rounds' && !req.withScores && store.read('scores').some(function (r) { return keys.indexOf(String(r.round)) >= 0; })) {
+          throw err('scores', 'This round has scores. Delete it with its scores only if you mean to.');
+        }
+        var v = bump();
         store.remove(t, keys);
         store.upsert('deleted', stamp('deleted', keys.map(function (k) { return { tbl: t, k: k }; }), v));
         if (t === 'rounds') {
@@ -436,6 +443,13 @@ var NCGS = (function () {
               store.upsert('deleted', stamp('deleted', gone.map(function (k) { return { tbl: dt, k: k }; }), v));
             }
           });
+          // ...and the settings that belong to it (withdrawals, scramble format, team shots, pots and the draw), so a
+          // new round that happens to get the same id doesn't inherit them (structural review H2).
+          var goneSet = store.read('settings').filter(function (r) { var p = String(r.key).split(':'); return ROUND_SETTINGS[p[0]] && keys.indexOf(p[1]) >= 0; }).map(function (r) { return keyOf('settings', r); });
+          if (goneSet.length) {
+            store.remove('settings', goneSet);
+            store.upsert('deleted', stamp('deleted', goneSet.map(function (k) { return { tbl: 'settings', k: k }; }), v));
+          }
         }
         if (req.log) store.upsert('log', stamp('log', [logRow(v, req.log.by || 'Organiser', req.log.action, req.log.detail)], v));
         commit(v);
@@ -658,7 +672,7 @@ var NCGS = (function () {
     return api;
   }
 
-  var api = { SCHEMA: SCHEMA, TABLES: TABLES, keyOf: keyOf, memoryStore: memoryStore, sheetStore: sheetStore, createServer: createServer, appsScript: appsScript, toCell: toCell, fromCell: fromCell };
+  var api = { SCHEMA: SCHEMA, TABLES: TABLES, ROUND_SETTINGS: ROUND_SETTINGS, keyOf: keyOf, memoryStore: memoryStore, sheetStore: sheetStore, createServer: createServer, appsScript: appsScript, toCell: toCell, fromCell: fromCell };
   if (typeof module === 'object' && module.exports) module.exports = api;
   return api;
 })();

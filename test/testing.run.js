@@ -16,6 +16,7 @@ const { chromium } = require('playwright');
     const n = window.__ncgs; n.ORGPIN.pin = '1234';
     const base = n.D.rounds().find(r => r.id === 'demo-cabopino');
     n.put('rounds', [Object.assign({}, base, { id: 'test-final', source: 'organiser', status: 'final', name: 'Test final' })]);
+    n.put('settings', [{ key: 'wd:test-final:x', value: '3' }, { key: 'format:test-final', value: 'scramble' }]);   // the round's own settings (review H2)
     const pid = n.D.members()[0].id; n.put('scores', [1, 2, 3].map(h => ({ round: 'test-final', player: pid, hole: h, strokes: 5, by: 'test', at: '' })));
     return n.flush().then(() => n.sync()).then(() => 'test-final');
   });
@@ -41,6 +42,8 @@ const { chromium } = require('playwright');
   await tap('[data-act="delete-round"]'); await tap('[data-act="delete-round"]');
   await pg.evaluate(() => window.__ncgs.flush().then(() => window.__ncgs.sync())); await pg.waitForTimeout(300);
   check('two taps delete the round and its scores', !(await pg.evaluate(f => !!window.__ncgs.D.round(f), fin)) && (await scoresOf(fin)) === 0);
+  check('the round\'s own settings go with it (review H2)', await pg.evaluate(() => !window.__ncgs.DB.server.tables.settings.some(x => /test-final/.test(x.key))));
+  check('nothing was refused along the way', await pg.evaluate(() => !(window.__ncgs.DB.prefs.rejected || []).length));
   check('no script errors', errs.length === 0);
   if (errs.length) console.log(errs);
   await b.close();

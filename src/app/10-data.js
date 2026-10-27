@@ -88,7 +88,11 @@ function applyLocal(tables, req) {
   } else if (req.op === 'remove') {
     const keys = req.rows.map(r => rowKey(req.table, r));
     removeKeys(tables, req.table, keys);
-    if (req.table === 'rounds') ['scores', 'claims', 'winners', 'checks', 'cards'].forEach(t => { tables[t] = tables[t].filter(r => !keys.includes(String(r.round))); });
+    if (req.table === 'rounds') {
+      ['scores', 'claims', 'winners', 'checks', 'cards'].forEach(t => { tables[t] = tables[t].filter(r => !keys.includes(String(r.round))); });
+      // the round's own settings go with it, as on the server (NCGS.ROUND_SETTINGS)
+      tables.settings = tables.settings.filter(r => { const p = String(r.key).split(':'); return !(NCGS.ROUND_SETTINGS[p[0]] && keys.includes(p[1])); });
+    }
   }
 }
 function view() {
@@ -203,7 +207,7 @@ function send(req, done) {
 /* Organiser writes carry the PIN typed this session. */
 const ORGPIN = { pin: null };
 function put(table, rows, log) { send({ op: 'put', table, rows, pin: ORGPIN.pin, log }); }
-function removeRows(table, rows, log) { send({ op: 'remove', table, rows, pin: ORGPIN.pin, log }); }
+function removeRows(table, rows, log, extra) { send(Object.assign({ op: 'remove', table, rows, pin: ORGPIN.pin, log }, extra || {})); }
 
 /* ----- Reading the data ----- */
 /* Groups and KB pairs go together: a round with groups always shows valid KB pairs, even if none were saved yet (the same on every phone) */
