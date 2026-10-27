@@ -2,7 +2,8 @@
 // It talks to the server the way the app does (load, since, saveHole), with the app's polling rhythm, retries and clashes.
 //
 //   Local copy (safe, default):    node tools/devserver.js 8766 &   then   node tools/rehearsal.js
-//   A COPY of the Apps Script setup:   node tools/rehearsal.js --api <copy's web app URL> --pin <copy's PIN> --minutes 120 --speed 1
+//   A COPY of the Apps Script setup:   node tools/rehearsal.js --api <copy's web app URL> --pin 1234 --setup-fixture --minutes 120 --speed 2
+//     (--setup-fixture adds the invented players and course to an empty copy; never use it on anything holding real data)
 //
 // Never point it at the live app: it creates a round called "Rehearsal …" and deletes it again at the end (--keep to leave it).
 // --speed compresses time: --minutes 120 --speed 60 plays a two-hour round in two minutes (same number of requests per hole).
@@ -43,8 +44,28 @@ async function deliver(req) {
 }
 
 (async () => {
-  const data = await call({ op: 'load' });
+  let data = await call({ op: 'load' });
   if (!data || !data.tables) { console.log('FAIL  could not load from ' + API); process.exit(1); }
+  // Safety: against anything but this machine, refuse to run unless every player on the server is an invented one.
+  // A rehearsal copy holds only the fixture's players; the live server holds the society's, so this stops a wrong URL.
+  if (!/^https?:\/\/(localhost|127\.0\.0\.1)[:/]/.test(API)) {
+    const fxIds = new Set(require('../data/fixture-seed.json').members.map(m => m.id));
+    const strangers = data.tables.members.filter(m => !fxIds.has(m.id));
+    if (strangers.length || data.tables.rounds.some(r => r.source !== 'rehearsal')) {
+      console.log(`STOP  ${API} holds players or rounds that are not the invented test data. This tool only runs against an empty rehearsal copy. Nothing was changed.`);
+      process.exit(2);
+    }
+  }
+  // A fresh rehearsal copy starts empty: give it the invented players and course (organiser writes, so the PIN is needed).
+  if (args['setup-fixture'] && !data.tables.courses.some(c => c.holes && c.holes.length === 18)) {
+    const fx = require('../data/fixture-seed.json');
+    for (const t of ['members', 'courses']) {
+      const r = await deliver({ op: 'put', table: t, rows: fx[t], pin: PIN, log: { by: 'Rehearsal', action: 'Rehearsal data added', detail: t } });
+      if (!r || r.error) { console.log(`FAIL  could not add invented ${t}: ${JSON.stringify(r)}`); process.exit(1); }
+    }
+    data = await call({ op: 'load' });
+    console.log('Added the invented players and course to this empty copy.');
+  }
   const members = data.tables.members.filter(m => m.active !== false && !String(m.id).startsWith('guest-'));
   const course = data.tables.courses.find(c => c.holes && c.holes.length === 18 && c.tees && Object.keys(c.tees).length);
   if (!course) { console.log('FAIL  no course with a full card'); process.exit(1); }
