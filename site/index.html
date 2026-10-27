@@ -2132,9 +2132,11 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .drw-counts b { color: #D4B483; font-weight: 700; }
 .drw-saved { margin-left: auto; font-size: .85rem; color: #CFE0D6; }
 .drw-left { margin: 0 0 12px; text-align: center; font-size: 1rem; }
+/* Changes the server refused: a tappable notice on Home and the hole screens (structural review H1). */
+.rej-note { display: block; width: 100%; min-height: 44px; margin: 12px 0 0; text-align: left; font: inherit; font-size: var(--t-sub); font-weight: 600; border: 0; cursor: pointer; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610271307","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610272148","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3997,11 +3999,14 @@ const DB = {
   _memo: {}
 };
 TABLES.forEach(t => { DB.server.tables[t] = DB.server.tables[t] || []; });
+// A clash ("another phone saved this hole") is kept with the phone's settings, so a restart doesn't lose this phone's
+// version before someone has looked at it (structural review M2).
+DB.conflicts = Array.isArray(DB.prefs.conflicts) ? DB.prefs.conflicts : [];
 DB.loaded = DB.server.ver > 0;
 
 const FAILED = {};
 function persist(k, v) { const ok = LS.set(KEY[k], v); if (ok) delete FAILED[k]; else FAILED[k] = 1; DB.saveOk = !Object.keys(FAILED).length; return ok; }
-function savePrefs() { persist('prefs', DB.prefs); }
+function savePrefs() { DB.prefs.conflicts = DB.conflicts; persist('prefs', DB.prefs); }
 function saveOutbox() { persist('outbox', DB.outbox); }
 function saveCache() { LS.set(KEY.cache, DB.server); }
 
@@ -4126,10 +4131,25 @@ let retryTimer = null;
 /* Errors that mean "try again later" (server busy, lock timeout) keep the change queued.
    Errors that mean "never" (round finalised or deleted, bad PIN) move it to a kept list so it is not lost silently. */
 const RETRY_ERRORS = { server: 1 };
-function reject(item, resp) {
-  DB.prefs.rejected = (DB.prefs.rejected || []).concat([{ req: item.req, error: resp.error, message: resp.message || '', at: new Date().toISOString() }]).slice(-50);
-  savePrefs();
+const WHY = { final: 'the round was already final', missing: 'the round no longer exists', notlive: 'the round had not started', pin: 'it needed the organiser PIN' };
+/* Plain words for what a refused change was, for this phone's list and the organiser's log. */
+function rejectedWhat(req) {
+  if (req.op !== 'saveHole') return req.op === 'put' ? `A change to ${req.table}` : 'A change';
+  const vals = Object.entries(req.scores || {}).map(([pid, s]) => `${(req.names && req.names[pid]) || D.nameOf(pid)} ${s.v === null ? 'cleared' : s.v === 'P' ? 'pick-up' : s.v}`);
+  return `${req.label || 'Hole ' + req.hole}: ${vals.join(', ')}`;
 }
+function reject(item, resp) {
+  const at = new Date().toISOString();
+  const why = WHY[resp.error] || resp.message || 'the server refused it';
+  DB.prefs.rejected = (DB.prefs.rejected || []).concat([{ req: item.req, error: resp.error, message: resp.message || '', why, what: rejectedWhat(item.req), at }]).slice(-50);
+  savePrefs();
+  // Tell the organiser too: a score refused after Finalise would otherwise exist only on this phone (review H1).
+  // Phones may add to the log; a refused log row is never logged again.
+  if (item.req.op === 'saveHole') {
+    send({ op: 'put', table: 'log', rows: [{ id: `rej:${item.req.round}:${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, at, by: (DB.prefs.me && D.nameOf(DB.prefs.me)) || 'Player', action: 'Score not saved', detail: `${rejectedWhat(item.req)} (${why})` }] });
+  }
+}
+function clearRejected() { DB.prefs.rejected = []; savePrefs(); }
 async function flush() {
   if (flushing || !DB.outbox.length) return;
   flushing = true;
@@ -4142,20 +4162,24 @@ async function flush() {
       if (!resp || (resp.error && RETRY_ERRORS[resp.error])) {
         DB.online = !!resp;
         item.tries = (item.tries || 0) + 1;
+        // The server answers but keeps failing: say so, rather than looking like "Sending…" for ever (review M3).
+        DB.stuck = !!resp && item.tries >= 3;
         clearTimeout(retryTimer);
         retryTimer = setTimeout(flush, Math.min(30000, 4000 * (1 + item.tries)));
         break;
       }
       DB.online = true;
+      DB.stuck = false;
       DB.outbox.shift();
       saveOutbox();
       sent += 1;
       if (!resp.error) { DB.sentSeq = (DB.sentSeq || 0) + 1; (DB.sent = DB.sent || []).push({ req: item.req, seq: DB.sentSeq }); }
       if (resp.error) {
-        if (resp.error !== 'pin') reject(item, resp);
+        if (!(item.req.op === 'put' && item.req.table === 'log')) reject(item, resp);
         toast(resp.error === 'pin' ? 'Organiser PIN needed for that' : resp.error === 'final' ? 'That round is final, so that score was not saved' : resp.message || 'That change was not saved');
       } else if (resp.conflicts && resp.conflicts.length) {
         resp.conflicts.forEach(c => DB.conflicts.push({ round: item.req.round, grp: item.req.grp, hole: Number(item.req.hole), player: c.player, server: c.server, mine: c.mine }));
+        savePrefs();
         tick();
       }
       try { if (item.done) item.done(resp); } catch (e) { /* a screen callback must not stop the queue */ }
@@ -4692,6 +4716,7 @@ VIEWS.home = () => {
     <h1 class="vh">${esc(doneToday ? `${roundName(doneToday)}: the result` : homeHeadline(feature))}</h1>
     ${homeState === 'upcoming' ? `<p class="home-season-label">The ${season} season</p><p class="home-quiet-title">Next on the card.</p>` : ''}
     ${doneToday ? resultCard(doneToday) : feature ? nowCard(feature) : homeSeasonIntro(season, played)}</header>`;
+  html += rejectedNote();   // a score the server refused is never only a passing toast (review H1)
   if (homeState === 'matchday') html += homeMatchday(feature);
   const table = goy(season);
   const lead = table[0];
@@ -5402,8 +5427,26 @@ function holesSheet(rid, gc, here) {
     ${seg('Front nine', E.SEGMENTS.front)}${seg('Back nine', E.SEGMENTS.back)}
     <div class="cap hs-key"><span class="hs-ki"><i class="hs-k done"></i>Scored</span><span class="hs-ki"><i class="hs-k nxt"></i>Next to play</span>${(D.round(rid).contests || []).length ? '<span class="hs-ki"><b class="hs-tag">Pin</b><b class="hs-tag">Drive</b>Contest hole</span>' : ''}<span class="hs-tip">Tap a scored hole to change it.</span></div></div></div>`;
 }
+/* Changes the server refused (round already final, deleted, not started, PIN). Kept on the phone and shown until
+   someone has looked; the organiser's log has them too (structural review H1). */
+function rejectedNote() {
+  const n = (DB.prefs.rejected || []).length;
+  return n ? `<button class="banner warn rej-note" data-act="rejected">${plural(n, 'change')} not saved · See why</button>` : '';
+}
+VIEWS.rejected = () => {
+  const list = (DB.prefs.rejected || []).slice().reverse();
+  const when = at => { const d = new Date(at); return isNaN(d) ? '' : d.toLocaleString('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit' }); };
+  return {
+    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Not saved</h1></div><p class="sub">${list.length ? 'The server refused these, so they are only on this phone. The organiser can see them in the log.' : 'Nothing waiting.'}</p></header>
+      ${list.length ? sec('', cardOf(list.map(x => `<div class="row tall"><span class="two"><span>${esc(x.what || rejectedWhat(x.req))}</span><span class="sub">Not saved because ${esc(x.why || x.message || x.error)}${when(x.at) ? ` · ${esc(when(x.at))}` : ''}</span></span></div>`).join('')), true) +
+        `<button class="btn quiet" data-act="rejected-clear">${UI.confirm === 'rej-clear' ? 'Tap again: the organiser has these' : 'Clear this list'}</button>` : ''}`
+  };
+};
 function saveWarning() {
   if (!DB.saveOk) return '<p class="err" style="text-align:center">This phone is not saving. Keep this screen open.</p>';
+  const rej = rejectedNote();
+  if (DB.stuck && DB.outbox.length) return `${rej}<p class="err" style="text-align:center">Not reaching the server · ${plural(DB.outbox.filter(i => i.req.op === 'saveHole').length || DB.outbox.length, 'save')} waiting on this phone. They keep trying.</p>`;
+  if (rej) return rej;
   if (DB.outbox.length && !DB.online) return `<p class="cap" style="text-align:center;margin-top:12px">No signal · ${plural(DB.outbox.filter(i => i.req.op === 'saveHole').length || DB.outbox.length, 'save')} waiting on this phone</p>`;
   return '';
 }
@@ -6891,6 +6934,9 @@ ORG.round = p => {
     ${isScramble(r) ? `<button class="row tall" data-act="org-go" data-v="teamshots" data-rid="${r.id}"><span class="two"><span>Team shots</span><span class="sub">${(r.groups || []).map(g => `Team ${g.n}: ${teamShotsOf(r)[g.id] || 0}`).join(' · ') || 'Draw the teams first'}</span></span>${chev}</button>` : ''}
     ${r.trip ? `<button class="row tall" data-act="org-tripboard" data-rid="${r.id}"><span class="two"><span>Trip leaderboard</span><span class="sub">${tripBoardOn(r) ? `${esc(r.trip)} adds up the days` : `No combined board for ${esc(r.trip)}: each day has its own results`}</span></span><span class="pill ${tripBoardOn(r) ? 'g' : 'n'}">${tripBoardOn(r) ? 'On' : 'Off'}</span></button>` : ''}
     ${isScramble(r) ? '' : `<button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${E.kbOff(r) ? 'Off' : r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`}`), true);
+  // Scores a phone sent after this round was final (or otherwise refused): they never reached the scores (review H1).
+  const refused = D.log().filter(l => String(l.id).startsWith(`rej:${r.id}:`));
+  if (refused.length) html += `<div class="banner warn"><b>${plural(refused.length, 'score')} sent by a phone ${refused.length === 1 ? 'was' : 'were'} not saved.</b>${refused.map(l => `<br>${esc(l.by)}: ${esc(l.detail)}`).join('')}<br>Correct the card here if they should count.</div>`;
   if (c && (!c.holes || !tee)) html += `<div class="banner note">${esc(c.name)} needs ${!c.holes ? 'its par and stroke index for each hole' : 'tee details'} before scores can be entered. <button class="link inline" data-act="org-go" data-v="course" data-cid="${c.id}">Add them</button></div>`;
   const comp = progressOf(r.id);
   if (comp && r.status !== 'upcoming') {
@@ -8097,6 +8143,8 @@ const ACT = {
     }).catch(() => toast('Needs signal to restore'));
   }
 };
+ACT.rejected = () => go('rejected');
+ACT['rejected-clear'] = () => { if (UI.confirm !== 'rej-clear') { UI.confirm = 'rej-clear'; render(); return; } UI.confirm = null; clearRejected(); render(); toast('Cleared'); };
 Object.assign(ACT, DRAW_ACT, GROUP_ACT);
 
 const FORMS = {
