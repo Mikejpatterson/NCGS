@@ -29,46 +29,43 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await page.waitForSelector('.brand');
   await shot('01-home', true);
   let t = await text();
-  check('home: next round first, then Past rounds, Golfer of the Year, Players tiles, a quiet Organiser link, and no year in the header', !/2026 season/.test(t) && /Past rounds\s*8 played/.test(t) && /Golfer of the Year\s*Sean leads on 115/.test(t) && /Players\s*12 golfers/.test(t) && !!(await page.$('.foot [data-act="org"]')) && !(await page.$('.links [data-act="org"]')));
-  check('home: the list of past rounds is not on the front page', !/Kieran, Sean/.test(t));
+  // Society overview, against the invented fixture (tools/make-fixture.js): two Marbella trip rounds, 12 golfers.
+  check('home: Past rounds, Golfer of the Year, Players tiles, a quiet Organiser link, and no year in the header', !/2026 season/.test(t) && /Past rounds\s*2 rounds played/.test(t) && /Golfer of the Year\s*Aidan leads/.test(t) && /Players\s*12 golfers/.test(t) && !!(await page.$('.foot [data-act="org"]')) && !(await page.$('.links [data-act="org"]')));
+  check('home: the list of past rounds is not on the front page', !/long-named second day/.test(t));
+  check('home: no "Thru N" badge (the slowest group\'s holes read as your own)', !/Thru \d/.test(t));
   await tap('[data-act="trip"]');
   t = await text();
-  check('home: Trip standings tile opens the whole-trip table with a link to each day', /Marbella/.test(t) && /All 3 rounds count/.test(t) && (await page.$$('[data-act="leaderboard"]')).length === 3);
+  check('home: Trip standings tile opens the whole-trip table with a link to each day', /Marbella/.test(t) && /All 2 rounds count/.test(t) && (await page.$$('[data-act="leaderboard"]')).length === 2);
+  check('trip: level totals share a position (Aidan and Eoghan T1 on 72)', /T1[A-Z]{2}Aidan.*72T1[A-Z]{2}Eoghan.*72/.test(t));
   await tap('[data-act="back"]');
   await tap('[data-act="rounds"]');
   t = await text();
-  check('past rounds screen lists all eight; Westport shows the tie', (await page.$$('[data-act="round"]')).length >= 8 && /Kieran, Sean/.test(t));
+  check('past rounds screen lists both, newest first, with each winner', (await page.$$('[data-act="round"]')).length === 2 && /15\s*May.*Bartley.*14\s*May.*Aidan/s.test(t));
 
-  // A past trip round (GameBook order, KBs, contests, groups)
-  await tap('[data-act="round"][data-rid="2026-rio-real"]');
+  // A past trip round (winner card, top 8, KBs, contests, groups)
+  await tap('[data-act="round"][data-rid="fx-r1"]');
   t = await text();
   check('finished round: the winner leads in a pine card, the table shows the top 8 with Show all 12', /WINNER/.test(t) && !!(await page.$('.fincard')) && (await page.$$('.fin .lrow')).length === 8 && /Show all 12/.test(t));
   await tap('[data-key^="all-"]');
   await tap('[data-key^="grp-"]');
   t = await text();
-  check('round: GameBook order kept (Mike F 10th ahead of Damien on 23)', /10[A-Za-z]{2,3}Mike F2311[A-Za-z]{2,3}Damien23/.test(t));
-  check('round: KBs and contests from the sheet', /Sean & Peadar · 67/.test(t) && /Nearest the pinPeadar/.test(t) && /Longest driveMike P/.test(t));
-  check('round: buggies listed under groups', /Mike P & Dave/.test(t));
-  await shot('02-round-rio-real', true);
-  await tap('[data-act="player"][data-pid="mike-p"]');
-  t = await text();
-  check('player: GOY 12th, best 3 = 66, to beat 16', /12th/.test(t) && /Best 366/.test(t) && /To beat16/.test(t));
-  check('player: rounds list marks the counting three', (await page.$$('.pill.g')).length === 3);
-  await shot('03-player', true);
+  check('round: Show all lists all 12', (await page.$$('.fin .lrow')).length === 12 && /Show fewer/.test(t));
+  check('round: KBs and contests shown, an unawarded contest says so', /Gearóid & Ivor · 59/.test(t) && /Nearest the pin 7\s*Not awarded/.test(t));
+  check('round: buggies listed under groups', /Aidan & Bartley\s*Cathal & Donnacha/.test(t));
+  await shot('02-round-fx-r1', true);
   await tap('[data-act="back"]');
   await tap('[data-act="back"]');
 
-  // An Irish round: points only, ties shown as ties
-  await tap('[data-act="round"][data-rid="2026-westport"]');
-  t = await text();
-  check('Irish round: level scores share a position', /T1[A-Za-z]{2,3}Kieran32T1[A-Za-z]{2,3}Sean32/.test(t) && /From the society sheet/.test(t));
-  await tap('[data-act="back"]');
-  await tap('[data-act="back"]');
-
-  // GOY table
+  // GOY table and a player page
   await tap('[data-act="goy"]');
   t = await text();
-  check('GOY: Colin 3rd and John K 4th on 100', /3[A-Za-z]{2,3}Colin383428100/.test(t) && /4[A-Za-z]{2,3}John K363331100/.test(t));
+  check('GOY: level totals share a position (Bartley and Cathal T3 on 68)', /T3[A-Z]{2}Bartley\d+68T3[A-Z]{2}Cathal\d+68/.test(t));
+  await tap('[data-act="player"][data-pid="mike-p"]');
+  t = await text();
+  check('player: GOY 2nd, best 3 = 72', /2nd/.test(t) && /Best 372/.test(t));
+  check('player: rounds list marks the counting rounds', (await page.$$('.pill.g')).length === 2);
+  await shot('03-player', true);
+  await tap('[data-act="back"]');
   await tap('[data-act="back"]');
 
   // Demo round: play
@@ -148,7 +145,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await page.waitForSelector('[data-act="undo"]');
   t = await text();
   check('after: result and next hole', /Saved/.test(t) && /Hole 16/.test(t));
-  check('after save: one card with the result and one line per match, no Was lines, no pills', (await page.$$('.aftercard .afrow')).length === 2 && !/Was /.test(t) && !(await page.$('.aftercard .pill')));
+  check('after save: one card with the hole result and one line per match (back nine, overall), no Was lines, no pills', (await page.$$('.aftercard .afres')).length === 1 && (await page.$$('.aftercard .bw-row:not(.afres)')).length === 2 && !/Was /.test(t) && !(await page.$('.aftercard .pill')), await page.$$eval('.aftercard .bw-row', e => e.map(x => x.textContent.trim()).join(' | ')).catch(() => 'no .aftercard'));
   await shot('07-after');
   await tap('[data-act="undo"]');
   check('undo returns to the entry with the scores kept', /Save hole 15/.test(await text()));
@@ -176,7 +173,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await tap('[data-act="respill"][data-p="ct"]');
   t = await text();
   check('Contests pill: nearest the pin and longest drive', /Nearest the pin/.test(t) && /Longest drive/.test(t));
-  check('Contests pill: answered contests get the gold cup, the one still to play says To be confirmed', (await page.$$('.ct-won .cupw')).length > 0 && /To be confirmed/.test(t) && /John K/.test(t));
+  check('Contests pill: answered contests get the gold cup, the one still to play says To be confirmed', (await page.$$('.ct-won .cupw')).length > 0 && /To be confirmed/.test(t) && /Bartley/.test(t), t.replace(/\s+/g, ' ').slice(0, 500));
   check('Contests rows are tidy: hole under the name, winner on one line', /Hole\s*\d+/.test(t) && (await page.$$eval('.ct-r .b', els => els.every(e => e.getBoundingClientRect().height < 28))));
   await shot('08b-contests', true);
   await tap('[data-act="respill"][data-p="lb"]');
@@ -195,7 +192,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await page.press('#askin', 'Enter');
   await page.waitForSelector('.msg.ai .bub:not(.err):not(.wait)');
   t = await text();
-  check('rules: verdict first and big, steps under it, rule number as a chip, my question stays', (await page.$eval('.msg.ai:last-of-type .verdict', e => e.textContent)) === 'Take relief.' && !!(await page.$('.bub .ab')) && (await page.$eval('.rulechip', e => e.textContent)) === 'Rule 17.1' && /red area/.test(t));
+  check('rules: verdict first and big, steps under it, rule number as a button that opens the rule, my question stays', (await page.$eval('.msg.ai:last-of-type .verdict', e => e.textContent)) === 'Take relief.' && !!(await page.$('.bub .ab')) && (await page.$eval('.rref .rref-n', e => e.textContent)) === 'Rule 17.1' && /red area/.test(t));
   check('rules: a microphone button sits beside the box', !!(await page.$('.askbar .mic')) && JSON.stringify(await page.$$eval('.tab', b => b.map(x => x.dataset.tab))) === JSON.stringify(['home', 'hole', 'board', 'rules']));
   check('rules: the input is still there and empty for the next question', (await page.$eval('#askin', e => e.value)) === '');
   await shot('08c-rules', true);
@@ -294,21 +291,23 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   t = await text();
   check('new round created', /Cabopino/.test(t) && /Not drawn/.test(t));
   const newRid = await page.evaluate(() => window.__ncgs.UI.orgStack.slice(-1)[0].p.rid);
-  await tap('[data-act="org-go"][data-v="playing"]');
+  await tap('[data-act="org-go"][data-v="groups"]');
   const ten = (await page.$$eval('[data-act="org-toggle-player"]', els => els.map(e => e.dataset.pid))).slice(0, 10);
   for (const pid of ten) await tap(`[data-act="org-toggle-player"][data-pid="${pid}"]`);
   await tap('[data-act="org-draw"][data-kind="random"]');
   t = await text();
   check('draw: 10 players make groups of 4, 3 and 3 with tee times', /Group 1/.test(t) && /Group 3/.test(t) && /09:30/.test(t) && /09:46/.test(t));
-  // swap two players
-  const order = await page.$$eval('[data-act="org-swap"]', els => els.map(e => e.dataset.pid));
+  check('the draw is saved straight away: no Save step', !(await page.$('[data-act="org-save-groups"]')) && await page.evaluate(rid => (window.__ncgs.D.round(rid).groups || []).length === 3, newRid));
+  // swap two players: tap one, Swap with…, tap the other
+  const order = await page.$$eval('[data-act="grp-pick"]', els => els.map(e => e.dataset.pid));
   const a = order[0], b = order[5];
-  await tap(`[data-act="org-swap"][data-pid="${a}"]`);
-  await tap(`[data-act="org-swap"][data-pid="${b}"]`);
-  const firstNow = await page.$eval('[data-act="org-swap"]', el => el.dataset.pid);
-  check('tap two players to swap them', firstNow === b && a !== b);
+  await tap(`[data-act="grp-pick"][data-pid="${a}"]`);
+  await tap(`[data-act="grp-swap"][data-pid="${a}"]`);
+  await tap(`[data-act="grp-pick"][data-pid="${b}"]`);
+  const firstNow = await page.$eval('[data-act="grp-pick"]', el => el.dataset.pid);
+  check('swap two players', firstNow === b && a !== b);
   await shot('13-org-groups', true);
-  await tap('[data-act="org-save-groups"]');
+  await tap('[data-act="back"]');
   await page.waitForTimeout(200);
   t = await text();
   check('groups saved on the round', /10 players · 3 groups/.test(t));
@@ -321,7 +320,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await page.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.orgStack = [{ v: 'home', p: {} }]; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); });
   await page.waitForTimeout(100);
   t = await text();
-  check('home shows the new round under Coming up', /Also on/.test(t) && /Sun 18 Apr/.test(t) && /09:30/.test(t) && /Past rounds\s*8 played/.test(t), t.slice(0, 200));
+  check('home shows the new round under Coming up', /Also on/.test(t) && /Sun 18 Apr/.test(t) && /09:30/.test(t) && /Past rounds\s*2 rounds played/.test(t), t.replace(/\s+/g, ' ').slice(0, 700));
   await shot('14-home-with-next', true);
 
   // Members: add someone, change an index
@@ -343,9 +342,11 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   check('index saved', /29\.4/.test(await text()));
   await tap('[data-act="back"]');
 
-  // Course: Rio Real has no card yet; adding one needs every hole
+  // Course: one with no card yet (invented); adding a card needs every hole
+  await page.evaluate(() => { const n = window.__ncgs; n.put('courses', [{ id: 'no-card', name: 'Links with no card yet', area: 'Invented' }]); });
+  await page.waitForTimeout(200);
   await tap('[data-act="org-go"][data-v="courses"]');
-  await tap('[data-act="org-go"][data-v="course"][data-cid="rio-real"]');
+  await tap('[data-act="org-go"][data-v="course"][data-cid="no-card"]');
   await page.selectOption('#h-par-0', '4');
   await page.fill('#h-si-0', '5');
   await tap('form[data-form="course"] button[type="submit"]');

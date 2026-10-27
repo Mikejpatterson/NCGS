@@ -200,9 +200,29 @@ const titleCheck = ({ sel, want, max }) => {
     [...process.execArgv, require('path').join(__dirname, 'scenarios.run.js')], { stdio: 'inherit', env: subEnv });
   if (sc.error) console.error(sc.error);
   if (sc.status !== 0) process.exit(sc.status || 1);
+  // The Westport scramble (owner brief §6; Codex's invariants, 24 October).
+  const scr = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'scramble.run.js')], { stdio: 'inherit', env: subEnv });
+  if (scr.error) console.error(scr.error);
+  if (scr.status !== 0) process.exit(scr.status || 1);
   // Contest claims in playing order, through Home (owner rule; Codex's counterexample, 24 October).
   const co = require('child_process').spawnSync(process.execPath,
     [...process.execArgv, require('path').join(__dirname, 'contest-order.run.js')], { stdio: 'inherit', env: subEnv });
   if (co.error) console.error(co.error);
   if (co.status !== 0) process.exit(co.status || 1);
+  // The breakfast draw (owner brief §7; Codex's review, 26 October): members' pots, the stage, short pots, every size.
+  const dr = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'draw.run.js')], { stdio: 'inherit', env: subEnv });
+  if (dr.error) console.error(dr.error);
+  if (dr.status !== 0) process.exit(dr.status || 1);
+  // One Groups screen for every round (owner, 26 October): move, swap, add, replace, take out, order, withdraw.
+  const gr = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'groups.run.js')], { stdio: 'inherit', env: subEnv });
+  if (gr.error) console.error(gr.error);
+  if (gr.status !== 0) process.exit(gr.status || 1);
+  // Home tells you your day: your tee time and group, and today's result once it's final (plan batch B, 26 October).
+  const hd = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'home-day.run.js')], { stdio: 'inherit', env: subEnv });
+  if (hd.error) console.error(hd.error);
+  if (hd.status !== 0) process.exit(hd.status || 1);
 })();

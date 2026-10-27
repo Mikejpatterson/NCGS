@@ -435,6 +435,7 @@ button.btn:has(> svg) { flex-direction: row; }
 .now-kind { font-size: var(--t-sub); font-weight: 600; color: var(--award); }
 .now-name { font-size: var(--t-head); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; margin-top: 2px; text-wrap: balance; }
 .now-line { font-size: var(--t-body); color: #CFE2D6; }
+.now-you { display: block; margin-top: 10px; font-size: var(--t-body); font-weight: 600; color: #FAF8F3; text-wrap: pretty; }
 .now-acts { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-top: 20px; }
 .go { min-height: 54px; border-radius: 14px; background: var(--action-inverse); color: var(--on-action-inverse); font-weight: 700; font-size: var(--t-body); text-align: center; }
 .go.alt { background: rgba(255,255,255,.16); color: #fff; font-weight: 600; }
@@ -1596,6 +1597,7 @@ body { font-variant-numeric: tabular-nums; }
 .pk { border-color: #C9D2CC; }
 .pk.me { background: var(--action-tint); border-color: var(--action); }
 .pk.wide { grid-column: span 2; }
+.rg-team { grid-column: span 2; display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: .95rem; }
 .rp-kbs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 12px; }
 .rp-about { white-space: pre-line; line-height: 1.45; }
 
@@ -1683,6 +1685,7 @@ body { font-variant-numeric: tabular-nums; }
 /* Round page: Players tab */
 .rp-players .pl-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 3.2rem 3.4rem 14px; gap: 8px; align-items: center; width: 100%; min-height: 56px; padding: 6px 14px; text-align: left; font-variant-numeric: tabular-nums; }
 .rp-players .pl-row + .pl-row { border-top: .5px solid var(--line); }
+.rp-players.scr .pl-row { grid-template-columns: 34px minmax(0, 1fr) 14px; }
 .rp-players .pl-row.cols { min-height: 30px; padding-top: 10px; padding-bottom: 0; }
 .rp-players .pl-row.me { background: var(--action-tint); }
 .rp-players .pl-n { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
@@ -1907,9 +1910,231 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .hero .seg.year { background: var(--press); }
 .hero .seg.year button { color: var(--text); min-height: 44px; font-variant-numeric: tabular-nums; }
 .hero .seg.year button.on { background: #fff; color: var(--pine); font-weight: 700; }
+
+/* Scramble hole (Westport, owner brief §6): one team score, then whose drive. Big targets, readable outdoors. */
+.scr .scr-score { padding: 14px 16px 12px; }
+.scr .scr-team-head { display: flex; flex-direction: column; gap: 2px; margin: 14px 4px 0; }
+.scr .scr-team-head .sub { overflow-wrap: anywhere; }
+.scr .scr-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }
+.scr .scr-head .sub { overflow-wrap: anywhere; }
+.scr .scr-step { display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; align-items: center; gap: 10px; }
+.scr .scr-st { height: 64px; border-radius: 16px; background: var(--fill); color: var(--pine); font-size: 2rem; font-weight: 500; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.scr .scr-st:active { background: var(--press); }
+.scr .scr-val { min-height: 64px; border-radius: 16px; font-size: var(--t-num, 2.6rem); font-weight: 800; color: var(--pine); font-variant-numeric: tabular-nums; line-height: 1; }
+.scr .scr-val small { font-size: var(--t-body); font-weight: 600; color: var(--faint); }
+.scr .scr-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px; min-height: 44px; }
+.scr .scr-meta .link { min-height: 44px; padding: 0 4px; font-weight: 700; }
+.scr .scr-drives { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 8px; }
+.scr .scr-drv { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "av nm" "av dc"; column-gap: 10px; align-items: center; text-align: left; min-height: 64px; padding: 10px 12px; border-radius: 16px; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); }
+.scr .scr-drv .av { grid-area: av; }
+.scr .scr-drv .scr-dn { grid-area: nm; font-weight: 700; overflow-wrap: break-word; min-width: 0; }
+.scr .scr-drv .scr-dc { grid-area: dc; font-size: .85rem; color: var(--sub); font-variant-numeric: tabular-nums; }
+.scr .scr-drv.need .scr-dc { color: var(--team-b); font-weight: 600; }
+.scr .scr-drv.on { background: var(--pine); box-shadow: none; }
+.scr .scr-drv.on .scr-dn, .scr .scr-drv.on .scr-dc { color: #fff; }
+.scr .scr-warn { margin: 10px 4px 0; color: var(--team-b); font-weight: 600; }
+.scr-row { align-items: start; }
+.scr-row .scr-team { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.scr-row .scr-team .sub { overflow-wrap: anywhere; }
+.scr-row .scr-note { font-size: .85rem; color: var(--team-b); font-weight: 600; }
+/* Drive chips on every scramble team (owner, 25 October). */
+.scr-chips { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 4px; }
+.scr-chip { display: inline-flex; align-items: baseline; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--fill); color: var(--text); font-size: .85rem; line-height: 1.35; white-space: nowrap; }
+.scr-chip b { font-weight: 700; font-variant-numeric: tabular-nums; }
+.scr-chip.ok { background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: var(--sub); }
+.scr-chip.warn { background: color-mix(in srgb, var(--team-b) 12%, #fff); color: var(--team-b); }
+.mini .scr-owed { font-size: .78rem; font-weight: 600; color: var(--sub); margin-left: 6px; white-space: nowrap; }
+.mini .scr-owed.warn { color: var(--team-b); }
+.scr-row .scr-thru { font-size: .85rem; color: var(--sub); font-weight: 500; }
+
+/* Scramble, simplified (owner, 25 October: fewer words). Drives as dots; one-word headings. */
+.scr-dots { display: inline-flex; gap: 4px; align-items: center; }
+.scr-dots i { width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--line-strong, #B9C4BD); }
+.scr-dots i.on { background: var(--pine); box-shadow: none; }
+.scr-dots.warn i:not(.on) { box-shadow: inset 0 0 0 1.5px var(--team-b); }
+.scr .scr-drv { grid-template-columns: minmax(0, 1fr); grid-template-areas: "nm" "dc"; row-gap: 6px; min-height: 64px; }
+.scr .scr-drv .scr-dots { grid-area: dc; }
+.scr .scr-drv.on .scr-dots i { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.6); }
+.scr .scr-drv.on .scr-dots i.on { background: #fff; box-shadow: none; }
+.scr .scr-warn { margin: 8px 4px 0; font-size: .95rem; }
+.scr-row .scr-chips { gap: 4px 12px; margin-top: 6px; }
+.scr-pd { display: inline-flex; align-items: center; gap: 5px; font-size: .8rem; }
+.scr-pd b { font-weight: 700; color: var(--sub); letter-spacing: .02em; }
+.scr-row .scr-pts { display: flex; flex-direction: column; align-items: flex-end; margin-left: auto; }
+.scr-row .scr-pts b { font-size: 1.15rem; font-weight: 800; }
+.scr-row .scr-pts small { font-size: .78rem; color: var(--sub); }
+
+.lrow.scr-row { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; grid-template-areas: "pos name pts" ". chips chips"; align-items: start; column-gap: 8px; }
+.scr-row .scr-pos { grid-area: pos; }
+.scr-row .scr-name { grid-area: name; min-width: 0; }
+.scr-row .scr-pts { grid-area: pts; }
+.scr-row .scr-chips { grid-area: chips; display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; }
+
+.scr-row .scr-name small { font-size: .8rem; color: var(--sub); font-weight: 500; }
+.scr-row b.scr-pts { font-size: 1.15rem; font-weight: 800; text-align: right; }
+.scr-row .scr-chips { margin-top: 4px; }
+.lrow.scr-row { height: auto; min-height: 0; row-gap: 2px; align-content: start; padding-top: 10px; padding-bottom: 10px; }
+/* Westport presentation: one decision at a time on the hole; named drive ledgers on Results.
+   Existing save actions, counts, warnings and radio semantics are unchanged. */
+.scr .entcard { margin-bottom: 22px; }
+.scr > .sec { margin-top: 20px; }
+.scr > .sec .sec-label, .scr-finish > .sec .sec-label { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.scr > .sec .sec-label::after, .scr-finish > .sec .sec-label::after { content: ""; height: 1px; flex: 1; background: var(--pine); opacity: .3; }
+.scr .scr-drives { gap: 8px; }
+.scr .scr-drv { min-height: 72px; padding: 13px 14px; row-gap: 9px; border-radius: 14px; background: transparent; box-shadow: inset 0 0 0 1px #BCCAC0; }
+.scr .scr-drv .scr-dn { font-size: 1rem; font-weight: 600; }
+.scr .scr-drv.on { background: var(--pine); box-shadow: inset 0 0 0 2px var(--pine); }
+.scr .scr-score { border-radius: 20px; padding: 16px; box-shadow: inset 0 0 0 1px var(--line); }
+.scr .scr-step { grid-template-columns: 60px minmax(0, 1fr) 60px; gap: 14px; }
+.scr .scr-st { width: 60px; height: 60px; border-radius: 50%; background: var(--fill); font-weight: 400; }
+.scr .scr-val { display: grid; place-items: center; text-align: center; min-height: 68px; font-size: 3rem; font-weight: 650; }
+.scr .scr-val small { color: var(--sub); font-weight: 500; font-size: 1.1rem; }
+.scr .scr-meta { margin-top: 4px; }
+.scr .scr-meta .sub { color: var(--pine); font-weight: 600; }
+.scr .scr-meta .link { font-weight: 500; }
+.scr .savebar { margin-top: 20px; }
+.scr .scr-warn { margin: 10px 0 0; font-size: .85rem; line-height: 1.45; font-weight: 600; }
+.scr-standings > .sec { margin-top: 25px; }
+.scr-standings .sec-label { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; padding-bottom: 9px; border-bottom: 2px solid var(--pine); }
+.scr-legend { color: var(--sub); font-size: .75rem; font-weight: 500; }
+.scr-standings .card { border-radius: 0; background: transparent; box-shadow: none; overflow: visible; }
+.scr-standings .lrow.scr-row { grid-template-columns: 1.5rem minmax(0, 1fr) auto; column-gap: 8px; padding: 14px 0 16px; border-bottom: 1px solid #CFD8CF; }
+.scr-standings .scr-row .scr-pos { padding-top: 2px; font-size: .85rem; }
+.scr-standings .scr-row .scr-name > b { color: var(--pine); font-size: 1.05rem; font-weight: 650; }
+.scr-standings .scr-row .scr-name small { display: inline-block; margin-left: 5px; font-size: .72rem; }
+.scr-standings .scr-row b.scr-pts { color: var(--pine); font-size: 1.45rem; font-weight: 650; line-height: 1.1; }
+.scr-standings .scr-row .scr-chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5rem), 1fr)); gap: 8px 16px; margin-top: 10px; }
+/* Long surnames: never split mid-word. The dots drop under the name when the name needs the room. */
+.scr-standings .scr-pd { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 6px; min-width: 0; }
+.scr-standings .scr-pd b { flex: 1 1 auto; min-width: 0; color: var(--text); font-size: .78rem; font-weight: 500; letter-spacing: 0; overflow-wrap: break-word; }
+.scr-standings .scr-dots { flex: none; gap: 3px; }
+.scr-standings .scr-dots i { width: 8px; height: 8px; }
+.scr-standings .scr-row.low { padding-left: 8px; padding-right: 8px; background: var(--lead-tint); }
+/* Breakfast draw (owner brief §7): the wheels are the core; only the team being drawn; names large enough to read across a room.
+   iPad first, phone fine. Pine stage for the big moment, ivory names; champagne only for the small pot labels on pine. */
+.drw-top { padding-bottom: 0; }
+.drw-stage { margin: 4px 0 0; padding: 18px 16px 22px; border-radius: 24px; background: var(--pine); color: #FAF8F3; text-align: center; }
+.drw-stage.done { padding: 28px 18px; }
+.drw-kicker { margin: 0; color: #D4B483; font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.drw-team { margin: 4px 0 14px; font-family: var(--font-display); font-weight: 500; font-size: 2.1rem; line-height: 1.1; color: #FAF8F3; }
+.drw-cells { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.drw-cell { display: grid; align-content: start; justify-items: center; gap: 8px; min-height: 9rem; padding: 12px 8px 14px; border-radius: 18px; background: rgba(250, 248, 243, .07); box-shadow: inset 0 0 0 1px rgba(250, 248, 243, .14); min-width: 0; }
+.drw-cell.got { align-content: center; background: #FAF8F3; color: var(--pine); }
+.drw-cell.warn { background: rgba(155, 52, 67, .35); }
+.drw-pot { color: #D4B483; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.drw-cell.got .drw-pot { color: var(--sub); }
+.drw-name { font-size: clamp(1.7rem, 6.5vw, 3.2rem); font-weight: 750; line-height: 1.05; overflow-wrap: break-word; max-width: 100%; }
+.drw-full { color: var(--sub); font-size: .9rem; overflow-wrap: break-word; max-width: 100%; }
+.drw-none { font-size: 1rem; font-weight: 600; opacity: .85; }
+.drw-wheel { position: relative; width: min(100%, 300px); aspect-ratio: 1; }
+.drw-wheel svg { display: block; width: 100%; height: 100%; }
+.drw-rot { transform-box: view-box; transform-origin: 100px 100px; }
+.drw-ptr { position: absolute; z-index: 1; top: -6px; left: 50%; width: 0; height: 0; margin-left: -11px; border-left: 11px solid transparent; border-right: 11px solid transparent; border-top: 20px solid #D4B483; }
+@keyframes drw-spin { from { transform: rotate(0deg); } to { transform: rotate(var(--to)); } }
+@media (prefers-reduced-motion: reduce) { .drw-rot { animation-duration: 1ms !important; } }
+.drw-act { margin-top: 18px; }
+.drw-act .btn { margin: 0; }
+.drw-go { background: #FAF8F3; color: var(--pine); font-size: 1.15rem; min-height: 56px; }
+.drw-stage .btn.quiet { background: transparent; color: #FAF8F3; box-shadow: inset 0 0 0 1.5px rgba(250, 248, 243, .6); }
+.drw-watch, .drw-sync { margin: 8px 0 0; color: #CFE0D6; font-size: .9rem; }
+.drw-stage .banner { text-align: left; margin: 0 0 12px; }
+@media (min-width: 700px) {
+  .drw-stage { padding: 28px 28px 32px; }
+  .drw-team { font-size: 3rem; margin-bottom: 20px; }
+  .drw-cells { gap: 18px; }
+  .drw-cell { min-height: 14rem; }
+  .drw-go { max-width: 420px; margin: 0 auto !important; }
+}
+/* Line-up: names first, team numbers as quiet labels. */
+.drw-lineup { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 12px; margin-top: 12px; }
+.drw-lt { padding: 12px 16px 14px; border-radius: 18px; background: var(--card, #fff); box-shadow: 0 0 0 1px var(--line); }
+.drw-ln { color: var(--sub); font-size: .78rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.drw-lt ul { margin: 6px 0 0; padding: 0; list-style: none; }
+.drw-lt li { padding: 3px 0; font-size: 1.25rem; font-weight: 650; overflow-wrap: break-word; }
+/* Pots editor: a name and four pot buttons per row. */
+.drw-prow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.drw-pn { min-width: 0; overflow-wrap: break-word; }
+.drw-pb { display: inline-flex; gap: 6px; flex: none; }
+.drw-pb button { width: 44px; height: 44px; border-radius: 12px; border: 0; background: var(--fill); color: var(--text); font: inherit; font-weight: 700; }
+.drw-pb button.on { background: var(--pine); color: #fff; }
+.drw-pb button:disabled { opacity: .55; }
+.drw-pace button { min-height: 44px; }
+.drw-potlist { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: 12px; }
+.drw-mh { padding: 12px 16px 4px; color: var(--pine); font-weight: 700; }
+/* On an iPad the draw and the line-up use the width: the wheels are the point. */
+#app:has(.drw-stage), #app:has(.drw-lineup) { max-width: 1000px; }
+@media (min-width: 700px) {
+  #app:has(.drw-stage), #app:has(.drw-lineup) { padding-inline: max(16px, calc((100vw - 960px) / 2)); }
+  .drw-wheel { width: min(100%, 380px); }
+  .drw-lt li { font-size: 1.5rem; }
+}
+.card .drw-pb > button { display: grid; place-items: center; flex: none; width: 44px; min-width: 44px; height: 44px; padding: 0; text-align: center; }
+.drw-pace { display: inline-flex; flex: none; }
+.drw-pace button { padding: 0 14px; white-space: nowrap; }
+/* A revealed name shrinks to fit its box rather than breaking mid-word (cqi: the box's own width). */
+.drw-cell { container-type: inline-size; }
+.drw-name { font-size: min(clamp(1.7rem, 6.5vw, 3.2rem), calc(100cqi / (var(--len, 8) * .62))); overflow-wrap: normal; }
+/* Line-up as a pine card (a big moment): two teams a row, four across on a wide screen; never an orphan. */
+.drw-lineup { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 14px; border-radius: 24px; background: var(--pine); }
+@media (min-width: 900px) { .drw-lineup { grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 20px; gap: 14px; } }
+.drw-lt { background: rgba(250, 248, 243, .07); box-shadow: inset 0 0 0 1px rgba(250, 248, 243, .14); color: #FAF8F3; min-width: 0; }
+.drw-ln { color: #D4B483; font-variant-numeric: tabular-nums; }
+.drw-lt li { color: #FAF8F3; font-size: 1.15rem; }
+.drw-gap { color: #CFE0D6; font-size: .85rem; font-weight: 500; }
+.org-team.picked, .row.picked { box-shadow: inset 0 0 0 2px var(--pine); }
+/* Groups screen (owner, 26 October): tap a name or a group; its choices open underneath. */
+.grp .grp-head { border-radius: 16px; background: var(--card, #fff); box-shadow: 0 0 0 1px var(--line); margin-bottom: 8px; }
+.grp .grp-head b { font-size: 1.25rem; }
+.grp-panel { margin: 0 0 10px; padding: 12px 14px 14px; border-radius: 16px; background: var(--fill); }
+.grp-panel .cap { margin: 0 0 8px; }
+.grp-panel .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.chipb { min-height: 44px; min-width: 64px; padding: 0 14px; border: 0; border-radius: 22px; background: #fff; color: var(--pine); font: inherit; font-weight: 650; font-variant-numeric: tabular-nums; box-shadow: inset 0 0 0 1.5px var(--pine); }
+.chipb:disabled { opacity: .4; }
+.grp-acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: 8px; margin-bottom: 8px; }
+.grp-acts .btn { margin: 0; min-height: 44px; }
+.grp-start { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
+.grp-start .cap { margin: 0; }
+.grp-start .field { margin: 0; }
+.grp-people { margin: 8px 0; max-height: 50vh; overflow-y: auto; }
+.grp-dim { opacity: .45; }
+.grp-outzone { margin-top: 12px; padding-top: 6px; border-top: 1px solid var(--line); }
+.grp-out { display: block; margin: 0 auto; min-height: 44px; }
+.grp-panel .grp-out { color: var(--team-b); }
+.pr.wdrow { display: grid; gap: 2px; padding-block: 12px; min-height: 44px; }
+.wdrow .wd-n { font-size: 1.1rem; font-weight: 650; color: var(--sub); overflow-wrap: break-word; }
+.wdrow .wd-s { color: var(--sub); font-size: .9rem; }
+.grp-swapbar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0; padding: 10px 14px; border-radius: 16px; background: var(--pine); color: #fff; font-weight: 600; }
+.grp-swapbar .link { color: #fff; min-height: 44px; }
+.grp .card .grp-head { border-radius: 0; background: transparent; box-shadow: none; margin: 0; border-bottom: 1px solid var(--line); }
+.grp .card .grp-panel { margin: 0; border-radius: 0; }
+.right.sub.nowrap { white-space: nowrap; }
+/* Drive warning: amber while the minimum can still be met, red once it can't (UX review F13). */
+.scr .scr-warn { color: #8A5A00; }
+.scr .scr-warn.bad { color: var(--team-b); }
+.now-kb { margin: 10px 0 0; text-align: center; color: #F2EFE7; font-weight: 600; }
+/* iPad line-up held up to the room: two teams by two, names large (UX review F07). */
+@media (min-width: 700px) {
+  .drw-lineup { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 24px; gap: 18px; }
+  .drw-lt { padding: 18px 22px 20px; }
+  .drw-lt .drw-ln { font-size: 1rem; }
+  .drw-lt li { font-size: 2.1rem; padding: 4px 0; }
+}
+@media (min-width: 1200px) { .drw-lineup { grid-template-columns: repeat(4, minmax(0, 1fr)); } .drw-lt li { font-size: 1.8rem; } }
+.entry .pr.wdrow, .entry .bugs .pr.wdrow { display: flex; flex-direction: column; justify-content: center; gap: 2px; grid-template-columns: none; grid-template-areas: none; min-height: 64px; padding: 10px 14px 10px 18px; }
+.entry .pr.wdrow, .entry .bugs .pr.wdrow { align-items: flex-start; text-align: left; border: 0; box-shadow: none; background: none; border-radius: 0; margin: 0; }
+
+/* Finalise: what's still to do sits above the button, as clear as the button (UX review F17). */
+.fin-wait { margin: 16px 0 8px; padding: 12px 16px; border-radius: 16px; background: var(--fill); }
+.fin-wait p { margin: 0 0 4px; }
+.fin-wait ul { margin: 0; padding-left: 1.1rem; color: var(--sub); }
+.btn[aria-disabled="true"] { opacity: .6; }
+.drw-counts { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin: 0 0 12px; padding: 10px 14px; border-radius: 14px; background: var(--pine); color: #FAF8F3; font-variant-numeric: tabular-nums; }
+.drw-counts b { color: #D4B483; font-weight: 700; }
+.drw-saved { margin-left: auto; font-size: .85rem; color: #CFE0D6; }
+.drw-left { margin: 0 0 12px; text-align: center; font-size: 1rem; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610242014","server":"e228da71"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610262105","server":"e228da71"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2494,6 +2719,48 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
   /** Golfer of the Year: best N scores count. Ties compare the counting scores best to worst,
    *  then the next best scores in turn. Only identical full records stay tied.
    *  results: [{ rid, scores: { pid: points } }]. */
+  /* Scramble (Westport day two, owner brief §6): four players, one team score per hole. The team's strokes are saved in
+     the scores row of the player whose drive was used, so one row per hole records both. Team shots are the organiser's
+     manual allowance (normally 0). Each player must have at least `minDrives` drives used (normally 3). */
+  function scrambleTeam(team, holes, strokesOf, teamShots, minDrives) {
+    const min = minDrives === undefined ? 3 : minDrives;
+    const ph = Number(teamShots) || 0;
+    const per = {}, drives = {}, doubles = [];
+    team.forEach(p => { drives[p] = 0; });
+    holes.forEach(h => {
+      const shots = shotsOnHole(ph, h.si);
+      const filled = team.filter(p => isEntered(strokesOf(p, h.n)));
+      if (filled.length > 1) doubles.push(h.n);   // two drives recorded (two phones at once): shown, never guessed
+      if (filled.length !== 1) { per[h.n] = { gross: null, driver: null, shots, points: null }; return; }
+      const d = filled[0], gross = strokesOf(d, h.n);
+      drives[d]++;
+      per[h.n] = { gross, driver: d, shots, points: stablefordPoints(gross, h.par, shots) };
+    });
+    const played = holes.filter(h => per[h.n].points !== null).length;
+    const total = holes.reduce((t, h) => t + (per[h.n].points || 0), 0);
+    const left = holes.length - played;
+    const short = team.filter(p => drives[p] < min);
+    const needed = team.reduce((t, p) => t + Math.max(0, min - drives[p]), 0);
+    const complete = played === holes.length && !doubles.length;
+    return { holes: per, total, played, left, complete, drives, doubles, short, minDrives: min,
+      failed: complete && short.length > 0,            // the golden rule: finished without everyone's drives
+      atRisk: !complete && needed > 0 && needed >= left,   // every remaining hole now has to go to someone short
+      impossible: !complete && needed > left };            // can't be done any more: the team will be KBs
+  }
+
+  /* Scramble teams ranked by Stableford with the normal countback. Once every team has finished, the KBs are any team
+     that finished without every player's minimum drives (automatic, whatever its points); otherwise the bottom team,
+     with anyone level. */
+  function scrambleStandings(teams) {
+    const ranked = rankByKey(teams.map(t => Object.assign({}, t, { key: countbackKey(Object.fromEntries(Object.entries(t.holes).map(([n, h]) => [n, h.points]))) })));
+    // Decided only once every team has finished: during play nobody is labelled KBs.
+    const done = ranked.length > 1 && ranked.every(t => t.complete);
+    const failed = ranked.filter(t => t.failed);
+    const last = ranked.length ? ranked[ranked.length - 1] : null;
+    const kbs = !done ? [] : failed.length ? failed : ranked.filter(t => t.pos === last.pos);
+    return ranked.map(t => Object.assign(t, { kb: kbs.includes(t) }));
+  }
+
   function goyStandings(members, results, bestN) {
     const n = bestN || 3;
     const rows = [];
@@ -2654,13 +2921,268 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
   }
 
   return {
-    NOBODY, contestStatus, claimsInPlayOrder, SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
+    NOBODY, contestStatus, claimsInPlayOrder, scrambleTeam, scrambleStandings, SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,
     kbValid, kbEffective, kbGroups, kbOff, teamsFor, groupSizes, addMinutes, teeTimesFrom, makeGroups, randomDraw, shuffle, kbPairsFor,
     countbackKey, compareKeys, rankByKey, finalOrder, kbStandings, goyStandings, scoreMark, pickupStrokes
   };
+});
+</script>
+<script>/* Breakfast draw (owner brief §7): one player from each pot per team, drawn without replacement.
+ * Pure functions only, so every rule can be tested in Node. The app stores the draw in the settings table:
+ *   pots:<rid>                         {"pots":[[pid…],…],"show":true}   the committee's pots (names only, never handicaps)
+ *   drawdev:<rid>                      {"dev","at","keep":[slot…]}       the one device running the draw
+ *   drawepoch:<rid>                    "2"                                bumped by a logged restart; older picks are ignored
+ *   draw:<rid>:<epoch>:<t>:<p>:<dev>   {"pid","at"}                       one row per pick, per device
+ * A pick's key includes the device, so two devices can never overwrite each other's pick: both rows survive and the
+ * slot shows as a conflict that blocks making the groups. The draw never silently chooses a winner. */
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.Draw = api;
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+
+  const POTS = 'ABCDEFGH';
+  const potName = p => POTS[p] || String(p + 1);
+  const slotKey = (t, p) => t + ':' + p;
+
+  /** How many teams: the size of the biggest pot. A team gets nobody from a pot that has run out. */
+  const teamCount = pots => pots.reduce((m, x) => Math.max(m, x.length), 0);
+
+  /** Read the picks for one round and epoch from settings rows. Returns { 't:p': [{pid, dev, at}] } (several rows = conflict). */
+  function picksFrom(rows, rid, epoch) {
+    const pre = `draw:${rid}:${epoch}:`, out = {};
+    (rows || []).forEach(r => {
+      if (!r || typeof r.key !== 'string' || r.key.indexOf(pre) !== 0) return;
+      const [t, p, ...dev] = r.key.slice(pre.length).split(':');
+      let v; try { v = JSON.parse(r.value); } catch (e) { return; }
+      if (!v || !v.pid) return;
+      (out[slotKey(Number(t), Number(p))] = out[slotKey(Number(t), Number(p))] || []).push({ pid: v.pid, dev: dev.join(':'), at: v.at || '' });
+    });
+    return out;
+  }
+
+  /** The draw as it stands: teams, who is left in each pot, the next slots, conflicts and duplicates. */
+  /* opts.holder: the device now running the draw; opts.keep: slots ('t:p') already confirmed when it took over.
+     After a handover, a pick by any other device for a slot that was not kept is a conflict, never a quiet result. */
+  function state(pots, picks, opts) {
+    const o = opts || {}, keep = new Set(o.keep || []);
+    const foreign = (t, p, rows) => !!o.holder && rows.some(x => x.dev !== o.holder) && !keep.has(slotKey(t, p));
+    pots = (pots || []).map(x => (x || []).slice());
+    const T = teamCount(pots), used = {}, dup = [], conflicts = [], stray = [];
+    const teams = Array.from({ length: T }, (_, t) => ({ n: t + 1, slots: pots.map((_, p) => {
+      const rows = (picks || {})[slotKey(t, p)] || [];
+      const pids = [...new Set(rows.map(x => x.pid))];
+      const clash = pids.length > 1 || new Set(rows.map(x => x.dev)).size > 1 || foreign(t, p, rows);
+      if (clash) conflicts.push({ t, p, rows });
+      const pid = pids.length === 1 && !clash ? pids[0] : null;
+      if (pid && pots[p].indexOf(pid) < 0) stray.push({ t, p, pid });
+      if (pid) { if (used[pid]) dup.push(pid); used[pid] = (used[pid] || 0) + 1; }
+      return { p, pid, conflict: clash };
+    }) }));
+    const left = pots.map(x => x.filter(pid => !used[pid]));
+    // A slot is open while its pot still has someone in it; an empty pot means "nobody from this pot".
+    let open = [];
+    teams.forEach(tm => tm.slots.forEach(s => { if (!s.pid && !s.conflict && left[s.p].length) open.push({ t: tm.n - 1, p: s.p }); }));
+    // The last team is not drawn: it is whoever is left in each pot (owner, 26 October). Worked out from the saved
+    // picks, so nothing extra is stored and every device agrees. Not while there is a clash to sort out.
+    if (open.length && !conflicts.length && open.every(x => x.t === T - 1 && left[x.p].length === 1)) {
+      open.forEach(x => { const sl = teams[x.t].slots[x.p]; sl.pid = left[x.p][0]; sl.auto = true; left[x.p] = []; });
+      open = [];
+    }
+    // Fill team by team: the current team is the first one with an open slot; slots in pot order.
+    const current = open.length ? open[0].t : -1;
+    const next = open.filter(s => s.t === current);
+    const short = teams.filter(tm => tm.slots.some(s => !s.pid)).map(tm => tm.n);
+    return {
+      pots, teams, left, next, current, conflicts, dup: [...new Set(dup)], stray,
+      done: !open.length && !conflicts.length,
+      started: teams.some(tm => tm.slots.some(s => s.pid || s.conflict)),
+      short: open.length ? [] : short
+    };
+  }
+
+  /** Unbiased whole number in [0, n) from a source of 32-bit random numbers (rejection sampling, no modulo bias). */
+  function pickIndex(n, rand32) {
+    if (!(n >= 1)) throw new Error('nothing to pick from');
+    const lim = Math.floor(0x100000000 / n) * n;
+    for (let i = 0; i < 1000; i++) { const x = rand32() >>> 0; if (x < lim) return x % n; }
+    throw new Error('random source is not random');
+  }
+
+  /** Draw the given slots (one, or the whole team for "all four together"): one name each from what is left. */
+  function draw(st, slots, rand32) {
+    const taken = new Set();
+    return slots.map(s => {
+      const pool = st.left[s.p].filter(pid => !taken.has(pid));
+      const pid = pool[pickIndex(pool.length, rand32)];
+      taken.add(pid);
+      return { t: s.t, p: s.p, pid };
+    });
+  }
+
+  /** Can the groups be made? Every reason that blocks it, in plain words. shortOk: team numbers the committee agreed play short. */
+  function blockers(st, opts) {
+    const o = opts || {}, why = [];
+    if (!st.started) why.push('Nobody has been drawn yet.');
+    if (st.next.length) why.push('The draw is not finished.');
+    if (st.conflicts.length) why.push(`Two devices drew ${st.conflicts.length === 1 ? 'the same place' : st.conflicts.length + ' of the same places'}. Restart the draw.`);
+    if (st.dup.length || st.stray.length) why.push('Someone was drawn twice or from the wrong pot. Restart the draw.');
+    if (o.pending) why.push('Some picks are not saved to the server yet.');
+    const notAgreed = st.short.filter(n => (o.shortOk || []).indexOf(n) < 0);
+    if (notAgreed.length) why.push(`Team ${notAgreed.join(', ')} ${notAgreed.length === 1 ? 'is' : 'are'} short: the committee decides how ${notAgreed.length === 1 ? 'it plays' : 'they play'}.`);
+    return why;
+  }
+
+  /** Playing groups from the drawn teams, in draw order. The inner split (A+B / C+D) is only the storage shape. */
+  function groupsFrom(st, firstTee, interval, addMinutes) {
+    return st.teams.map((tm, i) => {
+      const ids = tm.slots.map(s => s.pid).filter(Boolean);
+      const half = Math.ceil(ids.length / 2);
+      const teeTime = firstTee ? addMinutes(firstTee, i * (Number(interval) || 0)) : '';
+      return { id: 'g' + (i + 1), n: i + 1, teeTime, startHole: 1, teams: [ids.slice(0, half), ids.slice(half)].filter(x => x.length) };
+    });
+  }
+
+  /** Pots must not share a player, and a pot needs at least one name. */
+  function potProblems(pots) {
+    const seen = {}, why = [];
+    if (!pots || pots.length < 2) why.push('At least two pots are needed.');
+    (pots || []).forEach((x, p) => { if (!x.length) why.push(`Pot ${potName(p)} is empty.`); x.forEach(pid => { if (seen[pid] !== undefined) why.push(`Someone is in pot ${potName(seen[pid])} and pot ${potName(p)}.`); seen[pid] = p; }); });
+    return why;
+  }
+
+  return { POTS, potName, slotKey, teamCount, picksFrom, state, pickIndex, draw, blockers, groupsFrom, potProblems };
+});
+</script>
+<script>/* Group changes (owner, 26 October): one set of rules for every round, any day. The organiser moves, swaps, adds,
+ * replaces or takes out players and reorders groups; buggy pairs, KB pairs and tee times follow automatically.
+ * Pure functions only, so each rule can be tested in Node. Group ids stay stable (contest claims and card checks are
+ * keyed by them); the number and tee time follow the order. A group holds at most four. */
+(function (root, factory) {
+  const api = factory();
+  if (typeof module === 'object' && module.exports) module.exports = api;
+  else root.Groups = api;
+})(typeof self !== 'undefined' ? self : this, function () {
+  'use strict';
+  const MAX = 4;
+  const clone = x => JSON.parse(JSON.stringify(x));
+  const idsOf = g => g.teams.flat();
+  const where = (groups, pid) => groups.findIndex(g => idsOf(g).includes(pid));
+
+  /* Buggies inside a group after its players change: pairs that are still whole stay together, a newcomer fills the
+     gap left by whoever went, and only odd shapes fall back to the plain split (first two, then the rest). */
+  function rebuggy(teams, ids) {
+    let t = teams.map(x => x.filter(pid => ids.includes(pid))).filter(x => x.length);
+    ids.filter(pid => !t.flat().includes(pid)).forEach(pid => {
+      const gap = t.find(x => x.length < 2);
+      if (gap && t.length <= 2) gap.push(pid); else t.push([pid]);
+    });
+    t = t.filter(x => x.length);
+    const flat = t.flat();
+    const ok = (t.length === 2 && t.every(x => x.length <= 2)) || (t.length === 1 && flat.length <= 2);
+    if (ok) return flat.length === 2 && t.length === 1 ? [[flat[0]], [flat[1]]] : t;
+    if (flat.length >= 4) return [flat.slice(0, 2), flat.slice(2, 4)];
+    if (flat.length === 3) return [flat.slice(0, 2), flat.slice(2)];
+    if (flat.length === 2) return [[flat[0]], [flat[1]]];
+    return [flat];
+  }
+  const setIds = (g, ids) => Object.assign(g, { teams: rebuggy(g.teams, ids) });
+
+  /** Numbers and tee times follow the order; empty groups go. */
+  function tidy(groups, firstTee, interval, addMinutes) {
+    const out = groups.filter(g => idsOf(g).length);
+    const step = Number(interval) > 0 ? Number(interval) : 8;
+    out.forEach((g, i) => { g.n = i + 1; g.teeTime = firstTee && addMinutes ? addMinutes(firstTee, i * step) : g.teeTime || ''; });
+    return out;
+  }
+
+  /** Why a change can't be made, or '' if it can. */
+  function refuse(groups, op) {
+    const gi = op.pid ? where(groups, op.pid) : -1;
+    if (op.pid && gi < 0) return 'That player isn\'t in a group.';
+    if (op.type === 'move' && op.to !== groups.length) { if (op.to === gi) return 'Already in that group.'; if (!groups[op.to]) return 'No such group.'; if (idsOf(groups[op.to]).length >= MAX) return `Group ${op.to + 1} already has ${MAX}.`; }
+    if (op.type === 'add') { if (where(groups, op.add) >= 0) return 'Already playing.'; if (!groups[op.to] && op.to !== groups.length) return 'No such group.'; if (groups[op.to] && idsOf(groups[op.to]).length >= MAX) return `Group ${op.to + 1} already has ${MAX}.`; }
+    if (op.type === 'replace' && where(groups, op.add) >= 0) return 'Already playing.';
+    if (op.type === 'swap' && where(groups, op.with) < 0) return 'That player isn\'t in a group.';
+    return '';
+  }
+
+  /** Apply one change. ops: move {pid,to} (to = groups.length starts a new group) · swap {pid,with} · remove {pid} · add {add,to} (to = groups.length makes a new
+      group) · replace {pid,add} · order {from,to}. Returns new groups; throws with a plain reason if refused. */
+  function apply(groups, op, newId) {
+    const why = refuse(groups, op);
+    if (why) throw new Error(why);
+    const g = clone(groups);
+    const gi = op.pid ? where(g, op.pid) : -1;
+    if (op.type === 'move') {
+      setIds(g[gi], idsOf(g[gi]).filter(x => x !== op.pid));
+      if (op.to === g.length) g.push({ id: newId || 'g' + (g.length + 1), n: g.length + 1, teeTime: '', startHole: 1, teams: [[op.pid]] });   // a new group at the end
+      else setIds(g[op.to], idsOf(g[op.to]).concat([op.pid]));
+    }
+    else if (op.type === 'swap') {
+      const gj = where(g, op.with);
+      if (gi === gj) g[gi].teams = g[gi].teams.map(t => t.map(x => x === op.pid ? op.with : x === op.with ? op.pid : x));
+      else { g[gi].teams = g[gi].teams.map(t => t.map(x => x === op.pid ? op.with : x)); g[gj].teams = g[gj].teams.map(t => t.map(x => x === op.with ? op.pid : x)); }
+    }
+    else if (op.type === 'remove') setIds(g[gi], idsOf(g[gi]).filter(x => x !== op.pid));
+    else if (op.type === 'replace') g[gi].teams = g[gi].teams.map(t => t.map(x => x === op.pid ? op.add : x));
+    else if (op.type === 'add') {
+      if (op.to === g.length) g.push({ id: newId || 'g' + (g.length + 1), n: g.length + 1, teeTime: '', startHole: 1, teams: [[op.add]] });
+      else setIds(g[op.to], idsOf(g[op.to]).concat([op.add]));
+    }
+    else if (op.type === 'order') { const [x] = g.splice(op.from, 1); g.splice(op.to, 0, x); }
+    else throw new Error('Unknown change');
+    return g;
+  }
+
+  /* KB pairs after a change: pairs that still work (both playing, in different KB groups) stay; only the broken ones
+     are re-paired, across groups and avoiding past partners where possible. Returns { kb, changed }. */
+  function repairKb(kbGroups, kb, history, shuffle, seed) {
+    const groupOf = {};
+    kbGroups.forEach(g => idsOf(g).forEach(pid => { groupOf[pid] = g.id; }));
+    const used = new Set(), keep = [];
+    (kb || []).forEach(pr => {
+      if (pr && pr.length === 2 && groupOf[pr[0]] && groupOf[pr[1]] && groupOf[pr[0]] !== groupOf[pr[1]] && !used.has(pr[0]) && !used.has(pr[1])) { keep.push(pr.slice()); used.add(pr[0]); used.add(pr[1]); }
+    });
+    const seen = new Set((history || []).filter(p => p && p.length === 2).map(p => [p[0], p[1]].sort().join('|')));
+    const pairUp = left => {
+      let best = null;
+      for (let a = 0; a < 300; a++) {
+        const pool = shuffle(left, (seed || 1) + a * 7919), pairs = [];
+        let ok = true, repeats = 0;
+        while (pool.length > 1) {
+          const x = pool.shift(), k = pool.findIndex(y => groupOf[y] !== groupOf[x]);
+          if (k < 0) { ok = false; break; }
+          const y = pool.splice(k, 1)[0];
+          if (seen.has([x, y].sort().join('|'))) repeats++;
+          pairs.push([x, y]);
+        }
+        if (ok && (!best || repeats < best.repeats)) best = { pairs, repeats };
+        if (best && !best.repeats) break;
+      }
+      return best && best.pairs;
+    };
+    // Re-pair only the broken pairs; if that can't work (say both leftovers are now in one group), free up as few
+    // working pairs as possible: every single pair first, then every two, then three; then start afresh.
+    const left0 = Object.keys(groupOf).filter(pid => !used.has(pid));
+    if (!left0.length) return { kb: keep, changed: [] };
+    const subsets = (arr, k, from = 0, cur = [], out = []) => { if (cur.length === k) { out.push(cur.slice()); return out; } for (let i = from; i < arr.length; i++) { cur.push(i); subsets(arr, k, i + 1, cur, out); cur.pop(); } return out; };
+    for (let r = 0; r <= Math.min(3, keep.length); r++) {
+      for (const idx of subsets(keep, r)) {
+        const pairs = pairUp(left0.concat(idx.flatMap(i => keep[i])));
+        if (pairs) return { kb: keep.filter((_, i) => !idx.includes(i)).concat(pairs), changed: pairs };
+      }
+    }
+    const all = pairUp(Object.keys(groupOf));
+    if (all) return { kb: all, changed: all };
+    return { kb: null, changed: null };
+  }
+
+  return { MAX, idsOf, where, rebuggy, tidy, refuse, apply, repairKb };
 });
 </script>
 <script>/* NCGS data service.
@@ -3739,13 +4261,41 @@ function roundWhenShort(r) {
 function computeR(rid) {
   return memo('comp:' + rid, () => {
     const r = D.round(rid);
-    if (!canScore(r)) return null;
+    if (!canScore(r) || isScramble(r)) return null;   // a scramble's stored strokes are team scores (scrambleOf)
     const players = {};
     r.groups.forEach(g => g.teams.flat().forEach(pid => { const m = D.member(pid) || { id: pid, name: pid, index: 0 }; players[pid] = m; }));
     return E.computeRound({ groups: r.groups, holes: holesOf(r), tee: teeOf(r), allowance: allowanceOf(r), players, scores: D.scores(rid), phOverride: r.ph });
   });
 }
-const hasCards = r => r && r.source !== 'imported' && canScore(r);
+/* Scramble rounds (Westport day two, owner brief §6). Kept in the settings table so no server change is needed:
+   format:<round> = scramble; teamshots:<round> = {"g1":0,"g2":2} (organiser's manual team allowance, normally 0);
+   tripboard:<season>:<trip> = off for a trip with no combined leaderboard. */
+const isScramble = r => !!r && D.setting('format:' + r.id, '') === 'scramble';
+function teamShotsOf(r) { try { const v = JSON.parse(D.setting('teamshots:' + (r && r.id), '{}')); return v && typeof v === 'object' ? v : {}; } catch (e) { return {}; } }
+const tripBoardOn = r => !(r && r.trip && D.setting(`tripboard:${r.season}:${r.trip}`, '') === 'off');
+/* Each scramble team's holes, read from the row of the player whose drive was used (E.scrambleTeam), plus playing
+   progress shaped like a scoring group (holes[n].complete, nextHole) so the hole picker and contest questions work. */
+function scrambleOf(rid) {
+  return memo('scr:' + rid, () => {
+    const r = D.round(rid);
+    if (!isScramble(r) || !canScore(r)) return null;
+    const holes = holesOf(r).map((h, i) => ({ n: i + 1, par: h.par, si: h.si }));
+    const sc = D.scores(rid), shots = teamShotsOf(r);
+    const groups = r.groups.map(g => {
+      const team = g.teams.flat();
+      const res = E.scrambleTeam(team, holes, (pid, n) => (sc[pid] || {})[n], shots[g.id] || 0);
+      const hs = {};
+      holes.forEach(h => { hs[h.n] = { complete: res.holes[h.n].points !== null, double: res.doubles.includes(h.n) }; });
+      const order = E.playOrder(g.startHole);
+      return Object.assign({}, res, { id: g.id, n: g.n, name: 'Team ' + g.n, teams: g.teams, team, teeTime: g.teeTime, holes: hs, scramble: res.holes, holesDone: res.played, nextHole: order.find(n => !hs[n].complete) || null });
+    });
+    return { groups, standings: E.scrambleStandings(groups) };
+  });
+}
+// Where each group has got to, for either kind of round: groups with id, holes[n].complete, holesDone, nextHole.
+const progressOf = rid => { const r = D.round(rid); return isScramble(r) ? scrambleOf(rid) : computeR(rid); };
+// Individual scorecards don't exist for a scramble: the stored stroke is the team's, not the driver's own.
+const hasCards = r => r && r.source !== 'imported' && canScore(r) && !isScramble(r);
 const liveRid = () => { const r = D.rounds().find(x => x.status === 'live'); return r ? r.id : null; };
 const upcoming = () => D.rounds().filter(r => r.status === 'upcoming').sort((a, b) => String(a.date || '9').localeCompare(String(b.date || '9')));
 function myGroup(rid) {
@@ -3775,6 +4325,12 @@ function resultsOf(rid) {
       if (c.ntp !== undefined) contests.push({ type: 'ntp', hole: null, winner: c.ntp });
       if (c.ld !== undefined) contests.push({ type: 'ld', hole: null, winner: c.ld });
       return { rows, kb, contests, source: r.results.ordered ? 'recorded' : 'sheet' };
+    }
+    const wins0 = D.winners(rid);
+    const contestsOf = () => (r.contests || []).map(c => ({ type: c.type, hole: c.hole, winner: wins0[c.hole] || null, lead: wins0[c.hole] ? null : claimLeader(rid, c.hole, null), status: E.contestStatus(D.claims(rid)[c.hole], (r.groups || []).map(g => g.id), wins0[c.hole]) }));
+    if (isScramble(r)) {
+      const s = scrambleOf(rid);
+      return { rows: [], kb: [], teams: s ? s.standings : [], contests: contestsOf(), source: 'scramble' };
     }
     const comp = computeR(rid);
     if (!comp) return { rows: [], kb: [], contests: [] };
@@ -3880,6 +4436,8 @@ function toast(msg) {
 
 /* ---- 20-society.js ---- */
 /* ================= SOCIETY SCREENS ================= */
+/* A contest answer of "nobody" is stored as '_nobody'; every screen shows it as "Nobody" (journey 6 review). */
+{ const nameOf0 = D.nameOf; D.nameOf = id => (id === '_nobody' ? 'Nobody' : nameOf0(id)); }
 const VIEWS = {};
 
 function roundRow(r, right) {
@@ -3903,7 +4461,7 @@ function pastRow(r) {
 }
 const statusPill = r => {
   if (isDemo(r)) return '<span class="pill w">Demo</span>';
-  if (r.status === 'live') { const c = computeR(r.id); const thru = c ? Math.min(...c.groups.map(g => g.holesDone)) : 0; return `<span class="pill w">${thru ? 'Thru ' + thru : 'Live'}</span>`; }
+  if (r.status === 'live') return '<span class="pill w">Live</span>';   // not 'Thru N': the slowest group's count read as your own (owner, 26 October)
   if (r.status === 'final') return '<span class="pill g">Final</span>';
   return '';
 };
@@ -3921,12 +4479,20 @@ function heroFacts(r) {
 function playLabel(r) {
   const mine = myGroup(r.id);
   if (!DB.prefs.me || !mine) return 'Play now';
-  const gc = computeR(r.id).groups.find(g => g.id === mine.id);
+  const gc = progressOf(r.id).groups.find(g => g.id === mine.id);
   return gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now';
 }
 /* The top three of a live round, and you if you are lower down. Taken from the same leaderboard as the Results tab. */
 function miniBoard(r) {
   const res = resultsOf(r.id);
+  if (res && res.source === 'scramble') {
+    const g = myGroup(r.id), teams = res.teams || [];
+    if (!teams.length) return '';
+    let show = teams.slice(0, 3);
+    const mine = g ? teams.find(t => t.id === g.id) : null;
+    if (mine && !show.includes(mine)) show = [show[0], show[1], mine];
+    return `<div class="mini num">${show.map(t => `<div class="mr${mine === t ? ' me' : ''}"><span class="mp">${esc(t.posLabel)}</span><span class="mn">${esc(t.name)}</span><span class="mt">${t.total}</span></div>`).join('')}</div>`;
+  }
   const rows = res && res.rows ? res.rows : [];
   if (!rows.length) return '';
   let show = rows.slice(0, 3);
@@ -3986,13 +4552,67 @@ const lenStyle = s => `style="--len:${[...s].length}"`;
 /* The round card's buttons. During a live round that you're playing, the main button takes you back to scoring
    ("Continue · Hole 7"), and Players · Groups · KBs becomes a quieter link underneath (design review, 22 October). */
 function nowActs(r, live, group) {
-  const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">${live ? 'Players · Groups · KBs' : 'View round details'}</button>`;
+  // Everyone has finished: the results are what people want now (UX review F20). Provisional until the organiser finalises.
+  if (live && allIn(r)) {
+    const kb = kbLine(r);
+    return `<div class="now-acts one"><button class="go" data-act="leaderboard" data-rid="${r.id}">See the results</button>${kb ? `<p class="now-kb">${esc(kb)}</p>` : ''}</div>`;
+  }
+  const groups = `<button class="go" data-act="round" data-rid="${r.id}" data-tab="players">${live ? (isScramble(r) ? 'Players · Groups' : 'Players · Groups · KBs') : drawTabOn(r) ? (drawOf(r.id).st.started ? 'Follow the draw' : 'See the pots') : 'View round details'}</button>`;
   const next = group ? group.nextHole : null;
   if (!next) return `<div class="now-acts one">${groups}</div>`;
   return `<div class="now-acts one"><button class="go" data-act="tab" data-tab="hole">Continue \u00b7 Hole ${next}</button>
-    <button class="go-link" data-act="round" data-rid="${r.id}" data-tab="players">Players \u00b7 Groups \u00b7 KBs</button></div>`;
+    <button class="go-link" data-act="round" data-rid="${r.id}" data-tab="players">Players \u00b7 Groups${isScramble(r) ? '' : ' \u00b7 KBs'}</button></div>`;
 }
 
+/* Your tee time and who you're out with, once the groups are out and until your group starts (journeys 2/20, 5). */
+function youreOff(r, group) {
+  const me = DB.prefs.me;
+  if (!me || !r.groups || !r.groups.length || (group && group.holesDone)) return '';
+  const g = r.groups.find(x => x.teams.flat().includes(me));
+  if (!g) return '';
+  const others = g.teams.flat().filter(pid => pid !== me).map(pid => D.nameOf(pid));
+  const list = others.length > 1 ? others.slice(0, -1).join(', ') + ' and ' + others[others.length - 1] : others.join('');
+  const when = g.teeTime ? `You're off at ${g.teeTime}` : `You're in ${isScramble(r) ? 'Team' : 'Group'} ${g.n}`;
+  return `${isScramble(r) && g.teeTime ? `Team ${g.n} · ` : ''}${when}${list ? ' with ' + list : ''}${g.startHole && g.startHole !== 1 ? ` · from hole ${g.startHole}` : ''}`;
+}
+/* A trip without a combined board: each day in a few words, e.g. "Day 1: Aidan won · Day 2: live" (journeys 5/12). */
+function tripDays(list) {
+  return list.map((x, i) => {
+    const w = x.status === 'final' ? (() => { const res = resultsOf(x.id); if (!res) return 'played'; const top = isScramble(x) ? (res.teams || []).filter(t => t.pos === 1).map(t => t.name) : (res.rows || []).filter(t => t.pos === 1).map(t => t.name); return top.length ? `${top.join(' & ')} won` : 'played'; })() : x.status === 'live' ? 'live' : 'to play';
+    return `Day ${x.trip_day || i + 1}: ${w}`;
+  }).join(' \u00b7 ');
+}
+/* Today's finished round: who won, and the way to the results. */
+function winnersOf(r) {
+  const res = resultsOf(r.id);
+  if (!res) return '';
+  if (isScramble(r)) { const t = (res.teams || []).filter(x => x.pos === 1); return t.length ? `${t.map(x => x.name).join(' and ')} won` : ''; }
+  const top = (res.rows || []).filter(x => x.pos === 1);
+  return top.length ? `${top.map(x => x.name).join(' and ')} won on ${top[0].total} points` : '';
+}
+function resultCard(r) {
+  const won = winnersOf(r), kb = isScramble(r) ? kbLine(r) : (() => { const low = kbLowOf(r.id); return low && low.length ? `KBs: ${low.map(k => k.name).join(' and ')}` : ''; })();
+  return `<div class="now home-live-ticket">
+    <button class="now-main" data-act="leaderboard" data-rid="${r.id}">
+      <span class="now-top"><span class="now-kind">Today</span><span class="pill g">Final</span></span>
+      <span class="now-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</span>
+      ${won ? `<span class="now-you">${esc(won)}</span>` : ''}
+      ${kb ? `<span class="now-line">${esc(kb)}</span>` : ''}
+    </button>
+    <div class="now-acts one"><button class="go" data-act="leaderboard" data-rid="${r.id}">See the results</button></div>
+  </div>`;
+}
+/* Every group has finished all its holes (the round may still be waiting for the organiser to finalise). */
+function allIn(r) {
+  try { const p = progressOf(r.id); return !!(p && p.groups.length && p.groups.every(g => g.complete)); } catch (e) { return false; }
+}
+/* Who's KBs once everyone is in, said plainly; provisional until the round is final. */
+function kbLine(r) {
+  const res = resultsOf(r.id);
+  if (!res) return '';
+  if (isScramble(r)) { const t = (res.teams || []).filter(x => x.kb); return t.length ? `KBs: ${t.map(x => x.name).join(' and ')}${r.status === 'final' ? '' : ' (to be confirmed)'}` : ''; }
+  return '';
+}
 function nowCard(r) {
   const live = r.status === 'live';
   const playable = canScore(r) && (live || !r.date || daysFromToday(r.date) <= 0);
@@ -4006,22 +4626,29 @@ function nowCard(r) {
   const mine = live && myGroup(r.id);
   // Your group's progress only adds Continue and the next contest; if it can't be worked out, Home still shows the round.
   let group = null;
-  try { const comp = mine && computeR(r.id); group = (comp && comp.groups.find(g => g.id === mine.id)) || null; }
+  try { const comp = mine && progressOf(r.id); group = (comp && comp.groups.find(g => g.id === mine.id)) || null; }
   catch (e) { console.warn('Home: group progress unavailable', e); group = null; }
   const thisContest = group && group.nextHole ? contestOn(r.id, group.nextHole) : null;
+  const you = youreOff(r, group);
   return `<div class="now ${live ? 'home-live-ticket' : 'home-announcement'}">
     <button class="now-main" data-act="round" data-rid="${r.id}">
-      <span class="now-top"><span class="now-kind">${kind}</span>${statusPill(r)}</span>
+      <span class="now-top"><span class="now-kind">${kind}</span>${live && allIn(r) ? '<span class="pill w">All in</span>' : statusPill(r)}</span>
       <span class="now-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</span>
       ${date ? `<span class="home-date" aria-hidden="true"><small>${MONTHS[date.getMonth()].slice(0, 3)}</small><b>${date.getDate()}</b></span><span class="vh">${esc(fmtDate(r.date, true))}</span>` : ''}
       ${line2 ? `<span class="now-line">${esc(line2)}</span>` : ''}
       <span class="now-line">${esc(heroFacts(r))}</span>
+      ${you ? `<span class="now-you">${esc(you)}</span>` : ''}
       ${thisContest ? `<span class="home-this-hole">${CONTEST[thisContest.type]} · Hole ${thisContest.hole}</span>` : ''}
     </button>
     ${nowActs(r, live, group)}
   </div>`;
 }
 
+/* A group has played past this contest hole: "not yet played" would be wrong, the result is waiting for reports (UX review F11). */
+function contestPassed(rid, hole) {
+  const pr = hole ? progressOf(rid) : null;
+  return !!(pr && pr.groups.some(g => g.holes && g.holes[hole] && g.holes[hole].complete));
+}
 /* Home borrows the existing result/claim state. It never awards a contest or writes scores. */
 function homeMatchday(r) {
   const res = resultsOf(r.id);
@@ -4033,8 +4660,9 @@ function homeMatchday(r) {
       const who = c.winner || (c.lead && c.lead.pid);
       const confirmed = c.status && c.status.confirmed;
       const answered = c.status && c.status.answered;
-      const state = confirmed ? 'Confirmed' : who || answered ? 'To be confirmed' : 'Not yet played';
-      const name = who ? D.nameOf(who) : confirmed ? 'Nobody' : answered ? 'Nobody yet' : 'No claim yet';
+      const passed = contestPassed(r.id, c.hole);
+      const state = confirmed ? 'Confirmed' : who || answered ? 'To be confirmed' : passed ? 'Waiting for groups' : 'Not yet played';
+      const name = who ? D.nameOf(who) : confirmed ? 'Nobody' : answered ? 'Nobody yet' : passed ? 'No report yet' : 'No claim yet';
       return `<div class="home-contest"><span class="hs-ic" aria-hidden="true">${sized(ICON.flagpin, 20)}</span><span class="home-contest-copy"><span class="b">${CONTEST[c.type]}${c.hole ? ` <span class="sub">· Hole ${c.hole}</span>` : ''}</span><span class="sub">${esc(name)}</span></span><span class="home-contest-state">${state}</span></div>`;
     }).join('')}</div></section>`;
   }
@@ -4052,16 +4680,18 @@ VIEWS.home = () => {
   const played = seasonRounds(season).filter(r => r.status === 'final');
   const live = D.rounds().filter(r => r.status === 'live');
   const next = announced();   // an upcoming round shows here once the organiser gives it a date (owner, 23 October)
+  // On the day a round is finalised, its result leads Home; the next round moves down to "Also on" (journeys 6/18).
+  const doneToday = live[0] ? null : D.rounds().filter(r => r.status === 'final' && !isDemo(r) && r.date && daysFromToday(r.date) === 0).slice(-1)[0] || null;
   const feature = live[0] || next[0] || null;
-  const more = [...live.slice(1), ...next.slice(live[0] ? 0 : 1)];
+  const more = doneToday ? next : [...live.slice(1), ...next.slice(live[0] ? 0 : 1)];
   const me = DB.prefs.me ? D.member(DB.prefs.me) : null;
   const hello = greeting(me);
-  const homeState = feature && feature.status === 'live' ? 'matchday' : feature ? 'upcoming' : 'quiet';
+  const homeState = feature && feature.status === 'live' ? 'matchday' : doneToday ? 'result' : feature ? 'upcoming' : 'quiet';
   let html = `<header class="hero home home-${homeState}"><div class="brand"><span class="badge crest">${CREST_SVG}</span><span class="vh">${esc(D.society())}</span><p class="greet${hello.length > 22 ? ' long' : ''}">${esc(hello)}</p>
     <button class="who-chip${me ? ' only-av' : ''}" data-act="who" aria-label="${me ? 'You are ' + esc(me.name) + '. Change' : 'Who are you?'}">${me ? `<span class="who-av">${esc(initialsOf(me))}</span>` : 'Who are you?'}</button></div>
-    <h1 class="vh">${esc(homeHeadline(feature))}</h1>
+    <h1 class="vh">${esc(doneToday ? `${roundName(doneToday)}: the result` : homeHeadline(feature))}</h1>
     ${homeState === 'upcoming' ? `<p class="home-season-label">The ${season} season</p><p class="home-quiet-title">Next on the card.</p>` : ''}
-    ${feature ? nowCard(feature) : homeSeasonIntro(season, played)}</header>`;
+    ${doneToday ? resultCard(doneToday) : feature ? nowCard(feature) : homeSeasonIntro(season, played)}</header>`;
   if (homeState === 'matchday') html += homeMatchday(feature);
   const table = goy(season);
   const lead = table[0];
@@ -4081,9 +4711,9 @@ VIEWS.home = () => {
   const ic = k => `<span class="hs-ic" aria-hidden="true">${sized(ICON[k], 20)}</span>`;
   const rrow = (act, k, t, sub, rid) => `<button class="row hs-row" data-act="${act}"${rid ? ` data-rid="${rid}"` : ''}>${ic(k)}<span class="hs-txt"><span class="hs-t">${t}</span><span class="hs-s">${sub}</span></span>${chev}</button>`;
   html += `${goyHidden}${sec(label('The season'), cardOf([
-    !inPlay && lastRound ? rrow('round', 'flagpin', 'Last round', esc(roundName(lastRound)), lastRound.id) : '',
+    !inPlay && lastRound && lastRound !== doneToday ? rrow('round', 'flagpin', 'Last round', esc(roundName(lastRound)), lastRound.id) : '',
     rrow('goy', 'trophy', 'Golfer of the Year', goyLine),
-    tripList.length > 1 ? rrow('trip', 'course', 'Trip standings', tripLine, tripFor.id) : '',
+    tripList.length > 1 ? (tripBoardOn(tripFor) ? rrow('trip', 'course', 'Trip standings', tripLine, tripFor.id) : rrow('trip', 'course', esc(tripFor.trip), esc(tripDays(tripList)), tripFor.id)) : '',
     rrow('rounds', 'history', 'Past rounds', played.length ? `${plural(played.length, 'round')} played` : 'None played yet'),
     rrow('stats', 'bars', 'Stats', 'KBs, birdies, averages'),
     rrow('players', 'users', 'Players', plural(D.regulars().length, 'golfer'))].join('')), true)}`;
@@ -4242,7 +4872,7 @@ function groupsBlock(r, interactive) {
       (tee ? `<p class="cap note">${esc(tee.name)} tees · Slope ${tee.slope} · Rating ${tee.rating} · Par ${tee.par} · ${Math.round(allowanceOf(r) * 100)}%</p>` : ''));
   }
   const others = r.groups.filter(g => !mine || g.id !== mine.id);
-  const live = r.status === 'live' ? computeR(r.id) : null;
+  const live = r.status === 'live' ? progressOf(r.id) : null;
   html += sec(label(mine ? 'Other groups' : 'Groups'), cardOf(others.map(g => {
     const key = r.id + g.id;
     const open = !!UI.open[key];
@@ -4265,9 +4895,14 @@ function dropRow(rid, x, inner, cls = 'lrow') {
 }
 const dropChev = `<span class="chev dn">${chev}</span>`;
 
+function contestsBlock(res) {
+  const contests = res.contests.filter(c => c.winner !== undefined);
+  return contests.length ? sec(label('Contests'), cardOf(contests.map(c => `<div class="row"><span>${CONTEST[c.type]}${c.hole ? ` <span class="sub">${c.hole}</span>` : ''}</span>${c.winner ? `<span class="b ct-won">${esc(D.nameOf(c.winner))}${CUP}</span>` : '<span class="sub">Nobody</span>'}</div>`).join(''))) : '';
+}
 function resultsBlock(r) {
   const res = resultsOf(r.id);
   if (!res) return '';
+  if (res.source === 'scramble') return scrambleTable(r, res) + contestsBlock(res);
   const app = res.source === 'app';
   let html = sec(label('Stableford'), cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
@@ -4295,6 +4930,13 @@ function resultsBlock(r) {
 
 /* The page for a finished round: the winner first, then the table, then one small card for KBs and contests. */
 function finishedCard(r, res) {
+  if (res.source === 'scramble') {
+    // No winners' presentation for a scramble (owner): the KBs are the story.
+    const kb = (res.teams || []).filter(t => t.kb);
+    const sub = [roundName(r), r.date ? fmtDate(r.date, true) : ''].filter(Boolean).join(' · ');
+    return `<div class="fincard"><div class="finrow"><span class="fink">KBS</span><span class="finfinal">Final</span></div>
+      <div class="finwin"><div class="finwho"><b class="finname">${esc(kb.map(t => t.name).join(' & ') || '–')}</b><h1 class="finsub">${esc(kb.map(scrNames).join(' · ') || sub)}</h1></div><b class="finpts">${kb.length ? kb[0].total : ''}</b></div></div>`;
+  }
   const top = res.rows.filter(x => x.pos === 1);
   const names = top.map(x => D.nameOf(x.id)).join(' & ');
   const sub = [roundName(r), r.date ? fmtDate(r.date, true) : ''].filter(Boolean).join(' · ');
@@ -4302,6 +4944,7 @@ function finishedCard(r, res) {
     <div class="finwin"><div class="finwho"><b class="finname">${esc(names)}${CUP}</b><h1 class="finsub">${esc(sub)}</h1></div><b class="finpts">${top[0].total}</b></div></div>`;
 }
 function finishedBody(r, res) {
+  if (res.source === 'scramble') return scrambleTable(r, res) + contestsBlock(res) + `<button class="btn" data-act="results" data-rid="${r.id}">Share results</button>`;
   const app = res.source === 'app';
   const all = !!UI.open['all-' + r.id], many = res.rows.length > 8;
   const shown = all || !many ? res.rows : res.rows.slice(0, 8);
@@ -4342,7 +4985,8 @@ VIEWS.round = p => {
   const holes = holesOf(r);
   const inPlay = UI.stack.some(e => ['tee', 'match', 'board', 'rules'].includes(e.v));
   const prev = UI.stack[UI.stack.length - 2];
-  let html = '<header class="hero s">' + navBack(prev && prev.v === 'tee' ? `Hole ${UI.hole || ''}`.trim() : prev && prev.v === 'player' ? D.nameOf(prev.p.pid) : prev && prev.v === 'card' ? 'Card' : D.society());
+  // The back link names where it goes (journey 1: it used to say "NCGS" coming from Past rounds).
+  let html = '<header class="hero s">' + navBack(prev && prev.v === 'tee' ? `Hole ${UI.hole || ''}`.trim() : prev && prev.v === 'card' ? 'Card' : backLabel());
   html += `<div class="head"><h1 class="title">${esc(roundName(r))}</h1>${statusPill(r)}</div>`;
   const when = roundWhen(r);
   if (when) html += `<p class="sub">${esc(when)}</p>`;
@@ -4378,7 +5022,8 @@ VIEWS.round = p => {
     const kbPair = (r.kb || []).find(pr => pr.includes(me));
     const kbWith = kbPair ? kbPair.filter(pid => pid !== me) : [];
     const names = pairNames;
-    const dl = [
+    // A scramble team is the whole group: no "against", no KB partner.
+    const dl = isScramble(r) ? `<dt>Team</dt><dd>${mine.teams.flat().filter(pid => pid !== me).map(pid => esc(D.nameOf(pid))).join(', ')}</dd>` : [
       partner.length ? `<dt>With</dt><dd>${names(partner)}</dd>` : '',
       other ? `<dt>Against</dt><dd>${names(other)}</dd>` : (!partner.length ? `<dt>With</dt><dd>${names(mine.teams.flat().filter(pid => pid !== me))}</dd>` : ''),
       kbWith.length ? `<dt>KB with</dt><dd>${names(kbWith)}</dd>` : ''
@@ -4390,19 +5035,22 @@ VIEWS.round = p => {
   let go = '';
   if (playable) {
     let lbl = 'Play now';
-    if (me && mine) { const gc = computeR(r.id).groups.find(g => g.id === mine.id); lbl = inPlay || gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now'; }
+    if (me && mine) { const gc = progressOf(r.id).groups.find(g => g.id === mine.id); lbl = inPlay || gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now'; }
     go = `<button class="go" data-act="play" data-rid="${r.id}">${lbl}</button>`;
   } else if (live) go = `<button class="go" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>`;
-  html = `<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">Stableford</span></div>
+  html = `<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">${isScramble(r) ? 'Scramble' : 'Stableford'}</span></div>
     <h1 class="rp-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
   if (playable && me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
 
-  const tabsAvail = ['players', 'groups', 'kb', 'weather', 'course'];
-  const rt = tabsAvail.includes(UI.rtab) ? UI.rtab : 'players';
-  const tabName = { players: 'Players', groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
+  // Breakfast draw: the pots (then the draw) come first; a scramble has no KB pairs, so no KBs tab.
+  const potsTab = drawTabOn(r);
+  const tabsAvail = (potsTab ? ['pots'] : []).concat(['players', 'groups'], isScramble(r) ? [] : ['kb'], ['weather', 'course']);
+  const rt = potsTab && UI.rtab === 'players' && !UI.rtabPicked ? 'pots' : tabsAvail.includes(UI.rtab) ? UI.rtab : tabsAvail[0];
+  const tabName = { pots: drawOf(r.id).st.started ? 'Draw' : 'Pots', players: 'Players', groups: 'Groups', kb: 'KBs', weather: 'Weather', course: 'Course' };
   html += `<div class="seg pills rtabs" role="tablist">${tabsAvail.map(k => `<button class="${rt === k ? 'on' : ''}" role="tab" data-act="rtab" data-t="${k}" aria-selected="${rt === k}">${tabName[k]}</button>`).join('')}</div>`;
   const quiet = t => cardOf(`<div class="row"><span class="sub">${t}</span></div>`);
-  if (rt === 'players') html += roundPlayers(r);
+  if (rt === 'pots') html += drawMemberView(r);
+  else if (rt === 'players') html += roundPlayers(r);
   else if (rt === 'groups') html += roundGroups(r);
   else if (rt === 'kb') html += r.kb && r.kb.length ? `<div class="card rp-kbs">${r.kb.map(pr => `<span class="pk${pr.includes(me) ? ' me' : ''}">${pairNames(pr)}</span>`).join('')}</div>` : quiet(E.kbOff(r) ? 'No KBs in this round' : 'KB pairs are not drawn yet');
   else if (rt === 'weather') html += forecast(r, true) || quiet(r.date ? 'The forecast appears in the 9 days before the round.' : 'The forecast appears once the round has a date.');
@@ -4425,6 +5073,12 @@ function roundGroups(r) {
     return `<${can ? 'button' : 'div'} class="hrow"${can ? ` data-act="hcp" data-pid="${pid}" data-rid="${r.id}"` : ''}><span class="nm">${g.teams.length > 1 ? dot(i) : ''}<span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span></span><span class="r sub">${m ? fmtIndex(m.index) : ''}</span><span class="r b">${ph === null ? '' : ph}</span>${can ? chev : '<span></span>'}</${can ? 'button' : 'div'}>`;
   }).join('')).join('');
   const mine = myGroup(r.id);
+  // A scramble group is one team of four: names together, no buggy pairs, no handicap working.
+  if (isScramble(r)) return `<div class="card rp-groups">${r.groups.map(g => {
+    const gc = live ? live.groups.find(x => x.id === g.id) : null;
+    const prog = gc ? (gc.complete ? 'Finished' : gc.holesDone ? 'Thru ' + gc.holesDone : '') : '';
+    return `<div class="rg${mine && mine.id === g.id ? ' me' : ''}"><span class="rg-t"><b>${esc(g.teeTime || 'G' + g.n)}</b>${prog ? `<small>${prog}</small>` : ''}</span><span class="rg-team"><span class="cap">Team ${g.n}</span><span>${g.teams.flat().map(pid => pid === DB.prefs.me ? `<b>${esc(D.nameOf(pid))}</b>` : esc(D.nameOf(pid))).join(', ')}</span></span><span></span></div>`;
+  }).join('')}</div>`;
   return `<div class="card rp-groups">${r.groups.map(g => {
     const key = 'rg' + r.id + g.id, open = !!UI.open[key];
     const gc = live ? live.groups.find(x => x.id === g.id) : null;
@@ -4443,10 +5097,11 @@ function roundPlayers(r) {
   const phOf = pid => (r.ph && r.ph[pid] !== undefined ? r.ph[pid] : comp ? comp.players[pid].ph : tee && D.member(pid) ? E.playingHandicap(D.member(pid).index, tee, allowanceOf(r)) : null);
   const ids = r.groups.flatMap(g => g.teams.flat().map(pid => ({ pid, g })));
   ids.sort((a, b) => D.nameOf(a.pid).localeCompare(D.nameOf(b.pid)));
-  const cols = '<div class="pl-row cols"><span></span><span></span><span class="r cap">Index</span><span class="r cap">Playing</span><span></span></div>';
-  return `<div class="card rp-players">${cols}${ids.map(({ pid, g }) => {
-    const m = D.member(pid), ph = phOf(pid), can = tee && m;
-    const inner = `${avBadge(pid)}<span class="pl-n"><span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span><span class="cap">${esc(g.teeTime ? g.teeTime : 'Group ' + g.n)}</span></span><span class="r sub num">${m ? fmtIndex(m.index) : ''}</span><span class="r b num">${ph === null ? '' : ph}</span>${can ? chev : '<span></span>'}`;
+  const scr = isScramble(r);   // a scramble plays off team shots: no personal playing handicap
+  const cols = `<div class="pl-row cols"><span></span><span></span>${scr ? '' : '<span class="r cap">Index</span><span class="r cap">Playing</span>'}<span></span></div>`;
+  return `<div class="card rp-players${scr ? ' scr' : ''}">${cols}${ids.map(({ pid, g }) => {
+    const m = D.member(pid), ph = scr ? null : phOf(pid), can = tee && m && !scr;
+    const inner = `${avBadge(pid)}<span class="pl-n"><span class="${pid === DB.prefs.me ? 'b' : ''}">${esc(D.nameOf(pid))}</span><span class="cap">${esc(scr ? `Team ${g.n}${g.teeTime ? ' · ' + g.teeTime : ''}` : g.teeTime ? g.teeTime : 'Group ' + g.n)}</span></span>${scr ? '' : `<span class="r sub num">${m ? fmtIndex(m.index) : ''}</span><span class="r b num">${ph === null ? '' : ph}</span>`}${can ? chev : '<span></span>'}`;
     return can ? `<button class="pl-row${pid === DB.prefs.me ? ' me' : ''}" data-act="hcp" data-pid="${pid}" data-rid="${r.id}">${inner}</button>` : `<div class="pl-row">${inner}</div>`;
   }).join('')}</div>`;
 }
@@ -4548,7 +5203,7 @@ VIEWS.player = p => {
   html += `<div class="head"><h1 class="title is-name">${esc(m.name)}</h1></div><p class="sub">${esc([m.full, 'Index ' + fmtIndex(m.index)].filter(Boolean).join(' · '))}</p>`;
   html += `<div class="tiles${past ? ' two' : ''}"><div class="tile flag"><span class="cap">GOY${past ? ' ' + season : ''}</span><span class="bignum">${row ? posWord(row.posLabel) : '–'}</span></div>
     <div class="tile"><span class="cap">Best ${D.goyBest()}</span><span class="bignum">${row ? row.total : '–'}</span></div>
-    ${past ? '' : `<div class="tile"><span class="cap">To beat</span><span class="bignum">${row && row.toBeat ? row.toBeat : '–'}</span></div>`}</div></header>`;
+    ${past || !(row && row.toBeat) ? '' : `<div class="tile"><span class="cap">To beat</span><span class="bignum">${row.toBeat}</span></div>`}</div></header>`;
   const rowsFor = yr => seasonRounds(yr).filter(r => r.status === 'final' || r.status === 'live').reverse().map(r => {
     const res = resultsOf(r.id);
     const me = res ? res.rows.find(x => x.id === m.id) : null;
@@ -4641,7 +5296,7 @@ let downloads = null;
 
 function playHomeView(rid) {
   const g = myGroup(rid);
-  const comp = computeR(rid);
+  const comp = progressOf(rid);
   if (!g || !comp) return 'round';
   const gc = comp.groups.find(x => x.id === g.id);
   return gc.nextHole || askPending(rid, gc, g.id) ? 'tee' : 'finish';
@@ -4711,6 +5366,7 @@ function myConflicts(rid, gid) { return DB.conflicts.filter(c => c.round === rid
    a hole saved on two phones) shows under the players on that screen. */
 VIEWS.tee = () => {
   const rid = playRid();
+  if (isScramble(D.round(rid))) return VIEWS.scramble();
   const comp = computeR(rid);
   const g = myGroup(rid);
   if (!comp || !g) return VIEWS.round({ rid });
@@ -4844,11 +5500,15 @@ if (window.ResizeObserver) {
 
 VIEWS.entry = () => {
   const ctx = entryCtx();
+  if (isScramble(D.round(ctx.rid))) return VIEWS.scramble();
   const comp = computeR(ctx.rid);
   const gc = comp.groups.find(x => x.id === ctx.gid);
   const h = holeOf(ctx.rid, ctx.n);
   const d = ensureDraft(ctx);
   const pids = gc.teams.flat();
+  // A withdrawn player picks up (scratch) on every hole from their withdrawal: filled in here, saved with the group.
+  const wdHere = pids.filter(pid => { const w = wdOf(ctx.rid, pid); return w && ctx.n >= w; });
+  wdHere.forEach(pid => { if (d[pid] !== 'P') { d[pid] = 'P'; savePrefs(); } });
   if (ctx.mode === 'player' && !ctx.edit) { const ask = askPending(ctx.rid, gc, ctx.gid); if (ask) return VIEWS.ask(ctx.rid, gc, ask); }
   const missing = pids.filter(pid => !E.isEntered(d[pid]));
   const final = D.round(ctx.rid).status === 'final';
@@ -4862,7 +5522,9 @@ VIEWS.entry = () => {
   const clash = DB.conflicts.filter(c => c.round === ctx.rid && c.grp === ctx.gid && c.hole === ctx.n);
   if (clash.length) html += `<div class="banner" style="margin-top:12px">Another phone saved ${clash.map(c => `${esc(D.nameOf(c.player))} ${fmtGross(c.server)}`).join(', ')}</div>`;
   html += gc.teams.map((t, i) => {
-    const rows = t.map(pid => entryRow(pid, d[pid], comp.players[pid].holes[ctx.n].shots, h.par, ctx.rid));
+    const rows = t.map(pid => wdHere.includes(pid)
+      ? { tile: `<div class="pr wdrow"><b class="wd-n">${esc(D.nameOf(pid))}</b><span class="wd-s">Withdrawn · pick-ups from hole ${wdOf(ctx.rid, pid)}</span></div>`, drop: '' }
+      : entryRow(pid, d[pid], comp.players[pid].holes[ctx.n].shots, h.par, ctx.rid));
     return `<div class="bugs ${buggies ? 'b' + (i + 1) : 'b0'}"${buggies ? ` role="group" aria-label="Buggy ${i + 1}"` : ''}>${rows.map(r => r.tile + r.drop).join('')}</div>`;
   }).join('');
   if (ctx.mode === 'player' && !ctx.edit) html += needsAttention(ctx.rid, gc, ctx.gid);
@@ -5060,7 +5722,7 @@ VIEWS.after = () => {
   } else next = `<button class="btn" data-act="to-finish">See the card</button>`;
   return {
     tabs: 'hole',
-    html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><b>Par ${ah.par}</b><span>Index ${ah.si}${ah.yards ? ` · ${ah.yards} yds` : ''}</span></div></div><div class="afsaved"><span class="savedchip">${sized(ICON.check, 18)} Saved</span><button class="undochip" data-act="undo">Undo</button></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
+    html: `<div class="after"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small><b class="entn">${a.n}</b></div><div class="entr"><b>Par ${ah.par}</b><span>Index ${ah.si}${ah.yards ? ` · ${ah.yards} yds` : ''}</span></div></div><div class="afsaved"><span class="savedchip">${sized(ICON.check, 18)} ${DB.outbox.some(i => i.req && i.req.op === 'saveHole' && i.req.round === a.rid && Number(i.req.hole) === a.n) ? 'On this phone · sends when there\'s signal' : 'Saved'}</span><button class="undochip" data-act="undo">Undo</button></div><div class="prog" role="img" aria-label="Hole ${a.n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === a.n ? 'cur' : k < a.n ? 'done' : ''}"></i>`).join('')}</div></header>
       ${buggies ? `<div class="sec-label afbw"><span class="sub">Buggy Wars</span></div><div class="bw-vs afvs">${bwBadges(gc.teams[0], 0)}<span class="sub">v</span>${bwBadges(gc.teams[1], 1)}</div>
       <div class="card bw-card aftercard"><div class="bw-row afres"><span class="bw-l afl">Hole ${a.n}</span>${head}<span></span>${sub ? `<small class="afres-sub">${esc(sub)}</small>` : ''}</div>${rows}</div>` : `<div class="aftercard"><div class="afhead"><div class="res">${head}</div>${sub ? `<p class="sub res-sub">${esc(sub)}</p>` : ''}</div>${rows}</div>`}
       ${edge}${next}${saveWarning()}</div>`
@@ -5314,6 +5976,7 @@ function applyCheck(seg) {
 /* ----- End of the round for a group ----- */
 VIEWS.finish = () => {
   const rid = playRid();
+  if (isScramble(D.round(rid))) return VIEWS.scrambleFinish();
   const comp = computeR(rid);
   const g = myGroup(rid);
   const gc = comp.groups.find(x => x.id === g.id);
@@ -5365,6 +6028,7 @@ VIEWS.hcp = p => {
 /* ----- Buggy Wars board ----- */
 function buggyView(rid) {
   const r = D.round(rid);
+  if (isScramble(r)) return { html: '' };   // no Buggy Wars in a scramble
   const comp = computeR(rid);
   if (!comp) return { html: `${sec('', cardOf('<div class="row sub">Groups to be drawn</div>'))}` };
   const groups = comp.groups.filter(g => g.teams.length === 2);
@@ -5457,7 +6121,10 @@ VIEWS.board = () => {
   const pillSel = avail.includes(UI.res) ? UI.res : 'lb';
   const live0 = r.status === 'live';
   const thru0 = live0 && res0 && res0.rows.length ? Math.max(...res0.rows.map(x => x.thru || 0)) : 0;
-  let html = `<header class="hero c lbhead">${live0 ? `<p class="eyebrow"><span class="pulse"></span>LIVE${thru0 ? ' \u00b7 THRU ' + thru0 : ''}</p>` : ''}<div class="hrow2"><h1 class="big">Leaderboard</h1></div><p class="sub">${esc(roundName(r))} \u00b7 Stableford</p></header>`;
+  // Opened from somewhere (a trip day, a round, Home's "See the results"): a back link, so it isn't a dead end (journey 4).
+  const fromSt = typeof stackOf === 'function' ? stackOf() : UI.stack;
+  const backTo = fromSt && fromSt.length > 1 && fromSt[fromSt.length - 1].v === 'board' ? navBack(backLabel()) : '';
+  let html = `${backTo}<header class="hero c lbhead">${live0 ? `<p class="eyebrow"><span class="pulse"></span>LIVE${thru0 ? ' \u00b7 THRU ' + thru0 : ''}</p>` : ''}<div class="hrow2"><h1 class="big">Leaderboard</h1></div><p class="sub">${esc(roundName(r))} \u00b7 ${isScramble(r) ? 'Team scramble' : 'Stableford'}</p></header>`;
   if (avail.length > 1) {
     const names = { lb: 'Scores', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
     html += `<div class="seg pills${avail.length > 3 ? ' four' : ''}" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
@@ -5474,13 +6141,14 @@ VIEWS.board = () => {
     html += sec(label('Contests'), cardOf(res.contests.map(c => {
       const st = c.status, tag = !st ? '' : st.confirmed ? '<span class="pill g">Confirmed</span>' : '<span class="pill n">To be confirmed</span>';
       const who = c.winner || (c.lead && c.lead.pid);
-      const right = who ? (st && st.confirmed ? `<span class="b ct-won">${esc(D.nameOf(who))}${CUP}</span>` : `<span class="b">${esc(D.nameOf(who))}</span>${tag}`) : st && st.confirmed ? `<span class="sub">Nobody</span>${tag}` : `<span class="sub">${st && st.answered ? 'Nobody yet' : 'Not yet played'}</span>${tag}`;
+      const right = who ? (st && st.confirmed ? `<span class="b ct-won">${esc(D.nameOf(who))}${CUP}</span>` : `<span class="b">${esc(D.nameOf(who))}</span>${tag}`) : st && st.confirmed ? `<span class="sub">Nobody</span>${tag}` : `<span class="sub">${st && st.answered ? 'Nobody yet' : contestPassed(r.id, c.hole) ? 'Waiting for groups' : 'Not yet played'}</span>${tag}`;
       return `<div class="row crow"><span class="ct-l"><span>${CONTEST[c.type]}</span>${c.hole ? `<span class="sub">Hole ${c.hole}</span>` : ''}</span><span class="ct-r">${right}</span></div>`;
     }).join('')));
     return { tabs: 'board', html };
   }
 
   const pillTxt = r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r);
+  if (res.source === 'scramble') return { tabs: 'board', html: html + scrambleTable(r, res) };
   html += sec(`${label(esc(roundName(r)))}${pillTxt}`, cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
     return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
@@ -5494,7 +6162,8 @@ VIEWS.trip = p => {
   const list = tripRounds(D.round(p.rid));
   const r0 = D.round(p.rid);
   let html = `${navBack(backLabel())}<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">${esc(r0.trip || 'Trip standings')}</h1></div></header>`;
-  html += tripTable(list);
+  if (tripBoardOn(r0)) html += tripTable(list);
+  else html += `<p class="cap note" style="margin:8px 4px 0">No combined leaderboard for this trip: each day has its own results.</p>`;
   html += sec(label('Each day'), cardOf(list.map(x => `<button class="row" data-act="leaderboard" data-rid="${x.id}"><span>Day ${x.trip_day || x.seq}</span><span class="right">${x.status === 'upcoming' ? '<span class="sub">Not played</span>' : ''}${chev}</span></button>`).join('')));
   return { html };
 };
@@ -5630,6 +6299,185 @@ function fixSave() {
   render();
   toast(`${D.nameOf(f.pid)}, hole ${f.n}: ${f.v === 'P' ? 'picked up' : f.v}`);
 }
+
+/* ---- 32-scramble.js ---- */
+/* ----- Scramble (Westport day two, owner brief §6) -----
+   One team score per hole, saved in the row of the player whose drive was used (see scrambleOf in 10-data.js).
+   Each save sends every team member: the driver gets the team's strokes, everyone else is cleared, each with the value
+   this phone last saw. The server checks each row on its own, so if two phones disagree both rows can survive: the hole
+   then shows "two drives saved" and counts for nothing until someone picks one. Nothing is ever chosen silently. */
+
+const scrDriveWord = k => (k === 1 ? '1 drive' : `${k} drives`);
+const scrNames = g => g.team.map(D.nameOf).join(', ');
+
+// What the team score and driver are on this hole now, from the stored rows.
+function scrStored(rid, gc, n) {
+  const sc = D.scores(rid);
+  const filled = gc.team.filter(pid => E.isEntered((sc[pid] || {})[n]));
+  return { filled, values: Object.fromEntries(gc.team.map(pid => { const v = (sc[pid] || {})[n]; return [pid, v === undefined ? null : v]; })) };
+}
+function scrDraft(ctx, gc) {
+  const byGroup = draftsFor(ctx);
+  if (!byGroup[ctx.n]) {
+    const st = scrStored(ctx.rid, gc, ctx.n);
+    const d = { _base: st.values };
+    if (st.filled.length === 1) { d.driver = st.filled[0]; d.score = st.values[st.filled[0]]; }
+    byGroup[ctx.n] = d;
+  }
+  return byGroup[ctx.n];
+}
+
+/* A player's drives as dots that fill in (owner, 25 October: visible for every team, few words). Red empty dots when
+   the team is running out of holes for them. */
+function scrDots(k, min, warn) {
+  return `<span class="scr-dots${warn ? ' warn' : ''}" aria-hidden="true">${Array.from({ length: min }, (_, i) => `<i class="${i < k ? 'on' : ''}"></i>`).join('')}</span>`;
+}
+function scrDriveChips(t) {
+  const tight = t.atRisk || t.impossible || t.failed;
+  return `<span class="scr-chips">${t.team.map(pid => {
+    const k = t.drives[pid] || 0;
+    return `<span class="scr-pd" aria-label="${esc(D.nameOf(pid))}: ${plural(k, 'drive')}"><b>${esc(D.nameOf(pid))}</b>${scrDots(k, t.minDrives, tight && k < t.minDrives)}</span>`;
+  }).join('')}</span>`;
+}
+const scrOwed = t => t.team.reduce((s, pid) => s + Math.max(0, t.minDrives - (t.drives[pid] || 0)), 0);
+
+/* The team results, best first. The KBs are marked; there is no winners' presentation (owner: avoiding last place is
+   the drama). Drives under the minimum and holes with two drives saved are shown plainly. */
+function scrambleTable(r, res) {
+  const teams = res.teams || [];
+  if (!teams.length) return sec(label('Teams'), cardOf('<div class="row"><span class="sub">Teams are not drawn yet</span></div>'));
+  const rows = teams.map(t => {
+    const thru = t.complete ? 'finished' : t.played ? `thru ${t.played}` : '';
+    const flag = t.doubles.length ? ` <span class="pill w" title="Two drives saved">Check ${t.doubles.join(', ')}</span>` : '';
+    return `<div class="lrow scr-row${t.kb ? ' low' : ''}"><span class="sub scr-pos">${esc(t.posLabel)}</span><span class="scr-name"><b>${esc(t.name)}</b> <small>${esc(thru)}</small>${t.kb ? ' <span class="pill w">KBs</span>' : ''}${flag}</span><b class="scr-pts num">${t.total}</b>${scrDriveChips(t)}</div>`;
+  }).join('');
+  return `<div class="scr-standings">${sec(label('Teams') + `<span class="scr-legend">Drives · ${teams[0].minDrives} each</span>`, cardOf(rows))}</div>`;
+}
+
+VIEWS.scramble = () => {
+  let ctx = entryCtx();
+  const rid = ctx.rid, r = D.round(rid), s = scrambleOf(rid);
+  const gc = s && s.groups.find(g => g.id === ctx.gid);
+  if (!gc) return VIEWS.round({ rid });
+  if (ctx.mode === 'player' && cur().v === 'tee') {
+    const ask0 = askPending(rid, gc, gc.id);
+    if (ask0) return VIEWS.ask(rid, gc, ask0);
+    if (!gc.nextHole) return VIEWS.scrambleFinish();
+    const t = UI.teeHole, dr = ((DB.prefs.drafts[rid] || {})[gc.id] || {})[t];
+    const working = t && gc.holes[t] && (!gc.holes[t].complete || (dr && (dr.score !== undefined || dr.driver)));
+    UI.hole = UI.teeHole = working ? t : gc.nextHole;
+    UI.edit = false;
+    ctx = entryCtx();
+  } else if (ctx.mode === 'player' && !ctx.edit) {
+    const ask = askPending(rid, gc, gc.id);
+    if (ask) return VIEWS.ask(rid, gc, ask);
+  }
+  const n = ctx.n, h = holeOf(rid, n), d = scrDraft(ctx, gc);
+  const final = r.status === 'final';
+  const shots = gc.scramble[n] ? gc.scramble[n].shots : 0;
+  const st = scrStored(rid, gc, n);
+  let html = '<div class="entry scr">';
+  if (ctx.mode === 'org') html += `<div class="entnav"><button class="entback" data-act="entry-back" aria-label="Back">${ICON.back}<span>Back</span></button><span class="entgrp">Correcting ${esc(gc.name)}</span></div>`;
+  html += `<header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>HOLE</small>${ctx.mode === 'org' ? `<b class="entn">${n}</b>` : `<button class="holebtn" data-act="holes" aria-label="Go to a hole. Now on hole ${n}"><b class="entn">${n}</b><span class="hdown">${ICON.down}</span></button>`}</div><div class="entr"><b>Par ${h.par}</b><span>Index ${h.si}${h.yards ? ` · ${h.yards} yds` : ''}</span></div></div><div class="prog" role="img" aria-label="Hole ${n} of 18">${Array.from({ length: 18 }, (_, i) => i + 1).map(k => `<i class="${k === n ? 'cur' : gc.holes[k].complete ? 'done' : ''}"></i>`).join('')}</div></header>`;
+  if (final) html += `<div class="banner" style="margin-top:12px">This round is final.</div>${ctx.mode === 'org' ? '<button class="btn quiet" data-act="reopen">Reopen round</button>' : ''}`;
+  if (st.filled.length > 1) html += `<div class="banner warn" style="margin-top:12px"><b>Two drives saved:</b> ${st.filled.map(pid => `${esc(D.nameOf(pid))} ${fmtGross(st.values[pid])}`).join(' · ')}. Pick one and save.</div>`;
+  const clash = DB.conflicts.filter(c => c.round === rid && c.grp === gc.id && c.hole === n);
+  if (clash.length && st.filled.length <= 1) html += `<div class="banner" style="margin-top:12px">Another phone saved ${clash.map(c => `${esc(D.nameOf(c.player))} ${fmtGross(c.server)}`).join(', ')}</div>`;
+
+  /* In the order it happens (owner, 25 October): whose drive is picked walking off the tee, the score added on holing out.
+     The drive choice is kept on this phone (it survives closing the app) until the score is saved with it. */
+  const left = gc.left, tight = gc.atRisk || gc.impossible;
+  html += sec(label('Drive'), `<div class="scr-drives" role="radiogroup" aria-label="Whose drive was used">${gc.team.map(pid => {
+    const on = d.driver === pid, k = gc.drives[pid] || 0;
+    return `<button class="scr-drv${on ? ' on' : ''}" role="radio" aria-checked="${on}" data-act="scr-driver" data-pid="${pid}" aria-label="${esc(D.nameOf(pid))}, ${plural(k, 'drive')}"><span class="scr-dn">${esc(D.nameOf(pid))}</span>${scrDots(k, gc.minDrives, tight && k < gc.minDrives)}</button>`;
+  }).join('')}</div>`);
+  // Say who still needs drives (UX review F13): amber while it can still be done, red once it can't.
+  if (tight) {
+    const by = {};
+    gc.short.forEach(pid => { const k = gc.minDrives - gc.drives[pid]; (by[k] = by[k] || []).push(D.nameOf(pid)); });
+    const and = a => a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1] : a[0];
+    const who = Object.keys(by).sort((a, b) => b - a).map(k => `${esc(and(by[k]))} ${by[k].length > 1 ? 'need' : 'needs'} ${plural(Number(k), 'more drive')}${by[k].length > 1 ? ' each' : ''}`).join('; ');
+    html += gc.impossible
+      ? `<p class="scr-warn bad">Not enough holes left for ${gc.minDrives} drives each: the team will be KBs.</p>`
+      : `<p class="scr-warn">${who} · ${plural(left, 'hole')} left</p>`;
+  }
+
+  const v = d.score;
+  const pts = E.isEntered(v) ? E.stablefordPoints(v, h.par, shots) : null;
+  html += sec(label('Score'), `<div class="scr-score card" aria-label="Team score">
+    <div class="scr-step"><button class="scr-st" data-act="scr-score" data-dir="down" aria-label="One less for the team">−</button>
+    <button class="scr-val num" data-act="scr-clear" aria-label="Team score ${E.isEntered(v) ? (v === 'P' ? 'picked up' : v) : 'not set'}">${E.isEntered(v) ? (v === 'P' ? '–' : v) : `<small>Par ${h.par}</small>`}</button>
+    <button class="scr-st" data-act="scr-score" data-dir="up" aria-label="One more for the team">+</button></div>
+    <div class="scr-meta"><span class="sub">${pts !== null ? `${pts} pts` : ''}${shots ? `${pts !== null ? ' · ' : ''}${plural(shots, 'shot')}` : ''}</span><button class="link" data-act="scr-pickup">${v === 'P' ? 'Picked up' : 'Pick up'}</button></div></div>`);
+
+  const ready = E.isEntered(d.score) && d.driver;
+  const lbl = ctx.mode === 'org' ? 'Save correction' : ctx.edit || gc.holes[n].complete ? 'Save changes' : `Save hole ${n}`;
+  html += `<div class="savebar"><button class="btn ${ready ? '' : 'quiet'}" data-act="scr-save">${lbl}</button>${saveWarning()}</div></div>`;
+  if (ctx.mode === 'player') html += holesSheet(rid, gc, n);
+  if (ctx.mode === 'player' && !ctx.edit && !UI.holeSheet && !gc.holes[n].complete && r.status === 'live') html += contestIntro(rid, gc, n);
+  return ctx.mode === 'player' ? { html, tabs: 'hole' } : { html };
+};
+
+function scrCtx() {
+  const ctx = entryCtx(), s = scrambleOf(ctx.rid), gc = s && s.groups.find(g => g.id === ctx.gid);
+  return gc ? { ctx, gc, d: scrDraft(ctx, gc), h: holeOf(ctx.rid, ctx.n) } : null;
+}
+function scrEdit(fn) {
+  const x = scrCtx();
+  if (!x) return;
+  if (D.round(x.ctx.rid).status === 'final') { toast('This round is final. Reopen it to change scores.'); return; }
+  fn(x);
+  savePrefs();
+  render();
+}
+const scrScore = dir => scrEdit(({ d, h }) => {
+  if (!E.isEntered(d.score) || d.score === 'P') { d.score = h.par; return; }
+  d.score = Math.max(1, Math.min(15, d.score + (dir === 'up' ? 1 : -1)));
+});
+const scrPickup = () => scrEdit(({ d }) => { d.score = d.score === 'P' ? undefined : 'P'; });
+const scrClear = () => scrEdit(({ d }) => { delete d.score; });
+const scrDriver = pid => scrEdit(({ d }) => { d.driver = d.driver === pid ? undefined : pid; });
+
+function scrSave() {
+  const x = scrCtx();
+  if (!x) return;
+  const { ctx, gc, d } = x;
+  const r = D.round(ctx.rid);
+  if (!E.isEntered(d.score) || !d.driver) { toast(E.isEntered(d.score) ? 'Pick whose drive was used' : 'Set the team score first'); return; }
+  if (r.status === 'final') { toast('This round is final. Reopen it to change scores.'); return; }
+  const st = scrStored(ctx.rid, gc, ctx.n);
+  const scores = {};
+  gc.team.forEach(pid => {
+    const clash = DB.conflicts.find(c => c.round === ctx.rid && c.grp === gc.id && c.hole === ctx.n && c.player === pid);
+    const seen = d._base && pid in d._base ? d._base[pid] : st.values[pid];
+    scores[pid] = { v: pid === d.driver ? d.score : null, base: clash ? clash.server : seen };
+  });
+  const req = { op: 'saveHole', round: ctx.rid, grp: gc.id, hole: ctx.n, scores, by: ctx.mode === 'org' ? 'Organiser' : byMe(),
+    names: Object.fromEntries(gc.team.map(pid => [pid, D.nameOf(pid)])), label: `${roundName(r)} · ${gc.name} · Hole ${ctx.n} (drive: ${D.nameOf(d.driver)})` };
+  if (ctx.mode === 'org') req.pin = ORGPIN.pin;
+  DB.conflicts = DB.conflicts.filter(c => !(c.round === ctx.rid && c.grp === gc.id && c.hole === ctx.n));
+  clearDraft(ctx);
+  savePrefs();
+  send(req);
+  tick();
+  if (ctx.mode === 'org') { back(); toast(`Hole ${ctx.n} saved`); return; }
+  UI.edit = false; UI.after = null; UI.teeHole = null;
+  replaceTop('tee', { rid: ctx.rid });
+  toast(`Hole ${ctx.n} saved · ${D.nameOf(d.driver)}'s drive`);
+}
+
+VIEWS.scrambleFinish = () => {
+  const rid = playRid(), s = scrambleOf(rid), g = myGroup(rid);
+  const gc = s && g && s.groups.find(x => x.id === g.id);
+  if (!gc) return VIEWS.round({ rid });
+  const t = s.standings.find(x => x.id === gc.id) || gc;
+  const drives = gc.team.map(pid => `<div class="row"><span>${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${gc.drives[pid]}</span>${gc.drives[pid] < gc.minDrives ? '<span class="pill w">Short</span>' : ''}</span></div>`).join('');
+  const html = `<div class="after scr-finish"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>${esc(gc.name.toUpperCase())}</small><b class="entn">${t.total}</b></div><div class="entr"><b>Finished</b><span>Team Stableford</span></div></div></header>
+    ${gc.failed ? `<div class="banner warn" style="margin-top:12px">Not everyone has ${gc.minDrives} drives, so the team is KBs whatever its points.</div>` : ''}
+    ${sec(label('Drives used'), cardOf(drives))}
+    <button class="btn" data-act="leaderboard" data-rid="${rid}">See the teams</button></div>`;
+  return { html, tabs: 'hole' };
+};
 
 /* ---- 35-rules.js ---- */
 /* ----- Rules checker: ask about the Rules of Golf, checked live against the official rules ----- */
@@ -5973,11 +6821,13 @@ function nextChecklist(r) {
   const items = [
     { ok: !!r.date, t: r.date ? 'Date' : 'Date: members see the round once it has one', go: ['details', r.id], need: true },
     { ok: !!(c && c.holes && tee), t: 'Course and tees', go: ['details', r.id], need: true },
-    { ok: !!(r.groups && r.groups.length), t: 'Players and groups', go: ['playing', r.id], need: true },
+    // A scramble's teams come from the breakfast draw, and it has no KB pairs to set up (UX review F01).
+    isScramble(r)
+      ? { ok: !!(r.groups && r.groups.length), t: !hasPots(r.id) ? 'Breakfast draw: set the pots' : r.groups && r.groups.length ? 'Teams drawn' : 'Breakfast draw', go: ['drawhome', r.id], need: true }
+      : { ok: !!(r.groups && r.groups.length), t: 'Players and groups', go: ['groups', r.id], need: true },
     { ok: !!r.first_tee, t: 'First tee time', go: ['details', r.id], need: true },
-    { ok: !!(r.contests && r.contests.length), t: 'Contests', go: ['details', r.id], need: false },
-    { ok: !!(E.kbOff(r) || (r.kb && r.kb.length)), t: 'KBs', go: ['kb', r.id], need: false }
-  ];
+    { ok: !!(r.contests && r.contests.length), t: 'Contests', go: ['details', r.id], need: false }
+  ].concat(isScramble(r) ? [] : [{ ok: !!(E.kbOff(r) || (r.kb && r.kb.length)), t: 'KBs', go: ['kb', r.id], need: false }]);
   const left = items.filter(i => i.need && !i.ok).length;
   const head = `<span class="two"><span>${esc(roundName(r))}</span><span class="sub">${left ? `${plural(left, 'thing')} to do` : 'Ready to go'}</span></span>`;
   return sec(label('Next up'), cardOf(`<div class="row tall">${head}<span class="pill ${left ? 'w' : 'g'}">${left ? 'To do' : 'Ready'}</span></div>` +
@@ -6006,14 +6856,14 @@ ORG.home = () => {
 };
 
 function finaliseBlockers(r) {
-  const comp = computeR(r.id);
+  const comp = progressOf(r.id);
   if (!comp) return ['no scores'];
   const open = comp.groups.filter(g => !g.complete).length;
   const claims = D.claims(r.id);
   const wins = D.winners(r.id);
   const toConfirm = (r.contests || []).filter(c => (claims[c.hole] || []).length && !wins[c.hole]).length;
   const reasons = [];
-  if (open) reasons.push(`${plural(open, 'card')} open`);
+  if (open) reasons.push(`${plural(open, isScramble(r) ? 'team' : 'group')} still playing`);
   if (toConfirm) reasons.push(`${plural(toConfirm, 'contest')} to confirm`);
   return reasons;
 }
@@ -6031,18 +6881,23 @@ ORG.round = p => {
   const nPlayers = (r.groups || []).reduce((s, g) => s + g.teams.flat().length, 0);
   const details = [c ? c.name : 'No course', tee ? tee.name : '', r.date ? fmtDate(r.date, true) : '', r.first_tee || ''].filter(Boolean).join(' · ');
   const locked = r.status !== 'upcoming';
+  // The breakfast draw sits just above Groups: it is how a scramble's groups get made.
+  // Once play starts the draw is history, so the row goes (UX review F16).
+  const drawRow = r.status === 'upcoming' && (isScramble(r) || hasPots(r.id)) ? `<button class="row tall" data-act="org-go" data-v="drawhome" data-rid="${r.id}"><span class="two"><span>Breakfast draw</span><span class="sub">${!hasPots(r.id) ? 'Set the pots, then draw the teams' : drawMade(r) ? 'Done' : drawOf(r.id).st.started ? 'Under way' : 'Pots set'}</span></span>${chev}</button>` : '';
   html += sec('', cardOf(`
     <button class="row tall" data-act="org-go" data-v="details" data-rid="${r.id}"><span class="two"><span>Details</span><span class="sub">${esc(details)}</span></span>${chev}</button>
-    <button class="row tall" data-act="org-go" data-v="${locked ? 'groupsview' : 'playing'}" data-rid="${r.id}"><span class="two"><span>Groups and buggies</span><span class="sub">${r.groups && r.groups.length ? `${plural(nPlayers, 'player')} · ${plural(r.groups.length, 'group')}` : 'Not drawn'}</span></span>${chev}</button>
-    ${r.groups && r.groups.length && r.status !== 'final' ? `<button class="row tall" data-act="org-go" data-v="late" data-rid="${r.id}"><span class="two"><span>Change a player</span><span class="sub">Swap someone in, or let someone drop out</span></span>${chev}</button>` : ''}
-    <button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${E.kbOff(r) ? 'Off' : r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`), true);
+    ${drawRow}<button class="row tall" data-act="org-go" data-v="${r.status === 'final' ? 'groupsview' : 'groups'}" data-rid="${r.id}"><span class="two"><span>Groups</span><span class="sub">${r.groups && r.groups.length ? `${plural(nPlayers, 'player')} · ${plural(r.groups.length, isScramble(r) ? 'team' : 'group')}${locked && r.status !== 'final' ? ' · withdraw only now' : ''}` : isScramble(r) || hasPots(r.id) ? 'Teams not drawn yet' : 'Not drawn'}</span></span>${chev}</button>
+    <button class="row tall" data-act="org-format" data-rid="${r.id}"><span class="two"><span>Format</span><span class="sub">${isScramble(r) ? 'Scramble: one team score per group, drives recorded' : 'Individual Stableford'}</span></span><span class="pill ${isScramble(r) ? 'g' : 'n'}">${isScramble(r) ? 'Scramble' : 'Stableford'}</span></button>
+    ${isScramble(r) ? `<button class="row tall" data-act="org-go" data-v="teamshots" data-rid="${r.id}"><span class="two"><span>Team shots</span><span class="sub">${(r.groups || []).map(g => `Team ${g.n}: ${teamShotsOf(r)[g.id] || 0}`).join(' · ') || 'Draw the teams first'}</span></span>${chev}</button>` : ''}
+    ${r.trip ? `<button class="row tall" data-act="org-tripboard" data-rid="${r.id}"><span class="two"><span>Trip leaderboard</span><span class="sub">${tripBoardOn(r) ? `${esc(r.trip)} adds up the days` : `No combined board for ${esc(r.trip)}: each day has its own results`}</span></span><span class="pill ${tripBoardOn(r) ? 'g' : 'n'}">${tripBoardOn(r) ? 'On' : 'Off'}</span></button>` : ''}
+    ${isScramble(r) ? '' : `<button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${E.kbOff(r) ? 'Off' : r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`}`), true);
   if (c && (!c.holes || !tee)) html += `<div class="banner note">${esc(c.name)} needs ${!c.holes ? 'its par and stroke index for each hole' : 'tee details'} before scores can be entered. <button class="link inline" data-act="org-go" data-v="course" data-cid="${c.id}">Add them</button></div>`;
-  const comp = computeR(r.id);
+  const comp = progressOf(r.id);
   if (comp && r.status !== 'upcoming') {
-    html += sec(label('Groups'), cardOf(comp.groups.map(gc => {
+    html += sec(label(isScramble(r) ? 'Teams' : 'Groups'), cardOf(comp.groups.map(gc => {
       const sub = D.card(r.id, gc.id);
       const prog = gc.complete ? (sub ? 'Submitted' : 'Finished') : gc.holesDone ? `Thru ${gc.holesDone}` : 'Not started';
-      return `<button class="row" data-act="org-go" data-v="group" data-rid="${r.id}" data-gid="${gc.id}"><span>Group ${gc.n}</span><span class="right sub"><span class="bar"><i style="width:${Math.round(gc.holesDone / 18 * 100)}%"></i></span>${prog}${chev}</span></button>`;
+      return `<button class="row" data-act="org-go" data-v="group" data-rid="${r.id}" data-gid="${gc.id}"><span>${isScramble(r) ? 'Team' : 'Group'} ${gc.n}</span><span class="right sub nowrap"><span class="bar"><i style="width:${Math.round(gc.holesDone / 18 * 100)}%"></i></span>${prog}${chev}</span></button>`;
     }).join('')));
     const contests = r.contests || [];
     if (contests.length) {
@@ -6058,13 +6913,12 @@ ORG.round = p => {
   }
   if (r.status === 'live') {
     const reasons = finaliseBlockers(r);
-    html += reasons.length ? `<button class="btn quiet" data-act="finalise" data-rid="${r.id}">Finalise<small style="color:var(--sub)">${esc(reasons.join(' · '))}</small></button>`
+    html += reasons.length ? `<div class="fin-wait"><p class="b">Before you can finalise</p><ul>${reasons.map(x => `<li>${esc(x.charAt(0).toUpperCase() + x.slice(1))}</li>`).join('')}</ul></div><button class="btn quiet" data-act="finalise" data-rid="${r.id}" aria-disabled="true">Finalise</button>`
       : `<button class="btn" data-act="finalise" data-rid="${r.id}">Finalise</button>`;
   } else if (r.status === 'final') {
     html += `<button class="btn quiet" data-act="reopen" data-rid="${r.id}">Reopen round</button>`;
-  } else {
-    const why = !canScore(r) ? (r.groups && r.groups.length ? 'Course details needed' : 'Draw the groups first') : liveRid() ? 'Another round is live' : '';
-    html += `<button class="btn ${why ? 'quiet' : ''}" data-act="start-round" data-rid="${r.id}">Start round${why ? `<small style="color:var(--sub)">${esc(why)}</small>` : ''}</button>`;
+  } else if (canScore(r)) {
+    html += `<p class="cap" style="text-align:center">Goes live with the first score</p>`;   // the server starts it (server.js saveHole)
   }
   if (r.status === 'upcoming' || isDemo(r) || D.testing()) {
     const sc = Object.values(D.scores(r.id)).reduce((n, byHole) => n + Object.keys(byHole).length, 0);
@@ -6088,7 +6942,7 @@ ORG.details = p => {
       <div class="fld"><label class="sub" for="f-course">Course</label><select id="f-course" class="field" data-change="details-course">${D.courses().map(x => `<option value="${x.id}"${x.id === st.course ? ' selected' : ''}>${esc(x.name)}${x.holes ? '' : ' (no card yet)'}</option>`).join('')}</select></div>
       <div class="fld"><label class="sub" for="f-tee">Tees</label><select id="f-tee" class="field">${tees.length ? tees.map(([k, t]) => `<option value="${k}"${r && r.tee === k ? ' selected' : ''}>${esc(t.name)} · ${t.slope} / ${t.rating}</option>`).join('') : '<option value="">Add tees to the course first</option>'}</select></div>
       ${field('f-date', 'Date', r ? r.date : '', 'type="date"')}
-      <div class="two-col">${field('f-tee-time', 'First tee', r ? r.first_tee : '', 'type="time"')}${field('f-interval', 'Minutes between groups', r && r.interval ? r.interval : 8, 'inputmode="numeric"')}</div>
+      <div class="two-col">${field('f-tee-time', 'First tee', r ? r.first_tee : '10:00', 'type="time"')}${field('f-interval', 'Minutes between groups', r && r.interval ? r.interval : 8, 'inputmode="numeric"')}</div>
       <div class="two-col">${field('f-trip', 'Trip', r ? r.trip : '', 'placeholder="None"')}${field('f-day', 'Day', r ? r.trip_day : '', 'inputmode="numeric"')}</div>
       <div class="two-col">${field('f-ntp', 'Nearest the pin holes', ntp, 'inputmode="numeric" placeholder="7, 15"')}${field('f-ld', 'Longest drive holes', ld, 'inputmode="numeric" placeholder="12"')}</div>
       ${formErr()}
@@ -6100,7 +6954,7 @@ ORG.details = p => {
 /* ----- Who is playing, and the draw ----- */
 function draftFor(r) {
   if (!UI.draft || UI.draft.rid !== r.id) {
-    UI.draft = { rid: r.id, ids: r.groups ? r.groups.flatMap(g => g.teams.flat()) : [], groups: r.groups ? clone(r.groups) : null, repeats: [], sel: null };
+    UI.draft = { rid: r.id, ids: [] };
   }
   return UI.draft;
 }
@@ -6109,39 +6963,36 @@ function priorTripGroups(r) {
   return D.rounds().filter(x => x.trip === r.trip && x.season === r.season && x.id !== r.id && x.groups && (x.trip_day || 0) < (r.trip_day || 99)).map(x => ({ rid: x.id, groups: x.groups }));
 }
 ORG.playing = p => {
+  // Nobody drawn yet: tick who's playing, then draw. The draw saves at once and this becomes the Groups screen.
   const r = D.round(p.rid);
   const d = draftFor(r);
-  let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups and buggies</h1></div></header>`;
-  if (!d.groups) {
-    html += sec(label(`Playing · ${d.ids.length}`), cardOf(D.active().map(m => {
-      const on = d.ids.includes(m.id);
-      return `<button class="row" data-act="org-toggle-player" data-pid="${m.id}" aria-pressed="${on}"><span>${esc(m.name)}${isGuest(m) ? ' <span class="pill n">Guest</span>' : ''}</span>${on ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : ''}</button>`;
-    }).join('') + `<button class="row" data-act="org-go" data-v="guest" data-rid="${r.id}"><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}Add a guest</span></button>`), true);
-    const priorFinal = r.trip ? D.rounds().filter(x => x.trip === r.trip && x.season === r.season && x.id !== r.id && x.status === 'final' && (x.trip_day || 0) < (r.trip_day || 99)) : [];
-    if (d.ids.length >= 2) {
-      html += `<button class="btn" data-act="org-draw" data-kind="random">Draw groups</button>`;
-      if (priorFinal.length) html += `<button class="btn quiet" style="margin-top:8px" data-act="org-draw" data-kind="standings">Leaders out last</button>`;
-    }
-    return { html };
+  let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups</h1></div><p class="sub">Tick who's playing, then draw</p></header>`;
+  html += sec(label(`Playing · ${d.ids.length}`), cardOf(D.active().map(m => {
+    const on = d.ids.includes(m.id);
+    return `<button class="row" data-act="org-toggle-player" data-pid="${m.id}" aria-pressed="${on}"><span>${esc(m.name)}${isGuest(m) ? ' <span class="pill n">Guest</span>' : ''}</span>${on ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : ''}</button>`;
+  }).join('') + `<button class="row" data-act="org-go" data-v="guest" data-rid="${r.id}"><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}Add a guest</span></button>`), true);
+  if (d.ids.length >= 2) {
+    html += `<button class="btn" data-act="org-draw" data-kind="random">Draw ${isScramble(r) ? 'teams' : 'groups'}</button>`;
+    if (priorFinalDays(r).length) html += `<button class="btn quiet" style="margin-top:8px" data-act="org-draw" data-kind="standings">Leaders out last</button>`;
   }
-  const sel = d.sel;
-  html = html.replace('</header>', `<p class="sub head-sub">${plural(d.ids.length, 'player')} · first tee ${esc(r.first_tee || 'not set')}</p></header>`);
-  if (d.repeats.length) html += `<div class="banner note">${d.repeats.map(x => `${esc(x.pair.map(D.nameOf).join(' & '))} shared a buggy before`).join('<br>')}</div>`;
-  const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
-  const holeCount = (holesOf(r) || []).length || 18;
-  d.groups.forEach((g, gi) => {
-    const sh = g.startHole || 1;
-    const startRow = `<div class="row"><label for="sh-${gi}">Starts on hole</label><select id="sh-${gi}" class="field short" data-change="start-hole" data-gi="${gi}" aria-label="Group ${gi + 1} starts on hole">${Array.from({ length: holeCount }, (_, k) => `<option value="${k + 1}"${sh === k + 1 ? ' selected' : ''}>${k + 1}</option>`).join('')}</select></div>`;
-    html += sec(`<span class="b">Group ${gi + 1}</span><span class="sub">${esc(sh !== 1 ? 'Hole ' + sh + ' · ' : '')}${esc(times[gi] || '')}</span>`, cardOf(startRow + g.teams.map((t, i) => t.map(pid =>
-      `<button class="row${sel === pid ? ' picked' : ''}" data-act="org-swap" data-pid="${pid}"><span style="display:flex;align-items:center;gap:8px">${g.teams.length > 1 ? dot(i) : ''}${esc(D.nameOf(pid))}</span>${g.teams.length > 1 ? `<span class="cap">Buggy ${i + 1}</span>` : ''}</button>`).join('')).join('')), true);
-  });
-  html += `<button class="btn" data-act="org-save-groups">Save groups</button>
-    <div class="foot"><button class="link" data-act="org-draw" data-kind="again">Draw again</button><button class="link" data-act="org-draw" data-kind="players">Change players</button></div>`;
   return { html };
 };
+function priorFinalDays(r) {
+  return r.trip ? D.rounds().filter(x => x.trip === r.trip && x.season === r.season && x.id !== r.id && x.status === 'final' && (x.trip_day || 0) < (r.trip_day || 99)) : [];
+}
+/* Save a fresh draw as the round's groups, with tee times and KB pairs, in one write. */
+function saveDraw(r, drawn, said) {
+  const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, drawn.length);
+  const allOff = E.kbOff(r);   // KBs switched off for the whole round stays off if the groups are redrawn
+  const groups = drawn.map((g, i) => Object.assign({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: 1, teams: g.teams }, allOff ? { noKb: true } : {}));
+  let kb = null;
+  const kg = E.kbGroups(Object.assign({}, r, { groups }));
+  if (kg.length > 1 && !isScramble(r)) { const res = E.kbPairsFor(kg, (Date.now() % 100000) + 3, priorKbPairs(r.id)); kb = res.pairs.length ? res.pairs : null; }   // every drawn round gets KB pairs, no repeat partners
+  put('rounds', [Object.assign({}, r, { groups, kb })], { action: said, detail: `${roundName(r)}: ${groups.map(g => `${g.teeTime} ${g.teams.map(t => t.map(D.nameOf).join(' & ')).join(' v ')}`).join('; ')}` });
+}
 ORG.groupsview = p => {
   const r = D.round(p.rid);
-  return { html: `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups and buggies</h1></div></header>${groupsBlock(r, false)}` };
+  return { html: `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups</h1></div></header>${groupsBlock(r, false)}` };
 };
 
 /* Every KB pair from the other rounds (rounds scored in the app, and imported ones), so a new draw can avoid repeat partners */
@@ -6170,10 +7021,19 @@ ORG.kb = p => {
 
 /* ----- Corrections and contests ----- */
 ORG.group = p => {
+  if (isScramble(D.round(p.rid))) {
+    const s = scrambleOf(p.rid), gc = s && s.groups.find(g => g.id === p.gid);
+    if (!gc) return { html: '' };
+    const rows = E.playOrder(gc.teams && D.round(p.rid).groups.find(g => g.id === gc.id).startHole).map(n => {
+      const h = gc.scramble[n], dbl = gc.holes[n].double;
+      return `<button class="row" data-act="org-go" data-v="correct" data-rid="${p.rid}" data-gid="${gc.id}" data-n="${n}" aria-label="Correct hole ${n}"><span class="b num">${n}</span><span class="right">${dbl ? '<span class="pill w">Two drives</span>' : h.driver ? `<span class="sub">${esc(D.nameOf(h.driver))}</span><span class="b num">${h.gross === 'P' ? '–' : h.gross}<sup>${h.points}</sup></span>` : '<span class="sub">–</span>'}${chev}</span></button>`;
+    }).join('');
+    return { html: `<header class="hero s">${navBack('Round')}<div class="head"><h1 class="title">${esc(gc.name)}</h1></div><p class="sub">${esc(gc.team.map(D.nameOf).join(', '))} · ${gc.total} pts</p></header>${sec(label('Holes'), cardOf(rows))}` };
+  }
   const comp = computeR(p.rid);
   const gc = comp.groups.find(g => g.id === p.gid);
   const pids = gc.teams.flat();
-  const head = `<div class="orow"><span class="cap">Hole</span>${pids.map((pid, i) => `<span class="cap b ${i < 2 ? 'c-a' : 'c-b'}">${esc(D.nameOf(pid))}</span>`).join('')}</div>`;
+  const head = `<div class="orow"><span class="cap">Hole</span>${pids.map((pid, i) => `<span class="cap b ${i < 2 ? 'c-a' : 'c-b'}" title="${esc(D.nameOf(pid))}" aria-label="${esc(D.nameOf(pid))}">${esc(initialsOf(D.member(pid)) || D.nameOf(pid).slice(0, 2))}</span>`).join('')}</div>`;
   const rows = gc.order.map(n => `<button class="orow" data-act="org-go" data-v="correct" data-rid="${p.rid}" data-gid="${p.gid}" data-n="${n}" aria-label="Correct hole ${n}"><span class="b">${n}</span>${pids.map(pid => {
     const hp = comp.players[pid].holes[n];
     return `<span>${hp.gross === null ? '<span class="sub">–</span>' : `${hp.gross === 'P' ? '–' : hp.gross}<sup>${hp.points}</sup>`}</span>`;
@@ -6190,6 +7050,13 @@ ORG.group = p => {
   };
 };
 ORG.correct = () => VIEWS.entry();
+// Team shots for a scramble (owner brief §6): normally 0; the committee may give some teams 2 or 3 to balance the field.
+ORG.teamshots = p => {
+  const r = D.round(p.rid), cur0 = teamShotsOf(r);
+  return { html: `<header class="hero s">${navBack(esc(roundName(r)))}<div class="head"><h1 class="title">Team shots</h1></div><p class="sub">Shots each team gets, given by stroke index. Usually 0.</p></header>
+    <form data-form="teamshots" autocomplete="off" class="sec near">${(r.groups || []).map(g => field('ts-' + g.id, `Team ${g.n} · ${g.teams.flat().map(D.nameOf).join(', ')}`, String(cur0[g.id] || 0), 'inputmode="numeric"')).join('')}
+    ${formErr()}<button class="btn" type="submit">Save</button></form>` };
+};
 ORG.contest = p => {
   const n = Number(p.n);
   const c = contestOn(p.rid, n);
@@ -6217,11 +7084,16 @@ ORG.guest = p => ({
 
 /* ----- A change of player after the groups are saved ----- */
 function scoresFor(rid, pid) { const sc = D.scores(rid)[pid]; return sc ? Object.keys(sc).length : 0; }
+/* A scramble's team scores sit in the rows of whoever drove, so once any team has a score the teams are fixed for the
+   whole round: swapping or removing anyone, even a teammate with no rows, could hide a team's hole and its drive
+   (Codex review of #41). Before the first score, teams can change as usual. */
+const rosterLocked = r => isScramble(r) && Object.values(D.scores(r.id)).some(h => Object.values(h || {}).some(v => v !== null && v !== undefined));
 ORG.late = p => {
   const r = D.round(p.rid);
   const sel = UI.late && UI.late.rid === r.id ? UI.late.pid : null;
   let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Change a player</h1></div><p class="sub names">${sel ? esc(D.nameOf(sel)) : 'Tap the player who is changing'}</p></header>`;
   const inRound = new Set((r.groups || []).flatMap(g => g.teams.flat()));
+  if (rosterLocked(r)) return { html: html + sec('', cardOf(`<div class="row tall"><span class="sub">The teams have started scoring, so players can't be swapped or taken out of this scramble: a team's holes are saved under whoever drove. Correct a hole on the team's screen instead.</span></div>`)) };
   if (!sel) {
     html += (r.groups || []).map((g, gi) => sec(label(`Group ${gi + 1}`), cardOf(g.teams.flat().map(pid => `<button class="row" data-act="late-pick" data-rid="${r.id}" data-pid="${pid}"><span>${esc(D.nameOf(pid))}</span>${scoresFor(r.id, pid) ? `<span class="sub">${plural(scoresFor(r.id, pid), 'score')}</span>` : chev}</button>`).join('')), gi === 0)).join('');
     return { html };
@@ -6368,6 +7240,7 @@ function demoFill() {
   const rid = liveRid();
   if (!rid) return;
   const comp = computeR(rid);
+  if (!comp) { toast('Demo scores are for individual rounds only'); return; }
   const mine = myGroup(rid);
   let seed = 7 + view().log.length;
   const rnd = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
@@ -6390,6 +7263,491 @@ function demoFill() {
   });
   toast(filled.length ? `Group${filled.length > 1 ? 's' : ''} ${filled.join(' and ')} finished` : 'Other groups are already finished');
 }
+
+/* ---- 42-draw.js ---- */
+/* ----- Breakfast draw (owner brief §7; design agreed with Codex on issue #1, 26 October) -----
+   The committee sets four pots; at breakfast one device draws one name from each pot per team, without replacement.
+   The drawn team is the playing group. Rules and checks live in src/draw.js (window.Draw); storage is the settings table:
+     pots:<rid>  drawdev:<rid>  drawepoch:<rid>  draw:<rid>:<epoch>:<team>:<pot>:<device>  drawshort:<rid>:<epoch>  drawpace:<rid>
+   The draw is finished when the round's own groups carry the draw's mark (group.draw = epoch): the groups and "finished"
+   are one row written in one request, so no phone can ever see one without the other (Codex review of #45, 26 October).
+   Guarantees:
+   - One device runs the draw. Becoming that device needs the server to confirm it (online); once confirmed it may carry
+     on offline (each pick waits in the outbox, stored on the device). The server has no compare-and-set, so two phones
+     claiming at the same moment can both briefly be confirmed: online, each pick first checks the server again, which
+     narrows that to a moment, and if both still draw, their picks are a visible clash that blocks the groups.
+   - Each pick is saved before its wheel turns, so a reload replays the result and never redraws.
+   - Each pick's key includes the device, so nothing is overwritten: a clash shows and blocks the groups.
+   - No undo: a mistake means a logged restart, only before the groups are made and before any score.
+   - The groups wait until every pick is confirmed by the server, and the committee has agreed how any short team plays. */
+const DR = window.Draw;
+const SPIN_MS = 2600, SPIN_GAP = 350;
+
+const drawDev = () => {
+  if (!DB.prefs.dev) { DB.prefs.dev = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); savePrefs(); }
+  return DB.prefs.dev;
+};
+const jsonSetting = (k, d) => { try { const v = JSON.parse(D.setting(k, '')); return v && typeof v === 'object' ? v : d; } catch (e) { return d; } };
+const serverSetting = k => { const s = (DB.server.tables.settings || []).find(x => x.key === k); return s ? s.value : null; };
+/* Settings keys this device has written that the server has not yet confirmed in a sync. */
+function pendingSettingKeys() {
+  const ks = new Set();
+  [...DB.outbox, ...(DB.sent || [])].forEach(i => { const q = i.req; if (q && q.op === 'put' && q.table === 'settings') (q.rows || []).forEach(r => ks.add(r.key)); });
+  return ks;
+}
+const drawMade = r => !!r && (r.groups || []).some(g => g && g.draw);
+const hasScores = rid => Object.values(D.scores(rid) || {}).some(h => Object.values(h || {}).some(E.isEntered));
+const potsOf = rid => { const v = jsonSetting('pots:' + rid, null); const ps = v && Array.isArray(v.pots) ? v.pots : []; return { pots: [0, 1, 2, 3].map(i => (Array.isArray(ps[i]) ? ps[i] : [])), show: !!(v && v.show) }; };
+const hasPots = rid => potsOf(rid).pots.some(x => x.length);
+
+function drawOf(rid) {
+  const { pots, show } = potsOf(rid);
+  const ep = Number(D.setting('drawepoch:' + rid, 1)) || 1;
+  const holder = jsonSetting('drawdev:' + rid, null);
+  const keep = holder && holder.keep && Number(holder.keep.ep) === ep ? holder.keep.slots || [] : [];
+  const st = DR.state(pots, DR.picksFrom(view().settings, rid, ep), { holder: holder && holder.dev, keep });
+  const pend = pendingSettingKeys();
+  const pending = [...pend].some(k => k.indexOf(`draw:${rid}:`) === 0 || k === 'drawdev:' + rid || k === 'drawepoch:' + rid);
+  let onServer = null; try { onServer = JSON.parse(serverSetting('drawdev:' + rid) || 'null'); } catch (e) { /* not set */ }
+  // This device may draw only once the server has confirmed it as the draw device.
+  const mine = !!holder && holder.dev === drawDev() && !!onServer && onServer.dev === drawDev() && !pend.has('drawdev:' + rid);
+  const shortOk = (jsonSetting(`drawshort:${rid}:${ep}`, { teams: [] }).teams || []).map(Number);
+  return { rid, pots, show, ep, holder, mine, st, pending, shortOk,
+    made: drawMade(D.round(rid)), pace: D.setting('drawpace:' + rid, 'one') === 'all' ? 'all' : 'one' };
+}
+/* A draw in progress: phones check for news more often so people further away can follow it. */
+const drawLive = () => D.rounds().some(r => r.status !== 'final' && hasPots(r.id) && (() => { const d = drawOf(r.id); return d.st.started && !d.made; })());
+
+/* The wheel turning for the picks just saved. Kept in prefs, so a reload mid-spin finishes the same spin. */
+const spinOf = rid => { const s = DB.prefs.drawSpin; return s && s.rid === rid && Date.now() - s.at < spinTotal(s) ? s : null; };
+const spinTotal = s => SPIN_MS + (s.slots.length - 1) * SPIN_GAP;
+/* Ask the server again shortly, so "saved" turns into "confirmed" without waiting for the next minute's check. */
+let drawCheck = null;
+function drawConfirmSoon() {
+  if (drawCheck) return;
+  drawCheck = setTimeout(() => { drawCheck = null; if (DB.outbox.length) { flush(); drawConfirmSoon(); return; } sync().then(render); }, 700);
+}
+const shortName = pid => { const m = D.member(pid); return (m && m.name) || pid; };
+
+function wheelSvg(names, pick, spin, i) {
+  const n = Math.max(1, names.length), seg = 360 / n, R = 100;
+  const shades = ['#0B3D2E', '#14523F', '#0F4636', '#1B5E49'];
+  const at = a => [R + R * Math.sin(a * Math.PI / 180), R - R * Math.cos(a * Math.PI / 180)];
+  const parts = names.map((pid, k) => {
+    const a0 = k * seg, a1 = (k + 1) * seg, [x0, y0] = at(a0), [x1, y1] = at(a1), mid = a0 + seg / 2;
+    const path = n === 1 ? `<circle cx="${R}" cy="${R}" r="${R}" fill="${shades[0]}"/>` : `<path d="M${R},${R} L${x0.toFixed(2)},${y0.toFixed(2)} A${R},${R} 0 ${seg > 180 ? 1 : 0} 1 ${x1.toFixed(2)},${y1.toFixed(2)} Z" fill="${shades[k % (n % 2 && n > 1 ? 3 : 4)]}" stroke="#FAF8F3" stroke-width="1.5"/>`;
+    const nm = shortName(pid), fs = Math.max(9, Math.min(17, 150 / Math.max(6, nm.length)));
+    const flip = mid > 90 && mid < 270;
+    return `${path}<text transform="rotate(${mid.toFixed(2)} ${R} ${R})${flip ? ` rotate(180 ${R} ${R - 58})` : ''}" x="${R}" y="${R - 58}" text-anchor="middle" dominant-baseline="middle" font-size="${fs.toFixed(1)}" fill="#FAF8F3" font-weight="650" font-family="-apple-system,system-ui,sans-serif">${esc(nm)}</text>`;
+  }).join('');
+  let style = '';
+  if (spin && pick) {
+    const k = names.indexOf(pick), to = 360 * 5 - (k + 0.5) * seg;
+    const dur = SPIN_MS + i * SPIN_GAP, gone = Math.min(dur, Date.now() - spin.at);
+    style = ` style="--to:${to.toFixed(2)}deg;animation:drw-spin ${dur}ms cubic-bezier(.12,.62,.1,1) ${-gone}ms forwards"`;
+  }
+  return `<div class="drw-wheel" aria-hidden="true"><i class="drw-ptr"></i><svg viewBox="-4 -4 208 208"><g class="drw-rot"${style}>${parts}</g><circle cx="${R}" cy="${R}" r="14" fill="#FAF8F3"/></svg></div>`;
+}
+
+/* One pot's place in the team on the stage: a name, a turning wheel, a still wheel, or nobody left. */
+function stageCell(d, team, p, spin) {
+  const s = team.slots[p], spinning = spin && spin.slots.findIndex(x => x.t === team.n - 1 && x.p === p);
+  const head = `<span class="drw-pot">Pot ${DR.potName(p)}</span>`;
+  if (s.conflict) return `<div class="drw-cell warn">${head}<b class="drw-none">Two devices drew here</b></div>`;
+  if (s.pid && spin && spinning > -1) {
+    const pool = d.pots[p].filter(pid => pid === s.pid || d.st.left[p].includes(pid));
+    return `<div class="drw-cell spin" data-act="draw-skip">${head}${wheelSvg(pool, s.pid, spin, spinning)}</div>`;
+  }
+  if (s.pid) return `<div class="drw-cell got">${head}<b class="drw-name" style="--len:${Math.max(6, shortName(s.pid).length)}">${esc(shortName(s.pid))}</b></div>`;
+  if (!d.st.left[p].length) return `<div class="drw-cell">${head}<b class="drw-none">No one left in pot ${DR.potName(p)}</b></div>`;
+  return `<div class="drw-cell wait">${head}${wheelSvg(d.st.left[p], null, null, 0)}</div>`;
+}
+
+const drawBanner = d => [
+  d.st.conflicts.length ? `<div class="banner warn">Two devices drew the same place, so this draw can't make the groups. Restart it from the draw page.</div>` : '',
+  d.st.dup.length || d.st.stray.length ? '<div class="banner warn">Someone was drawn twice or from the wrong pot. Restart the draw.</div>' : ''
+].join('');
+
+/* The organiser's page for the draw: pots, who can see them, pacing, and the way in. */
+ORG.drawhome = p => {
+  const r = D.round(p.rid), d = drawOf(p.rid);
+  const counts = d.pots.map((x, i) => `${DR.potName(i)} ${x.length}`).join(' · ');
+  const uneven = new Set(d.pots.filter(x => x.length).map(x => x.length)).size > 1;
+  if (d.made) return { html: `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Breakfast draw</h1></div><p class="sub">Done. The teams are the groups.</p></header>
+    <button class="btn" data-act="org-go" data-v="drawlineup" data-rid="${r.id}">Line-up</button>` };
+  const elsewhere = d.holder && d.holder.dev !== drawDev();
+  let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Breakfast draw</h1></div><p class="sub">${esc(counts)}${uneven ? ' · pots are uneven' : ''}</p></header>${drawBanner(d)}`;
+  html += sec('', cardOf(`
+    <button class="row tall" data-act="org-go" data-v="pots" data-rid="${r.id}"><span class="two"><span>Pots</span><span class="sub">${d.st.started ? 'Fixed now the draw has started' : 'Put each player in pot A, B, C or D'}</span></span>${chev}</button>
+    <button class="row tall" data-act="draw-show" data-rid="${r.id}"><span class="two"><span>Members can see the pots</span><span class="sub">On the round page, names only</span></span><span class="pill ${d.show ? 'g' : 'n'}">${d.show ? 'On' : 'Off'}</span></button>
+    <div class="row tall"><span class="two"><span>Pace</span><span class="sub">${d.pace === 'all' ? 'All four pots together' : 'One pot at a time'}</span></span><span class="seg sm drw-pace"><button class="${d.pace === 'one' ? 'on' : ''}" data-act="draw-pace" data-rid="${r.id}" data-v="one" aria-pressed="${d.pace === 'one'}">One</button><button class="${d.pace === 'all' ? 'on' : ''}" data-act="draw-pace" data-rid="${r.id}" data-v="all" aria-pressed="${d.pace === 'all'}">All four</button></span></div>${elsewhere ? '\n    <div class="row tall"><span class="sub">Another device is running the draw</span></div>' : ''}`), true);
+  html += `<button class="btn" data-act="org-go" data-v="draw" data-rid="${r.id}">${d.st.started ? 'Back to the draw' : 'Open the draw'}</button>`;
+  if (d.st.started) html += `<button class="btn quiet" data-act="org-go" data-v="drawlineup" data-rid="${r.id}">Line-up</button>`;
+  if (d.st.started && !d.made && !hasScores(r.id)) html += `<div class="foot"><button class="link c-b" data-act="draw-restart" data-rid="${r.id}">${UI.confirm === 'drestart-' + r.id ? 'Tap again to restart: everyone goes back in their pots' : 'Restart the draw'}</button></div>`;
+  return { html };
+};
+
+/* Pots: tap A, B, C or D beside each name. Fixed once the first name is drawn. */
+ORG.pots = p => {
+  const r = D.round(p.rid), d = drawOf(p.rid), at = {};
+  d.pots.forEach((x, i) => x.forEach(pid => { at[pid] = i; }));
+  const probs = d.pots.some(x => x.length) ? DR.potProblems(d.pots.filter(x => x.length)) : [];
+  const people = D.members().filter(m => m.active !== false || at[m.id] !== undefined);
+  const rows = people.map(m => `<div class="row drw-prow"><span class="drw-pn">${esc(m.name)}</span><span class="drw-pb" role="group" aria-label="Pot for ${esc(m.name)}">${[0, 1, 2, 3].map(i => `<button class="${at[m.id] === i ? 'on' : ''}" data-act="draw-pot" data-rid="${r.id}" data-pid="${m.id}" data-p="${i}" aria-pressed="${at[m.id] === i}"${d.st.started ? ' disabled' : ''}>${DR.potName(i)}</button>`).join('')}</span></div>`).join('');
+  return { html: `<header class="hero s">${navBack('Breakfast draw')}<div class="head"><h1 class="title">Pots</h1></div></header>
+    <div class="drw-counts" aria-live="polite">${d.pots.map((x, i) => `<span><b>${DR.potName(i)}</b> <span class="num">${x.length}</span></span>`).join('')}<span class="drw-saved">${DB.outbox.length ? 'Saving…' : 'Saved'}</span></div>
+    ${d.st.started ? '<div class="banner note">The draw has started, so the pots are fixed.</div>' : ''}${probs.map(w => `<div class="banner warn">${esc(w)}</div>`).join('')}
+    ${sec('', cardOf(rows), true)}` };
+};
+
+/* The stage: only the team being drawn, its four pots as big wheels, then the name. */
+ORG.draw = p => {
+  const r = D.round(p.rid), d = drawOf(p.rid), spin = spinOf(p.rid);
+  const T = d.st.teams.length;
+  const hold = UI.drawHold && UI.drawHold.rid === p.rid ? UI.drawHold.t : -1;
+  const ti = spin ? spin.slots[0].t : hold > -1 ? hold : d.st.current;
+  const top = `<header class="hero s drw-top">${navBack('Breakfast draw', 'back')}</header>`;
+  if (!T) return { html: top + cardOf('<div class="row"><span class="sub">Set the pots first.</span></div>') };
+  if (ti < 0) {
+    if (d.pending) drawConfirmSoon();
+    else if (d.mine && !d.made && !(r.groups && r.groups.length) && !DR.blockers(d.st, { shortOk: d.shortOk }).length) drawAutoSoon(r.id);
+    return { html: `${top}<div class="drw-stage done"><p class="drw-kicker">Breakfast draw</p><h1 class="drw-team">${d.made ? 'These are the groups' : `All ${T} teams drawn`}</h1>${drawBanner(d)}${T > 1 && d.st.teams[T - 1].slots.some(x => x.auto) ? `<p class="drw-watch">Team ${T} is the players left in each pot.</p>` : ''}
+      <button class="btn" data-act="org-go" data-v="drawlineup" data-rid="${r.id}">See the line-up</button></div>` };
+  }
+  const team = d.st.teams[ti];
+  const cells = team.slots.map((_, i) => stageCell(d, team, i, spin)).join('');
+  const teamOpen = d.st.next.length && d.st.current === ti;
+  let act = '';
+  if (d.pending) drawConfirmSoon();
+  if (!d.mine && d.holder && d.holder.dev === drawDev()) act = '<p class="drw-watch">Waiting for the server to confirm this device…</p>';
+  else if (!d.mine) {
+    const online = DB.online && !DB.outbox.length;
+    act = `${d.holder ? '<p class="drw-watch">The draw is running on another device.</p>' : ''}
+      ${online ? (d.holder ? `<button class="btn quiet" data-act="draw-claim" data-rid="${r.id}">${UI.confirm === 'dclaim-' + r.id ? 'Tap again to take over the draw here' : 'Take over the draw here'}</button>` : `<button class="btn drw-go" data-act="draw-claim" data-rid="${r.id}">Start the draw</button>`) : '<p class="drw-watch">Connect to the internet to run the draw here.</p>'}`;
+  } else if (spin) act = `<p class="drw-watch">${spin.slots.length === 1 ? `Tap pot ${DR.potName(spin.slots[0].p)} to stop it` : 'Tap a wheel to stop it'}</p>`;
+  else if (DB.prefs.drawBusy && DB.prefs.drawBusy.rid === r.id && Date.now() - DB.prefs.drawBusy.at < 8000) act = '<button class="btn drw-go" disabled>Checking…</button>';
+  else if (teamOpen) act = `<button class="btn drw-go" data-act="draw-go" data-rid="${r.id}">${d.pace === 'all' ? `Draw team ${ti + 1}` : `Draw pot ${DR.potName(d.st.next[0].p)}`}</button>`;
+  else if (d.st.current > -1) act = `<button class="btn drw-go" data-act="draw-next" data-rid="${r.id}">Next team</button>`;
+  else act = `${T > 1 && d.st.teams[T - 1].slots.some(x => x.auto) ? `<p class="drw-watch drw-left">Team ${T} is the players left in each pot.</p>` : ''}<button class="btn drw-go" data-act="draw-next" data-rid="${r.id}">See the line-up</button>`;
+  return { html: `${top}<div class="drw-stage"><p class="drw-kicker">Breakfast draw · ${T} teams</p><h1 class="drw-team">Team ${ti + 1}</h1>${drawBanner(d)}
+    <div class="drw-cells">${cells}</div><div class="drw-act">${act}</div>${d.pending ? '<p class="drw-sync">Saving to the server…</p>' : ''}</div>` };
+};
+
+/* After the draw: everyone, names first, team numbers as quiet labels. Then the groups. */
+/* The line-up: a pine card, names first. Once the groups are made it shows the saved groups (with tee times), so a later
+   tee-time swap shows here too; before that, the drawn teams. */
+function drawLineup(d, r, upTo) {
+  // A place not drawn yet says so; "No one from pot X" only when that pot has really run out (UX review F10).
+  const gap = s => `<span class="drw-gap">${s.conflict ? 'Two devices drew here' : d.st.left[s.p].length ? 'Not drawn yet' : `No one from pot ${DR.potName(s.p)}`}</span>`;
+  const teams = r && drawMade(r)
+    ? r.groups.map(g => ({ label: `${g.teeTime ? esc(g.teeTime) + ' · ' : ''}Team ${g.n}`, names: g.teams.flat().map(pid => esc(shortName(pid))) }))
+    : d.st.teams.filter((tm, i) => upTo === undefined || upTo < 0 || i <= upTo).map(tm => ({ label: `Team ${tm.n}`, names: tm.slots.map(s => s.pid ? esc(shortName(s.pid)) : gap(s)) }));
+  return `<div class="drw-lineup">${teams.map(t => `<section class="drw-lt"><span class="drw-ln">${t.label}</span><ul>${t.names.map(n => `<li>${n}</li>`).join('')}</ul></section>`).join('')}</div>`;
+}
+ORG.drawlineup = p => {
+  const r = D.round(p.rid), d = drawOf(p.rid);
+  const why = DR.blockers(d.st, { pending: d.pending, shortOk: d.shortOk });
+  const scored = hasScores(r.id);
+  let html = `<header class="hero s">${navBack('Breakfast draw')}<div class="head"><h1 class="title">${d.made ? 'The groups' : 'Line-up'}</h1></div><p class="sub">${esc(roundName(r))}</p></header>${drawBanner(d)}${drawLineup(d, r)}`;
+  if (d.st.short.length) html += sec(label('Short teams'), cardOf(d.st.short.map(n => `<button class="row tall" data-act="draw-short" data-rid="${r.id}" data-n="${n}"><span class="two"><span>Team ${n} plays short</span><span class="sub">Tick once the committee has agreed how</span></span><span class="pill ${d.shortOk.includes(n) ? 'g' : 'n'}">${d.shortOk.includes(n) ? 'Agreed' : 'Not yet'}</span></button>`).join('')), true);
+  if (d.made) { /* the title says it */ }
+  else if (scored) html += '<div class="banner note">Scores are in, so the groups can\'t change now.</div>';
+  else if (why.length) html += why.filter(w => !/not saved to the server/.test(w) || !d.mine).map(w => `<p class="cap note">${esc(w)}</p>`).join('') + (d.pending ? '<p class="cap note">Saving to the server…</p>' : '');
+  else if (!d.mine) html += '<p class="cap note">The device running the draw saves these as the groups.</p>';
+  else if (r.groups && r.groups.length) html += `<button class="btn" data-act="draw-make" data-rid="${r.id}">${UI.confirm === 'dmake-' + r.id ? 'Tap again: these replace the current groups' : 'Make these the groups'}</button>`;
+  else drawAutoSoon(r.id);
+  if (d.pending) drawConfirmSoon();
+  return { html };
+};
+
+/* Members: the pots before the draw, then the teams as they are drawn (names first). */
+function drawMemberView(r) {
+  const d = drawOf(r.id);
+  // While drawing: the teams done so far and the one being drawn; later teams appear as they're drawn (UX review F10).
+  if (d.st.started) return `<p class="cap" style="margin:4px 4px 10px">${d.made ? 'The draw is done.' : d.st.current > -1 ? `Drawing team ${d.st.current + 1} of ${d.st.teams.length}…` : 'All teams drawn.'}</p>${drawLineup(d, r, d.st.current)}`;
+  return `<div class="drw-potlist">${d.pots.map((x, i) => x.length ? `<section class="card drw-mpot"><div class="drw-mh">Pot ${DR.potName(i)}</div>${x.map(pid => `<div class="row"><span>${esc(D.nameOf(pid))}</span></div>`).join('')}</section>` : '').join('')}</div>`;
+}
+/* Once the draw has made the groups, members just see Groups (owner, 26 October). */
+const drawTabOn = r => !!r && r.status !== 'final' && hasPots(r.id) && !drawMade(r) && (potsOf(r.id).show || drawOf(r.id).st.started);
+
+/* ----- Actions ----- */
+/* Online, a pick first checks the server (is this still the draw device? has anything changed?); offline it goes ahead.
+   The check is marked in prefs, so a double tap while it runs draws nothing. */
+function drawPick(rid) {
+  const busy = DB.prefs.drawBusy;
+  if (busy && busy.rid === rid && Date.now() - busy.at < 8000) return;
+  const d0 = drawOf(rid);
+  if (!d0.mine || spinOf(rid)) return;
+  if (!DB.online || DB.outbox.length) { drawPickNow(rid); return; }
+  DB.prefs.drawBusy = { rid, at: Date.now() }; savePrefs(); render();
+  sync().catch(() => {}).then(() => { DB.prefs.drawBusy = null; savePrefs(); drawPickNow(rid); });
+}
+function drawPickNow(rid) {
+  const d = drawOf(rid);
+  if (!d.mine || spinOf(rid) || !d.st.next.length || d.made || hasScores(rid) || d.st.conflicts.length) { render(); return; }
+  const slots = d.pace === 'all' ? d.st.next : d.st.next.slice(0, 1);
+  const rand = () => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0]; };
+  const picks = DR.draw(d.st, slots, rand), dev = drawDev(), at = new Date().toISOString();
+  // Saved (queued on this device) before the wheel turns: a reload replays these names, it never draws again.
+  DB.prefs.drawSpin = { rid, slots: picks, at: Date.now() }; savePrefs();
+  put('settings', picks.map(x => ({ key: `draw:${rid}:${d.ep}:${x.t}:${x.p}:${dev}`, value: JSON.stringify({ pid: x.pid, at }) })),
+    { action: 'Breakfast draw', detail: picks.map(x => `Team ${x.t + 1} pot ${DR.potName(x.p)}: ${D.nameOf(x.pid)}`).join(' · ') });
+  UI.drawHold = { rid, t: picks[0].t };
+  render();
+  drawConfirmSoon();
+  setTimeout(render, spinTotal(DB.prefs.drawSpin) + 30);
+}
+const DRAW_ACT = {
+  'draw-pot': el => {
+    const rid = el.dataset.rid, pid = el.dataset.pid, p = Number(el.dataset.p), d = drawOf(rid);
+    if (d.st.started) { toast('The draw has started, so the pots are fixed.'); return; }
+    const pots = d.pots.map(x => x.filter(id => id !== pid));
+    if (!(d.pots[p] || []).includes(pid)) pots[p].push(pid);
+    put('settings', [{ key: 'pots:' + rid, value: JSON.stringify({ pots, show: d.show }) }]);
+    render();
+  },
+  'draw-show': el => {
+    const rid = el.dataset.rid, d = drawOf(rid);
+    put('settings', [{ key: 'pots:' + rid, value: JSON.stringify({ pots: d.pots, show: !d.show }) }], { action: 'Breakfast draw', detail: d.show ? 'Pots hidden from members' : 'Pots shown to members' });
+    render();
+  },
+  'draw-pace': el => { put('settings', [{ key: 'drawpace:' + el.dataset.rid, value: el.dataset.v === 'all' ? 'all' : 'one' }]); render(); },
+  'draw-claim': el => {
+    const rid = el.dataset.rid, d = drawOf(rid);
+    if (!DB.online || DB.outbox.length) { toast('Connect to the internet first.'); return; }
+    if (d.made || hasScores(rid)) { toast('The groups are made, so the draw is closed.'); return; }
+    // Starting the draw is one tap; taking it over from another device is two.
+    if (d.holder && UI.confirm !== 'dclaim-' + rid) { UI.confirm = 'dclaim-' + rid; render(); return; }
+    UI.confirm = null;
+    // Check with the server first: a device that has been asleep must not take over a draw that is already finished.
+    sync().then(() => {
+      const d2 = drawOf(rid);
+      if (!DB.online || DB.outbox.length) { toast('Connect to the internet first.'); render(); return; }
+      if (d2.made || hasScores(rid)) { toast('The groups are made, so the draw is closed.'); render(); return; }
+      // Keep the picks the server already has; anything the old device draws after this point shows as a clash.
+      const kept = Object.keys(DR.picksFrom(DB.server.tables.settings, rid, d2.ep));
+      put('settings', [{ key: 'drawdev:' + rid, value: JSON.stringify({ dev: drawDev(), at: new Date().toISOString(), keep: { ep: d2.ep, slots: kept } }) }],
+        { action: 'Breakfast draw', detail: d2.holder ? 'Draw taken over by another device' : 'Draw device chosen' });
+      drawConfirmSoon();
+      render();
+    });
+    render();
+  },
+  'draw-go': el => drawPick(el.dataset.rid),
+  'draw-skip': el => { const s = DB.prefs.drawSpin; if (s) { s.at = 0; savePrefs(); } render(); },
+  'draw-next': el => { UI.drawHold = null; const d = drawOf(el.dataset.rid); if (d.st.current < 0) go('drawlineup', { rid: el.dataset.rid }); else render(); },
+  'draw-restart': el => {
+    const rid = el.dataset.rid, d = drawOf(rid);
+    if (d.made || hasScores(rid)) { toast('The groups are made, so the draw can\'t restart.'); return; }
+    if (d.holder && !d.mine) { toast('Only the device running the draw can restart it.'); return; }
+    if (UI.confirm !== 'drestart-' + rid) { UI.confirm = 'drestart-' + rid; render(); return; }
+    UI.confirm = null; UI.drawHold = null;
+    if (!DB.online) { toast('Connect to the internet to restart the draw.'); render(); return; }
+    // Check with the server first, so a device that missed the groups being made can't reopen the draw.
+    sync().then(() => {
+      const d2 = drawOf(rid);
+      if (d2.made || hasScores(rid) || (d2.holder && !d2.mine)) { toast('The draw can\'t restart now.'); render(); return; }
+      const ep = d2.ep + 1;
+      put('settings', [{ key: 'drawepoch:' + rid, value: String(ep) }].concat(d2.holder ? [{ key: 'drawdev:' + rid, value: JSON.stringify({ dev: d2.holder.dev, at: new Date().toISOString(), keep: { ep, slots: [] } }) }] : []),
+        { action: 'Breakfast draw', detail: 'Draw restarted' });
+      toast('Everyone is back in their pots');
+      drawConfirmSoon();
+      render();
+    });
+    render();
+  },
+  'draw-short': el => {
+    const rid = el.dataset.rid, n = Number(el.dataset.n), d = drawOf(rid);
+    if (d.made) return;
+    const teams = d.shortOk.includes(n) ? d.shortOk.filter(x => x !== n) : d.shortOk.concat([n]);
+    put('settings', [{ key: `drawshort:${rid}:${d.ep}`, value: JSON.stringify({ teams }) }], { action: 'Breakfast draw', detail: `Team ${n} plays short: ${teams.includes(n) ? 'agreed by the committee' : 'not agreed'}` });
+    render();
+  },
+  // Only needed when the round already had groups made another way: replacing them takes two taps.
+  'draw-make': el => {
+    const rid = el.dataset.rid;
+    if (UI.confirm !== 'dmake-' + rid) { UI.confirm = 'dmake-' + rid; render(); return; }
+    UI.confirm = null;
+    drawMakeGroups(rid, true);
+  }
+};
+/* The drawn teams are the groups (owner, 26 October): as soon as the draw is finished and every pick is confirmed by the
+   server, the draw device saves them. One request: the groups and the draw's "finished" mark travel in the same round row. */
+function drawMakeGroups(rid, replace) {
+  const r = D.round(rid), d = drawOf(rid);
+  if (!r || !d.mine || d.made || hasScores(rid)) return false;
+  if (DR.blockers(d.st, { pending: d.pending, shortOk: d.shortOk }).length) return false;
+  if (r.groups && r.groups.length && !replace) return false;   // groups made by hand: the organiser chooses
+  const groups = DR.groupsFrom(d.st, r.first_tee || '', r.interval || 10, E.addMinutes);
+  put('rounds', [Object.assign({}, r, { groups: groups.map(g => Object.assign(g, { draw: d.ep })), kb: null })], { action: 'Groups saved', detail: `${roundName(r)}: ${plural(groups.length, 'team')} from the breakfast draw` });
+  toast('The teams are the groups');
+  render();
+  return true;
+}
+let drawAutoT = null;
+const drawAutoSoon = rid => { if (drawAutoT) return; drawAutoT = setTimeout(() => { drawAutoT = null; drawMakeGroups(rid, false); }, 0); };
+
+/* ---- 44-groups.js ---- */
+/* ----- Groups: one screen for every round, any day (owner, 26 October) -----
+   Only the organiser. Before play starts, anything goes: move, swap, add, replace or take out a player, and change a
+   group's tee time. Buggy pairs, KB pairs and tee times follow automatically (rules in src/groups.js). Each change is
+   saved at once as one round row and logged. Once play starts, the only change is a withdrawal: from that hole on the
+   player's scores are pick-ups (scratch), entered through the group's normal save. Nobody with scores is moved. */
+const GR = window.Groups;
+const grStarted = r => !!r && r.status !== 'upcoming';
+const wdOf = (rid, pid) => { const v = Number(D.setting(`wd:${rid}:${pid}`, 0)); return v > 0 ? v : 0; };
+const grSel = rid => (UI.gsel && UI.gsel.rid === rid ? UI.gsel : null);
+
+/* Apply one change, tidy, repair KBs, save the round in one write, and say what happened. */
+function grChange(rid, op, said) {
+  const r = D.round(rid);
+  if (!r || grStarted(r)) { toast('Play has started: the only change now is a withdrawal.'); return false; }
+  const touched = [op.pid, op.with].filter(Boolean).filter(pid => scoresFor(rid, pid));
+  if (touched.length) { toast(`${D.nameOf(touched[0])} already has scores, so they stay where they are.`); return false; }
+  let groups;
+  try {
+    const ids = (r.groups || []).map(g => g.id);
+    const newId = 'g' + (ids.reduce((m, id) => Math.max(m, Number(String(id).replace(/\D/g, '')) || 0), 0) + 1);
+    groups = GR.tidy(GR.apply(r.groups || [], op, newId), r.first_tee || '', r.interval || 8, E.addMinutes);
+  } catch (e) { toast(e.message); return false; }
+  const out = new Set((r.groups || []).flatMap(g => g.teams.flat()));
+  groups.forEach(g => g.teams.flat().forEach(pid => out.delete(pid)));
+  let kb = r.kb, kbNote = '';
+  if (!isScramble(r) && !E.kbOff(Object.assign({}, r, { groups }))) {
+    const kg = groups.filter(g => !g.noKb);
+    if (kg.length > 1) {
+      const res = GR.repairKb(kg, r.kb, priorKbPairs(rid), E.shuffle, (Date.now() % 100000) + 3);
+      kb = res.kb && res.kb.length ? res.kb : null;
+      if (res.changed && res.changed.length) kbNote = ` New KB pairs: ${res.changed.map(p => p.map(D.nameOf).join(' & ')).join(', ')}.`;
+    } else kb = null;
+  } else if (isScramble(r)) kb = null;
+  const ph = r.ph ? Object.fromEntries(Object.entries(r.ph).filter(([k]) => !out.has(k))) : r.ph;
+  put('rounds', [Object.assign({}, r, { groups, kb, ph: ph && Object.keys(ph).length ? ph : null })], { action: 'Groups changed', detail: `${roundName(r)}: ${said}.${kbNote}` });
+  UI.gsel = null; UI.confirm = null;
+  toast(said + (kbNote ? ' KB pairs updated.' : ''));
+  render();
+  return true;
+}
+
+ORG.groups = p => {
+  const r = D.round(p.rid);
+  if (!r) return ORG.home();
+  if (!r.groups || !r.groups.length) return ORG.playing(p);   // nobody drawn yet: pick players, then draw
+  const scr = isScramble(r), live = grStarted(r), sel = grSel(r.id);
+  const n = r.groups.reduce((s, g) => s + g.teams.flat().length, 0);
+  // A scramble in play: teams are fixed and there's nothing to tap (UX review F18).
+  const fixed = live && scr;
+  const sub = fixed ? 'Play has started: the teams are fixed' : live ? 'Play has started: tap a player to withdraw them' : `${plural(n, 'player')} · tap a name or a group to change it`;
+  let html = `<header class="hero s">${navBack(roundName(r))}<div class="head"><h1 class="title">Groups</h1></div><p class="sub">${esc(sub)}</p></header>`;
+  if (sel && sel.mode === 'swap') html += `<div class="grp-swapbar"><span>${sel.only !== undefined ? `${esc(grName(r, sel.only))} is full. Tap who ${esc(D.nameOf(sel.pid))} swaps with.` : `Tap who ${esc(D.nameOf(sel.pid))} swaps with.`}</span><button class="link" data-act="grp-cancel">Cancel</button></div>`;
+  r.groups.forEach((g, gi) => {
+    const gOpen = sel && sel.gi === gi && !sel.pid;
+    const head = `<button class="row tall grp-head${gOpen ? ' picked' : ''}" data-act="grp-group" data-rid="${r.id}" data-gi="${gi}" aria-expanded="${gOpen}"${live ? ' disabled' : ''}><span class="two"><b class="num">${esc(g.teeTime || '')}</b><span class="sub">${scr ? 'Team' : 'Group'} ${g.n}${g.teams.flat().length !== GR.MAX ? ` · ${plural(g.teams.flat().length, 'player')}` : ''}${g.startHole && g.startHole !== 1 ? ` · starts hole ${g.startHole}` : ''}</span></span></button>`;
+    const rows = g.teams.map((t, i) => t.map(pid => {
+      const on = sel && sel.pid === pid, wd = wdOf(r.id, pid), sc = scoresFor(r.id, pid);
+      const note = wd ? `<span class="pill n">Withdrawn · hole ${wd}</span>` : sc && !live ? '<span class="sub">Has scores</span>' : !scr && g.teams.length > 1 ? `<span class="cap">Buggy ${i + 1}</span>` : '';
+      const inner = `<span style="display:flex;align-items:center;gap:8px">${!scr && g.teams.length > 1 ? dot(i) : ''}${esc(D.nameOf(pid))}</span>${note}`;
+      const row = fixed ? `<div class="row">${inner}</div>` : `<button class="row${on ? ' picked' : ''}" data-act="grp-pick" data-rid="${r.id}" data-pid="${pid}" aria-expanded="${!!on}">${inner}</button>`;
+      return row + (on && sel.mode !== 'swap' ? grPlayerPanel(r, pid, gi) : '');
+    }).join('')).join('');
+    html += `<section class="sec near grp${sel && sel.only !== undefined && sel.only !== gi ? ' grp-dim' : ''}" id="grp-${gi}"><div class="card">${head}${gOpen ? grGroupPanel(r, gi) : ''}${rows}</div></section>`;
+  });
+  // A trip: say if anyone shares a buggy again with someone from an earlier day.
+  const repeats = live || scr ? [] : E.repeatedPartners([...priorTripGroups(r), { rid: r.id, groups: r.groups }]).filter(x => x.rounds.includes(r.id));
+  if (repeats.length) html = html.replace('</header>', `</header><div class="banner note">${repeats.map(x => `${esc(x.pair.map(D.nameOf).join(' & '))} shared a buggy before`).join('<br>')}</div>`);
+  const anyScores = r.groups.some(g => g.teams.flat().some(pid => scoresFor(r.id, pid)));
+  if (!live && !drawMade(r) && !anyScores) html += `<div class="foot"><button class="link" data-act="org-draw" data-kind="again">${UI.confirm === 'redraw-' + r.id ? 'Tap again: new groups from the same players' : `Draw ${scr ? 'teams' : 'groups'} again`}</button></div>`;
+  return { html };
+};
+
+const grName = (r, gi) => { const g = r.groups[gi]; return `${isScramble(r) ? 'Team' : 'Group'} ${g.n}${g.teeTime ? ' (' + g.teeTime + ')' : ''}`; };
+/* What can happen to a player: before play, move / swap / replace / take out; once play has started, withdraw. */
+function grPlayerPanel(r, pid, gi) {
+  const name = esc(D.nameOf(pid));
+  if (grStarted(r)) {
+    if (isScramble(r)) return `<div class="grp-panel"><p class="cap">A scramble team plays on as a team: no one needs withdrawing.</p></div>`;
+    const wd = wdOf(r.id, pid);
+    if (wd) return `<div class="grp-panel"><p class="cap">${name} picks up on every hole from ${wd}.</p><button class="btn quiet" data-act="grp-unwithdraw" data-rid="${r.id}" data-pid="${pid}">${UI.confirm === 'unwd-' + pid ? 'Tap again: back in' : 'Undo the withdrawal'}</button></div>`;
+    const from = grNextHole(r, pid);
+    return `<div class="grp-panel"><p class="cap">${name} picks up (scratch) on every hole from ${from}.</p><button class="btn" data-act="grp-withdraw" data-rid="${r.id}" data-pid="${pid}" data-from="${from}">${UI.confirm === 'wd-' + pid ? `Tap again to withdraw ${name}` : `Withdraw ${name} from hole ${from}`}</button></div>`;
+  }
+  if (scoresFor(r.id, pid)) return `<div class="grp-panel"><p class="cap">${name} already has scores in this round, so they stay where they are.</p></div>`;
+  // A full group still takes them: tapping it asks who in that group they swap with.
+  const moves = r.groups.map((g, j) => j === gi ? '' : `<button class="chipb" data-act="grp-move" data-rid="${r.id}" data-pid="${pid}" data-to="${j}">${esc(g.teeTime || (isScramble(r) ? 'Team ' : 'Group ') + g.n)}</button>`).join('');
+  if (UI.gsel && UI.gsel.mode === 'replace') return `<div class="grp-panel"><p class="cap b">Who plays instead of ${name}?</p>${grPeople(r, 'grp-replace-with', `data-pid="${pid}"`)}<button class="btn quiet" data-act="grp-replace" data-rid="${r.id}" data-pid="${pid}">Cancel</button></div>`;
+  return `<div class="grp-panel">
+    <p class="cap">Move ${name} to</p><div class="chips">${moves}<button class="chipb" data-act="grp-move" data-rid="${r.id}" data-pid="${pid}" data-to="${r.groups.length}">New group</button></div>
+    <div class="grp-acts"><button class="btn quiet" data-act="grp-swap" data-rid="${r.id}" data-pid="${pid}">Swap with…</button><button class="btn quiet" data-act="grp-replace" data-rid="${r.id}" data-pid="${pid}">Replace with…</button></div>
+    <div class="grp-outzone"><button class="link c-b grp-out" data-act="grp-remove" data-rid="${r.id}" data-pid="${pid}">${UI.confirm === 'out-' + pid ? `Tap again to take ${name} out` : `Take ${name} out of the round`}</button></div></div>`;
+}
+/* What can happen to a group: add a player, go out earlier or later. */
+function grGroupPanel(r, gi) {
+  const g = r.groups[gi], full = g.teams.flat().length >= GR.MAX, last = r.groups.length - 1;
+  return `<div class="grp-panel">
+    <div class="grp-acts">${gi > 0 ? `<button class="btn quiet" data-act="grp-order" data-rid="${r.id}" data-gi="${gi}" data-to="${gi - 1}">Earlier</button>` : ''}${gi < last ? `<button class="btn quiet" data-act="grp-order" data-rid="${r.id}" data-gi="${gi}" data-to="${gi + 1}">Later</button>` : ''}${gi < last - 1 ? `<button class="btn quiet" data-act="grp-order" data-rid="${r.id}" data-gi="${gi}" data-to="${last}">Out last</button>` : ''}${gi > 1 ? `<button class="btn quiet" data-act="grp-order" data-rid="${r.id}" data-gi="${gi}" data-to="0">Out first</button>` : ''}</div>
+    ${full ? `<p class="cap">This ${isScramble(r) ? 'team' : 'group'} has ${GR.MAX}.</p>` : `<p class="cap">Add a player</p>${grPeople(r, 'grp-add', `data-to="${gi}"`)}`}
+    ${grStartRow(r, gi)}</div>`;
+}
+/* Starting hole lives in the group's options: shotgun starts are rare (journeys 2/13). */
+function grStartRow(r, gi) {
+  const sh = r.groups[gi].startHole || 1, n = (holesOf(r) || []).length || 18;
+  return `<div class="grp-start"><label class="cap" for="sh-${gi}">Starts on hole</label><select id="sh-${gi}" class="field short" data-change="grp-start" data-rid="${r.id}" data-gi="${gi}">${Array.from({ length: n }, (_, k) => `<option value="${k + 1}"${sh === k + 1 ? ' selected' : ''}>${k + 1}</option>`).join('')}</select></div>`;
+}
+function grStart(rid, gi, hole) {
+  const r = D.round(rid);
+  if (!r || grStarted(r) || !r.groups[gi]) return;
+  const groups = r.groups.map((g, i) => i === gi ? Object.assign({}, g, { startHole: hole }) : g);
+  put('rounds', [Object.assign({}, r, { groups })], { action: 'Groups changed', detail: `${roundName(r)}: ${r.groups[gi].teeTime || 'Group ' + r.groups[gi].n} starts on hole ${hole}` });
+  toast(`${r.groups[gi].teeTime || 'Group ' + r.groups[gi].n} starts on hole ${hole}`);
+  render();
+}
+/* Members not playing (and guests), plus a way to add a new guest. */
+function grPeople(r, act, extra) {
+  const playing = new Set(r.groups.flatMap(g => g.teams.flat()));
+  const free = D.active().filter(m => !playing.has(m.id));
+  return `<div class="card grp-people">${free.map(m => `<button class="row" data-act="${act}" data-rid="${r.id}" ${extra} data-new="${m.id}"><span>${esc(m.name)}${isGuest(m) ? ' <span class="pill n">Guest</span>' : ''}</span><span class="sub num">${fmtIndex(m.index)}</span></button>`).join('') || '<div class="row"><span class="sub">Everyone is already playing</span></div>'}
+    <button class="row" data-act="org-go" data-v="guest" data-rid="${r.id}"><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}New guest</span></button></div>`;
+}
+/* The first hole this player's group hasn't saved yet: a withdrawal starts there. */
+function grNextHole(r, pid) {
+  const gc = progressOf(r.id).groups.find(g => g.teams.flat().includes(pid));
+  return (gc && gc.nextHole) || 1;
+}
+
+const GROUP_ACT = {
+  'grp-pick': el => {
+    const rid = el.dataset.rid, pid = el.dataset.pid, sel = grSel(rid);
+    if (sel && sel.mode === 'swap' && sel.pid !== pid) { grChange(rid, { type: 'swap', pid: sel.pid, with: pid }, `${D.nameOf(sel.pid)} and ${D.nameOf(pid)} swapped`); return; }
+    UI.gsel = sel && sel.pid === pid ? null : { rid, pid }; UI.confirm = null; render();
+  },
+  'grp-group': el => { const rid = el.dataset.rid, gi = Number(el.dataset.gi), sel = grSel(rid); UI.gsel = sel && !sel.pid && sel.gi === gi ? null : { rid, gi }; UI.confirm = null; render(); },
+  'grp-cancel': () => { UI.gsel = null; render(); },
+  'grp-move': el => { const r = D.round(el.dataset.rid), to = Number(el.dataset.to), g = r.groups[to];
+    if (g && g.teams.flat().length >= GR.MAX) { UI.gsel = { rid: r.id, pid: el.dataset.pid, mode: 'swap', only: to }; render(); const t = document.getElementById('grp-' + to); if (t && t.scrollIntoView) t.scrollIntoView({ block: 'center', behavior: 'smooth' }); return; }
+    grChange(r.id, { type: 'move', pid: el.dataset.pid, to }, `${D.nameOf(el.dataset.pid)} moved to ${g ? (g.teeTime || 'group ' + g.n) : 'a new group at the end'}`); },
+  'grp-swap': el => { UI.gsel = { rid: el.dataset.rid, pid: el.dataset.pid, mode: 'swap' }; render(); },
+  'grp-replace': el => { const s = grSel(el.dataset.rid); UI.gsel = { rid: el.dataset.rid, pid: el.dataset.pid, mode: s && s.mode === 'replace' ? null : 'replace' }; render(); },
+  'grp-replace-with': el => grChange(el.dataset.rid, { type: 'replace', pid: el.dataset.pid, add: el.dataset.new }, `${D.nameOf(el.dataset.new)} in for ${D.nameOf(el.dataset.pid)}`),
+  'grp-remove': el => {
+    const pid = el.dataset.pid;
+    if (UI.confirm !== 'out-' + pid) { UI.confirm = 'out-' + pid; render(); return; }
+    grChange(el.dataset.rid, { type: 'remove', pid }, `${D.nameOf(pid)} taken out`);
+  },
+  'grp-add': el => grChange(el.dataset.rid, { type: 'add', add: el.dataset.new, to: Number(el.dataset.to) }, `${D.nameOf(el.dataset.new)} added`),
+  'grp-order': el => { const r = D.round(el.dataset.rid), from = Number(el.dataset.gi), to = Number(el.dataset.to); if (to < 0 || to >= r.groups.length) return; grChange(r.id, { type: 'order', from, to }, `${r.groups[from].teeTime || 'Group ' + r.groups[from].n} group now goes out ${to === r.groups.length - 1 ? 'last' : 'at ' + (r.groups[to].teeTime || 'position ' + (to + 1))}`); },
+  'grp-withdraw': el => {
+    const rid = el.dataset.rid, pid = el.dataset.pid, from = Number(el.dataset.from) || 1;
+    if (UI.confirm !== 'wd-' + pid) { UI.confirm = 'wd-' + pid; render(); return; }
+    put('settings', [{ key: `wd:${rid}:${pid}`, value: String(from) }], { action: 'Player withdrew', detail: `${roundName(D.round(rid))}: ${D.nameOf(pid)}, pick-ups from hole ${from}` });
+    UI.gsel = null; UI.confirm = null; toast(`${D.nameOf(pid)} withdrawn: pick-ups from hole ${from}`); render();
+  },
+  'grp-unwithdraw': el => {
+    const rid = el.dataset.rid, pid = el.dataset.pid;
+    if (UI.confirm !== 'unwd-' + pid) { UI.confirm = 'unwd-' + pid; render(); return; }
+    put('settings', [{ key: `wd:${rid}:${pid}`, value: '' }], { action: 'Withdrawal undone', detail: `${roundName(D.round(rid))}: ${D.nameOf(pid)}` });
+    UI.gsel = null; UI.confirm = null; render();
+  }
+};
 
 /* ---- 45-preview.js ---- */
 /* ----- Test scenarios (private preview only; window.NCGS_SCENARIOS comes from src/preview/scenarios.js) ----- */
@@ -6439,7 +7797,7 @@ const ACT = {
   leaderboard: el => { UI.playRid = el.dataset.rid; UI.board = el.dataset.rid; UI.res = 'lb'; go('board', { rid: el.dataset.rid }); },
   'wx-retry': el => { delete UI.wx[el.dataset.cid]; render(); },
   trip: el => go('trip', { rid: el.dataset.rid }),
-  rtab: el => { UI.rtab = el.dataset.t; render(); },
+  rtab: el => { UI.rtab = el.dataset.t; UI.rtabPicked = true; render(); },
   bwseg: el => { UI.open[el.dataset.key] = el.dataset.open !== '1'; render(); },
   respill: el => { UI.res = el.dataset.p; UI.scrollTop = true; render(); },
   toggle: el => { UI.open[el.dataset.key] = !UI.open[el.dataset.key]; render(); },
@@ -6473,7 +7831,7 @@ const ACT = {
   'ask-clear': () => { ruleClose(); UI.chat = []; UI.chatInfo = {}; UI.chatBusy = false; UI.askDraft = ''; render(); },
   'ask-pick': el => { UI.askPick = { key: el.dataset.key, v: el.dataset.v }; render(); },
   'ask-confirm': () => {
-    const rid = playRid(), g = myGroup(rid), comp = computeR(rid);
+    const rid = playRid(), g = myGroup(rid), comp = progressOf(rid);
     if (!g || !comp) return;
     const gc = comp.groups.find(x => x.id === g.id), c = askPending(rid, gc, g.id);
     const key = c && contestKey(rid, g.id, c.hole);
@@ -6487,6 +7845,26 @@ const ACT = {
   'intro-go': el => { const rid = playRid(), g = myGroup(rid); (DB.prefs.intro = DB.prefs.intro || {})[contestKey(rid, g.id, Number(el.dataset.n))] = true; savePrefs(); render(); },
   'intro-scrim': () => {},
   save: () => saveHole(),
+  'scr-score': el => scrScore(el.dataset.dir),
+  'scr-pickup': () => scrPickup(),
+  'scr-clear': () => scrClear(),
+  'scr-driver': el => scrDriver(el.dataset.pid),
+  'scr-save': () => scrSave(),
+  'org-format': el => {
+    const r = D.round(el.dataset.rid);
+    if (!r) return;
+    if (Object.values(D.scores(r.id)).some(h => Object.values(h || {}).some(E.isEntered))) { toast('Scores are in, so the format can\'t change now.'); return; }
+    const on = !isScramble(r);
+    put('settings', [{ key: 'format:' + r.id, value: on ? 'scramble' : '' }], { action: 'Round format', detail: `${roundName(r)}: ${on ? 'scramble (team score)' : 'individual Stableford'}` });
+    toast(on ? 'Scramble: one team score per group' : 'Individual Stableford');
+  },
+  'org-tripboard': el => {
+    const r = D.round(el.dataset.rid);
+    if (!r || !r.trip) return;
+    const off = tripBoardOn(r);
+    put('settings', [{ key: `tripboard:${r.season}:${r.trip}`, value: off ? 'off' : '' }], { action: 'Trip leaderboard', detail: `${r.trip} ${r.season}: ${off ? 'off' : 'on'}` });
+    toast(off ? 'No combined trip leaderboard' : 'Trip leaderboard on');
+  },
   'entry-back': () => {
     const ctx = entryCtx(), d = (draftsFor(ctx) || {})[ctx.n];
     if (ctx.mode === 'player' && !ctx.edit && d && Object.keys(d).some(k => k[0] !== '_')) toast('Scores kept. Pick up where you left off.');
@@ -6497,7 +7875,7 @@ const ACT = {
   'holes-close': () => { UI.holeSheet = false; render(); },
   'holes-scrim': (el, e) => { if (e.target !== el) return; UI.holeSheet = false; render(); },
   'goto-hole': el => {
-    const rid = playRid(), g = myGroup(rid), comp = computeR(rid);
+    const rid = playRid(), g = myGroup(rid), comp = progressOf(rid);
     UI.holeSheet = false;
     if (!g || !comp) { render(); return; }
     const gc = comp.groups.find(x => x.id === g.id), n = Number(el.dataset.n);
@@ -6587,53 +7965,29 @@ const ACT = {
   'org-new-round': () => { UI.formState = null; go('details', {}); },
   'org-toggle-player': el => { const d = UI.draft; const i = d.ids.indexOf(el.dataset.pid); if (i >= 0) d.ids.splice(i, 1); else d.ids.push(el.dataset.pid); render(); },
   'org-draw': el => {
+    // Draws and saves at once; the Groups screen then shows the groups to change. "again" redraws the same players.
     const r = D.round(cur().p.rid);
-    const d = draftFor(r);
     const kind = el.dataset.kind;
-    if (kind === 'players') { d.groups = null; d.sel = null; render(); return; }
+    const again = kind === 'again';
+    if (again) {
+      if (grStarted(r) || drawMade(r) || (r.groups || []).some(g => g.teams.flat().some(pid => scoresFor(r.id, pid)))) { toast('These groups can no longer be redrawn.'); return; }
+      if (UI.confirm !== 'redraw-' + r.id) { UI.confirm = 'redraw-' + r.id; render(); return; }
+      UI.confirm = null;
+    }
+    const ids = again ? r.groups.flatMap(g => g.teams.flat()) : draftFor(r).ids;
     const prior = priorTripGroups(r);
     let res;
-    if (kind === 'standings' || (kind === 'again' && d.kind === 'standings')) {
-      const done = D.rounds().filter(x => x.trip === r.trip && x.season === r.season && x.status === 'final' && x.id !== r.id && (x.trip_day || 0) < (r.trip_day || 99));
-      const pts = done.map(x => pointsOf(x.id));
-      const standings = E.rankRows(d.ids.map(pid => ({ id: pid, name: D.nameOf(pid), total: pts.reduce((s, p) => s + (p[pid] || 0), 0) })), 'total', 'desc');
+    if (kind === 'standings') {
+      const pts = priorFinalDays(r).map(x => pointsOf(x.id));
+      const standings = E.rankRows(ids.map(pid => ({ id: pid, name: D.nameOf(pid), total: pts.reduce((s, p) => s + (p[pid] || 0), 0) })), 'total', 'desc');
       res = E.proposeDraw(standings, prior, []);
-      d.kind = 'standings';
     } else {
-      d.seed = (d.seed || Date.now() % 100000) + 17;
-      res = E.randomDraw(d.ids, [], d.seed, prior);
-      d.kind = 'random';
+      res = E.randomDraw(ids, [], (Date.now() % 100000) + 17, prior);
     }
-    d.groups = res.groups;
-    d.repeats = res.repeats;
-    d.sel = null;
+    saveDraw(r, res.groups, again ? 'Groups redrawn' : 'Groups drawn');
+    UI.draft = null; UI.gsel = null;
     render();
-  },
-  'org-swap': el => {
-    const d = UI.draft;
-    const pid = el.dataset.pid;
-    if (!d.sel) { d.sel = pid; render(); return; }
-    if (d.sel === pid) { d.sel = null; render(); return; }
-    const a = d.sel, b = pid;
-    d.groups.forEach(g => g.teams.forEach(t => t.forEach((x, i) => { if (x === a) t[i] = b; else if (x === b) t[i] = a; })));
-    d.sel = null;
-    d.repeats = E.repeatedPartners([...priorTripGroups(D.round(d.rid)), { rid: d.rid, groups: d.groups }]).filter(x => x.rounds.includes(d.rid));
-    render();
-  },
-  'org-save-groups': () => {
-    const r = D.round(cur().p.rid);
-    const d = draftFor(r);
-    const times = E.teeTimesFrom(r.first_tee || '', r.interval || 8, d.groups.length);
-    const allOff = E.kbOff(r);   // KBs switched off for the whole round stays off if the groups are redrawn
-    const groups = d.groups.map((g, i) => Object.assign({ id: 'g' + (i + 1), n: i + 1, teeTime: times[i] || '', startHole: g.startHole || 1, teams: g.teams }, allOff ? { noKb: true } : {}));
-    const ids = new Set(groups.flatMap(g => g.teams.flat()));
-    const kg = E.kbGroups(Object.assign({}, r, { groups }));
-    let kb = E.kbValid(kg, r.kb) ? r.kb : null;
-    if (!kb && kg.length > 1) { const res = E.kbPairsFor(kg, (Date.now() % 100000) + 3, priorKbPairs(r.id)); kb = res.pairs.length ? res.pairs : null; }   // every drawn round gets KB pairs, no repeat partners
-    put('rounds', [Object.assign({}, r, { groups, kb })], { action: 'Groups saved', detail: `${roundName(r)}: ${groups.map(g => `${g.teeTime} ${g.teams.map(t => t.map(D.nameOf).join(' & ')).join(' v ')}`).join('; ')}` });
-    UI.draft = null;
-    back();
-    toast('Groups and KB pairs saved');
+    toast(isScramble(r) ? 'Teams drawn' : 'Groups drawn, KB pairs made');
   },
   'org-kb-make': () => { const r = D.round(cur().p.rid); const res = E.kbPairsFor(E.kbGroups(r), (Date.now() % 100000) + 3, priorKbPairs(r.id)); UI.kbDraft = { rid: r.id, pairs: res.pairs, sel: null }; render(); },
   'org-kb-swap': el => {
@@ -6660,21 +8014,13 @@ const ACT = {
     tick(); render();
   },
   'org-unwin': el => { removeRows('winners', [{ round: el.dataset.rid, hole: Number(el.dataset.n) }], { action: 'Contest winner cleared', detail: `${roundName(D.round(el.dataset.rid))} · hole ${el.dataset.n}` }); render(); },
-  'start-round': el => {
-    const r = D.round(el.dataset.rid);
-    if (!r.groups || !r.groups.length) { toast('Draw the groups first'); return; }
-    if (!canScore(r)) { toast('The course needs its par, index and tees first'); return; }
-    if (liveRid()) { toast('Finalise the live round first'); return; }
-    put('rounds', [Object.assign({}, r, { status: 'live' })], { action: 'Round started', detail: roundName(r) });
-    toast(`${roundName(r)} is live`);
-  },
   finalise: el => {
     const r = D.round(el.dataset.rid);
     const reasons = finaliseBlockers(r);
     if (reasons.length) { toast(`Not yet: ${reasons.join(', ')}`); return; }
-    const comp = computeR(r.id);
+    const comp = computeR(r.id);   // null for a scramble: no individual playing handicaps to keep
     const snapHoles = (holesOf(r) || []).map(h => { const o = Object.assign({}, h); delete o.yards; return o; });
-    put('rounds', [Object.assign({}, r, { status: 'final', ph: Object.fromEntries(Object.values(comp.players).map(p => [p.id, p.ph])), allowance: allowanceOf(r), results: snapHoles.length === 18 && teeOf(r) ? { snap: { holes: snapHoles, tee: teeOf(r) } } : r.results || null })], { action: 'Round finalised', detail: `${roundName(r)}: results, handicaps and the course card fixed` });
+    put('rounds', [Object.assign({}, r, { status: 'final', ph: comp ? Object.fromEntries(Object.values(comp.players).map(p => [p.id, p.ph])) : (r.ph || null), allowance: allowanceOf(r), results: snapHoles.length === 18 && teeOf(r) ? { snap: { holes: snapHoles, tee: teeOf(r) } } : r.results || null })], { action: 'Round finalised', detail: `${roundName(r)}: results, handicaps and the course card fixed` });
     tick();
     toast(`${roundName(r)} is final`);
   },
@@ -6723,12 +8069,14 @@ const ACT = {
   'late-cancel': () => { UI.late = null; UI.confirm = null; render(); },
   'late-replace': el => {
     const r = D.round(el.dataset.rid), pid = el.dataset.pid, np = el.dataset.new;
+    if (rosterLocked(r)) { toast('The teams have scores, so they are fixed now'); return; }
     if (scoresFor(r.id, pid)) { toast('That player already has scores'); return; }
     put('rounds', [withPlayerChanged(r, pid, np)], { action: 'Player swapped', detail: `${roundName(r)}: ${D.nameOf(np)} in for ${D.nameOf(pid)}` });
     UI.late = null; toast(`${D.nameOf(np)} is in`); back();
   },
   'late-drop': el => {
     const r = D.round(el.dataset.rid), pid = el.dataset.pid;
+    if (rosterLocked(r)) { toast('The teams have scores, so they are fixed now'); return; }
     if (scoresFor(r.id, pid)) { toast('That player already has scores'); return; }
     if (UI.confirm !== 'drop-' + pid) { UI.confirm = 'drop-' + pid; render(); return; }
     put('rounds', [withPlayerChanged(r, pid, null)], { action: 'Player dropped out', detail: `${roundName(r)}: ${D.nameOf(pid)}` });
@@ -6749,6 +8097,7 @@ const ACT = {
     }).catch(() => toast('Needs signal to restore'));
   }
 };
+Object.assign(ACT, DRAW_ACT, GROUP_ACT);
 
 const FORMS = {
   ask: () => { const i = document.getElementById('askin'); askQuestion(i ? i.value : UI.askDraft); },
@@ -6837,6 +8186,19 @@ const FORMS = {
     Object.values(tees).forEach(t => { if (par) t.par = par; });
     const id = c ? c.id : (D.course(slug(name)) ? slug(name) + '-' + Date.now().toString(36).slice(-3) : slug(name));
     put('courses', [{ id, name, area: val('c-area') || null, about: val('c-about') || null, lat: num('c-lat'), lon: num('c-lon'), tees, holes: holeData }], { action: c ? 'Course changed' : 'Course added', detail: name });
+    toast('Saved');
+    back();
+  },
+  teamshots: () => {
+    const r = D.round(cur().p.rid);
+    const out = {};
+    for (const g of r.groups || []) {
+      const v = val('ts-' + g.id);
+      const k = v === '' ? 0 : Number(v);
+      if (!(Number.isInteger(k) && k >= 0 && k <= 36)) { UI.formError = `Team ${g.n}: a whole number of shots, 0 to 36.`; render(); return; }
+      out[g.id] = k;
+    }
+    put('settings', [{ key: 'teamshots:' + r.id, value: JSON.stringify(out) }], { action: 'Team shots', detail: `${roundName(r)}: ${(r.groups || []).map(g => `Team ${g.n} ${out[g.id]}`).join(', ')}` });
     toast('Saved');
     back();
   },
@@ -6945,9 +8307,9 @@ function render() {
   if (showTabs) {
     let lbl = 'Hole';
     try {
-      const rid = playRid() || liveRid(), mine = rid && myGroup(rid), comp = mine && computeR(rid);
+      const rid = playRid() || liveRid(), mine = rid && myGroup(rid), comp = mine && progressOf(rid);
       const gc = comp && comp.groups.find(g => g.id === mine.id);
-      if (gc) lbl = gc.nextHole ? `Hole ${gc.nextHole}` : 'Card';
+      if (gc) lbl = gc.nextHole ? `Hole ${gc.nextHole}` : isScramble(D.round(rid)) ? 'Team' : 'Card';
     } catch (e) { /* keep "Hole" */ }
     const span = tabs.querySelector('.tab[data-tab="hole"] span');
     if (span && span.textContent !== lbl) span.textContent = lbl;
@@ -7032,7 +8394,7 @@ document.addEventListener('mousedown', e => { if (e.target.closest && e.target.c
 if (window.visualViewport) { window.visualViewport.addEventListener('resize', placeAskBar); window.visualViewport.addEventListener('scroll', placeAskBar); }
 document.addEventListener('change', e => {
   const t = e.target;
-  if (t.dataset && t.dataset.change === 'start-hole' && UI.draft && UI.draft.groups) { UI.draft.groups[Number(t.dataset.gi)].startHole = Number(t.value); render(); return; }
+  if (t.dataset && t.dataset.change === 'grp-start') { grStart(t.dataset.rid, Number(t.dataset.gi), Number(t.value)); return; }
   if (t.dataset && t.dataset.change === 'details-course') { UI.formState = Object.assign({}, UI.formState, { course: t.value }); render(); return; }
   const el = t.closest && t.closest('input[data-photo]');
   if (!el || !el.files || !el.files[0]) return;
@@ -7047,7 +8409,7 @@ window.addEventListener('online', () => { flush(); sync(); });
 /* Fresh data every 15 seconds while a round is live, every minute otherwise. */
 setInterval(() => {
   if (document.hidden) return;
-  const every = liveRid() ? 15000 : 60000;
+  const every = liveRid() ? 15000 : drawLive() ? 8000 : 60000;
   if (Date.now() - DB.lastSync >= every) sync();
   if (DB.outbox.length && DB.online) flush();
 }, 5000);

@@ -425,6 +425,7 @@ button.btn:has(> svg) { flex-direction: row; }
 .now-kind { font-size: var(--t-sub); font-weight: 600; color: var(--award); }
 .now-name { font-size: var(--t-head); font-weight: 800; letter-spacing: -.03em; line-height: 1.05; margin-top: 2px; text-wrap: balance; }
 .now-line { font-size: var(--t-body); color: #CFE2D6; }
+.now-you { display: block; margin-top: 10px; font-size: var(--t-body); font-weight: 600; color: #FAF8F3; text-wrap: pretty; }
 .now-acts { display: grid; grid-template-columns: 1.4fr 1fr; gap: 10px; margin-top: 20px; }
 .go { min-height: 54px; border-radius: 14px; background: var(--action-inverse); color: var(--on-action-inverse); font-weight: 700; font-size: var(--t-body); text-align: center; }
 .go.alt { background: rgba(255,255,255,.16); color: #fff; font-weight: 600; }
@@ -1586,6 +1587,7 @@ body { font-variant-numeric: tabular-nums; }
 .pk { border-color: #C9D2CC; }
 .pk.me { background: var(--action-tint); border-color: var(--action); }
 .pk.wide { grid-column: span 2; }
+.rg-team { grid-column: span 2; display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: .95rem; }
 .rp-kbs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 12px; }
 .rp-about { white-space: pre-line; line-height: 1.45; }
 
@@ -1673,6 +1675,7 @@ body { font-variant-numeric: tabular-nums; }
 /* Round page: Players tab */
 .rp-players .pl-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 3.2rem 3.4rem 14px; gap: 8px; align-items: center; width: 100%; min-height: 56px; padding: 6px 14px; text-align: left; font-variant-numeric: tabular-nums; }
 .rp-players .pl-row + .pl-row { border-top: .5px solid var(--line); }
+.rp-players.scr .pl-row { grid-template-columns: 34px minmax(0, 1fr) 14px; }
 .rp-players .pl-row.cols { min-height: 30px; padding-top: 10px; padding-bottom: 0; }
 .rp-players .pl-row.me { background: var(--action-tint); }
 .rp-players .pl-n { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
@@ -1897,3 +1900,225 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .hero .seg.year { background: var(--press); }
 .hero .seg.year button { color: var(--text); min-height: 44px; font-variant-numeric: tabular-nums; }
 .hero .seg.year button.on { background: #fff; color: var(--pine); font-weight: 700; }
+
+/* Scramble hole (Westport, owner brief §6): one team score, then whose drive. Big targets, readable outdoors. */
+.scr .scr-score { padding: 14px 16px 12px; }
+.scr .scr-team-head { display: flex; flex-direction: column; gap: 2px; margin: 14px 4px 0; }
+.scr .scr-team-head .sub { overflow-wrap: anywhere; }
+.scr .scr-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }
+.scr .scr-head .sub { overflow-wrap: anywhere; }
+.scr .scr-step { display: grid; grid-template-columns: 64px minmax(0, 1fr) 64px; align-items: center; gap: 10px; }
+.scr .scr-st { height: 64px; border-radius: 16px; background: var(--fill); color: var(--pine); font-size: 2rem; font-weight: 500; line-height: 1; display: flex; align-items: center; justify-content: center; }
+.scr .scr-st:active { background: var(--press); }
+.scr .scr-val { min-height: 64px; border-radius: 16px; font-size: var(--t-num, 2.6rem); font-weight: 800; color: var(--pine); font-variant-numeric: tabular-nums; line-height: 1; }
+.scr .scr-val small { font-size: var(--t-body); font-weight: 600; color: var(--faint); }
+.scr .scr-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px; min-height: 44px; }
+.scr .scr-meta .link { min-height: 44px; padding: 0 4px; font-weight: 700; }
+.scr .scr-drives { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 8px; }
+.scr .scr-drv { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "av nm" "av dc"; column-gap: 10px; align-items: center; text-align: left; min-height: 64px; padding: 10px 12px; border-radius: 16px; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); }
+.scr .scr-drv .av { grid-area: av; }
+.scr .scr-drv .scr-dn { grid-area: nm; font-weight: 700; overflow-wrap: break-word; min-width: 0; }
+.scr .scr-drv .scr-dc { grid-area: dc; font-size: .85rem; color: var(--sub); font-variant-numeric: tabular-nums; }
+.scr .scr-drv.need .scr-dc { color: var(--team-b); font-weight: 600; }
+.scr .scr-drv.on { background: var(--pine); box-shadow: none; }
+.scr .scr-drv.on .scr-dn, .scr .scr-drv.on .scr-dc { color: #fff; }
+.scr .scr-warn { margin: 10px 4px 0; color: var(--team-b); font-weight: 600; }
+.scr-row { align-items: start; }
+.scr-row .scr-team { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.scr-row .scr-team .sub { overflow-wrap: anywhere; }
+.scr-row .scr-note { font-size: .85rem; color: var(--team-b); font-weight: 600; }
+/* Drive chips on every scramble team (owner, 25 October). */
+.scr-chips { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 4px; }
+.scr-chip { display: inline-flex; align-items: baseline; gap: 4px; padding: 2px 8px; border-radius: 999px; background: var(--fill); color: var(--text); font-size: .85rem; line-height: 1.35; white-space: nowrap; }
+.scr-chip b { font-weight: 700; font-variant-numeric: tabular-nums; }
+.scr-chip.ok { background: transparent; box-shadow: inset 0 0 0 1px var(--line); color: var(--sub); }
+.scr-chip.warn { background: color-mix(in srgb, var(--team-b) 12%, #fff); color: var(--team-b); }
+.mini .scr-owed { font-size: .78rem; font-weight: 600; color: var(--sub); margin-left: 6px; white-space: nowrap; }
+.mini .scr-owed.warn { color: var(--team-b); }
+.scr-row .scr-thru { font-size: .85rem; color: var(--sub); font-weight: 500; }
+
+/* Scramble, simplified (owner, 25 October: fewer words). Drives as dots; one-word headings. */
+.scr-dots { display: inline-flex; gap: 4px; align-items: center; }
+.scr-dots i { width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--line-strong, #B9C4BD); }
+.scr-dots i.on { background: var(--pine); box-shadow: none; }
+.scr-dots.warn i:not(.on) { box-shadow: inset 0 0 0 1.5px var(--team-b); }
+.scr .scr-drv { grid-template-columns: minmax(0, 1fr); grid-template-areas: "nm" "dc"; row-gap: 6px; min-height: 64px; }
+.scr .scr-drv .scr-dots { grid-area: dc; }
+.scr .scr-drv.on .scr-dots i { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.6); }
+.scr .scr-drv.on .scr-dots i.on { background: #fff; box-shadow: none; }
+.scr .scr-warn { margin: 8px 4px 0; font-size: .95rem; }
+.scr-row .scr-chips { gap: 4px 12px; margin-top: 6px; }
+.scr-pd { display: inline-flex; align-items: center; gap: 5px; font-size: .8rem; }
+.scr-pd b { font-weight: 700; color: var(--sub); letter-spacing: .02em; }
+.scr-row .scr-pts { display: flex; flex-direction: column; align-items: flex-end; margin-left: auto; }
+.scr-row .scr-pts b { font-size: 1.15rem; font-weight: 800; }
+.scr-row .scr-pts small { font-size: .78rem; color: var(--sub); }
+
+.lrow.scr-row { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; grid-template-areas: "pos name pts" ". chips chips"; align-items: start; column-gap: 8px; }
+.scr-row .scr-pos { grid-area: pos; }
+.scr-row .scr-name { grid-area: name; min-width: 0; }
+.scr-row .scr-pts { grid-area: pts; }
+.scr-row .scr-chips { grid-area: chips; display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; }
+
+.scr-row .scr-name small { font-size: .8rem; color: var(--sub); font-weight: 500; }
+.scr-row b.scr-pts { font-size: 1.15rem; font-weight: 800; text-align: right; }
+.scr-row .scr-chips { margin-top: 4px; }
+.lrow.scr-row { height: auto; min-height: 0; row-gap: 2px; align-content: start; padding-top: 10px; padding-bottom: 10px; }
+/* Westport presentation: one decision at a time on the hole; named drive ledgers on Results.
+   Existing save actions, counts, warnings and radio semantics are unchanged. */
+.scr .entcard { margin-bottom: 22px; }
+.scr > .sec { margin-top: 20px; }
+.scr > .sec .sec-label, .scr-finish > .sec .sec-label { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.scr > .sec .sec-label::after, .scr-finish > .sec .sec-label::after { content: ""; height: 1px; flex: 1; background: var(--pine); opacity: .3; }
+.scr .scr-drives { gap: 8px; }
+.scr .scr-drv { min-height: 72px; padding: 13px 14px; row-gap: 9px; border-radius: 14px; background: transparent; box-shadow: inset 0 0 0 1px #BCCAC0; }
+.scr .scr-drv .scr-dn { font-size: 1rem; font-weight: 600; }
+.scr .scr-drv.on { background: var(--pine); box-shadow: inset 0 0 0 2px var(--pine); }
+.scr .scr-score { border-radius: 20px; padding: 16px; box-shadow: inset 0 0 0 1px var(--line); }
+.scr .scr-step { grid-template-columns: 60px minmax(0, 1fr) 60px; gap: 14px; }
+.scr .scr-st { width: 60px; height: 60px; border-radius: 50%; background: var(--fill); font-weight: 400; }
+.scr .scr-val { display: grid; place-items: center; text-align: center; min-height: 68px; font-size: 3rem; font-weight: 650; }
+.scr .scr-val small { color: var(--sub); font-weight: 500; font-size: 1.1rem; }
+.scr .scr-meta { margin-top: 4px; }
+.scr .scr-meta .sub { color: var(--pine); font-weight: 600; }
+.scr .scr-meta .link { font-weight: 500; }
+.scr .savebar { margin-top: 20px; }
+.scr .scr-warn { margin: 10px 0 0; font-size: .85rem; line-height: 1.45; font-weight: 600; }
+.scr-standings > .sec { margin-top: 25px; }
+.scr-standings .sec-label { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; padding-bottom: 9px; border-bottom: 2px solid var(--pine); }
+.scr-legend { color: var(--sub); font-size: .75rem; font-weight: 500; }
+.scr-standings .card { border-radius: 0; background: transparent; box-shadow: none; overflow: visible; }
+.scr-standings .lrow.scr-row { grid-template-columns: 1.5rem minmax(0, 1fr) auto; column-gap: 8px; padding: 14px 0 16px; border-bottom: 1px solid #CFD8CF; }
+.scr-standings .scr-row .scr-pos { padding-top: 2px; font-size: .85rem; }
+.scr-standings .scr-row .scr-name > b { color: var(--pine); font-size: 1.05rem; font-weight: 650; }
+.scr-standings .scr-row .scr-name small { display: inline-block; margin-left: 5px; font-size: .72rem; }
+.scr-standings .scr-row b.scr-pts { color: var(--pine); font-size: 1.45rem; font-weight: 650; line-height: 1.1; }
+.scr-standings .scr-row .scr-chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5rem), 1fr)); gap: 8px 16px; margin-top: 10px; }
+/* Long surnames: never split mid-word. The dots drop under the name when the name needs the room. */
+.scr-standings .scr-pd { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 6px; min-width: 0; }
+.scr-standings .scr-pd b { flex: 1 1 auto; min-width: 0; color: var(--text); font-size: .78rem; font-weight: 500; letter-spacing: 0; overflow-wrap: break-word; }
+.scr-standings .scr-dots { flex: none; gap: 3px; }
+.scr-standings .scr-dots i { width: 8px; height: 8px; }
+.scr-standings .scr-row.low { padding-left: 8px; padding-right: 8px; background: var(--lead-tint); }
+/* Breakfast draw (owner brief §7): the wheels are the core; only the team being drawn; names large enough to read across a room.
+   iPad first, phone fine. Pine stage for the big moment, ivory names; champagne only for the small pot labels on pine. */
+.drw-top { padding-bottom: 0; }
+.drw-stage { margin: 4px 0 0; padding: 18px 16px 22px; border-radius: 24px; background: var(--pine); color: #FAF8F3; text-align: center; }
+.drw-stage.done { padding: 28px 18px; }
+.drw-kicker { margin: 0; color: #D4B483; font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.drw-team { margin: 4px 0 14px; font-family: var(--font-display); font-weight: 500; font-size: 2.1rem; line-height: 1.1; color: #FAF8F3; }
+.drw-cells { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.drw-cell { display: grid; align-content: start; justify-items: center; gap: 8px; min-height: 9rem; padding: 12px 8px 14px; border-radius: 18px; background: rgba(250, 248, 243, .07); box-shadow: inset 0 0 0 1px rgba(250, 248, 243, .14); min-width: 0; }
+.drw-cell.got { align-content: center; background: #FAF8F3; color: var(--pine); }
+.drw-cell.warn { background: rgba(155, 52, 67, .35); }
+.drw-pot { color: #D4B483; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.drw-cell.got .drw-pot { color: var(--sub); }
+.drw-name { font-size: clamp(1.7rem, 6.5vw, 3.2rem); font-weight: 750; line-height: 1.05; overflow-wrap: break-word; max-width: 100%; }
+.drw-full { color: var(--sub); font-size: .9rem; overflow-wrap: break-word; max-width: 100%; }
+.drw-none { font-size: 1rem; font-weight: 600; opacity: .85; }
+.drw-wheel { position: relative; width: min(100%, 300px); aspect-ratio: 1; }
+.drw-wheel svg { display: block; width: 100%; height: 100%; }
+.drw-rot { transform-box: view-box; transform-origin: 100px 100px; }
+.drw-ptr { position: absolute; z-index: 1; top: -6px; left: 50%; width: 0; height: 0; margin-left: -11px; border-left: 11px solid transparent; border-right: 11px solid transparent; border-top: 20px solid #D4B483; }
+@keyframes drw-spin { from { transform: rotate(0deg); } to { transform: rotate(var(--to)); } }
+@media (prefers-reduced-motion: reduce) { .drw-rot { animation-duration: 1ms !important; } }
+.drw-act { margin-top: 18px; }
+.drw-act .btn { margin: 0; }
+.drw-go { background: #FAF8F3; color: var(--pine); font-size: 1.15rem; min-height: 56px; }
+.drw-stage .btn.quiet { background: transparent; color: #FAF8F3; box-shadow: inset 0 0 0 1.5px rgba(250, 248, 243, .6); }
+.drw-watch, .drw-sync { margin: 8px 0 0; color: #CFE0D6; font-size: .9rem; }
+.drw-stage .banner { text-align: left; margin: 0 0 12px; }
+@media (min-width: 700px) {
+  .drw-stage { padding: 28px 28px 32px; }
+  .drw-team { font-size: 3rem; margin-bottom: 20px; }
+  .drw-cells { gap: 18px; }
+  .drw-cell { min-height: 14rem; }
+  .drw-go { max-width: 420px; margin: 0 auto !important; }
+}
+/* Line-up: names first, team numbers as quiet labels. */
+.drw-lineup { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: 12px; margin-top: 12px; }
+.drw-lt { padding: 12px 16px 14px; border-radius: 18px; background: var(--card, #fff); box-shadow: 0 0 0 1px var(--line); }
+.drw-ln { color: var(--sub); font-size: .78rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.drw-lt ul { margin: 6px 0 0; padding: 0; list-style: none; }
+.drw-lt li { padding: 3px 0; font-size: 1.25rem; font-weight: 650; overflow-wrap: break-word; }
+/* Pots editor: a name and four pot buttons per row. */
+.drw-prow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.drw-pn { min-width: 0; overflow-wrap: break-word; }
+.drw-pb { display: inline-flex; gap: 6px; flex: none; }
+.drw-pb button { width: 44px; height: 44px; border-radius: 12px; border: 0; background: var(--fill); color: var(--text); font: inherit; font-weight: 700; }
+.drw-pb button.on { background: var(--pine); color: #fff; }
+.drw-pb button:disabled { opacity: .55; }
+.drw-pace button { min-height: 44px; }
+.drw-potlist { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: 12px; }
+.drw-mh { padding: 12px 16px 4px; color: var(--pine); font-weight: 700; }
+/* On an iPad the draw and the line-up use the width: the wheels are the point. */
+#app:has(.drw-stage), #app:has(.drw-lineup) { max-width: 1000px; }
+@media (min-width: 700px) {
+  #app:has(.drw-stage), #app:has(.drw-lineup) { padding-inline: max(16px, calc((100vw - 960px) / 2)); }
+  .drw-wheel { width: min(100%, 380px); }
+  .drw-lt li { font-size: 1.5rem; }
+}
+.card .drw-pb > button { display: grid; place-items: center; flex: none; width: 44px; min-width: 44px; height: 44px; padding: 0; text-align: center; }
+.drw-pace { display: inline-flex; flex: none; }
+.drw-pace button { padding: 0 14px; white-space: nowrap; }
+/* A revealed name shrinks to fit its box rather than breaking mid-word (cqi: the box's own width). */
+.drw-cell { container-type: inline-size; }
+.drw-name { font-size: min(clamp(1.7rem, 6.5vw, 3.2rem), calc(100cqi / (var(--len, 8) * .62))); overflow-wrap: normal; }
+/* Line-up as a pine card (a big moment): two teams a row, four across on a wide screen; never an orphan. */
+.drw-lineup { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 14px; border-radius: 24px; background: var(--pine); }
+@media (min-width: 900px) { .drw-lineup { grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 20px; gap: 14px; } }
+.drw-lt { background: rgba(250, 248, 243, .07); box-shadow: inset 0 0 0 1px rgba(250, 248, 243, .14); color: #FAF8F3; min-width: 0; }
+.drw-ln { color: #D4B483; font-variant-numeric: tabular-nums; }
+.drw-lt li { color: #FAF8F3; font-size: 1.15rem; }
+.drw-gap { color: #CFE0D6; font-size: .85rem; font-weight: 500; }
+.org-team.picked, .row.picked { box-shadow: inset 0 0 0 2px var(--pine); }
+/* Groups screen (owner, 26 October): tap a name or a group; its choices open underneath. */
+.grp .grp-head { border-radius: 16px; background: var(--card, #fff); box-shadow: 0 0 0 1px var(--line); margin-bottom: 8px; }
+.grp .grp-head b { font-size: 1.25rem; }
+.grp-panel { margin: 0 0 10px; padding: 12px 14px 14px; border-radius: 16px; background: var(--fill); }
+.grp-panel .cap { margin: 0 0 8px; }
+.grp-panel .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.chipb { min-height: 44px; min-width: 64px; padding: 0 14px; border: 0; border-radius: 22px; background: #fff; color: var(--pine); font: inherit; font-weight: 650; font-variant-numeric: tabular-nums; box-shadow: inset 0 0 0 1.5px var(--pine); }
+.chipb:disabled { opacity: .4; }
+.grp-acts { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: 8px; margin-bottom: 8px; }
+.grp-acts .btn { margin: 0; min-height: 44px; }
+.grp-start { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; }
+.grp-start .cap { margin: 0; }
+.grp-start .field { margin: 0; }
+.grp-people { margin: 8px 0; max-height: 50vh; overflow-y: auto; }
+.grp-dim { opacity: .45; }
+.grp-outzone { margin-top: 12px; padding-top: 6px; border-top: 1px solid var(--line); }
+.grp-out { display: block; margin: 0 auto; min-height: 44px; }
+.grp-panel .grp-out { color: var(--team-b); }
+.pr.wdrow { display: grid; gap: 2px; padding-block: 12px; min-height: 44px; }
+.wdrow .wd-n { font-size: 1.1rem; font-weight: 650; color: var(--sub); overflow-wrap: break-word; }
+.wdrow .wd-s { color: var(--sub); font-size: .9rem; }
+.grp-swapbar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0; padding: 10px 14px; border-radius: 16px; background: var(--pine); color: #fff; font-weight: 600; }
+.grp-swapbar .link { color: #fff; min-height: 44px; }
+.grp .card .grp-head { border-radius: 0; background: transparent; box-shadow: none; margin: 0; border-bottom: 1px solid var(--line); }
+.grp .card .grp-panel { margin: 0; border-radius: 0; }
+.right.sub.nowrap { white-space: nowrap; }
+/* Drive warning: amber while the minimum can still be met, red once it can't (UX review F13). */
+.scr .scr-warn { color: #8A5A00; }
+.scr .scr-warn.bad { color: var(--team-b); }
+.now-kb { margin: 10px 0 0; text-align: center; color: #F2EFE7; font-weight: 600; }
+/* iPad line-up held up to the room: two teams by two, names large (UX review F07). */
+@media (min-width: 700px) {
+  .drw-lineup { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 24px; gap: 18px; }
+  .drw-lt { padding: 18px 22px 20px; }
+  .drw-lt .drw-ln { font-size: 1rem; }
+  .drw-lt li { font-size: 2.1rem; padding: 4px 0; }
+}
+@media (min-width: 1200px) { .drw-lineup { grid-template-columns: repeat(4, minmax(0, 1fr)); } .drw-lt li { font-size: 1.8rem; } }
+.entry .pr.wdrow, .entry .bugs .pr.wdrow { display: flex; flex-direction: column; justify-content: center; gap: 2px; grid-template-columns: none; grid-template-areas: none; min-height: 64px; padding: 10px 14px 10px 18px; }
+.entry .pr.wdrow, .entry .bugs .pr.wdrow { align-items: flex-start; text-align: left; border: 0; box-shadow: none; background: none; border-radius: 0; margin: 0; }
+
+/* Finalise: what's still to do sits above the button, as clear as the button (UX review F17). */
+.fin-wait { margin: 16px 0 8px; padding: 12px 16px; border-radius: 16px; background: var(--fill); }
+.fin-wait p { margin: 0 0 4px; }
+.fin-wait ul { margin: 0; padding-left: 1.1rem; color: var(--sub); }
+.btn[aria-disabled="true"] { opacity: .6; }
+.drw-counts { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 16px; margin: 0 0 12px; padding: 10px 14px; border-radius: 14px; background: var(--pine); color: #FAF8F3; font-variant-numeric: tabular-nums; }
+.drw-counts b { color: #D4B483; font-weight: 700; }
+.drw-saved { margin-left: auto; font-size: .85rem; color: #CFE0D6; }
+.drw-left { margin: 0 0 12px; text-align: center; font-size: 1rem; }
