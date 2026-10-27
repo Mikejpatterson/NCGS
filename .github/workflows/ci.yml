@@ -55,5 +55,6 @@ jobs:
           node test/organiser.run.js
           node test/testing.run.js
           node test/starthole.run.js
+          node test/ui.run.js
       - name: The app opens quickly on a weak signal
         run: if [ -f test/sw-open.run.js ]; then node test/sw-open.run.js; else echo "sw-open.run.js arrives with fix 1"; fi
