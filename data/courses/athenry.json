@@ -1,0 +1,114 @@
+{
+  "_source": "Validated 27 October 2026 from public sources; see docs/courses/ATHENRY.md. Ratings agree across sources to within 1 slope point and 0.1 rating; replace with the club card if one becomes available.",
+  "id": "athenry",
+  "name": "Athenry",
+  "area": "Galway",
+  "about": "Parkland course at Palmerstown, between Athenry and Oranmore. Par 70: two par 5s, twelve par 4s and four par 3s. The 7th (413 m) is stroke index 1; the 12th is the signature hole.",
+  "tees": {
+    "white": {
+      "name": "White",
+      "slope": 124,
+      "rating": 71.2,
+      "par": 70
+    },
+    "green": {
+      "name": "Green",
+      "slope": 117,
+      "rating": 69.2,
+      "par": 70
+    }
+  },
+  "holes": [
+    {
+      "n": 1,
+      "par": 4,
+      "si": 3
+    },
+    {
+      "n": 2,
+      "par": 4,
+      "si": 7
+    },
+    {
+      "n": 3,
+      "par": 3,
+      "si": 17
+    },
+    {
+      "n": 4,
+      "par": 4,
+      "si": 13
+    },
+    {
+      "n": 5,
+      "par": 4,
+      "si": 9
+    },
+    {
+      "n": 6,
+      "par": 3,
+      "si": 15
+    },
+    {
+      "n": 7,
+      "par": 4,
+      "si": 1
+    },
+    {
+      "n": 8,
+      "par": 5,
+      "si": 11
+    },
+    {
+      "n": 9,
+      "par": 4,
+      "si": 5
+    },
+    {
+      "n": 10,
+      "par": 5,
+      "si": 18
+    },
+    {
+      "n": 11,
+      "par": 4,
+      "si": 10
+    },
+    {
+      "n": 12,
+      "par": 3,
+      "si": 12
+    },
+    {
+      "n": 13,
+      "par": 4,
+      "si": 2
+    },
+    {
+      "n": 14,
+      "par": 4,
+      "si": 4
+    },
+    {
+      "n": 15,
+      "par": 4,
+      "si": 6
+    },
+    {
+      "n": 16,
+      "par": 4,
+      "si": 8
+    },
+    {
+      "n": 17,
+      "par": 3,
+      "si": 16
+    },
+    {
+      "n": 18,
+      "par": 4,
+      "si": 14
+    }
+  ],
+  "address": "Palmerstown, Oranmore, Co. Galway H91 HH5T"
+}
