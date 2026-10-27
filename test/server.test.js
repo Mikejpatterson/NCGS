@@ -218,6 +218,52 @@ test('first-time setup works before Drive access is granted (photos folder is on
   }
 });
 
+/* Structural review H4: Google allows 50,000 Script Properties reads a day on a personal account, and every phone
+   polls during a round. Once warm, a poll must read no Properties at all, and a save only the version it bumps. */
+test('Apps Script: a poll reads no Script Properties, and a save reads only the version', () => {
+  const ss = fakeSpreadsheet();
+  ss.getSheets = () => Object.values(ss.sheets);
+  ss.deleteSheet = () => {};
+  ss.getUrl = () => 'u';
+  ss.getId = () => 'sid';
+  const store = {};
+  const reads = [];
+  const props = { getProperty: k => { reads.push(k); return k in store ? store[k] : null; }, setProperty: (k, v) => { store[k] = v; } };
+  const cacheStore = {};
+  const cache = { get: k => (k in cacheStore ? cacheStore[k] : null), put: (k, v) => { cacheStore[k] = v; } };
+  global.PropertiesService = { getScriptProperties: () => props };
+  global.CacheService = { getScriptCache: () => cache };
+  global.LockService = fakeLock;
+  global.SpreadsheetApp = { create: () => ss, openById: () => ss };
+  global.DriveApp = { createFolder() { throw new Error('no'); }, getFolderById() { throw new Error('no'); } };
+  global.ContentService = { createTextOutput: t => ({ t, setMimeType() { return this; } }), MimeType: { JSON: 'json' } };
+  try {
+    // Each request builds a fresh appsScript(), as the Drive loader does.
+    const hit = (o, seed) => JSON.parse(N.appsScript(seed === undefined ? null : seed).http({ postData: { contents: JSON.stringify(o) } }).t);
+    const first = hit({ op: 'load' }, { members: [{ id: 'a', name: 'A', full: 'A', index: 10, active: true }], rounds: [ROUND] });
+    assert.equal(first.error, undefined);
+    hit({ op: 'since', v: 0 });   // warms the cache
+    reads.length = 0;
+    for (let i = 0; i < 5; i++) assert.equal(hit({ op: 'since', v: first.ver }).same, true);
+    assert.deepEqual(reads, [], 'polls read Script Properties: ' + reads.join(','));
+    reads.length = 0;
+    const saved = hit({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 1, scores: { a: { v: 5, base: null } }, by: 'A' });
+    assert.equal(saved.ok, true);
+    assert.deepEqual(reads, ['VER'], 'a save should read only the version it bumps: ' + reads.join(','));
+    reads.length = 0;
+    const after = hit({ op: 'since', v: first.ver });
+    assert.equal(after.tables.scores.length, 1, 'the poll after a save sees the new score');
+    assert.deepEqual(reads, []);
+  } finally {
+    ['PropertiesService', 'CacheService', 'LockService', 'SpreadsheetApp', 'DriveApp', 'ContentService'].forEach(k => delete global[k]);
+  }
+});
+
+test('the data service loaded from Drive stays small enough for Google\'s 100 KB cache (review M1)', () => {
+  const size = require('fs').statSync(require('path').join(__dirname, '..', 'src', 'server.js')).size;
+  assert.ok(size < 90 * 1024, `src/server.js is ${size} bytes`);
+});
+
 test('changing one player\'s past score leaves the rest of the group alone, and a stale change is refused', () => {
   for (const [kind, s] of servers().list) {
     s.api({ op: 'seed', data: { rounds: [ROUND] } });

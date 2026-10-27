@@ -19,6 +19,6 @@ Run everything (the two test files, then every screen test when the real data is
 
 ## Is the live server current?
 
-`build.js` stamps `server.js` with a short fingerprint of its source and builds the same fingerprint into the app. Settings → About shows "Server: Up to date" or "Out of date", and the Organiser home shows a red banner when the server in Drive is older than the app. After changing `src/server.js`, upload the new `dist/server.js` to Drive again.
+`build.js` stamps `server.js` with a short fingerprint of its source and builds the same fingerprint into the app. Settings → About shows "Server: Up to date" or "Out of date", and the Organiser home shows a red banner when the server in Drive is older than the app. After changing `src/server.js`, upload the new `dist/server.js` to Drive again. `dist/server.js` carries no starting data, so it stays small enough for Google's cache (a build fails if it reaches 90 KB); `dist/server-setup.js` includes the starting data and is only for a brand-new install.
 
 A finished round keeps the course card (pars, stroke indexes, tee) it was played on, stored inside the round's `results` field, so editing a course later cannot change an old result.
