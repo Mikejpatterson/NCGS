@@ -54,5 +54,12 @@ const check = (n, c, extra) => { console.log((c ? 'PASS  ' : 'FAIL  ') + n + (!c
     check('and it opens the trip page', /Day 1/.test(await p.locator('main').innerText()) && !!(await p.$('[data-act="back"]')));
     check('no script errors', errs.length === 0, errs.join(' | '));
   } catch (e) { console.error(e); ok = false; } finally { await b.close(); }
+  // home-day is already called by layout.run.js in CI: keep the season/result boundary covered there too.
+  if (ok) {
+    const result = require('child_process').spawnSync(process.execPath,
+      [...process.execArgv, require('path').join(__dirname, 'home-season-result.run.js')], { stdio: 'inherit', env: process.env });
+    if (result.error) console.error(result.error);
+    if (result.status !== 0) ok = false;
+  }
   console.log(ok ? 'all passed' : 'SOME FAILED'); process.exit(ok ? 0 : 1);
 })();

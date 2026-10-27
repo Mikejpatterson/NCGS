@@ -244,7 +244,7 @@ VIEWS.home = () => {
   const live = D.rounds().filter(r => r.status === 'live');
   const next = announced();   // an upcoming round shows here once the organiser gives it a date (owner, 23 October)
   // On the day a round is finalised, its result leads Home; the next round moves down to "Also on" (journeys 6/18).
-  const doneToday = live[0] ? null : D.rounds().filter(r => r.status === 'final' && !isDemo(r) && r.date && daysFromToday(r.date) === 0).slice(-1)[0] || null;
+  const doneToday = live[0] ? null : seasonRounds(season).filter(r => r.status === 'final' && r.date && daysFromToday(r.date) === 0).slice(-1)[0] || null;
   const feature = live[0] || next[0] || null;
   const more = doneToday ? next : [...live.slice(1), ...next.slice(live[0] ? 0 : 1)];
   const me = DB.prefs.me ? D.member(DB.prefs.me) : null;
