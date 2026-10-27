@@ -136,6 +136,6 @@ async function deliver(req) {
   console.log(`requests ${stats.requests} (${Object.entries(stats.byOp).map(([k, v]) => k + ' ' + v).join(', ')}), retries ${stats.retries}`);
   console.log(`response time ms: median ${q(0.5)}, 95% ${q(0.95)}, slowest ${lat[lat.length - 1] || 0}`);
   console.log(`errors: ${JSON.stringify(stats.errors)}`);
-  console.log(`Script Properties reads at today's 2 per request: about ${stats.requests * 2} (Google's daily limit on a Gmail account: 50,000)`);
+  console.log(`requests per day budget: before fix 2 each request read Script Properties twice (about ${stats.requests * 2} here; Google's daily limit on a Gmail account is 50,000). After fix 2 a poll reads none.`);
   process.exit(ok ? 0 : 1);
 })();
