@@ -619,6 +619,17 @@ var NCGS = (function () {
   /* ---------- Google Apps Script entry ---------- */
   function appsScript(seed) {
     var props = PropertiesService.getScriptProperties();
+    /* Google allows 50,000 Script Properties reads a day on a personal account, and every phone polls every 15 s
+       during a round (structural review H4). Settings that never change once set (which spreadsheet, whether setup
+       has run) are read from the script cache, which has no such daily limit, and only fall back to Properties. */
+    var cache = CacheService.getScriptCache();
+    function fixedProp(k) {
+      var v = cache.get('p:' + k);
+      if (v !== null && v !== undefined && v !== '') return v;
+      v = props.getProperty(k);
+      if (v !== null && v !== undefined && v !== '') { try { cache.put('p:' + k, v, 21600); } catch (e) { /* cache full */ } }
+      return v;
+    }
     function folder() {
       var id = props.getProperty('PHOTOS');
       if (id) { try { return DriveApp.getFolderById(id); } catch (e) { /* recreate below */ } }
@@ -627,7 +638,7 @@ var NCGS = (function () {
       return f;
     }
     function spreadsheet() {
-      var id = props.getProperty('SHEET');
+      var id = fixedProp('SHEET');
       if (id) return SpreadsheetApp.openById(id);
       var ss = SpreadsheetApp.create('NCGS data');
       props.setProperty('SHEET', ss.getId());
@@ -639,7 +650,7 @@ var NCGS = (function () {
     }
     function json(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
     function ensureReady() {
-      if (!seed || props.getProperty('READY')) return;
+      if (!seed || fixedProp('READY')) return;
       var lock = LockService.getScriptLock();
       lock.waitLock(30000);
       try {
@@ -654,7 +665,7 @@ var NCGS = (function () {
           if (e && e.postData && e.postData.contents) req = JSON.parse(e.postData.contents);
           else if (e && e.parameter && e.parameter.q) req = JSON.parse(e.parameter.q);
         } catch (x) { return json({ error: 'bad', message: 'Unreadable request' }); }
-        if (!req.op) return json({ ok: true, app: 'NCGS', build: BUILD, ver: Number(props.getProperty('VER') || 0) });
+        if (!req.op) return json({ ok: true, app: 'NCGS', build: BUILD, ver: Number(cache.get('VER') || props.getProperty('VER') || 0) });
         return json(server().api(req));
       },
       backup: function () { return sheetStore(spreadsheet(), props, CacheService.getScriptCache(), LockService, folder).backup(); },
