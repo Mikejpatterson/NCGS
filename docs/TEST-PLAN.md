@@ -61,3 +61,5 @@ It fails if the controls or the words differ, a screen cannot be opened or the p
 8. After uploading the new server: banner "server is out of date" disappears; Backup now works and a copy appears in the Drive folder "NCGS backups".
 9. After changing the PIN: old PIN refused, new one accepted.
 10. Ruling (once set up).
+
+**Retired 27 October 2026:** `test/ui.run.js`. It needed the real data (it opened a real 2026 round), so it never ran in CI and had drifted (it expected "cards open"). Its journeys are covered on invented data by `organiser.run.js`, `groups.run.js`, `home-day.run.js`, `layout.run.js` and the scenario suites, all run on every pull request by `.github/workflows/ci.yml`.
