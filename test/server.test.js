@@ -241,6 +241,39 @@ test('deleting a round removes its own settings, keeps everyone else\'s, and a r
   }
 });
 
+/* Reviewer's condition for fix 4 (H4): when the cached version expires (6 h without a save), the next poll reads
+   Script Properties once and puts it back; the polls after that read nothing. */
+test('when the cached version has gone, one poll reads it and puts it back; the next polls read nothing', () => {
+  const ss = fakeSpreadsheet();
+  const store = {}, reads = [];
+  const props = { getProperty: k => { reads.push(k); return k in store ? store[k] : null; }, setProperty: (k, v) => { store[k] = v; } };
+  const cacheMap = {};
+  const cache = { get: k => (k in cacheMap ? cacheMap[k] : null), put: (k, v) => { cacheMap[k] = v; } };
+  const s = N.createServer(N.sheetStore(ss, props, cache, fakeLock, () => null));
+  s.api({ op: 'seed', data: { members: [{ id: 'a', name: 'Al', index: 12, active: true }], rounds: [ROUND] } });
+  s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 1, scores: { a: { v: 5, base: null } }, by: 'Al' });
+  const ver = Number(store.VER);
+  delete cacheMap.VER;   // the cache entry expires overnight
+  reads.length = 0;
+  assert.equal(s.api({ op: 'since', v: ver }).same, true);
+  assert.deepEqual(reads.filter(k => k === 'VER'), ['VER'], 'the first poll reads the version once');
+  reads.length = 0;
+  for (let i = 0; i < 5; i++) assert.equal(s.api({ op: 'since', v: ver }).same, true);
+  assert.deepEqual(reads.filter(k => k === 'VER'), [], 'later polls read nothing');
+  s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 2, scores: { a: { v: 4, base: null } }, by: 'Al' });
+  const after = s.api({ op: 'since', v: ver });
+  assert.equal(after.tables.scores.length, 1, 'a save after that is still seen at once');
+});
+
+test('the in-memory store keeps its cached version in step with saves (preview and the local test server)', () => {
+  const s = N.createServer(N.memoryStore());
+  s.api({ op: 'seed', data: { members: [{ id: 'a', name: 'Al', index: 12, active: true }], rounds: [ROUND] } });
+  const v0 = s.api({ op: 'since', v: 0 }).ver;
+  s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 1, scores: { a: { v: 5, base: null } }, by: 'Al' });
+  const d = s.api({ op: 'since', v: v0 });
+  assert.ok(d.ver > v0 && d.tables.scores.length === 1);
+});
+
 test('a round with scores is only deleted when the request says so', () => {
   for (const [kind, s] of servers().list) {
     s.api({ op: 'seed', data: { members: [{ id: 'a', name: 'Al', index: 12, active: true }], rounds: [ROUND, Object.assign({}, ROUND, { id: 'r10', status: 'upcoming' })] } });

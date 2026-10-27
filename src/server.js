@@ -92,7 +92,7 @@ var NCGS = (function () {
         save();
       },
       getVer: function () { return data.ver; },
-      setVer: function (v) { data.ver = v; save(); },
+      setVer: function (v) { data.ver = v; cacheMap.VER = String(v); save(); },
       getPin: function () { return data.pin || DEFAULT_PIN; },
       setPin: function (p) { data.pin = p; save(); },
       putPhoto: function (dataUrl) { var id = 'ph' + (Object.keys(data.photos).length + 1) + '-' + Date.now(); data.photos[id] = dataUrl; save(); return id; },
@@ -290,6 +290,10 @@ var NCGS = (function () {
       var v = Number(req.v || 0);
       var cached = store.cacheGet('VER');
       var cur = cached !== null && cached !== undefined ? Number(cached) : store.getVer();
+      // The cached version expires after 6 h without a save (every morning). Put it back, so only the first poll
+      // after that reads Script Properties, not every poll until the next save (structural review H4).
+      // Short-lived on purpose: if a save lands between the read and this put, the stale value lasts a minute at most.
+      if (cached === null || cached === undefined) store.cachePut('VER', String(cur), 60);
       if (v >= cur) return { ver: cur, same: true, build: BUILD };
       var tables = {};
       TABLES.forEach(function (t) {

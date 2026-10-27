@@ -2134,7 +2134,7 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .drw-left { margin: 0 0 12px; text-align: center; font-size: 1rem; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610272200","server":"f856b600"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610272216","server":"15a2ed3e"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3219,7 +3219,7 @@ var NCGS = (function () {
   var ROUND_SETTINGS = { wd: 1, format: 1, teamshots: 1, pots: 1, draw: 1, drawdev: 1, drawepoch: 1, drawshort: 1, drawpace: 1 };
   var DEFAULT_PIN = '1234';
   // Stamped by build.js with a fingerprint of this file, so the app can tell whether the live server is the latest.
-  var BUILD = 'f856b600';
+  var BUILD = '15a2ed3e';
 
   function keyOf(table, row) {
     return SCHEMA[table].key.map(function (k) { return String(row[k]); }).join('|');
@@ -3279,7 +3279,7 @@ var NCGS = (function () {
         save();
       },
       getVer: function () { return data.ver; },
-      setVer: function (v) { data.ver = v; save(); },
+      setVer: function (v) { data.ver = v; cacheMap.VER = String(v); save(); },
       getPin: function () { return data.pin || DEFAULT_PIN; },
       setPin: function (p) { data.pin = p; save(); },
       putPhoto: function (dataUrl) { var id = 'ph' + (Object.keys(data.photos).length + 1) + '-' + Date.now(); data.photos[id] = dataUrl; save(); return id; },
@@ -3477,6 +3477,10 @@ var NCGS = (function () {
       var v = Number(req.v || 0);
       var cached = store.cacheGet('VER');
       var cur = cached !== null && cached !== undefined ? Number(cached) : store.getVer();
+      // The cached version expires after 6 h without a save (every morning). Put it back, so only the first poll
+      // after that reads Script Properties, not every poll until the next save (structural review H4).
+      // Short-lived on purpose: if a save lands between the read and this put, the stale value lasts a minute at most.
+      if (cached === null || cached === undefined) store.cachePut('VER', String(cur), 60);
       if (v >= cur) return { ver: cur, same: true, build: BUILD };
       var tables = {};
       TABLES.forEach(function (t) {
