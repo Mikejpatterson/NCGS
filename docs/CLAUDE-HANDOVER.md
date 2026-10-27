@@ -25,6 +25,9 @@ the remote refs, the queue and issue #1 before acting; these lines go out of dat
 - **Roadmap version 1** (`docs/ROADMAP.md`) was owner-approved via PR #18 (merge `e8e5a63`). The first three of its
   tasks were queued in `ad957cf`: `handover-current`, `name-resize-check`, `warning-token-audit`.
 
+**Owner, 27 October 2026:** there are no real rounds until Athenry in March 2027. Any round in the live app before then is a test round (for example the live Cabopino round used for the phone check).
+**Released 27 October 2026 (#48, merge 5efc378):** Westport scramble, breakfast draw, one Groups screen, Home "your day", UX-review fixes. Real-phone offline check passed the same morning on the owner's iPhone. With no signal, hole 8 was saved and showed "On this phone"; the app reopened after being closed and went to hole 9; once signal returned, Results showed the group thru 8.
+
 **Still open:**
 - **Real-iPhone / sunlight review has not happened.** All screenshots so far are Chromium on Linux with invented
   data. Typography (New York), colours, text scaling and offline use still need one real-phone session
