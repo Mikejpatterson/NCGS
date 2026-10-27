@@ -1,6 +1,7 @@
 // Builds every version of the app from the same source.
 //   dist/site/            the live app for GitHub Pages: index.html, manifest, icons, offline worker
-//   dist/server.js        the data service for Google Apps Script (with the 2026 starting data)
+//   dist/server.js        the data service for Google Apps Script (small: no starting data, stays in Google's cache)
+//   dist/server-setup.js  the same with the 2026 starting data, only for a brand-new install
 //   dist/bootstrap.gs     the one line pasted into Apps Script, which loads server.js from Drive
 //   dist/preview.html     the app with an in-browser copy of the data, for tests and review
 //   dist/golf-trip.html   the same preview as page content for publishing as an artifact
@@ -97,7 +98,13 @@ out('site/.nojekyll', '');
 });
 
 // Data service for Apps Script
-out('server.js', `${server}\nvar NCGS_SEED = ${JSON.stringify(seed)};\n`);
+// The data service loaded from Drive on every request carries no starting data: the live sheet was seeded long ago,
+// and the seed made the program too big for Google's 100 KB cache, so it was re-read from Drive each time (review M1).
+// A brand-new install pastes server-setup.js once instead, which includes the starting data.
+const serverOut = `${server}\nvar NCGS_SEED = null;\n`;
+if (Buffer.byteLength(serverOut) > 90 * 1024) throw new Error(`dist/server.js is ${Math.round(Buffer.byteLength(serverOut) / 1024)} KB: it must stay under 90 KB to fit Google's cache`);
+out('server.js', serverOut);
+out('server-setup.js', `${server}\nvar NCGS_SEED = ${JSON.stringify(seed)};\n`);
 out('bootstrap.gs', fs.existsSync(path.join(__dirname, 'tools', 'bootstrap.gs')) ? read('tools/bootstrap.gs') : '');
 
 console.log(`Built ${version}: preview ${(previewBody.length / 1024).toFixed(0)} KB, site ${(fs.statSync(path.join(__dirname, 'dist/site/index.html')).size / 1024).toFixed(0)} KB, api ${deploy.api ? 'set' : 'not set yet'}`);
