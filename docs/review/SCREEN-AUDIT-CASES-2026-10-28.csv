@@ -1,0 +1,439 @@
+pass,case,role,requested_view,scenario,size,rendered_view,floating_nav,return_controls,render_faults,capture_or_back_error,scroll_frames
+screen-audit-3909939,member-home,member,home,between,390,home,False,,0,,0
+screen-audit-3909939,member-rounds,member,rounds,between,390,rounds,False,Home,0,,0
+screen-audit-3909939,member-players,member,players,between,390,players,False,Home,0,,0
+screen-audit-3909939,member-goy,member,goy,between,390,goy,False,Home,0,,0
+screen-audit-3909939,member-round,member,round,between,390,round,False,Home,0,,0
+screen-audit-3909939,member-stats,member,stats,between,390,stats,False,Home,0,,0
+screen-audit-3909939,member-player,member,player,between,390,player,False,Home,0,,0
+screen-audit-3909939,member-card,member,card,between,390,card,False,Home,0,,0
+screen-audit-3909939,member-who,member,who,between,390,who,False,Home,0,,0
+screen-audit-3909939,member-tee,member,tee,today,390,tee,False,,0,,0
+screen-audit-3909939,member-rejected,member,rejected,between,390,rejected,False,Home,0,,0
+screen-audit-3909939,member-entry,member,entry,today,390,entry,True,,0,,0
+screen-audit-3909939,member-after,member,after,today,390,home,True,,1,,0
+screen-audit-3909939,member-check,member,check,today,390,check,True,Hole 15,0,,0
+screen-audit-3909939,member-finish,member,finish,today,390,finish,True,Back to the front page,0,,0
+screen-audit-3909939,member-hcp,member,hcp,today,390,hcp,False,Demo round,0,,0
+screen-audit-3909939,member-board,member,board,today,390,board,True,Home,0,,0
+screen-audit-3909939,member-trip,member,trip,between,390,trip,False,Home,0,,0
+screen-audit-3909939,member-results,member,results,between,390,results,False,Home,0,,0
+screen-audit-3909939,member-scramble,member,scramble,westport,390,scramble,True,,0,,0
+screen-audit-3909939,member-scrambleFinish,member,scrambleFinish,westport,390,scrambleFinish,True,,0,,0
+screen-audit-3909939,member-rules,member,rules,between,390,rules,False,,0,,0
+screen-audit-3909939,org-lock,org,lock,eventday,390,lock,False,Back,0,,0
+screen-audit-3909939,org-home,org,home,eventday,390,home,False,Done,0,,0
+screen-audit-3909939,org-round,org,round,eventday,390,round,False,Organiser,0,,0
+screen-audit-3909939,org-details,org,details,eventday,390,details,False,Autumn outing,0,,0
+screen-audit-3909939,org-playing,org,playing,eventday,390,playing,False,Autumn outing,0,,0
+screen-audit-3909939,org-groupsview,org,groupsview,eventday,390,groupsview,False,Autumn outing,0,,0
+screen-audit-3909939,org-kb,org,kb,eventday,390,kb,False,Autumn outing,0,,0
+screen-audit-3909939,org-group,org,group,eventday,390,group,False,Autumn outing,0,,0
+screen-audit-3909939,org-correct,org,correct,eventday,390,correct,False,Back,0,,0
+screen-audit-3909939,org-teamshots,org,teamshots,westport,390,teamshots,False,Westport,0,,0
+screen-audit-3909939,org-contest,org,contest,eventday,390,home,False,Done,1,,0
+screen-audit-3909939,org-guest,org,guest,eventday,390,guest,False,Players,0,,0
+screen-audit-3909939,org-late,org,late,eventday,390,late,False,Autumn outing,0,,0
+screen-audit-3909939,org-members,org,members,eventday,390,members,False,Organiser,0,,0
+screen-audit-3909939,org-member,org,member,eventday,390,member,False,Members,0,,0
+screen-audit-3909939,org-courses,org,courses,eventday,390,courses,False,Organiser,0,,0
+screen-audit-3909939,org-course,org,course,eventday,390,course,False,Courses,0,,0
+screen-audit-3909939,org-settings,org,settings,eventday,390,settings,False,Organiser,0,,0
+screen-audit-3909939,org-log,org,log,eventday,390,log,False,Organiser,0,,0
+screen-audit-3909939,org-export,org,export,eventday,390,export,False,Organiser,0,,0
+screen-audit-3909939,org-drawhome,org,drawhome,draw,390,drawhome,False,Westport,0,,0
+screen-audit-3909939,org-pots,org,pots,draw,390,pots,False,Breakfast draw,0,,0
+screen-audit-3909939,org-draw,org,draw,draw,390,draw,False,Breakfast draw,0,,0
+screen-audit-3909939,org-drawlineup,org,drawlineup,draw,390,drawlineup,False,Breakfast draw,0,,0
+screen-audit-3909939,org-groups,org,groups,eventday,390,groups,False,Autumn outing,0,,0
+screen-audit-3909939,member-scenarios,member,scenarios,between,390,scenarios,False,Home,0,,0
+screen-audit-3909939,home-preseason,member,home,preseason,390,home,False,,0,,0
+screen-audit-3909939,home-announced,member,home,announced,390,home,False,,0,,0
+screen-audit-3909939,home-ready,member,home,ready,390,home,False,,0,,0
+screen-audit-3909939,home-eventday,member,home,eventday,390,home,True,,0,,0
+screen-audit-3909939,home-today,member,home,today,390,home,True,,0,,0
+screen-audit-3909939,home-westport,member,home,westport,390,home,True,,0,,0
+screen-audit-3909939,home-draw,member,home,draw,390,home,True,,0,,0
+screen-audit-3909939,round-players,member,round,today,390,round,True,,0,,0
+screen-audit-3909939,round-groups,member,round,today,390,round,True,,0,,0
+screen-audit-3909939,round-kb,member,round,today,390,round,True,,0,,0
+screen-audit-3909939,round-course,member,round,today,390,round,True,,0,,0
+screen-audit-3909939,round-about,member,round,today,390,round,True,,0,,0
+screen-audit-3909939,round-wx,member,round,today,390,round,True,,0,,0
+screen-audit-3909939,board-bw,member,board,today,390,board,True,Home,0,,0
+screen-audit-3909939,board-ct,member,board,today,390,board,True,Home,0,,0
+screen-audit-3909939,board-st,member,board,today,390,board,True,Home,0,,0
+screen-audit-3909939,org-scramble-round,org,round,westport,390,round,False,Organiser,0,,0
+screen-audit-3909939,org-scramble-groups,org,groups,westport,390,groups,False,Westport,0,,0
+screen-audit-3909939,org-scramble-group,org,group,westport,390,group,False,Round,0,,0
+screen-audit-3909939,org-scramble-correct,org,correct,westport,390,correct,False,Back,0,,0
+screen-audit-3909939,org-new-details,org,details,eventday,390,details,False,Organiser,0,,0
+screen-audit-3909939,org-new-member,org,member,eventday,390,member,False,Members,0,,0
+screen-audit-3909939,org-new-course,org,course,eventday,390,course,False,Courses,0,,0
+screen-audit-3909939,org-groups-empty,org,groups,announced,390,groups,False,Cabopino,0,,0
+screen-audit-3909939,rules-round-ended,member,rules,today,390,rules,False,,0,,0
+screen-audit-3909939,board-round-ended,member,board,today,390,board,False,,0,,0
+screen-audit-3909939,tee-round-ended,member,tee,today,390,tee,False,,0,,0
+screen-audit-3909939,who-root,member,who,between,390,who,False,,0,,0
+screen-audit-3909939,member-home,member,home,between,360,home,False,,0,,0
+screen-audit-3909939,member-rounds,member,rounds,between,360,rounds,False,Home,0,,0
+screen-audit-3909939,member-players,member,players,between,360,players,False,Home,0,,0
+screen-audit-3909939,member-goy,member,goy,between,360,goy,False,Home,0,,0
+screen-audit-3909939,member-round,member,round,between,360,round,False,Home,0,,0
+screen-audit-3909939,member-stats,member,stats,between,360,stats,False,Home,0,,0
+screen-audit-3909939,member-player,member,player,between,360,player,False,Home,0,,0
+screen-audit-3909939,member-card,member,card,between,360,card,False,Home,0,,0
+screen-audit-3909939,member-who,member,who,between,360,who,False,Home,0,,0
+screen-audit-3909939,member-tee,member,tee,today,360,tee,False,,0,,0
+screen-audit-3909939,member-rejected,member,rejected,between,360,rejected,False,Home,0,,0
+screen-audit-3909939,member-entry,member,entry,today,360,entry,True,,0,,0
+screen-audit-3909939,member-after,member,after,today,360,home,True,,1,,0
+screen-audit-3909939,member-check,member,check,today,360,check,True,Hole 15,0,,0
+screen-audit-3909939,member-finish,member,finish,today,360,finish,True,Back to the front page,0,,0
+screen-audit-3909939,member-hcp,member,hcp,today,360,hcp,False,Demo round,0,,0
+screen-audit-3909939,member-board,member,board,today,360,board,True,Home,0,,0
+screen-audit-3909939,member-trip,member,trip,between,360,trip,False,Home,0,,0
+screen-audit-3909939,member-results,member,results,between,360,results,False,Home,0,,0
+screen-audit-3909939,member-scramble,member,scramble,westport,360,scramble,True,,0,,0
+screen-audit-3909939,member-scrambleFinish,member,scrambleFinish,westport,360,scrambleFinish,True,,0,,0
+screen-audit-3909939,member-rules,member,rules,between,360,rules,False,,0,,0
+screen-audit-3909939,org-lock,org,lock,eventday,360,lock,False,Back,0,,0
+screen-audit-3909939,org-home,org,home,eventday,360,home,False,Done,0,,0
+screen-audit-3909939,org-round,org,round,eventday,360,round,False,Organiser,0,,0
+screen-audit-3909939,org-details,org,details,eventday,360,details,False,Autumn outing,0,,0
+screen-audit-3909939,org-playing,org,playing,eventday,360,playing,False,Autumn outing,0,,0
+screen-audit-3909939,org-groupsview,org,groupsview,eventday,360,groupsview,False,Autumn outing,0,,0
+screen-audit-3909939,org-kb,org,kb,eventday,360,kb,False,Autumn outing,0,,0
+screen-audit-3909939,org-group,org,group,eventday,360,group,False,Autumn outing,0,,0
+screen-audit-3909939,org-correct,org,correct,eventday,360,correct,False,Back,0,,0
+screen-audit-3909939,org-teamshots,org,teamshots,westport,360,teamshots,False,Westport,0,,0
+screen-audit-3909939,org-contest,org,contest,eventday,360,home,False,Done,1,,0
+screen-audit-3909939,org-guest,org,guest,eventday,360,guest,False,Players,0,,0
+screen-audit-3909939,org-late,org,late,eventday,360,late,False,Autumn outing,0,,0
+screen-audit-3909939,org-members,org,members,eventday,360,members,False,Organiser,0,,0
+screen-audit-3909939,org-member,org,member,eventday,360,member,False,Members,0,,0
+screen-audit-3909939,org-courses,org,courses,eventday,360,courses,False,Organiser,0,,0
+screen-audit-3909939,org-course,org,course,eventday,360,course,False,Courses,0,,0
+screen-audit-3909939,org-settings,org,settings,eventday,360,settings,False,Organiser,0,,0
+screen-audit-3909939,org-log,org,log,eventday,360,log,False,Organiser,0,,0
+screen-audit-3909939,org-export,org,export,eventday,360,export,False,Organiser,0,,0
+screen-audit-3909939,org-drawhome,org,drawhome,draw,360,drawhome,False,Westport,0,,0
+screen-audit-3909939,org-pots,org,pots,draw,360,pots,False,Breakfast draw,0,,0
+screen-audit-3909939,org-draw,org,draw,draw,360,draw,False,Breakfast draw,0,,0
+screen-audit-3909939,org-drawlineup,org,drawlineup,draw,360,drawlineup,False,Breakfast draw,0,,0
+screen-audit-3909939,org-groups,org,groups,eventday,360,groups,False,Autumn outing,0,,0
+screen-audit-3909939,member-scenarios,member,scenarios,between,360,scenarios,False,Home,0,,0
+screen-audit-3909939,home-preseason,member,home,preseason,360,home,False,,0,,0
+screen-audit-3909939,home-announced,member,home,announced,360,home,False,,0,,0
+screen-audit-3909939,home-ready,member,home,ready,360,home,False,,0,,0
+screen-audit-3909939,home-eventday,member,home,eventday,360,home,True,,0,,0
+screen-audit-3909939,home-today,member,home,today,360,home,True,,0,,0
+screen-audit-3909939,home-westport,member,home,westport,360,home,True,,0,,0
+screen-audit-3909939,home-draw,member,home,draw,360,home,True,,0,,0
+screen-audit-3909939,round-players,member,round,today,360,round,True,,0,,0
+screen-audit-3909939,round-groups,member,round,today,360,round,True,,0,,0
+screen-audit-3909939,round-kb,member,round,today,360,round,True,,0,,0
+screen-audit-3909939,round-course,member,round,today,360,round,True,,0,,0
+screen-audit-3909939,round-about,member,round,today,360,round,True,,0,,0
+screen-audit-3909939,round-wx,member,round,today,360,round,True,,0,,0
+screen-audit-3909939,board-bw,member,board,today,360,board,True,Home,0,,0
+screen-audit-3909939,board-ct,member,board,today,360,board,True,Home,0,,0
+screen-audit-3909939,board-st,member,board,today,360,board,True,Home,0,,0
+screen-audit-3909939,org-scramble-round,org,round,westport,360,round,False,Organiser,0,,0
+screen-audit-3909939,org-scramble-groups,org,groups,westport,360,groups,False,Westport,0,,0
+screen-audit-3909939,org-scramble-group,org,group,westport,360,group,False,Round,0,,0
+screen-audit-3909939,org-scramble-correct,org,correct,westport,360,correct,False,Back,0,,0
+screen-audit-3909939,org-new-details,org,details,eventday,360,details,False,Organiser,0,,0
+screen-audit-3909939,org-new-member,org,member,eventday,360,member,False,Members,0,,0
+screen-audit-3909939,org-new-course,org,course,eventday,360,course,False,Courses,0,,0
+screen-audit-3909939,org-groups-empty,org,groups,announced,360,groups,False,Cabopino,0,,0
+screen-audit-3909939,rules-round-ended,member,rules,today,360,rules,False,,0,,0
+screen-audit-3909939,board-round-ended,member,board,today,360,board,False,,0,,0
+screen-audit-3909939,tee-round-ended,member,tee,today,360,tee,False,,0,,0
+screen-audit-3909939,who-root,member,who,between,360,who,False,,0,,0
+screen-audit-3909939,member-home,member,home,between,135,home,False,,0,,0
+screen-audit-3909939,member-rounds,member,rounds,between,135,rounds,False,Home,0,,0
+screen-audit-3909939,member-players,member,players,between,135,players,False,Home,0,,0
+screen-audit-3909939,member-goy,member,goy,between,135,goy,False,Home,0,,0
+screen-audit-3909939,member-round,member,round,between,135,round,False,Home,0,,0
+screen-audit-3909939,member-stats,member,stats,between,135,stats,False,Home,0,,0
+screen-audit-3909939,member-player,member,player,between,135,player,False,Home,0,,0
+screen-audit-3909939,member-card,member,card,between,135,card,False,Home,0,,0
+screen-audit-3909939,member-who,member,who,between,135,who,False,Home,0,,0
+screen-audit-3909939,member-tee,member,tee,today,135,tee,False,,0,,0
+screen-audit-3909939,member-rejected,member,rejected,between,135,rejected,False,Home,0,,0
+screen-audit-3909939,member-entry,member,entry,today,135,entry,True,,0,,0
+screen-audit-3909939,member-after,member,after,today,135,home,True,,1,,0
+screen-audit-3909939,member-check,member,check,today,135,check,True,Hole 15,0,"locator.click: Timeout 1500ms exceeded.
+Call log:
+[2m  - waiting for locator('[data-act=""back""],[data-act=""entry-back""]').first()[22m
+[2m    - locator resolved to <button class=""link"" data-act=""back"">…</button>[22m
+",0
+screen-audit-3909939,member-finish,member,finish,today,135,finish,True,Back to the front page,0,,0
+screen-audit-3909939,member-hcp,member,hcp,today,135,hcp,False,Demo round,0,,0
+screen-audit-3909939,member-board,member,board,today,135,board,True,Home,0,,0
+screen-audit-3909939,member-trip,member,trip,between,135,trip,False,Home,0,,0
+screen-audit-3909939,member-results,member,results,between,135,results,False,Home,0,,0
+screen-audit-3909939,member-scramble,member,scramble,westport,135,scramble,True,,0,,0
+screen-audit-3909939,member-scrambleFinish,member,scrambleFinish,westport,135,scrambleFinish,True,,0,,0
+screen-audit-3909939,member-rules,member,rules,between,135,rules,False,,0,,0
+screen-audit-3909939,org-lock,org,lock,eventday,135,lock,False,Back,0,,0
+screen-audit-3909939,org-home,org,home,eventday,135,home,False,Done,0,,0
+screen-audit-3909939,org-round,org,round,eventday,135,round,False,Organiser,0,,0
+screen-audit-3909939,org-details,org,details,eventday,135,details,False,Autumn outing,0,,0
+screen-audit-3909939,org-playing,org,playing,eventday,135,playing,False,Autumn outing,0,,0
+screen-audit-3909939,org-groupsview,org,groupsview,eventday,135,groupsview,False,Autumn outing,0,,0
+screen-audit-3909939,org-kb,org,kb,eventday,135,kb,False,Autumn outing,0,,0
+screen-audit-3909939,org-group,org,group,eventday,135,group,False,Autumn outing,0,,0
+screen-audit-3909939,org-correct,org,correct,eventday,135,correct,False,Back,0,,0
+screen-audit-3909939,org-teamshots,org,teamshots,westport,135,teamshots,False,Westport,0,,0
+screen-audit-3909939,org-contest,org,contest,eventday,135,home,False,Done,1,,0
+screen-audit-3909939,org-guest,org,guest,eventday,135,guest,False,Players,0,,0
+screen-audit-3909939,org-late,org,late,eventday,135,late,False,Autumn outing,0,,0
+screen-audit-3909939,org-members,org,members,eventday,135,members,False,Organiser,0,,0
+screen-audit-3909939,org-member,org,member,eventday,135,member,False,Members,0,,0
+screen-audit-3909939,org-courses,org,courses,eventday,135,courses,False,Organiser,0,,0
+screen-audit-3909939,org-course,org,course,eventday,135,course,False,Courses,0,,0
+screen-audit-3909939,org-settings,org,settings,eventday,135,settings,False,Organiser,0,,0
+screen-audit-3909939,org-log,org,log,eventday,135,log,False,Organiser,0,,0
+screen-audit-3909939,org-export,org,export,eventday,135,export,False,Organiser,0,,0
+screen-audit-3909939,org-drawhome,org,drawhome,draw,135,drawhome,False,Westport,0,,0
+screen-audit-3909939,org-pots,org,pots,draw,135,pots,False,Breakfast draw,0,,0
+screen-audit-3909939,org-draw,org,draw,draw,135,draw,False,Breakfast draw,0,,0
+screen-audit-3909939,org-drawlineup,org,drawlineup,draw,135,drawlineup,False,Breakfast draw,0,,0
+screen-audit-3909939,org-groups,org,groups,eventday,135,groups,False,Autumn outing,0,,0
+screen-audit-3909939,member-scenarios,member,scenarios,between,135,scenarios,False,Home,0,,0
+screen-audit-3909939,home-preseason,member,home,preseason,135,home,False,,0,,0
+screen-audit-3909939,home-announced,member,home,announced,135,home,False,,0,,0
+screen-audit-3909939,home-ready,member,home,ready,135,home,False,,0,,0
+screen-audit-3909939,home-eventday,member,home,eventday,135,home,True,,0,,0
+screen-audit-3909939,home-today,member,home,today,135,home,True,,0,,0
+screen-audit-3909939,home-westport,member,home,westport,135,home,True,,0,,0
+screen-audit-3909939,home-draw,member,home,draw,135,home,True,,0,,0
+screen-audit-3909939,round-players,member,round,today,135,round,True,,0,,0
+screen-audit-3909939,round-groups,member,round,today,135,round,True,,0,,0
+screen-audit-3909939,round-kb,member,round,today,135,round,True,,0,,0
+screen-audit-3909939,round-course,member,round,today,135,round,True,,0,,0
+screen-audit-3909939,round-about,member,round,today,135,round,True,,0,,0
+screen-audit-3909939,round-wx,member,round,today,135,round,True,,0,,0
+screen-audit-3909939,board-bw,member,board,today,135,board,True,Home,0,,0
+screen-audit-3909939,board-ct,member,board,today,135,board,True,Home,0,,0
+screen-audit-3909939,board-st,member,board,today,135,board,True,Home,0,,0
+screen-audit-3909939,org-scramble-round,org,round,westport,135,round,False,Organiser,0,,0
+screen-audit-3909939,org-scramble-groups,org,groups,westport,135,groups,False,Westport,0,,0
+screen-audit-3909939,org-scramble-group,org,group,westport,135,group,False,Round,0,,0
+screen-audit-3909939,org-scramble-correct,org,correct,westport,135,correct,False,Back,0,,0
+screen-audit-3909939,org-new-details,org,details,eventday,135,details,False,Organiser,0,,0
+screen-audit-3909939,org-new-member,org,member,eventday,135,member,False,Members,0,,0
+screen-audit-3909939,org-new-course,org,course,eventday,135,course,False,Courses,0,,0
+screen-audit-3909939,org-groups-empty,org,groups,announced,135,groups,False,Cabopino,0,,0
+screen-audit-3909939,rules-round-ended,member,rules,today,135,rules,False,,0,,0
+screen-audit-3909939,board-round-ended,member,board,today,135,board,False,,0,,0
+screen-audit-3909939,tee-round-ended,member,tee,today,135,tee,False,,0,,0
+screen-audit-3909939,who-root,member,who,between,135,who,False,,0,,0
+screen-audit-followup-3909939,member-after,member,after,today,390,after,True,,0,,0
+screen-audit-followup-3909939,org-contest,org,contest,eventday,390,home,False,Done,1,,0
+screen-audit-followup-3909939,rules-round-ended,member,rules,today,390,rules,False,,0,,0
+screen-audit-followup-3909939,board-round-ended,member,board,today,390,board,False,,0,,0
+screen-audit-followup-3909939,tee-round-ended,member,tee,today,390,tee,False,,0,,0
+screen-audit-followup-3909939,round-weather,member,round,today,390,round,True,,0,,0
+screen-audit-followup-3909939,round-pots,member,round,draw,390,round,True,,0,,0
+screen-audit-followup-3909939,rejected-populated,member,rejected,between,390,rejected,False,Home,0,,0
+screen-audit-followup-3909939,holes-overlay,member,entry,today,390,entry,False,,0,,0
+screen-audit-followup-3909939,member-after,member,after,today,360,after,True,,0,,0
+screen-audit-followup-3909939,org-contest,org,contest,eventday,360,home,False,Done,1,,0
+screen-audit-followup-3909939,rules-round-ended,member,rules,today,360,rules,False,,0,,0
+screen-audit-followup-3909939,board-round-ended,member,board,today,360,board,False,,0,,0
+screen-audit-followup-3909939,tee-round-ended,member,tee,today,360,tee,False,,0,,0
+screen-audit-followup-3909939,round-weather,member,round,today,360,round,True,,0,,0
+screen-audit-followup-3909939,round-pots,member,round,draw,360,round,True,,0,,0
+screen-audit-followup-3909939,rejected-populated,member,rejected,between,360,rejected,False,Home,0,,0
+screen-audit-followup-3909939,holes-overlay,member,entry,today,360,entry,False,,0,,0
+screen-audit-followup-3909939,member-after,member,after,today,135,after,True,,0,,0
+screen-audit-followup-3909939,org-contest,org,contest,eventday,135,home,False,Done,1,,0
+screen-audit-followup-3909939,rules-round-ended,member,rules,today,135,rules,False,,0,,0
+screen-audit-followup-3909939,board-round-ended,member,board,today,135,board,False,,0,,0
+screen-audit-followup-3909939,tee-round-ended,member,tee,today,135,tee,False,,0,,0
+screen-audit-followup-3909939,round-weather,member,round,today,135,round,True,,0,,0
+screen-audit-followup-3909939,round-pots,member,round,draw,135,round,True,,0,,0
+screen-audit-followup-3909939,rejected-populated,member,rejected,between,135,rejected,False,Home,0,,0
+screen-audit-followup-3909939,holes-overlay,member,entry,today,135,entry,False,,0,,0
+screen-audit-states-3909939,member-check,member,check,today,390,check,True,Hole 15,0,,0
+screen-audit-states-3909939,org-contest,org,contest,today,390,contest,False,Demo round,0,,0
+screen-audit-states-3909939,org-groups-empty,org,groups,announced,390,groups,False,Autumn outing,0,,0
+screen-audit-states-3909939,finish-complete,member,finish,today,390,finish,True,Back to the front page,0,,0
+screen-audit-states-3909939,scramble-finish-complete,member,scrambleFinish,westport,390,scrambleFinish,True,,0,,0
+screen-audit-states-3909939,check-reading,member,check,today,390,check,True,Hole 15; Carry on to hole 15,0,,0
+screen-audit-states-3909939,check-failed,member,check,today,390,check,True,Hole 15,0,,0
+screen-audit-states-3909939,check-manual,member,check,today,390,check,True,Hole 15,0,,0
+screen-audit-states-3909939,check-done,member,check,today,390,check,True,Hole 15; Done,0,,0
+screen-audit-states-3909939,member-check,member,check,today,360,check,True,Hole 15,0,,0
+screen-audit-states-3909939,org-contest,org,contest,today,360,contest,False,Demo round,0,,0
+screen-audit-states-3909939,org-groups-empty,org,groups,announced,360,groups,False,Autumn outing,0,,0
+screen-audit-states-3909939,finish-complete,member,finish,today,360,finish,True,Back to the front page,0,,0
+screen-audit-states-3909939,scramble-finish-complete,member,scrambleFinish,westport,360,scrambleFinish,True,,0,,0
+screen-audit-states-3909939,check-reading,member,check,today,360,check,True,Hole 15; Carry on to hole 15,0,,0
+screen-audit-states-3909939,check-failed,member,check,today,360,check,True,Hole 15,0,,0
+screen-audit-states-3909939,check-manual,member,check,today,360,check,True,Hole 15,0,,0
+screen-audit-states-3909939,check-done,member,check,today,360,check,True,Hole 15; Done,0,,0
+screen-audit-states-3909939,member-check,member,check,today,135,check,True,Hole 15,0,,0
+screen-audit-states-3909939,org-contest,org,contest,today,135,contest,False,Demo round,0,,0
+screen-audit-states-3909939,org-groups-empty,org,groups,announced,135,groups,False,Autumn outing,0,,0
+screen-audit-states-3909939,finish-complete,member,finish,today,135,finish,True,Back to the front page,0,,0
+screen-audit-states-3909939,scramble-finish-complete,member,scrambleFinish,westport,135,scrambleFinish,True,,0,,0
+screen-audit-states-3909939,check-reading,member,check,today,135,check,True,Hole 15; Carry on to hole 15,0,,0
+screen-audit-states-3909939,check-failed,member,check,today,135,check,True,Hole 15,0,,0
+screen-audit-states-3909939,check-manual,member,check,today,135,check,True,Hole 15,0,,0
+screen-audit-states-3909939,check-done,member,check,today,135,check,True,Hole 15; Done,0,,0
+screen-audit-scroll-3909939,member-home,member,home,between,390,home,False,,0,,2
+screen-audit-scroll-3909939,member-rounds,member,rounds,between,390,rounds,False,Home,0,,0
+screen-audit-scroll-3909939,member-players,member,players,between,390,players,False,Home,0,,1
+screen-audit-scroll-3909939,member-goy,member,goy,between,390,goy,False,Home,0,,3
+screen-audit-scroll-3909939,member-round,member,round,between,390,round,False,Home,0,,4
+screen-audit-scroll-3909939,member-stats,member,stats,between,390,stats,False,Home,0,,4
+screen-audit-scroll-3909939,member-player,member,player,between,390,player,False,Home,0,,3
+screen-audit-scroll-3909939,member-card,member,card,between,390,card,False,Home,0,,0
+screen-audit-scroll-3909939,member-who,member,who,between,390,who,False,Home,0,,1
+screen-audit-scroll-3909939,member-tee,member,tee,today,390,tee,False,,0,,0
+screen-audit-scroll-3909939,member-rejected,member,rejected,between,390,rejected,False,Home,0,,0
+screen-audit-scroll-3909939,member-entry,member,entry,today,390,entry,True,,0,,0
+screen-audit-scroll-3909939,member-after,member,after,today,390,after,True,,0,,0
+screen-audit-scroll-3909939,member-check,member,check,today,390,check,True,Hole 15,0,,0
+screen-audit-scroll-3909939,member-finish,member,finish,today,390,finish,True,Back to the front page,0,,0
+screen-audit-scroll-3909939,member-hcp,member,hcp,today,390,hcp,False,Demo round,0,,0
+screen-audit-scroll-3909939,member-board,member,board,today,390,board,True,Home,0,,4
+screen-audit-scroll-3909939,member-trip,member,trip,between,390,trip,False,Home,0,,1
+screen-audit-scroll-3909939,member-results,member,results,between,390,results,False,Home,0,,0
+screen-audit-scroll-3909939,member-scramble,member,scramble,westport,390,scramble,True,,0,,0
+screen-audit-scroll-3909939,member-scrambleFinish,member,scrambleFinish,westport,390,scrambleFinish,True,,0,,0
+screen-audit-scroll-3909939,member-rules,member,rules,between,390,rules,False,,0,,0
+screen-audit-scroll-3909939,org-lock,org,lock,eventday,390,lock,False,Back,0,,0
+screen-audit-scroll-3909939,org-home,org,home,eventday,390,home,False,Done,0,,1
+screen-audit-scroll-3909939,org-round,org,round,eventday,390,round,False,Organiser,0,,0
+screen-audit-scroll-3909939,org-details,org,details,eventday,390,details,False,Autumn outing,0,,0
+screen-audit-scroll-3909939,org-playing,org,playing,eventday,390,playing,False,Autumn outing,0,,2
+screen-audit-scroll-3909939,org-groupsview,org,groupsview,eventday,390,groupsview,False,Autumn outing,0,,0
+screen-audit-scroll-3909939,org-kb,org,kb,eventday,390,kb,False,Autumn outing,0,,1
+screen-audit-scroll-3909939,org-group,org,group,eventday,390,group,False,Autumn outing,0,,1
+screen-audit-scroll-3909939,org-correct,org,correct,eventday,390,correct,False,Back,0,,0
+screen-audit-scroll-3909939,org-teamshots,org,teamshots,westport,390,teamshots,False,Westport,0,,0
+screen-audit-scroll-3909939,org-contest,org,contest,today,390,contest,False,Demo round,0,,0
+screen-audit-scroll-3909939,org-guest,org,guest,eventday,390,guest,False,Players,0,,0
+screen-audit-scroll-3909939,org-late,org,late,eventday,390,late,False,Autumn outing,0,,1
+screen-audit-scroll-3909939,org-members,org,members,eventday,390,members,False,Organiser,0,,1
+screen-audit-scroll-3909939,org-member,org,member,eventday,390,member,False,Members,0,,0
+screen-audit-scroll-3909939,org-courses,org,courses,eventday,390,courses,False,Organiser,0,,0
+screen-audit-scroll-3909939,org-course,org,course,eventday,390,course,False,Courses,0,,3
+screen-audit-scroll-3909939,org-settings,org,settings,eventday,390,settings,False,Organiser,0,,3
+screen-audit-scroll-3909939,org-log,org,log,eventday,390,log,False,Organiser,0,,0
+screen-audit-scroll-3909939,org-export,org,export,eventday,390,export,False,Organiser,0,,2
+screen-audit-scroll-3909939,org-drawhome,org,drawhome,draw,390,drawhome,False,Westport,0,,0
+screen-audit-scroll-3909939,org-pots,org,pots,draw,390,pots,False,Breakfast draw,0,,1
+screen-audit-scroll-3909939,org-draw,org,draw,draw,390,draw,False,Breakfast draw,0,,0
+screen-audit-scroll-3909939,org-drawlineup,org,drawlineup,draw,390,drawlineup,False,Breakfast draw,0,,0
+screen-audit-scroll-3909939,org-groups,org,groups,eventday,390,groups,False,Autumn outing,0,,1
+screen-audit-scroll-3909939,member-scenarios,member,scenarios,between,390,scenarios,False,Home,0,,1
+screen-audit-scroll-3909939,home-preseason,member,home,preseason,390,home,False,,0,,1
+screen-audit-scroll-3909939,home-announced,member,home,announced,390,home,False,,0,,1
+screen-audit-scroll-3909939,home-ready,member,home,ready,390,home,False,,0,,1
+screen-audit-scroll-3909939,home-eventday,member,home,eventday,390,home,True,,0,,2
+screen-audit-scroll-3909939,home-today,member,home,today,390,home,True,,0,,4
+screen-audit-scroll-3909939,home-westport,member,home,westport,390,home,True,,0,,1
+screen-audit-scroll-3909939,home-draw,member,home,draw,390,home,True,,0,,1
+screen-audit-scroll-3909939,round-players,member,round,today,390,round,True,,0,,3
+screen-audit-scroll-3909939,round-groups,member,round,today,390,round,True,,0,,0
+screen-audit-scroll-3909939,round-kb,member,round,today,390,round,True,,0,,0
+screen-audit-scroll-3909939,round-course,member,round,today,390,round,True,,0,,1
+screen-audit-scroll-3909939,board-bw,member,board,today,390,board,True,Home,0,,0
+screen-audit-scroll-3909939,board-ct,member,board,today,390,board,True,Home,0,,0
+screen-audit-scroll-3909939,board-st,member,board,today,390,board,True,Home,0,,3
+screen-audit-scroll-3909939,org-scramble-round,org,round,westport,390,round,False,Organiser,0,,1
+screen-audit-scroll-3909939,org-scramble-groups,org,groups,westport,390,groups,False,Westport,0,,1
+screen-audit-scroll-3909939,org-scramble-group,org,group,westport,390,group,False,Round,0,,1
+screen-audit-scroll-3909939,org-scramble-correct,org,correct,westport,390,correct,False,Back,0,,0
+screen-audit-scroll-3909939,org-new-details,org,details,eventday,390,details,False,Organiser,0,,0
+screen-audit-scroll-3909939,org-new-member,org,member,eventday,390,member,False,Members,0,,0
+screen-audit-scroll-3909939,org-new-course,org,course,eventday,390,course,False,Courses,0,,4
+screen-audit-scroll-3909939,org-groups-empty,org,groups,announced,390,groups,False,Autumn outing,0,,1
+screen-audit-scroll-3909939,rules-round-ended,member,rules,today,390,rules,False,,0,,0
+screen-audit-scroll-3909939,board-round-ended,member,board,today,390,board,False,,0,,4
+screen-audit-scroll-3909939,tee-round-ended,member,tee,today,390,tee,False,,0,,0
+screen-audit-scroll-3909939,who-root,member,who,between,390,who,False,,0,,2
+screen-audit-scroll-3909939,round-weather,member,round,today,390,round,True,,0,,0
+screen-audit-scroll-3909939,round-pots,member,round,draw,390,round,True,,0,,0
+screen-audit-scroll-3909939,rejected-populated,member,rejected,between,390,rejected,False,Home,0,,0
+screen-audit-scroll-3909939,holes-overlay,member,entry,today,390,entry,False,,0,,0
+screen-audit-long-3909939,member-home,member,home,between,135-long,home,False,,0,,0
+screen-audit-long-3909939,member-rounds,member,rounds,between,135-long,rounds,False,Home,0,,0
+screen-audit-long-3909939,member-players,member,players,between,135-long,players,False,Home,0,,0
+screen-audit-long-3909939,member-goy,member,goy,between,135-long,goy,False,Home,0,,0
+screen-audit-long-3909939,member-round,member,round,between,135-long,round,False,Home,0,,0
+screen-audit-long-3909939,member-stats,member,stats,between,135-long,stats,False,Home,0,,0
+screen-audit-long-3909939,member-player,member,player,between,135-long,player,False,Home,0,,0
+screen-audit-long-3909939,member-card,member,card,between,135-long,card,False,Home,0,,0
+screen-audit-long-3909939,member-who,member,who,between,135-long,who,False,Home,0,,0
+screen-audit-long-3909939,member-tee,member,tee,today,135-long,tee,False,,0,,0
+screen-audit-long-3909939,member-rejected,member,rejected,between,135-long,rejected,False,Home,0,,0
+screen-audit-long-3909939,member-entry,member,entry,today,135-long,entry,True,,0,,0
+screen-audit-long-3909939,member-after,member,after,today,135-long,after,True,,0,,0
+screen-audit-long-3909939,member-check,member,check,today,135-long,check,True,Hole 15,0,,0
+screen-audit-long-3909939,member-finish,member,finish,today,135-long,finish,True,Back to the front page,0,,0
+screen-audit-long-3909939,member-hcp,member,hcp,today,135-long,hcp,False,Demo round,0,,0
+screen-audit-long-3909939,member-board,member,board,today,135-long,board,True,Home,0,,0
+screen-audit-long-3909939,member-trip,member,trip,between,135-long,trip,False,Home,0,,0
+screen-audit-long-3909939,member-results,member,results,between,135-long,results,False,Home,0,,0
+screen-audit-long-3909939,member-scramble,member,scramble,westport,135-long,scramble,True,,0,,0
+screen-audit-long-3909939,member-scrambleFinish,member,scrambleFinish,westport,135-long,scrambleFinish,True,,0,,0
+screen-audit-long-3909939,member-rules,member,rules,between,135-long,rules,False,,0,,0
+screen-audit-long-3909939,org-lock,org,lock,eventday,135-long,lock,False,Back,0,,0
+screen-audit-long-3909939,org-home,org,home,eventday,135-long,home,False,Done,0,,0
+screen-audit-long-3909939,org-round,org,round,eventday,135-long,round,False,Organiser,0,,0
+screen-audit-long-3909939,org-details,org,details,eventday,135-long,details,False,Autumn outing,0,,0
+screen-audit-long-3909939,org-playing,org,playing,eventday,135-long,playing,False,Autumn outing,0,,0
+screen-audit-long-3909939,org-groupsview,org,groupsview,eventday,135-long,groupsview,False,Autumn outing,0,,0
+screen-audit-long-3909939,org-kb,org,kb,eventday,135-long,kb,False,Autumn outing,0,,0
+screen-audit-long-3909939,org-group,org,group,eventday,135-long,group,False,Autumn outing,0,,0
+screen-audit-long-3909939,org-correct,org,correct,eventday,135-long,correct,False,Back,0,,0
+screen-audit-long-3909939,org-teamshots,org,teamshots,westport,135-long,teamshots,False,Westport,0,,0
+screen-audit-long-3909939,org-contest,org,contest,today,135-long,contest,False,Demo round,0,,0
+screen-audit-long-3909939,org-guest,org,guest,eventday,135-long,guest,False,Players,0,,0
+screen-audit-long-3909939,org-late,org,late,eventday,135-long,late,False,Autumn outing,0,,0
+screen-audit-long-3909939,org-members,org,members,eventday,135-long,members,False,Organiser,0,,0
+screen-audit-long-3909939,org-member,org,member,eventday,135-long,member,False,Members,0,,0
+screen-audit-long-3909939,org-courses,org,courses,eventday,135-long,courses,False,Organiser,0,,0
+screen-audit-long-3909939,org-course,org,course,eventday,135-long,course,False,Courses,0,,0
+screen-audit-long-3909939,org-settings,org,settings,eventday,135-long,settings,False,Organiser,0,,0
+screen-audit-long-3909939,org-log,org,log,eventday,135-long,log,False,Organiser,0,,0
+screen-audit-long-3909939,org-export,org,export,eventday,135-long,export,False,Organiser,0,,0
+screen-audit-long-3909939,org-drawhome,org,drawhome,draw,135-long,drawhome,False,Westport,0,,0
+screen-audit-long-3909939,org-pots,org,pots,draw,135-long,pots,False,Breakfast draw,0,,0
+screen-audit-long-3909939,org-draw,org,draw,draw,135-long,draw,False,Breakfast draw,0,,0
+screen-audit-long-3909939,org-drawlineup,org,drawlineup,draw,135-long,drawlineup,False,Breakfast draw,0,,0
+screen-audit-long-3909939,org-groups,org,groups,eventday,135-long,groups,False,Autumn outing,0,,0
+screen-audit-long-3909939,member-scenarios,member,scenarios,between,135-long,scenarios,False,Home,0,,0
+screen-audit-long-3909939,home-preseason,member,home,preseason,135-long,home,False,,0,,0
+screen-audit-long-3909939,home-announced,member,home,announced,135-long,home,False,,0,,0
+screen-audit-long-3909939,home-ready,member,home,ready,135-long,home,False,,0,,0
+screen-audit-long-3909939,home-eventday,member,home,eventday,135-long,home,True,,0,,0
+screen-audit-long-3909939,home-today,member,home,today,135-long,home,True,,0,,0
+screen-audit-long-3909939,home-westport,member,home,westport,135-long,home,True,,0,,0
+screen-audit-long-3909939,home-draw,member,home,draw,135-long,home,True,,0,,0
+screen-audit-long-3909939,round-players,member,round,today,135-long,round,True,,0,,0
+screen-audit-long-3909939,round-groups,member,round,today,135-long,round,True,,0,,0
+screen-audit-long-3909939,round-kb,member,round,today,135-long,round,True,,0,,0
+screen-audit-long-3909939,round-course,member,round,today,135-long,round,True,,0,,0
+screen-audit-long-3909939,board-bw,member,board,today,135-long,board,True,Home,0,,0
+screen-audit-long-3909939,board-ct,member,board,today,135-long,board,True,Home,0,,0
+screen-audit-long-3909939,board-st,member,board,today,135-long,board,True,Home,0,,0
+screen-audit-long-3909939,org-scramble-round,org,round,westport,135-long,round,False,Organiser,0,,0
+screen-audit-long-3909939,org-scramble-groups,org,groups,westport,135-long,groups,False,Westport,0,,0
+screen-audit-long-3909939,org-scramble-group,org,group,westport,135-long,group,False,Round,0,,0
+screen-audit-long-3909939,org-scramble-correct,org,correct,westport,135-long,correct,False,Back,0,,0
+screen-audit-long-3909939,org-new-details,org,details,eventday,135-long,details,False,Organiser,0,,0
+screen-audit-long-3909939,org-new-member,org,member,eventday,135-long,member,False,Members,0,,0
+screen-audit-long-3909939,org-new-course,org,course,eventday,135-long,course,False,Courses,0,,0
+screen-audit-long-3909939,org-groups-empty,org,groups,announced,135-long,groups,False,Autumn outing,0,,0
+screen-audit-long-3909939,round-weather,member,round,today,135-long,round,True,,0,,0
+screen-audit-long-3909939,round-pots,member,round,draw,135-long,round,True,,0,,0
+screen-audit-long-3909939,rejected-populated,member,rejected,between,135-long,rejected,False,Home,0,,0
+screen-audit-long-3909939,holes-overlay,member,entry,today,135-long,entry,False,,0,,0
