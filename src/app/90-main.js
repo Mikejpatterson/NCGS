@@ -265,7 +265,10 @@ const ACT = {
   'delete-round': el => {
     const r = D.round(el.dataset.rid);
     if (UI.confirm !== 'del-' + r.id) { UI.confirm = 'del-' + r.id; render(); return; }
-    removeRows('rounds', [{ id: r.id }], { action: 'Round deleted', detail: `${roundName(r)}${r.date ? ' ' + r.date : ''}` });
+    // The second tap was on "Tap again to delete the round and its N scores", so the scores go too (the server
+    // refuses to delete a round with scores unless told: structural review M4).
+    const withScores = Object.values(D.scores(r.id)).some(h => Object.keys(h || {}).length);
+    removeRows('rounds', [{ id: r.id }], { action: 'Round deleted', detail: `${roundName(r)}${r.date ? ' ' + r.date : ''}${withScores ? ' with its scores' : ''}` }, withScores ? { withScores: true } : null);
     UI.confirm = null;
     back();
   },
@@ -330,6 +333,8 @@ const ACT = {
     }).catch(() => toast('Needs signal to restore'));
   }
 };
+ACT.rejected = () => go('rejected');
+ACT['rejected-clear'] = () => { if (UI.confirm !== 'rej-clear') { UI.confirm = 'rej-clear'; render(); return; } UI.confirm = null; clearRejected(); render(); toast('Cleared'); };
 Object.assign(ACT, DRAW_ACT, GROUP_ACT);
 
 const FORMS = {
@@ -717,7 +722,7 @@ if (window.claude && typeof window.claude.use === 'function') {
   render();
   sync().then(() => flush());
 })();
-if ('serviceWorker' in navigator && BOOT.mode === 'live' && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator && BOOT.mode === 'live' && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
 window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, fmtDate, daysFromToday, todayIso, send, holeOf, computeR, myGroup, liveRid, refreshThread };
 
 /* A finger or wheel scroll after a redraw means the reader moved on purpose, so render() stops putting the old position back. */
