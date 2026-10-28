@@ -2,6 +2,33 @@
 
 Independent review, 27 October 2026, of `main` at `54108b8`. It covers the whole codebase, not only recent changes. I changed no application code, tests or workflows. Only the invented fixture data was used; the real data was not fetched.
 
+## Status update, 28 October 2026
+
+All the fixes below are merged into `main` (`3909939`). The server side went live on the owner's Apps Script setup on 28 October: Drive file replaced, server fingerprint `5d110ed7`, and the "server is out of date" banner has gone.
+
+| Fix | Findings | PR | Status |
+|---|---|---|---|
+| 1. The app opens from its saved copy after 2 s | H3 | #50 | Live. Measured 20.1 s → 2.1 s |
+| 2. No Script Properties read on a poll; small server file | H4, M1 | #51 | Live. The rehearsal against a copy is still to do (see below) |
+| 3. Refused and clashing scores kept and shown | H1, M2, M3 | #52 | Live |
+| 4. Round delete takes its settings; scores need confirming; VER cache re-put | H2, M4 (part) | #53 | Live |
+| 5. CI on every PR, whole-day test, stale tests fixed | M6, M7, T1, B3 test | #54 | Live |
+| 6. Starting data loads only from setup | **H5** (below) | #55 | Live |
+
+**Still open:**
+- the 20-phone rehearsal against a copy of the updated setup (`docs/review/REHEARSAL-COPY.md`);
+- Testing mode switched off before Athenry (M4, owner step);
+- the follow-ups agreed on #52 (a "dealt with" action for refused scores, plainer wording, the `rejected` view in the layout suite);
+- L1–L7.
+
+**H5. The starting-data request needed no PIN.** High. VERIFIED on the memory store, never on the live server. Fixed in #55 and live since 28 October 2026.
+I missed this in the original review and found it on 27 October while planning the rehearsal.
+- **The problem:** `ops.seed` (`server.js:578-591` at `54108b8`) had no PIN check. With `force: true` it wrote any rows to any table, skipping row validation, conflict checks and the final-round rule. The web app's address is in the public `site/index.html`, so anyone who read the code could have changed scores, members or rounds.
+- **The fix:** the Apps Script entry point now refuses that request outright. Starting data loads only from `setup()` inside Apps Script, and loading over existing data also needs the organiser PIN.
+- **Owner check:** an unexpected "Data loaded" entry in the change log would be the only sign the gap was ever used.
+
+**L8 (new, low).** `photoPut` needs no PIN, so anyone with the address could fill the Drive photo folder. Agreed to handle later.
+
 ---
 
 ## Part A: for the owner
