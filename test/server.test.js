@@ -335,6 +335,37 @@ test('the data service loaded from Drive stays small enough for Google\'s 100 KB
   assert.ok(size < 90 * 1024, `src/server.js is ${size} bytes`);
 });
 
+test('starting data: only setup() loads it; over the web it is refused; over existing data it needs the PIN', () => {
+  // in-process on an empty store (setup, the preview, the local test server): works as before
+  const s = N.createServer(N.memoryStore());
+  assert.equal(s.api({ op: 'seed', data: { members: [{ id: 'a', name: 'Al', index: 12, active: true }], rounds: [ROUND] } }).ok, true);
+  assert.equal(s.api({ op: 'seed', data: { members: [] } }).reason, 'not empty');
+  assert.equal(s.api({ op: 'seed', force: true, data: { members: [{ id: 'a', name: 'X', index: 1, active: true }] } }).error, 'pin');
+  assert.equal(s.api({ op: 'load' }).tables.members[0].name, 'Al', 'nothing changed without the PIN');
+  assert.equal(s.api({ op: 'seed', force: true, pin: '1234', data: { members: [{ id: 'b', name: 'Bo', index: 9, active: true }] } }).ok, true);
+  // over the web (the Apps Script entry point): refused outright, with or without force or PIN
+  const ss = fakeSpreadsheet();
+  ss.getSheets = () => Object.values(ss.sheets); ss.deleteSheet = () => {}; ss.getUrl = () => 'u'; ss.getId = () => 'sid';
+  global.PropertiesService = { getScriptProperties: () => fakeProps() };
+  global.CacheService = { getScriptCache: fakeCache };
+  global.LockService = fakeLock;
+  global.SpreadsheetApp = { create: () => ss, openById: () => ss };
+  global.DriveApp = { createFolder() { throw new Error('no'); }, getFolderById() { throw new Error('no'); } };
+  global.ContentService = { createTextOutput: t => ({ t, setMimeType() { return this; } }), MimeType: { JSON: 'json' } };
+  try {
+    const app = N.appsScript({ members: [{ id: 'a', name: 'A', full: 'A', index: 10, active: true }] });
+    const hit = o => JSON.parse(app.http({ postData: { contents: JSON.stringify(o) } }).t);
+    assert.equal(hit({ op: 'load' }).tables.members.length, 1, 'setup still seeds the empty sheet');
+    for (const extra of [{}, { force: true }, { force: true, pin: '1234' }]) {
+      const r = hit(Object.assign({ op: 'seed', data: { members: [{ id: 'z', name: 'Z', index: 1, active: true }] } }, extra));
+      assert.equal(r.error, 'bad', JSON.stringify(extra));
+    }
+    assert.equal(hit({ op: 'load' }).tables.members.length, 1, 'nothing was loaded over the web');
+  } finally {
+    ['PropertiesService', 'CacheService', 'LockService', 'SpreadsheetApp', 'DriveApp', 'ContentService'].forEach(k => delete global[k]);
+  }
+});
+
 test('changing one player\'s past score leaves the rest of the group alone, and a stale change is refused', () => {
   for (const [kind, s] of servers().list) {
     s.api({ op: 'seed', data: { rounds: [ROUND] } });

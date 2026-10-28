@@ -597,6 +597,7 @@ var NCGS = (function () {
       return store.lock(function () {
         var empty = store.read('members').length === 0 && store.read('rounds').length === 0;
         if (!empty && !req.force) return { ok: false, reason: 'not empty' };
+        if (!empty && !pinOk(req.pin)) throw err('pin', 'Organiser PIN needed.');   // loading over existing data is the organiser's call
         var v = bump();
         TABLES.forEach(function (t) {
           var rows = (req.data && req.data[t]) || [];
@@ -665,6 +666,8 @@ var NCGS = (function () {
           if (e && e.postData && e.postData.contents) req = JSON.parse(e.postData.contents);
           else if (e && e.parameter && e.parameter.q) req = JSON.parse(e.parameter.q);
         } catch (x) { return json({ error: 'bad', message: 'Unreadable request' }); }
+        // Starting data is only ever loaded by setup(), inside Apps Script, never over the web.
+        if (req.op === 'seed') return json({ error: 'bad', message: 'Not available' });
         if (!req.op) return json({ ok: true, app: 'NCGS', build: BUILD, ver: Number(cache.get('VER') || props.getProperty('VER') || 0) });
         return json(server().api(req));
       },

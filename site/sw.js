@@ -1,4 +1,4 @@
-const V = 'ncgs-202610281817';
+const V = 'ncgs-202610281858';
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(['./', 'index.html', 'manifest.webmanifest', 'icon-192.png'])).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 // Opening the app: try the network, but if it hasn't answered in 2 s use the saved copy, so a weak signal on the
