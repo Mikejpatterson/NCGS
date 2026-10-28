@@ -1,4 +1,4 @@
-// Organiser: next-up checklist, guests, and changing a player after the groups are saved.
+// Organiser: next-up checklist, and a guest joining in place of a member from the Groups screen.
 const { chromium } = require('playwright');
 (async () => {
   const b = await chromium.launch();
@@ -20,47 +20,32 @@ const { chromium } = require('playwright');
   let t = await text();
   check('Next up checklist is on the organiser home', /Next up/.test(t));
   check('it lists what is done and what is not', /Course and tees/.test(t) && /First tee time/.test(t) && /to do/.test(t));
-  // guest through the player picker is covered by the form; add one directly from the late-change screen
+  // A guest joins in place of a member, from the one Groups screen (the old "Change a player" screen was folded
+  // into Groups on 26 October; moving, swapping, taking out and protecting players with scores are in groups.run.js).
   await tap('[data-act="org-go"][data-v="round"][data-rid="next-1"]');
-  check('the round offers Change a player', /Change a player/.test(await text()));
-  await tap('[data-act="org-go"][data-v="late"]');
-  const first = await pg.evaluate(() => document.querySelector('[data-act="late-pick"]').dataset.pid);
-  const firstName = await pg.evaluate(p => window.__ncgs.D.nameOf(p), first);
-  await tap(`[data-act="late-pick"][data-pid="${first}"]`);
-  check('picking a player shows who can swap in', /Swap in/.test(await text()) && /Add a guest/.test(await text()));
-  // add a guest from here
-  await tap('[data-act="org-go"][data-v="guest"]');
+  check('the round has one Groups row and no separate Change a player', /Groups/.test(await text()) && !/Change a player/.test(await text()));
+  await tap('[data-act="org-go"][data-v="groups"][data-rid="next-1"]');
+  const first = await pg.evaluate(() => document.querySelector('[data-act="grp-pick"]').dataset.pid);
+  await tap(`[data-act="grp-pick"][data-pid="${first}"]`);
+  await tap(`[data-act="grp-replace"][data-pid="${first}"]`);
+  check('Replace asks who plays instead, with a way to add a guest', /Who plays instead of/.test(await text()) && /New guest/.test(await text()));
+  await tap('.grp-people [data-act="org-go"][data-v="guest"]');
   await pg.fill('#g-name', 'Paddy Guest'); await pg.fill('#g-index', '18.4');
   await pg.click('form[data-form="guest"] button[type="submit"]'); await pg.waitForTimeout(300);
   const guest = await pg.evaluate(() => (window.__ncgs.D.members().find(m => m.name === 'Paddy Guest') || {}).id);
   check('the guest is a member with a guest id', /^guest-/.test(guest || ''));
-  await tap(`[data-act="late-replace"][data-new="${guest}"]`);
+  // Saving the guest goes back to Groups with the replacement still open, so the new guest can be picked at once.
+  check('back on Groups, the new guest is offered as the replacement', !!(await pg.$(`[data-act="grp-replace-with"][data-new="${guest}"]`)));
+  await tap(`[data-act="grp-replace-with"][data-new="${guest}"]`);
   await pg.waitForTimeout(300);
   const inRound = await pg.evaluate(() => window.__ncgs.D.round('next-1').groups.flatMap(g => g.teams.flat()));
   check('the guest is now in the groups and the other player is out', inRound.includes(guest) && !inRound.includes(first));
-  check('the change is in the log', await pg.evaluate(() => window.__ncgs.DB.server.tables.log.some(l => l.action === 'Player swapped')));
+  check('the change is in the log', await pg.evaluate(() => window.__ncgs.DB.server.tables.log.some(l => l.action === 'Groups changed' && /Paddy Guest in for/.test(l.detail))));
   // guests are not on the Players list or in Golfer of the Year
   await pg.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.stack = [{ v: 'players', p: {} }]; n.render(); });
   check('guests do not appear in Players', !/Paddy Guest/.test(await text()));
   const inGoy = await pg.evaluate(() => window.__ncgs.D.regulars().some(m => m.name === 'Paddy Guest'));
   check('guests are not regulars', !inGoy);
-  // drop someone out: needs a second tap
-  await pg.evaluate(() => { const n = window.__ncgs; n.UI.org = true; n.UI.orgStack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'next-1' } }, { v: 'late', p: { rid: 'next-1' } }]; n.render(); });
-  const second = await pg.evaluate(() => [...document.querySelectorAll('[data-act="late-pick"]')].map(x => x.dataset.pid).find(p => !p.startsWith('guest-')));
-  await tap(`[data-act="late-pick"][data-pid="${second}"]`);
-  await tap('[data-act="late-drop"]');
-  check('dropping out asks first', /Tap again to take them out/.test(await text()));
-  await tap('[data-act="late-drop"]');
-  await pg.waitForTimeout(300);
-  check('and then removes them from the groups', !(await pg.evaluate(() => window.__ncgs.D.round('next-1').groups.flatMap(g => g.teams.flat()))).includes(second));
-  // a player who already has scores cannot be swapped
-  await pg.evaluate(() => {
-    const n = window.__ncgs; const pid = n.D.round('next-1').groups[0].teams.flat()[0];
-    n.put('scores', [{ round: 'next-1', player: pid, hole: 1, strokes: 5, by: 'test', at: '' }]);
-    n.UI.org = true; n.UI.late = { rid: 'next-1', pid }; n.UI.orgStack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'next-1' } }, { v: 'late', p: { rid: 'next-1' } }]; n.render();
-  });
-  await pg.waitForTimeout(300);
-  check('a player with scores is protected', /already has 1 score/.test(await text()) && !(await pg.$('[data-act="late-replace"]')));
   check('no script errors', errs.length === 0);
   if (errs.length) console.log(errs);
   await b.close(); console.log(ok ? 'all passed' : 'SOME FAILED'); process.exit(ok ? 0 : 1);

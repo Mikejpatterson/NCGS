@@ -1,0 +1,60 @@
+name: Checks on every change
+# Every pull request into main runs the whole test set on invented data (data/fixture-seed.json), so nothing reaches
+# the live app untested (structural review M6). Read-only: no secrets, no deploy, the real data is never used.
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Engine and server tests (CLAUDE.md)
+        run: node --test test/engine.test.js test/server.test.js
+      - name: Every unit test
+        run: node --test test/*.test.js
+      - name: Install browser
+        run: npm install --no-save --no-package-lock playwright@1.56.1 && npx playwright install --with-deps chromium
+      - name: Build the live app and the preview from invented data
+        run: |
+          cp data/fixture-seed.json data/seed.json
+          node build.js
+          rm data/seed.json
+          NCGS_FIXTURE=1 node build.js
+      - name: Start the preview and a local copy of the server
+        run: |
+          python3 -m http.server 8765 -d dist > /dev/null 2>&1 &
+          cp data/fixture-seed.json data/seed.json
+          node tools/devserver.js 8766 > /tmp/devserver.log 2>&1 &
+          sleep 2
+          rm data/seed.json
+      - name: Layout at 360, 390 and 135% text, with the screen suites it chains
+        run: MIN_TARGET=44 node test/layout.run.js
+      - name: Several phones against the real server code
+        run: |
+          node test/phones.run.js
+          node test/scramble-phones.run.js
+          node test/draw-phones.run.js
+      - name: A whole day, two rounds, an outage and finalise
+        run: node test/fullday.run.js
+      - name: Finishing a round, organiser, testing mode, start hole
+        run: |
+          node test/finish.run.js
+          node test/organiser.run.js
+          node test/testing.run.js
+          node test/starthole.run.js
+          node test/ui.run.js
+      - name: The app opens quickly on a weak signal
+        run: if [ -f test/sw-open.run.js ]; then node test/sw-open.run.js; else echo "sw-open.run.js arrives with fix 1"; fi

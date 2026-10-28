@@ -85,7 +85,9 @@ test('countback follows the rules exactly: back 9, back 6, back 3, then the 18th
   assert.ok(E.compareKeys(k(a), k(b)) < 0);
   const c = base.slice(), d = base.slice();
   c[9] = 4; c[0] = 0; d[16] = 4; d[0] = 0; // both lose 2 on the front and gain 2 on the back: equal back 9
-  assert.ok(E.compareKeys(k(c), k(d)) !== 0 || true);
+  // equal back 9, but d's gain is on 17 (inside the back 6) and c's on 10 (outside it): d wins on the back 6
+  assert.ok(E.compareKeys(k(d), k(c)) < 0, 'equal back 9: the better back 6 wins');
+  assert.ok(E.compareKeys(k(c), k(d)) > 0);
   const rows = E.rankByKey([{ name: 'a', total: 36, key: k(a) }, { name: 'b', total: 36, key: k(b) }]);
   assert.equal(rows.find(r => r.name === 'a').pos, 1);
   const same = E.rankByKey([{ name: 'a', total: 36, key: k(base) }, { name: 'b', total: 36, key: k(base) }]);

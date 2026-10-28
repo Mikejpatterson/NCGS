@@ -358,7 +358,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   // Demo round: finalise is blocked until the cards are in
   await tap('[data-act="org-go"][data-v="round"][data-rid="demo-cabopino"]');
   t = await text();
-  check('finalise names what is blocking it', /cards? open/.test(t));
+  check('finalise names what is blocking it', /still playing|to confirm/.test(t));   // wording since 26 October: "N groups still playing"
   await tap('[data-act="demo-fill"]').catch(() => {});
   await shot('16-org-round', true);
 
@@ -366,7 +366,7 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   await page.evaluate(() => { const n = window.__ncgs; n.UI.orgStack = [{ v: 'home', p: {} }]; n.render(); });
   await tap('[data-act="org-go"][data-v="log"]');
   t = await text();
-  check('change log: groups, KBs, member and handicap changes', /Groups saved/.test(t) && /KBs saved/.test(t) && /Member added/.test(t) && /Handicap index changed/.test(t));
+  check('change log: groups, KBs, member and handicap changes', /Groups (drawn|saved|changed)/.test(t) && /KBs saved/.test(t) && /Member added/.test(t) && /Handicap index changed/.test(t));
 
   // Small phone
   await page.setViewportSize({ width: 375, height: 548 });
