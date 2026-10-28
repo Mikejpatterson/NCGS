@@ -265,7 +265,10 @@ const ACT = {
   'delete-round': el => {
     const r = D.round(el.dataset.rid);
     if (UI.confirm !== 'del-' + r.id) { UI.confirm = 'del-' + r.id; render(); return; }
-    removeRows('rounds', [{ id: r.id }], { action: 'Round deleted', detail: `${roundName(r)}${r.date ? ' ' + r.date : ''}` });
+    // The second tap was on "Tap again to delete the round and its N scores", so the scores go too (the server
+    // refuses to delete a round with scores unless told: structural review M4).
+    const withScores = Object.values(D.scores(r.id)).some(h => Object.keys(h || {}).length);
+    removeRows('rounds', [{ id: r.id }], { action: 'Round deleted', detail: `${roundName(r)}${r.date ? ' ' + r.date : ''}${withScores ? ' with its scores' : ''}` }, withScores ? { withScores: true } : null);
     UI.confirm = null;
     back();
   },

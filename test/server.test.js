@@ -123,7 +123,7 @@ test('deleting a round removes its scores too', () => {
   for (const [kind, s] of servers().list) {
     s.api({ op: 'seed', data: { rounds: [ROUND] } });
     s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 1, scores: { a: { v: 4, base: null } } });
-    s.api({ op: 'remove', table: 'rounds', rows: [{ id: 'r9' }], pin: '1234' });
+    s.api({ op: 'remove', table: 'rounds', rows: [{ id: 'r9' }], pin: '1234', withScores: true });   // explicit since review M4
     const all = s.api({ op: 'load' });
     assert.equal(all.tables.rounds.length, 0, kind);
     assert.equal(all.tables.scores.length, 0, kind);
@@ -215,6 +215,77 @@ test('first-time setup works before Drive access is granted (photos folder is on
     assert.equal(driveCalls, 0);
   } finally {
     ['PropertiesService', 'CacheService', 'LockService', 'SpreadsheetApp', 'DriveApp', 'ContentService'].forEach(k => delete global[k]);
+  }
+});
+
+/* Structural review H2: a deleted round's settings (withdrawals, scramble format, draw) must not attach to a new round
+   that gets the same id. M4: a round with scores is only deleted when the request says so. */
+test('deleting a round removes its own settings, keeps everyone else\'s, and a re-created round inherits nothing', () => {
+  for (const [kind, s] of servers().list) {
+    s.api({ op: 'seed', data: { members: [{ id: 'a', name: 'Al', index: 12, active: true }], rounds: [ROUND, Object.assign({}, ROUND, { id: 'r10' })] } });
+    const mine = ['wd:r9:a', 'format:r9', 'teamshots:r9', 'pots:r9', 'draw:r9:1:0:0:dev1', 'drawdev:r9', 'drawepoch:r9', 'drawshort:r9:1', 'drawpace:r9'];
+    const others = ['wd:r10:a', 'format:r10', 'tripboard:2027:Westport', 'season', 'testing'];
+    const put = s.api({ op: 'put', table: 'settings', pin: '1234', rows: mine.concat(others).map(key => ({ key, value: '1' })) });
+    assert.equal(put.ok, true, kind);
+    const before = s.api({ op: 'load' }).ver;
+    const del = s.api({ op: 'remove', table: 'rounds', pin: '1234', rows: [{ id: 'r9' }] });
+    assert.equal(del.ok, true, kind);
+    const keys = s.api({ op: 'load' }).tables.settings.map(x => x.key).sort();
+    assert.deepEqual(keys, others.slice().sort(), kind + ': only the deleted round\'s settings go');
+    const d = s.api({ op: 'since', v: before });
+    const tombs = d.tables.deleted.filter(x => x.tbl === 'settings').map(x => x.k).sort();
+    assert.deepEqual(tombs, mine.slice().sort(), kind + ': other phones are told the settings went');
+    s.api({ op: 'put', table: 'rounds', pin: '1234', rows: [ROUND] });   // the reported case: same id again
+    const again = s.api({ op: 'load' }).tables.settings.filter(x => /:r9(:|$)/.test(x.key));
+    assert.deepEqual(again, [], kind + ': the re-created round inherits no settings');
+  }
+});
+
+/* Reviewer's condition for fix 4 (H4): when the cached version expires (6 h without a save), the next poll reads
+   Script Properties once and puts it back; the polls after that read nothing. */
+test('when the cached version has gone, one poll reads it and puts it back; the next polls read nothing', () => {
+  const ss = fakeSpreadsheet();
+  const store = {}, reads = [];
+  const props = { getProperty: k => { reads.push(k); return k in store ? store[k] : null; }, setProperty: (k, v) => { store[k] = v; } };
+  const cacheMap = {};
+  const cache = { get: k => (k in cacheMap ? cacheMap[k] : null), put: (k, v) => { cacheMap[k] = v; } };
+  const s = N.createServer(N.sheetStore(ss, props, cache, fakeLock, () => null));
+  s.api({ op: 'seed', data: { members: [{ id: 'a', name: 'Al', index: 12, active: true }], rounds: [ROUND] } });
+  s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 1, scores: { a: { v: 5, base: null } }, by: 'Al' });
+  const ver = Number(store.VER);
+  delete cacheMap.VER;   // the cache entry expires overnight
+  reads.length = 0;
+  assert.equal(s.api({ op: 'since', v: ver }).same, true);
+  assert.deepEqual(reads.filter(k => k === 'VER'), ['VER'], 'the first poll reads the version once');
+  reads.length = 0;
+  for (let i = 0; i < 5; i++) assert.equal(s.api({ op: 'since', v: ver }).same, true);
+  assert.deepEqual(reads.filter(k => k === 'VER'), [], 'later polls read nothing');
+  s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 2, scores: { a: { v: 4, base: null } }, by: 'Al' });
+  const after = s.api({ op: 'since', v: ver });
+  assert.equal(after.tables.scores.length, 1, 'a save after that is still seen at once');
+});
+
+test('the in-memory store keeps its cached version in step with saves (preview and the local test server)', () => {
+  const s = N.createServer(N.memoryStore());
+  s.api({ op: 'seed', data: { members: [{ id: 'a', name: 'Al', index: 12, active: true }], rounds: [ROUND] } });
+  const v0 = s.api({ op: 'since', v: 0 }).ver;
+  s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 1, scores: { a: { v: 5, base: null } }, by: 'Al' });
+  const d = s.api({ op: 'since', v: v0 });
+  assert.ok(d.ver > v0 && d.tables.scores.length === 1);
+});
+
+test('a round with scores is only deleted when the request says so', () => {
+  for (const [kind, s] of servers().list) {
+    s.api({ op: 'seed', data: { members: [{ id: 'a', name: 'Al', index: 12, active: true }], rounds: [ROUND, Object.assign({}, ROUND, { id: 'r10', status: 'upcoming' })] } });
+    s.api({ op: 'saveHole', round: 'r9', grp: 'g1', hole: 1, scores: { a: { v: 5, base: null } }, by: 'Al' });
+    const refused = s.api({ op: 'remove', table: 'rounds', pin: '1234', rows: [{ id: 'r9' }] });
+    assert.equal(refused.error, 'scores', kind);
+    let t = s.api({ op: 'load' }).tables;
+    assert.ok(t.rounds.some(r => r.id === 'r9') && t.scores.length === 1, kind + ': nothing was deleted');
+    assert.equal(s.api({ op: 'remove', table: 'rounds', pin: '1234', rows: [{ id: 'r10' }] }).ok, true, kind + ': a round without scores goes as before');
+    assert.equal(s.api({ op: 'remove', table: 'rounds', pin: '1234', rows: [{ id: 'r9' }], withScores: true }).ok, true, kind);
+    t = s.api({ op: 'load' }).tables;
+    assert.ok(!t.rounds.some(r => r.id === 'r9') && t.scores.length === 0, kind + ': with withScores the round and its scores go');
   }
 });
 

@@ -2136,7 +2136,7 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .rej-note { display: block; width: 100%; min-height: 44px; margin: 12px 0 0; text-align: left; font: inherit; font-size: var(--t-sub); font-weight: 600; border: 0; cursor: pointer; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610281807","server":"cbed7e6e"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610281817","server":"44e27fc4"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3217,9 +3217,11 @@ var NCGS = (function () {
   };
   var TABLES = Object.keys(SCHEMA);
   var PLAYER_TABLES = { checks: 1, cards: 1, log: 1 };
+  // Settings keyed "<kind>:<round id>[:…]" that belong to one round and go when it is deleted.
+  var ROUND_SETTINGS = { wd: 1, format: 1, teamshots: 1, pots: 1, draw: 1, drawdev: 1, drawepoch: 1, drawshort: 1, drawpace: 1 };
   var DEFAULT_PIN = '1234';
   // Stamped by build.js with a fingerprint of this file, so the app can tell whether the live server is the latest.
-  var BUILD = 'cbed7e6e';
+  var BUILD = '44e27fc4';
 
   function keyOf(table, row) {
     return SCHEMA[table].key.map(function (k) { return String(row[k]); }).join('|');
@@ -3279,7 +3281,7 @@ var NCGS = (function () {
         save();
       },
       getVer: function () { return data.ver; },
-      setVer: function (v) { data.ver = v; save(); },
+      setVer: function (v) { data.ver = v; cacheMap.VER = String(v); save(); },
       getPin: function () { return data.pin || DEFAULT_PIN; },
       setPin: function (p) { data.pin = p; save(); },
       putPhoto: function (dataUrl) { var id = 'ph' + (Object.keys(data.photos).length + 1) + '-' + Date.now(); data.photos[id] = dataUrl; save(); return id; },
@@ -3477,6 +3479,10 @@ var NCGS = (function () {
       var v = Number(req.v || 0);
       var cached = store.cacheGet('VER');
       var cur = cached !== null && cached !== undefined ? Number(cached) : store.getVer();
+      // The cached version expires after 6 h without a save (every morning). Put it back, so only the first poll
+      // after that reads Script Properties, not every poll until the next save (structural review H4).
+      // Short-lived on purpose: if a save lands between the read and this put, the stale value lasts a minute at most.
+      if (cached === null || cached === undefined) store.cachePut('VER', String(cur), 60);
       if (v >= cur) return { ver: cur, same: true, build: BUILD };
       var tables = {};
       TABLES.forEach(function (t) {
@@ -3612,8 +3618,13 @@ var NCGS = (function () {
       if (!SCHEMA[t] || t === 'deleted' || t === 'log') throw err('bad', 'Unknown table');
       if (!pinOk(req.pin)) throw err('pin', 'Organiser PIN needed.');
       return store.lock(function () {
-        var v = bump();
         var keys = (req.rows || []).map(function (r) { return keyOf(t, r); });
+        // A round with scores is only deleted when the request says so: two taps on the wrong round must not wipe a
+        // day's scores (structural review M4). The app sends withScores after saying how many scores go with it.
+        if (t === 'rounds' && !req.withScores && store.read('scores').some(function (r) { return keys.indexOf(String(r.round)) >= 0; })) {
+          throw err('scores', 'This round has scores. Delete it with its scores only if you mean to.');
+        }
+        var v = bump();
         store.remove(t, keys);
         store.upsert('deleted', stamp('deleted', keys.map(function (k) { return { tbl: t, k: k }; }), v));
         if (t === 'rounds') {
@@ -3625,6 +3636,13 @@ var NCGS = (function () {
               store.upsert('deleted', stamp('deleted', gone.map(function (k) { return { tbl: dt, k: k }; }), v));
             }
           });
+          // ...and the settings that belong to it (withdrawals, scramble format, team shots, pots and the draw), so a
+          // new round that happens to get the same id doesn't inherit them (structural review H2).
+          var goneSet = store.read('settings').filter(function (r) { var p = String(r.key).split(':'); return ROUND_SETTINGS[p[0]] && keys.indexOf(p[1]) >= 0; }).map(function (r) { return keyOf('settings', r); });
+          if (goneSet.length) {
+            store.remove('settings', goneSet);
+            store.upsert('deleted', stamp('deleted', goneSet.map(function (k) { return { tbl: 'settings', k: k }; }), v));
+          }
         }
         if (req.log) store.upsert('log', stamp('log', [logRow(v, req.log.by || 'Organiser', req.log.action, req.log.detail)], v));
         commit(v);
@@ -3858,7 +3876,7 @@ var NCGS = (function () {
     return api;
   }
 
-  var api = { SCHEMA: SCHEMA, TABLES: TABLES, keyOf: keyOf, memoryStore: memoryStore, sheetStore: sheetStore, createServer: createServer, appsScript: appsScript, toCell: toCell, fromCell: fromCell };
+  var api = { SCHEMA: SCHEMA, TABLES: TABLES, ROUND_SETTINGS: ROUND_SETTINGS, keyOf: keyOf, memoryStore: memoryStore, sheetStore: sheetStore, createServer: createServer, appsScript: appsScript, toCell: toCell, fromCell: fromCell };
   if (typeof module === 'object' && module.exports) module.exports = api;
   return api;
 })();
@@ -4077,7 +4095,11 @@ function applyLocal(tables, req) {
   } else if (req.op === 'remove') {
     const keys = req.rows.map(r => rowKey(req.table, r));
     removeKeys(tables, req.table, keys);
-    if (req.table === 'rounds') ['scores', 'claims', 'winners', 'checks', 'cards'].forEach(t => { tables[t] = tables[t].filter(r => !keys.includes(String(r.round))); });
+    if (req.table === 'rounds') {
+      ['scores', 'claims', 'winners', 'checks', 'cards'].forEach(t => { tables[t] = tables[t].filter(r => !keys.includes(String(r.round))); });
+      // the round's own settings go with it, as on the server (NCGS.ROUND_SETTINGS)
+      tables.settings = tables.settings.filter(r => { const p = String(r.key).split(':'); return !(NCGS.ROUND_SETTINGS[p[0]] && keys.includes(p[1])); });
+    }
   }
 }
 function view() {
@@ -4211,7 +4233,7 @@ function send(req, done) {
 /* Organiser writes carry the PIN typed this session. */
 const ORGPIN = { pin: null };
 function put(table, rows, log) { send({ op: 'put', table, rows, pin: ORGPIN.pin, log }); }
-function removeRows(table, rows, log) { send({ op: 'remove', table, rows, pin: ORGPIN.pin, log }); }
+function removeRows(table, rows, log, extra) { send(Object.assign({ op: 'remove', table, rows, pin: ORGPIN.pin, log }, extra || {})); }
 
 /* ----- Reading the data ----- */
 /* Groups and KB pairs go together: a round with groups always shows valid KB pairs, even if none were saved yet (the same on every phone) */
@@ -8089,7 +8111,10 @@ const ACT = {
   'delete-round': el => {
     const r = D.round(el.dataset.rid);
     if (UI.confirm !== 'del-' + r.id) { UI.confirm = 'del-' + r.id; render(); return; }
-    removeRows('rounds', [{ id: r.id }], { action: 'Round deleted', detail: `${roundName(r)}${r.date ? ' ' + r.date : ''}` });
+    // The second tap was on "Tap again to delete the round and its N scores", so the scores go too (the server
+    // refuses to delete a round with scores unless told: structural review M4).
+    const withScores = Object.values(D.scores(r.id)).some(h => Object.keys(h || {}).length);
+    removeRows('rounds', [{ id: r.id }], { action: 'Round deleted', detail: `${roundName(r)}${r.date ? ' ' + r.date : ''}${withScores ? ' with its scores' : ''}` }, withScores ? { withScores: true } : null);
     UI.confirm = null;
     back();
   },
