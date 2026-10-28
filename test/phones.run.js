@@ -108,6 +108,12 @@ const serverScores = async () => (await state()).tables.scores.filter(s => s.rou
     const conf = await a.pg.evaluate(() => window.__ncgs.DB.conflicts.length);
     check('4. the late phone is told about the clash', conf === 4, 'conflicts ' + conf);
     check('4. the clash is not lost: it is still on that phone', (await a.pg.evaluate(() => JSON.stringify(window.__ncgs.DB.conflicts))).includes('4'));
+    // 4b. the phone restarts before anyone looks at the clash: it is still there (review M2)
+    await a.pg.reload(); await a.pg.waitForFunction(() => window.__ncgs && window.__ncgs.DB.loaded); await a.pg.waitForTimeout(300);
+    const kept4 = await a.pg.evaluate(() => window.__ncgs.DB.conflicts.map(c => c.mine).join(','));
+    check('4b. after a restart the clash and this phone\'s scores are still there', kept4 === '4,4,4,4', kept4);
+    await a.go();
+    check('4b. and the hole screen still flags it ("Saved on two phones")', /Saved on two phones|Another phone saved/.test(await a.pg.locator('main').innerText()));
     await a.close(); await b.close();
 
     /* 5. the server goes away mid-round: scoring carries on, nothing is lost */
@@ -164,6 +170,35 @@ const serverScores = async () => (await state()).tables.scores.filter(s => s.rou
     check('7. a late score for a finished round is not added', (await serverScores()).length === 0);
     const kept = await a.pg.evaluate(() => (window.__ncgs.DB.prefs.rejected || []).length);
     check('7. it is kept on the phone, not thrown away', kept > 0, 'kept ' + kept);
+    // ...and shown, not just a passing toast (review H1): on Home, on the hole screen, and to the organiser
+    await a.pg.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); });
+    check('7. Home says a change was not saved', /1 change not saved/.test(await a.pg.locator('main').innerText()));
+    await a.pg.click('.rej-note'); await a.pg.waitForTimeout(150);
+    const why = await a.pg.locator('main').innerText();
+    check('7. tapping it says what and why', /Hole 1/.test(why) && /already final/.test(why), why.replace(/\s+/g, ' ').slice(0, 160));
+    await a.sync(); await a.pg.waitForTimeout(300);
+    const logged = (await state()).tables.log.filter(l => String(l.id).startsWith('rej:e2e:'));
+    check('7. the organiser\'s log has it', logged.length === 1 && /already final/.test(logged[0].detail), JSON.stringify(logged));
+    const o = await phone(R.g2[0]);
+    await o.sync();
+    await o.pg.evaluate(() => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; n.UI.org = true; n.UI.orgUnlocked = true; n.UI.orgStack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'e2e' } }]; n.render(); });
+    check('7. the organiser\'s round page shows the score that was not saved', /1 score sent by a phone was not saved/.test(await o.pg.locator('main').innerText()));
+    await o.close();
+    await a.pg.click('[data-act="rejected-clear"]'); await a.pg.click('[data-act="rejected-clear"]'); await a.pg.waitForTimeout(150);
+    check('7. the phone\'s list can be cleared', (await a.pg.evaluate(() => (window.__ncgs.DB.prefs.rejected || []).length)) === 0);
+    await a.close();
+
+    /* 7b. the server answers but keeps failing: the phone says it isn't reaching the server (review M3) */
+    R = await setupRound();
+    a = await phone(R.g1[0]); await a.go();
+    await fault('error');
+    await a.score(Object.fromEntries(R.g1.map(p => [p, 4])));
+    for (let i = 0; i < 4; i++) { await a.pg.evaluate(() => window.__ncgs.flush()); await a.pg.waitForTimeout(100); }
+    await a.pg.evaluate(() => window.__ncgs.render());
+    check('7b. after repeated server errors the phone says so', /Not reaching the server/.test(await a.pg.locator('main').innerText()));
+    await fault('none');
+    await a.sync(); await a.pg.waitForTimeout(500); await a.sync(); await a.pg.evaluate(() => window.__ncgs.render());
+    check('7b. and the scores go once the server recovers', (await serverScores()).length === 4 && !/Not reaching the server/.test(await a.pg.locator('main').innerText()));
     await a.close();
 
     /* 8. the organiser deletes the round under a phone that is mid-entry */

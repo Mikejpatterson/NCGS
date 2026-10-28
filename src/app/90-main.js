@@ -330,6 +330,8 @@ const ACT = {
     }).catch(() => toast('Needs signal to restore'));
   }
 };
+ACT.rejected = () => go('rejected');
+ACT['rejected-clear'] = () => { if (UI.confirm !== 'rej-clear') { UI.confirm = 'rej-clear'; render(); return; } UI.confirm = null; clearRejected(); render(); toast('Cleared'); };
 Object.assign(ACT, DRAW_ACT, GROUP_ACT);
 
 const FORMS = {

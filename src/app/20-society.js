@@ -255,6 +255,7 @@ VIEWS.home = () => {
     <h1 class="vh">${esc(doneToday ? `${roundName(doneToday)}: the result` : homeHeadline(feature))}</h1>
     ${homeState === 'upcoming' ? `<p class="home-season-label">The ${season} season</p><p class="home-quiet-title">Next on the card.</p>` : ''}
     ${doneToday ? resultCard(doneToday) : feature ? nowCard(feature) : homeSeasonIntro(season, played)}</header>`;
+  html += rejectedNote();   // a score the server refused is never only a passing toast (review H1)
   if (homeState === 'matchday') html += homeMatchday(feature);
   const table = goy(season);
   const lead = table[0];

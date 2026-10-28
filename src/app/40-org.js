@@ -102,6 +102,9 @@ ORG.round = p => {
     ${isScramble(r) ? `<button class="row tall" data-act="org-go" data-v="teamshots" data-rid="${r.id}"><span class="two"><span>Team shots</span><span class="sub">${(r.groups || []).map(g => `Team ${g.n}: ${teamShotsOf(r)[g.id] || 0}`).join(' · ') || 'Draw the teams first'}</span></span>${chev}</button>` : ''}
     ${r.trip ? `<button class="row tall" data-act="org-tripboard" data-rid="${r.id}"><span class="two"><span>Trip leaderboard</span><span class="sub">${tripBoardOn(r) ? `${esc(r.trip)} adds up the days` : `No combined board for ${esc(r.trip)}: each day has its own results`}</span></span><span class="pill ${tripBoardOn(r) ? 'g' : 'n'}">${tripBoardOn(r) ? 'On' : 'Off'}</span></button>` : ''}
     ${isScramble(r) ? '' : `<button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${E.kbOff(r) ? 'Off' : r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`}`), true);
+  // Scores a phone sent after this round was final (or otherwise refused): they never reached the scores (review H1).
+  const refused = D.log().filter(l => String(l.id).startsWith(`rej:${r.id}:`));
+  if (refused.length) html += `<div class="banner warn"><b>${plural(refused.length, 'score')} sent by a phone ${refused.length === 1 ? 'was' : 'were'} not saved.</b>${refused.map(l => `<br>${esc(l.by)}: ${esc(l.detail)}`).join('')}<br>Correct the card here if they should count.</div>`;
   if (c && (!c.holes || !tee)) html += `<div class="banner note">${esc(c.name)} needs ${!c.holes ? 'its par and stroke index for each hole' : 'tee details'} before scores can be entered. <button class="link inline" data-act="org-go" data-v="course" data-cid="${c.id}">Add them</button></div>`;
   const comp = progressOf(r.id);
   if (comp && r.status !== 'upcoming') {
