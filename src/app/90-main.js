@@ -719,7 +719,7 @@ if (window.claude && typeof window.claude.use === 'function') {
   render();
   sync().then(() => flush());
 })();
-if ('serviceWorker' in navigator && BOOT.mode === 'live' && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator && BOOT.mode === 'live' && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
 window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, fmtDate, daysFromToday, todayIso, send, holeOf, computeR, myGroup, liveRid, refreshThread };
 
 /* A finger or wheel scroll after a redraw means the reader moved on purpose, so render() stops putting the old position back. */
