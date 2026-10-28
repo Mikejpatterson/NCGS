@@ -114,8 +114,26 @@ function holesSheet(rid, gc, here) {
     ${seg('Front nine', E.SEGMENTS.front)}${seg('Back nine', E.SEGMENTS.back)}
     <div class="cap hs-key"><span class="hs-ki"><i class="hs-k done"></i>Scored</span><span class="hs-ki"><i class="hs-k nxt"></i>Next to play</span>${(D.round(rid).contests || []).length ? '<span class="hs-ki"><b class="hs-tag">Pin</b><b class="hs-tag">Drive</b>Contest hole</span>' : ''}<span class="hs-tip">Tap a scored hole to change it.</span></div></div></div>`;
 }
+/* Changes the server refused (round already final, deleted, not started, PIN). Kept on the phone and shown until
+   someone has looked; the organiser's log has them too (structural review H1). */
+function rejectedNote() {
+  const n = (DB.prefs.rejected || []).length;
+  return n ? `<button class="banner warn rej-note" data-act="rejected">${plural(n, 'change')} not saved · See why</button>` : '';
+}
+VIEWS.rejected = () => {
+  const list = (DB.prefs.rejected || []).slice().reverse();
+  const when = at => { const d = new Date(at); return isNaN(d) ? '' : d.toLocaleString('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit' }); };
+  return {
+    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Not saved</h1></div><p class="sub">${list.length ? 'The server refused these, so they are only on this phone. The organiser can see them in the log.' : 'Nothing waiting.'}</p></header>
+      ${list.length ? sec('', cardOf(list.map(x => `<div class="row tall"><span class="two"><span>${esc(x.what || rejectedWhat(x.req))}</span><span class="sub">Not saved because ${esc(x.why || x.message || x.error)}${when(x.at) ? ` · ${esc(when(x.at))}` : ''}</span></span></div>`).join('')), true) +
+        `<button class="btn quiet" data-act="rejected-clear">${UI.confirm === 'rej-clear' ? 'Tap again: the organiser has these' : 'Clear this list'}</button>` : ''}`
+  };
+};
 function saveWarning() {
   if (!DB.saveOk) return '<p class="err" style="text-align:center">This phone is not saving. Keep this screen open.</p>';
+  const rej = rejectedNote();
+  if (DB.stuck && DB.outbox.length) return `${rej}<p class="err" style="text-align:center">Not reaching the server · ${plural(DB.outbox.filter(i => i.req.op === 'saveHole').length || DB.outbox.length, 'save')} waiting on this phone. They keep trying.</p>`;
+  if (rej) return rej;
   if (DB.outbox.length && !DB.online) return `<p class="cap" style="text-align:center;margin-top:12px">No signal · ${plural(DB.outbox.filter(i => i.req.op === 'saveHole').length || DB.outbox.length, 'save')} waiting on this phone</p>`;
   return '';
 }

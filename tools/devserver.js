@@ -1,7 +1,7 @@
 // A local copy of the live setup, for testing with several simulated phones:
 // the real src/server.js running on an in-memory store, plus the built live app.
 //   node tools/devserver.js [port]      (needs a build first: node build.js)
-// Control while running:  POST /__fault {"mode":"none|down|slow|drop"}   GET /__state   POST /__reset
+// Control while running:  POST /__fault {"mode":"none|down|slow|drop|error"}   GET /__state   POST /__reset
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
@@ -33,6 +33,7 @@ http.createServer((req, res) => {
       const answer = () => { let q = {}; try { q = JSON.parse(b); } catch (e) { /* bad json */ } res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify(srv.api(q))); };
       if (fault === 'down') { res.writeHead(503); res.end('down'); return; }
       if (fault === 'drop') { req.socket.destroy(); return; }
+      if (fault === 'error') { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end(JSON.stringify({ error: 'server', message: 'Service error' })); return; }
       if (fault === 'slow') { setTimeout(answer, 3000); return; }
       answer();
     });
