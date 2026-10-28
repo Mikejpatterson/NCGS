@@ -24,11 +24,14 @@ const DB = {
   _memo: {}
 };
 TABLES.forEach(t => { DB.server.tables[t] = DB.server.tables[t] || []; });
+// A clash ("another phone saved this hole") is kept with the phone's settings, so a restart doesn't lose this phone's
+// version before someone has looked at it (structural review M2).
+DB.conflicts = Array.isArray(DB.prefs.conflicts) ? DB.prefs.conflicts : [];
 DB.loaded = DB.server.ver > 0;
 
 const FAILED = {};
 function persist(k, v) { const ok = LS.set(KEY[k], v); if (ok) delete FAILED[k]; else FAILED[k] = 1; DB.saveOk = !Object.keys(FAILED).length; return ok; }
-function savePrefs() { persist('prefs', DB.prefs); }
+function savePrefs() { DB.prefs.conflicts = DB.conflicts; persist('prefs', DB.prefs); }
 function saveOutbox() { persist('outbox', DB.outbox); }
 function saveCache() { LS.set(KEY.cache, DB.server); }
 
@@ -157,10 +160,25 @@ let retryTimer = null;
 /* Errors that mean "try again later" (server busy, lock timeout) keep the change queued.
    Errors that mean "never" (round finalised or deleted, bad PIN) move it to a kept list so it is not lost silently. */
 const RETRY_ERRORS = { server: 1 };
-function reject(item, resp) {
-  DB.prefs.rejected = (DB.prefs.rejected || []).concat([{ req: item.req, error: resp.error, message: resp.message || '', at: new Date().toISOString() }]).slice(-50);
-  savePrefs();
+const WHY = { final: 'the round was already final', missing: 'the round no longer exists', notlive: 'the round had not started', pin: 'it needed the organiser PIN' };
+/* Plain words for what a refused change was, for this phone's list and the organiser's log. */
+function rejectedWhat(req) {
+  if (req.op !== 'saveHole') return req.op === 'put' ? `A change to ${req.table}` : 'A change';
+  const vals = Object.entries(req.scores || {}).map(([pid, s]) => `${(req.names && req.names[pid]) || D.nameOf(pid)} ${s.v === null ? 'cleared' : s.v === 'P' ? 'pick-up' : s.v}`);
+  return `${req.label || 'Hole ' + req.hole}: ${vals.join(', ')}`;
 }
+function reject(item, resp) {
+  const at = new Date().toISOString();
+  const why = WHY[resp.error] || resp.message || 'the server refused it';
+  DB.prefs.rejected = (DB.prefs.rejected || []).concat([{ req: item.req, error: resp.error, message: resp.message || '', why, what: rejectedWhat(item.req), at }]).slice(-50);
+  savePrefs();
+  // Tell the organiser too: a score refused after Finalise would otherwise exist only on this phone (review H1).
+  // Phones may add to the log; a refused log row is never logged again.
+  if (item.req.op === 'saveHole') {
+    send({ op: 'put', table: 'log', rows: [{ id: `rej:${item.req.round}:${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, at, by: (DB.prefs.me && D.nameOf(DB.prefs.me)) || 'Player', action: 'Score not saved', detail: `${rejectedWhat(item.req)} (${why})` }] });
+  }
+}
+function clearRejected() { DB.prefs.rejected = []; savePrefs(); }
 async function flush() {
   if (flushing || !DB.outbox.length) return;
   flushing = true;
@@ -173,20 +191,24 @@ async function flush() {
       if (!resp || (resp.error && RETRY_ERRORS[resp.error])) {
         DB.online = !!resp;
         item.tries = (item.tries || 0) + 1;
+        // The server answers but keeps failing: say so, rather than looking like "Sending…" for ever (review M3).
+        DB.stuck = !!resp && item.tries >= 3;
         clearTimeout(retryTimer);
         retryTimer = setTimeout(flush, Math.min(30000, 4000 * (1 + item.tries)));
         break;
       }
       DB.online = true;
+      DB.stuck = false;
       DB.outbox.shift();
       saveOutbox();
       sent += 1;
       if (!resp.error) { DB.sentSeq = (DB.sentSeq || 0) + 1; (DB.sent = DB.sent || []).push({ req: item.req, seq: DB.sentSeq }); }
       if (resp.error) {
-        if (resp.error !== 'pin') reject(item, resp);
+        if (!(item.req.op === 'put' && item.req.table === 'log')) reject(item, resp);
         toast(resp.error === 'pin' ? 'Organiser PIN needed for that' : resp.error === 'final' ? 'That round is final, so that score was not saved' : resp.message || 'That change was not saved');
       } else if (resp.conflicts && resp.conflicts.length) {
         resp.conflicts.forEach(c => DB.conflicts.push({ round: item.req.round, grp: item.req.grp, hole: Number(item.req.hole), player: c.player, server: c.server, mine: c.mine }));
+        savePrefs();
         tick();
       }
       try { if (item.done) item.done(resp); } catch (e) { /* a screen callback must not stop the queue */ }
