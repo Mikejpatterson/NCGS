@@ -534,6 +534,9 @@ function render() {
      position is put back unless this redraw asked to go to the top or to the current hole. */
   if (document.activeElement && document.activeElement.tagName === 'BUTTON' && app.contains(document.activeElement)) document.activeElement.blur();   // a focused button that disappears can make iOS scroll
   const sc = scroller(), keepY = !UI.scrollTop && !UI.scrollCur ? sc.scrollTop : null, keepDocY = window.scrollY;
+  // Presentation context only: member/organiser surfaces share one identity without changing navigation.
+  app.dataset.view = cur().v;
+  app.dataset.context = UI.org ? 'organiser' : 'member';
   app.innerHTML = out.html + overlay;
   if (keepY !== null) {
     if (sc.scrollTop !== keepY) sc.scrollTop = keepY;

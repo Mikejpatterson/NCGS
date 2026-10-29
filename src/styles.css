@@ -1,7 +1,6 @@
-/* Layout: one calm column on iOS system grey.
-   Type: title 28, lead 20, body 17, secondary 15, caption 13; display sizes only for hero numbers. Weights: 400 text, 600 labels and buttons, 700 headings, 800 big numbers.
-   Spacing: 4 / 8 / 16 / 24. One left edge: the 16px page gutter; text inside cards sits 16px in.
-   One pill style. Light only, because it is read outdoors. */
+/* NCGS visual system: Modern Club Character.
+   The shared palette, typography, surfaces and control roles are documented in docs/design/APP-IDENTITY.md.
+   Existing Home, live-play and draw compositions are retained; shared component roles are consolidated below. */
 :root {
   --bg: #E5ECE6;
   --card: #FFFFFF;
@@ -62,7 +61,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--
 * { box-sizing: border-box; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-align: inherit; touch-action: manipulation; }
 h1, h2, p { margin: 0; }
-:focus-visible { outline: 3px solid #5B9CF0; outline-offset: 2px; border-radius: 8px; }
+:focus-visible { outline: 3px solid var(--pine); outline-offset: 2px; border-radius: 8px; }
 
 #app { max-width: 480px; margin: 0 auto; padding-inline: 16px; padding-block: 8px calc(72px + env(safe-area-inset-bottom, 0px)); }
 #app.no-tabs { padding-block-end: 16px; }
@@ -2221,3 +2220,84 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 
 /* The existing :has(.av.is-me) row tint/left rule remains, even with its decorative badge hidden. */
 .standings .lrow .lname.b { font-weight: 800; }
+
+/* App-wide identity: shared component roles across member and organiser journeys.
+   Home's editorial masthead, pine play panels and the draw stage retain their dedicated compositions. */
+:root {
+  --surface-page: var(--bg);
+  --surface-panel: var(--card);
+  --surface-soft: var(--action-tint);
+  --panel-radius: 16px;
+  --field-radius: 12px;
+  --sheet-radius: 24px;
+  --section-space: 24px;
+  --list-inset: 12px;
+  --page-heading-size: 2rem;
+  --ledger-total-size: 1.5rem;
+}
+#app[data-view] > .sec { margin-top: var(--section-space); }
+#app[data-view] > .sec.near { margin-top: 16px; }
+#app[data-view] .hero.s:has(h1) { padding-bottom: 18px; border-bottom: 2px solid var(--pine); }
+#app[data-view] .hero.s h1.title:not(.is-name) { font-size: var(--page-heading-size); line-height: 1.14; }
+#app[data-view] .hero.s > .nav { margin-bottom: 12px; }
+#app[data-view] .hero.s + .sec { margin-top: 20px; }
+#app[data-view] .hero.s .pill { color: var(--pine); background: var(--surface-soft); }
+#app[data-view] .card { border-radius: var(--panel-radius); }
+/* A collection is read down a shared edge; a chart, photograph or play panel keeps a contained surface. */
+#app[data-view] .card:has(> :is(.row, .lrow, .srow, .grow)) {
+  border: 0; border-radius: 0; box-shadow: none; background: transparent; overflow: visible;
+}
+#app[data-view] .card > :is(.row, .srow, .grow) { padding-left: var(--list-inset); padding-right: var(--list-inset); border-top: 1px solid var(--line); }
+#app[data-view] .card > :is(.row, .srow, .grow):first-child { border-top: 0; }
+#app[data-view] .sec > .sec-label + .card > :is(.row, .srow, .grow):first-child { border-top: 2px solid var(--pine); }
+#app[data-view] .card > .row { min-height: 52px; }
+#app[data-view] .row .two { gap: 4px; }
+#app[data-view] .row .two > .sub { line-height: 1.4; }
+/* Numeric standings use the same name/position/total grammar on round, trip, archive and season pages. */
+.standings { --ledger-columns: 2.2rem minmax(0, 1fr) 4.6rem; }
+#app[data-view] .lrow:not(.scr-row) {
+  grid-template-columns: var(--ledger-columns, 2.2rem minmax(0, 1fr) auto); gap: 10px;
+  min-height: 62px; padding: 10px var(--list-inset); border-top: 1px solid var(--line); background: transparent;
+}
+#app[data-view] .card > .lrow:first-child { border-top: 2px solid var(--pine); }
+#app[data-view] .lrow:not(.scr-row) .av { display: none; }
+#app[data-view] .lrow .lname { font-size: 1rem; font-weight: 600; }
+#app[data-view] .lrow .lname.b { font-weight: 800; }
+#app[data-view] .lrow > .sub { font-size: .9rem; font-weight: 500; }
+#app[data-view] .lrow .r .b, #app[data-view] .lrow .b.r { font-size: var(--ledger-total-size); font-weight: 650; letter-spacing: -.03em; }
+#app[data-view] .lrow:has(.av.is-lead), #app[data-view] .standings .lrow.is-leader { background: var(--surface-soft); }
+#app[data-view] .lrow:has(.av.is-me) { background: var(--action-tint); box-shadow: inset 3px 0 0 var(--pine); }
+#app[data-view] .lrow.low { background: var(--action-tint); }
+#app[data-view] .srow { grid-template-columns: 2.2rem minmax(0, 1fr) auto; gap: 10px; min-height: 62px; }
+#app[data-view] .srow > .av { display: none; }
+#app[data-view] .srow .rk { background: transparent; color: var(--sub); font-size: .9rem; font-weight: 500; }
+#app[data-view] .srow .sv { font-size: var(--ledger-total-size); font-weight: 650; }
+/* Page-local navigation is visually distinct from choice controls and main action pills. */
+#app[data-view] .seg[role="tablist"] { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 0 0 12px; padding: 0; border-radius: 0; background: transparent; border-bottom: 1px solid var(--line); }
+#app[data-view] .seg[role="tablist"] button { flex: 1 1 auto; width: auto; min-width: 44px; min-height: 48px; padding: 6px 0; border-radius: 0; box-shadow: none; border-bottom: 3px solid transparent; background: transparent; color: var(--sub); font-size: .85rem; font-weight: 500; }
+#app[data-view] .seg[role="tablist"] button[aria-selected="true"] { color: var(--pine); border-bottom-color: var(--pine); font-weight: 700; }
+/* Profiles and scorecards: numbers form a metric strip, rather than a cluster of competing tiles. */
+#app:is([data-view="player"], [data-view="card"]) .tiles { gap: 16px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+#app:is([data-view="player"], [data-view="card"]) .tiles > .tile { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; color: var(--text); }
+#app:is([data-view="player"], [data-view="card"]) .tile .bignum { color: var(--pine); font-size: 1.8rem; font-weight: 650; }
+#app:is([data-view="player"], [data-view="card"]) .tile .cap { color: var(--sub); font-weight: 500; }
+#app[data-view="stats"] .sumtiles { gap: 16px; padding: 16px 0; border-block: 1px solid var(--line); }
+#app[data-view="stats"] .sumtiles > div { padding: 0; border-radius: 0; background: transparent !important; box-shadow: none; }
+#app[data-view="stats"] .sumtiles b { font-size: 1.8rem; font-weight: 650; }
+/* Forms, field labels and sheets belong to the same identity in every role. */
+#app[data-view] .field { border-radius: var(--field-radius); border-color: var(--line); min-height: 48px; background-color: var(--surface-panel); }
+#app[data-view] .field.sm { min-height: 44px; }
+#app[data-view] .field.area { min-height: 88px; }
+#app[data-view] .fld > label { color: var(--sub); font-weight: 600; font-size: .85rem; line-height: 1.4; }
+#app[data-context="organiser"] form > .btn { margin-top: 20px; }
+#app[data-view] .sheet:not(.introcard) { border-radius: var(--sheet-radius) var(--sheet-radius) 0 0; }
+#app[data-view] :focus-visible { outline: 3px solid var(--pine); outline-offset: 3px; }
+#app[data-view] .hero.pine :focus-visible { outline-color: var(--action-inverse); }
+/* The results foundation uses the same spacing and tokens; it is not a separate visual theme. */
+#app[data-view] .results-page > .sec { margin-top: 12px; }
+#app[data-view] .season-results .hero.s { padding-bottom: 16px; }
+
+/* Shared sheets keep their close targets and reference labels usable at enlarged text sizes. */
+#app[data-view] [data-act="holes-close"] { min-width: 44px; }
+#app[data-view] .hs > .hs-tag { right: 3px; }
+#app[data-view] .orow > .cap { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
