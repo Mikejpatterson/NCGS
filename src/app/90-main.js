@@ -535,6 +535,12 @@ function render() {
   /* The tab bar only shows while a round is in play (live, or booked for today). The rest of the time Home is the hub. */
   const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
   const showTabs = !UI.org && !!out.tabs && inPlay;
+  // A finalisation/sync can remove the bar while a tab is still open. Keep a way out without
+  // changing the route, draft, queue or rejected saves. Existing page/dialog returns stay in charge.
+  if (!showTabs && !UI.org && cur().v !== 'home' &&
+      !app.querySelector('[data-act="back"], [data-act="entry-back"], [data-act="home"], .scrim, .full')) {
+    app.insertAdjacentHTML('afterbegin', `<div class="context-return">${navBack(backLabel())}</div>`);
+  }
   app.classList.toggle('no-tabs', !showTabs);
   tabs.hidden = !showTabs;
   tabs.classList.toggle('under', !!app.querySelector('.scrim, .full'));

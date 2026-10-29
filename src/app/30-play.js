@@ -169,6 +169,7 @@ function clearDraft(ctx) { const byGroup = draftsFor(ctx); delete byGroup[ctx.n]
 
 function entryRow(pid, val, shots, par, rid) {
   const name = esc(D.nameOf(pid));
+  const readOnly = D.round(rid).status === 'final';
   const dkey = `bd-${rid}-${pid}`, dopen = !!UI.open[dkey];
   const dcomp = computeR(rid), dpl = dcomp && dcomp.players[pid];
   const puN = E.pickupStrokes(par, shots);
@@ -184,15 +185,15 @@ function entryRow(pid, val, shots, par, rid) {
   const atOne = base !== null && base <= 1;
   const mid = base === null
     ? `<div class="stv none" data-pid="${pid}" data-n="" aria-live="polite">Par ${par}</div>`
-    : `<button class="stv${scratch ? ' out' : ''}" data-act="clear" data-pid="${pid}" data-n="${base}" aria-label="${name}: ${base} strokes. Tap to clear and start again from par"><b${base > 99 ? ' class="wide"' : ''}>${base}<sup>${pts}</sup></b><small>${word}</small></button>`;
+    : `<button class="stv${scratch ? ' out' : ''}" data-act="clear" data-pid="${pid}" data-n="${base}" aria-label="${name}: ${base} strokes. Tap to clear and start again from par"${readOnly ? ' disabled' : ''}><b${base > 99 ? ' class="wide"' : ''}>${base}<sup>${pts}</sup></b><small>${word}</small></button>`;
   const drop = dopen && dpl ? `<div class="dropcard in"><p class="cap dropwho">${name}</p>${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : '';
   const tile = `<div class="pr ptile${flash}">
     <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span class="nmrow"><span>${name}</span>${dpl ? dropChev : ''}</span><span class="pr-dots" role="img" aria-label="${shots} ${shots === 1 ? 'shot' : 'shots'}">${dots(shots, true)}</span></button>
-      <button class="pu ${scratch ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="P" aria-pressed="${scratch}">Pick up</button></div>
+      <button class="pu ${scratch ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="P" aria-pressed="${scratch}"${readOnly ? ' disabled' : ''}>Pick up</button></div>
     <div class="stepper" role="group" aria-label="Strokes for ${name}">
       ${mid}
-      <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne ? ' disabled' : ''}>\u2212</button>
-      <button class="st" data-act="set" data-dir="up" data-pid="${pid}" data-v="${up}" aria-label="One more stroke for ${name}"${scratch ? ' disabled' : ''}>+</button>
+      <button class="st" data-act="set" data-dir="down" data-pid="${pid}" data-v="${down}" aria-label="One fewer stroke for ${name}"${atOne || readOnly ? ' disabled' : ''}>\u2212</button>
+      <button class="st" data-act="set" data-dir="up" data-pid="${pid}" data-v="${up}" aria-label="One more stroke for ${name}"${scratch || readOnly ? ' disabled' : ''}>+</button>
     </div></div>`;
   return { tile, drop };
 }
@@ -260,7 +261,7 @@ VIEWS.entry = () => {
   if (ctx.mode === 'player' && !ctx.edit) html += needsAttention(ctx.rid, gc, ctx.gid);
   const who = missing.length && missing.length <= 2 ? ' · ' + missing.map(D.nameOf).join(', ') : '';
   const lbl = missing.length ? `${plural(missing.length, 'score')} to go${esc(who)}` : ctx.mode === 'org' ? 'Save correction' : ctx.edit ? 'Save changes' : `Save hole ${ctx.n}`;
-  html += `<div class="savebar"><button class="btn ${missing.length ? 'quiet' : ''}" data-act="save">${lbl}</button></div></div>`;
+  html += `<div class="savebar">${final && ctx.mode === 'player' ? `<button class="btn" data-act="leaderboard" data-rid="${ctx.rid}">See the results</button>${saveWarning()}` : `<button class="btn ${missing.length ? 'quiet' : ''}" data-act="save"${final ? ' disabled' : ''}>${lbl}</button>`}</div></div>`;
   if (ctx.mode === 'player') html += holesSheet(ctx.rid, gc, ctx.n);
   if (ctx.mode === 'player' && !ctx.edit && !UI.holeSheet && !gc.holes[ctx.n].complete && D.round(ctx.rid).status === 'live') html += contestIntro(ctx.rid, gc, ctx.n);
   return ctx.mode === 'player' ? { html, tabs: 'hole' } : { html };
@@ -400,7 +401,7 @@ function bwBoard(gc, seg, live, canEdit) {
     const inner = `<span class="bw-n${isNow ? ' cur' : ''}">${n}</span>${a}${b}`;
     return canEdit && hr.complete ? `<button class="bw-col" data-act="edit-hole" data-n="${n}" aria-label="Change hole ${n}">${inner}</button>` : `<div class="bw-col">${inner}</div>`;
   }).join('');
-  return `<div class="bw-board">${cols}<div class="bw-col bw-tot"><span class="bw-n">Holes</span><span class="bw-t a">${wa}</span><span class="bw-t b">${wb}</span></div></div>`;
+  return `<div class="bw-board${canEdit ? ' editable' : ''}">${cols}<div class="bw-col bw-tot"><span class="bw-n">Holes</span><span class="bw-t a">${wa}</span><span class="bw-t b">${wb}</span></div></div>`;
 }
 /* The two pairs as initials badges, blue v red. */
 const bwBadges = (t, i) => `<span class="bw-pair">${t.map(pid => `<span class="bw-bd ${i ? 'b' : 'a'}" aria-label="${esc(D.nameOf(pid))}">${esc(initialsOf(D.member(pid)) || D.nameOf(pid).slice(0, 2))}</span>`).join('')}</span>`;
@@ -749,7 +750,7 @@ VIEWS.hcp = p => {
   const row = (k, v, strong) => `<div class="row num"><span class="${strong ? 'b' : 'sub'}">${k}</span><span class="${strong ? 'b' : ''}">${v}</span></div>`;
   return {
     html: `${navBack(roundName(r))}
-      <div class="head"><h1 class="title is-name">${esc(m.name)}</h1><span class="bignum">${frozen !== null ? frozen : w.playing}</span></div>
+      <div class="head"><h1 class="title is-name" ${lenStyle(m.name)}>${esc(m.name)}</h1><span class="bignum">${frozen !== null ? frozen : w.playing}</span></div>
       <p class="sub">Playing handicap · ${esc(tee.name)} tees</p>
       ${sec('', cardOf(`${row('WHS index', fmtIndex(m.index))}${row(`× slope ${tee.slope} ÷ 113`, f2(w.slopePart))}${row(`+ rating ${tee.rating} − par ${tee.par}`, f2(w.ratingPart))}${row('Course handicap', f2(w.courseHandicap), true)}${pct !== 100 ? row(`× ${pct}%`, f2(w.beforeRounding)) : ''}${row('Playing handicap', frozen !== null ? frozen : w.playing, true)}`))}`
   };
@@ -894,7 +895,11 @@ VIEWS.trip = p => {
   let html = `${navBack(backLabel())}<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">${esc(r0.trip || 'Trip standings')}</h1></div></header>`;
   if (tripBoardOn(r0)) html += tripTable(list);
   else html += `<p class="cap note" style="margin:8px 4px 0">No combined leaderboard for this trip: each day has its own results.</p>`;
-  html += sec(label('Each day'), cardOf(list.map(x => `<button class="row" data-act="leaderboard" data-rid="${x.id}"><span>Day ${x.trip_day || x.seq}</span><span class="right">${x.status === 'upcoming' ? '<span class="sub">Not played</span>' : ''}${chev}</span></button>`).join('')));
+  html += sec(label('Each day'), cardOf(list.map(x => {
+    const sub = [`Day ${x.trip_day || x.seq}`, x.date ? fmtDate(x.date, true) : '', isScramble(x) ? 'Team scramble' : ''].filter(Boolean).join(' · ');
+    const status = x.status === 'final' ? 'Final' : x.status === 'live' ? 'Live' : 'Not played';
+    return `<button class="row tall" data-act="leaderboard" data-rid="${x.id}"><span class="two"><span class="b">${esc(roundName(x))}</span><span class="sub">${esc(sub)}</span></span><span class="right"><span class="pill ${x.status === 'final' ? 'g' : x.status === 'live' ? 'w' : 'n'}">${status}</span>${chev}</span></button>`;
+  }).join('')));
   return { html };
 };
 

@@ -228,7 +228,7 @@ ORG.kb = p => {
   const again = d.pairs.filter(pr => seenKb.has([pr[0], pr[1]].sort().join('+')));
   if (again.length) html += `<p class="cap note">${again.map(pr => esc(pr.map(D.nameOf).join(' & '))).join(', ')} ${again.length === 1 ? 'have' : 'have'} been KB partners before.</p>`;
   else html += '<p class="cap note">No repeat partners.</p>';
-  html += sec('', cardOf(d.pairs.map(pr => `<div class="row">${pr.map(pid => `<button class="chip${d.sel === pid ? ' on' : ''}" data-act="org-kb-swap" data-pid="${pid}">${esc(D.nameOf(pid))}</button>`).join('<span class="sub">&</span>')}</div>`).join('')), true);
+  html += sec('', cardOf(d.pairs.map(pr => `<div class="row kb-pair">${pr.map(pid => `<button class="chip${d.sel === pid ? ' on' : ''}" data-act="org-kb-swap" data-pid="${pid}">${esc(D.nameOf(pid))}</button>`).join('<span class="sub">&</span>')}</div>`).join('')), true);
   html += `<button class="btn" data-act="org-kb-save">Save KBs</button><div class="foot"><button class="link" data-act="org-kb-make">Shuffle</button><button class="link c-b" data-act="org-kb-clear">Turn KBs off for the round</button></div>`;
   return { html };
 };
@@ -342,7 +342,7 @@ ORG.members = () => {
 ORG.member = p => {
   const m = p.pid ? D.member(p.pid) : null;
   return {
-    html: `<header class="hero s">${navBack('Members')}<div class="head"><h1 class="title${m ? ' is-name' : ''}">${m ? esc(m.name) : 'New member'}</h1></div></header>
+    html: `<header class="hero s">${navBack('Members')}<div class="head"><h1 class="title${m ? ' is-name' : ''}" ${m ? lenStyle(m.name) : ''}>${m ? esc(m.name) : 'New member'}</h1></div></header>
     <form data-form="member" autocomplete="off" class="sec near">
       ${field('m-name', 'Name on the leaderboard', m ? m.name : '', 'placeholder="Mike P"')}
       ${field('m-full', 'Full name', m ? m.full : '')}
