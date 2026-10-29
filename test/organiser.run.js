@@ -46,6 +46,18 @@ const { chromium } = require('playwright');
   check('guests do not appear in Players', !/Paddy Guest/.test(await text()));
   const inGoy = await pg.evaluate(() => window.__ncgs.D.regulars().some(m => m.name === 'Paddy Guest'));
   check('guests are not regulars', !inGoy);
+  // Round details at a 360px phone with iPhone-like date and time boxes (Safari gives them a wide minimum width):
+  // every box stays inside its column and on screen (owner's screenshot, 29 October).
+  await pg.setViewportSize({ width: 360, height: 780 });
+  await pg.addStyleTag({ content: 'input[type=date], input[type=time] { min-width: 300px; }' });
+  await pg.evaluate(() => { const n = window.__ncgs; n.UI.org = true; n.UI.orgStack = [{ v: 'home', p: {} }, { v: 'details', p: { rid: 'next-1' } }]; n.UI.formState = null; n.render(); });
+  await pg.waitForTimeout(200);
+  const spill = await pg.evaluate(() => [...document.querySelectorAll('form[data-form="details"] .field')].filter(el => {
+    const r = el.getBoundingClientRect(), col = el.closest('.fld').getBoundingClientRect();
+    return r.right > col.right + 1 || r.right > innerWidth;
+  }).map(el => el.id));
+  check('round details: no box spills into the next one or off a 360px screen', spill.length === 0);
+  if (spill.length) console.log('  spilling:', spill.join(', '));
   check('no script errors', errs.length === 0);
   if (errs.length) console.log(errs);
   await b.close(); console.log(ok ? 'all passed' : 'SOME FAILED'); process.exit(ok ? 0 : 1);
