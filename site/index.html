@@ -2162,7 +2162,7 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .rej-note { display: block; width: 100%; min-height: 44px; margin: 12px 0 0; text-align: left; font: inherit; font-size: var(--t-sub); font-weight: 600; border: 0; cursor: pointer; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610291301","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610291808","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -4519,6 +4519,18 @@ function toast(msg) {
   toast.t = setTimeout(() => { UI.toast = null; renderToast(); }, 2600);
   renderToast();
 }
+
+/* ---- 16-courses.js ---- */
+/* ----- Ready-made courses -----
+   Course cards the organiser can add with one tap instead of typing 18 pars and indexes and the tee ratings.
+   Each card is checked against public sources before it goes in; how, and how sure, is in docs/courses/.
+   A printed club card always wins: the organiser can still edit every number afterwards. */
+const COURSE_LIBRARY = [
+  // Athenry (Galway), checked 27 October 2026: docs/courses/ATHENRY.md. Par and stroke index certain (club's own
+  // guide); White and Green ratings agree across sources to within a point of slope.
+  {"id": "athenry", "name": "Athenry", "area": "Galway", "about": "Parkland course at Palmerstown, between Athenry and Oranmore. Par 70: two par 5s, twelve par 4s and four par 3s. The 7th (413 m) is stroke index 1; the 12th is the signature hole.", "tees": {"white": {"name": "White", "slope": 124, "rating": 71.2, "par": 70}, "green": {"name": "Green", "slope": 117, "rating": 69.2, "par": 70}}, "holes": [{"n": 1, "par": 4, "si": 3, "m": null}, {"n": 2, "par": 4, "si": 7, "m": null}, {"n": 3, "par": 3, "si": 17, "m": null}, {"n": 4, "par": 4, "si": 13, "m": null}, {"n": 5, "par": 4, "si": 9, "m": null}, {"n": 6, "par": 3, "si": 15, "m": null}, {"n": 7, "par": 4, "si": 1, "m": null}, {"n": 8, "par": 5, "si": 11, "m": null}, {"n": 9, "par": 4, "si": 5, "m": null}, {"n": 10, "par": 5, "si": 18, "m": null}, {"n": 11, "par": 4, "si": 10, "m": null}, {"n": 12, "par": 3, "si": 12, "m": null}, {"n": 13, "par": 4, "si": 2, "m": null}, {"n": 14, "par": 4, "si": 4, "m": null}, {"n": 15, "par": 4, "si": 6, "m": null}, {"n": 16, "par": 4, "si": 8, "m": null}, {"n": 17, "par": 3, "si": 16, "m": null}, {"n": 18, "par": 4, "si": 14, "m": null}]}
+];
+const libraryFor = name => COURSE_LIBRARY.find(x => x.name.toLowerCase() === String(name || '').trim().toLowerCase()) || null;
 
 /* ---- 20-society.js ---- */
 /* ================= SOCIETY SCREENS ================= */
@@ -7258,7 +7270,9 @@ ORG.member = p => {
 ORG.courses = () => ({
   html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Courses</h1></div></header>
   ${sec('', cardOf(D.courses().map(c => `<button class="row tall" data-act="org-go" data-v="course" data-cid="${c.id}"><span class="two"><span>${esc(c.name)}</span><span class="sub">${esc([c.area, c.holes ? 'Par ' + c.holes.reduce((s, h) => s + h.par, 0) : 'No card yet'].filter(Boolean).join(' · '))}</span></span>${chev}</button>`).join('') +
-    `<button class="row" data-act="org-go" data-v="course" data-cid=""><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}Add course</span></button>`), true)}`
+    `<button class="row" data-act="org-go" data-v="course" data-cid=""><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}Add course</span></button>`), true)}
+  ${(() => { const ready = COURSE_LIBRARY.filter(x => !D.courses().some(c => c.name.toLowerCase() === x.name.toLowerCase()));
+    return ready.length ? sec(label('Ready to add'), cardOf(ready.map(x => `<button class="row tall" data-act="course-add-lib" data-name="${esc(x.name)}"><span class="two"><span>${esc(x.name)}</span><span class="sub">${esc(x.area)} · par ${x.holes.reduce((t, h) => t + h.par, 0)} · ${Object.values(x.tees).map(t => t.name).join(' and ')} tees</span></span><span class="c-g">${sized(ICON.plus, 20)}</span></button>`).join(''))) : ''; })()}`
 });
 ORG.course = p => {
   const c = p.cid ? D.course(p.cid) : null;
@@ -7269,8 +7283,11 @@ ORG.course = p => {
     <select id="h-par-${i}" class="field sm" aria-label="Par hole ${i + 1}"><option value=""></option>${[3, 4, 5].map(v => `<option${h.par === v ? ' selected' : ''}>${v}</option>`).join('')}</select>
     <input id="h-si-${i}" class="field sm" inputmode="numeric" value="${h.si || ''}" aria-label="Index hole ${i + 1}">
     <input id="h-m-${i}" class="field sm" inputmode="numeric" value="${h.m || ''}" aria-label="Metres hole ${i + 1}"></div>`).join('');
+  // A course with no card yet whose card is ready-made: fill it in with one tap (owner, 27 October).
+  const lib = c && (!c.holes || !c.tees || !Object.keys(c.tees).length) ? libraryFor(c.name) : null;
+  const fill = lib ? `<button class="btn" data-act="course-fill" data-cid="${c.id}">Fill in the ${esc(lib.name)} card</button><p class="cap" style="margin:8px 0 0">Par and stroke index for all 18 holes, and the ${Object.values(lib.tees).map(t => t.name).join(' and ')} tees' slope and rating. You can change any of it afterwards.</p>` : '';
   return {
-    html: `<header class="hero s">${navBack('Courses')}<div class="head"><h1 class="title">${c ? esc(c.name) : 'New course'}</h1></div></header>
+    html: `<header class="hero s">${navBack('Courses')}<div class="head"><h1 class="title">${c ? esc(c.name) : 'New course'}</h1></div></header>${fill ? `<section class="sec near">${fill}</section>` : ''}
     <form data-form="course" autocomplete="off" class="sec near">
       ${field('c-name', 'Name', c ? c.name : '')}
       ${field('c-area', 'Area', c ? c.area : '', 'placeholder="Mayo"')}
@@ -8212,6 +8229,19 @@ const ACT = {
       render();
     }).catch(() => toast('Needs signal to restore'));
   }
+};
+ACT['course-fill'] = el => {
+  const c = D.course(el.dataset.cid), lib = c && libraryFor(c.name);
+  if (!lib) return;
+  put('courses', [Object.assign({}, c, { tees: lib.tees, holes: lib.holes, area: c.area || lib.area, about: c.about || lib.about })], { action: 'Course card filled in', detail: `${c.name}: par ${lib.holes.reduce((t, h) => t + h.par, 0)}, ${Object.values(lib.tees).map(t => `${t.name} ${t.slope}/${t.rating}`).join(', ')}` });
+  UI.formState = null; render(); toast(`${c.name} card filled in`);
+};
+ACT['course-add-lib'] = el => {
+  const lib = libraryFor(el.dataset.name);
+  if (!lib || D.courses().some(c => c.name.toLowerCase() === lib.name.toLowerCase())) return;
+  const id = D.course(lib.id) ? lib.id + '-' + Date.now().toString(36).slice(-3) : lib.id;
+  put('courses', [Object.assign({}, lib, { id })], { action: 'Course added', detail: `${lib.name} (ready-made card)` });
+  render(); toast(`${lib.name} added`);
 };
 ACT.rejected = () => go('rejected');
 ACT['rejected-clear'] = () => { if (UI.confirm !== 'rej-clear') { UI.confirm = 'rej-clear'; render(); return; } UI.confirm = null; clearRejected(); render(); toast('Cleared'); };

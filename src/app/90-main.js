@@ -333,6 +333,19 @@ const ACT = {
     }).catch(() => toast('Needs signal to restore'));
   }
 };
+ACT['course-fill'] = el => {
+  const c = D.course(el.dataset.cid), lib = c && libraryFor(c.name);
+  if (!lib) return;
+  put('courses', [Object.assign({}, c, { tees: lib.tees, holes: lib.holes, area: c.area || lib.area, about: c.about || lib.about })], { action: 'Course card filled in', detail: `${c.name}: par ${lib.holes.reduce((t, h) => t + h.par, 0)}, ${Object.values(lib.tees).map(t => `${t.name} ${t.slope}/${t.rating}`).join(', ')}` });
+  UI.formState = null; render(); toast(`${c.name} card filled in`);
+};
+ACT['course-add-lib'] = el => {
+  const lib = libraryFor(el.dataset.name);
+  if (!lib || D.courses().some(c => c.name.toLowerCase() === lib.name.toLowerCase())) return;
+  const id = D.course(lib.id) ? lib.id + '-' + Date.now().toString(36).slice(-3) : lib.id;
+  put('courses', [Object.assign({}, lib, { id })], { action: 'Course added', detail: `${lib.name} (ready-made card)` });
+  render(); toast(`${lib.name} added`);
+};
 ACT.rejected = () => go('rejected');
 ACT['rejected-clear'] = () => { if (UI.confirm !== 'rej-clear') { UI.confirm = 'rej-clear'; render(); return; } UI.confirm = null; clearRejected(); render(); toast('Cleared'); };
 Object.assign(ACT, DRAW_ACT, GROUP_ACT);
