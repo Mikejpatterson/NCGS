@@ -18,6 +18,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: The live app (site/) was rebuilt from this source
+        run: node tools/check-site.js
       - run: node --test test/*.test.js
   deploy:
     needs: test
