@@ -156,7 +156,7 @@ ORG.details = p => {
       <div class="fld"><label class="sub" for="f-course">Course</label><select id="f-course" class="field" data-change="details-course">${D.courses().map(x => `<option value="${x.id}"${x.id === st.course ? ' selected' : ''}>${esc(x.name)}${x.holes ? '' : ' (no card yet)'}</option>`).join('')}</select></div>
       <div class="fld"><label class="sub" for="f-tee">Tees</label><select id="f-tee" class="field">${tees.length ? tees.map(([k, t]) => `<option value="${k}"${r && r.tee === k ? ' selected' : ''}>${esc(t.name)} · ${t.slope} / ${t.rating}</option>`).join('') : '<option value="">Add tees to the course first</option>'}</select></div>
       ${field('f-date', 'Date', r ? r.date : '', 'type="date"')}
-      <div class="two-col">${field('f-tee-time', 'First tee', r ? r.first_tee : '10:00', 'type="time"')}${field('f-interval', 'Minutes between groups', r && r.interval ? r.interval : 8, 'inputmode="numeric"')}</div>
+      <div class="two-col">${field('f-tee-time', 'First tee', r ? r.first_tee : '10:00', 'type="time"')}${field('f-interval', 'Minutes apart', r && r.interval ? r.interval : 8, 'inputmode="numeric"')}</div>
       <div class="two-col">${field('f-trip', 'Trip', r ? r.trip : '', 'placeholder="None"')}${field('f-day', 'Day', r ? r.trip_day : '', 'inputmode="numeric"')}</div>
       <div class="two-col">${field('f-ntp', 'Nearest the pin holes', ntp, 'inputmode="numeric" placeholder="7, 15"')}${field('f-ld', 'Longest drive holes', ld, 'inputmode="numeric" placeholder="12"')}</div>
       ${formErr()}
