@@ -5,7 +5,7 @@ A working-app design candidate based on released main `b2d849d`. The owner asked
 ## Design decisions
 
 - **The competition leads.** The course replaces the generic large Leaderboard title; Leaderboard and live/final state remain in a small masthead. Format/date sit underneath. The repeated round-title section is removed.
-- **Scores read as a ledger.** Rank, player and points have aligned column headings. Initials circles are removed from these standings, with full player names and progress retained. A quiet first-row tint and pine rule establish the hierarchy. Tap-to-expand scorecards still work.
+- **Scores read as a ledger.** Rank, player and points have aligned column headings. Initials circles are removed from these standings, with full player names and progress retained. A quiet tint on every shared leader and a pine rule establish the hierarchy. Tap-to-expand scorecards still work.
 - **Results navigation is quieter.** Underlined text tabs replace four competing outlined pills within this screen. The main glass navigation and primary action buttons retain their approved forms. Selection remains explicit and touch targets remain generous.
 - **The season belongs to the same family.** A clear season label, restrained leader panel and matching standings replace the oversized summary and collection of score badges. Counting scores remain visible as simple separated values; archive controls and eligibility are unchanged.
 - **Contests celebrate the result.** Each contest names the challenge and hole, then gives the golfer's name the prominence. Existing provisional, confirmed, nobody and waiting states are retained; no winner is inferred from an unfinished contest.
@@ -24,6 +24,12 @@ All pairs show the same fixture and 390px phone width. Full-page images include 
 | Season | ![Previous season standings](results-refinement-2026-10-29/before-goy.png) | ![Refined season standings](results-refinement-2026-10-29/after-goy.png) |
 | Contests | ![Previous contests](results-refinement-2026-10-29/before-contests.png) | ![Refined contests](results-refinement-2026-10-29/after-contests.png) |
 | Stats | ![Previous round statistics](results-refinement-2026-10-29/before-stats.png) | ![Refined match report](results-refinement-2026-10-29/after-stats.png) |
+
+### Imported results and shared leaders
+
+![Aligned imported standings with both tied leaders highlighted](results-refinement-2026-10-29/imported-ties.png)
+
+This additional invented imported-result fixture exercises shared first place and three-digit totals. Its points heading aligns without an expansion-arrow allowance. The normal app results retain their arrow spacing. The Final label remains visible on the ivory header.
 
 ## Validation and integration
 

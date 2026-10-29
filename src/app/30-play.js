@@ -856,7 +856,7 @@ VIEWS.board = () => {
   const fromSt = typeof stackOf === 'function' ? stackOf() : UI.stack;
   const backTo = fromSt && fromSt.length > 1 && fromSt[fromSt.length - 1].v === 'board' ? navBack(backLabel()) : '';
   const page = html => ({ tabs: 'board', html: `<div class="results-page">${html}</div>` });
-  let html = `${backTo}<header class="hero c lbhead"><div class="results-meta"><span>Leaderboard</span>${live0 ? `<span class="results-live"><span class="pulse"></span>Live${thru0 ? ' · thru ' + thru0 : ''}</span>` : statusPill(r)}</div><div class="hrow2"><h1 class="big">${esc(roundName(r))}</h1></div><p class="sub">${isScramble(r) ? 'Team scramble' : 'Stableford'}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''}</p></header>`;
+  let html = `${backTo}<header class="hero c lbhead"><div class="results-meta"><span>Leaderboard</span>${live0 ? `<span class="results-live"><span class="pulse"></span>Live${thru0 ? ' · thru ' + thru0 : ''}</span>` : r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r)}</div><div class="hrow2"><h1 class="big">${esc(roundName(r))}</h1></div><p class="sub">${isScramble(r) ? 'Team scramble' : 'Stableford'}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''}</p></header>`;
   if (avail.length > 1) {
     const names = { lb: 'Scores', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
     html += `<div class="seg pills${avail.length > 3 ? ' four' : ''}" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
@@ -880,9 +880,9 @@ VIEWS.board = () => {
   }
 
   if (res.source === 'scramble') return page(html + scrambleTable(r, res));
-  html += sec('', `<div class="standings"><div class="standings-head" aria-hidden="true"><span>Pos</span><span>Player</span><span>Pts</span></div>${cardOf(res.rows.map(x => {
+  html += sec('', `<div class="standings${res.source === 'app' ? ' expandable' : ''}"><div class="standings-head" aria-hidden="true"><span>Pos</span><span>Player</span><span>Pts</span></div>${cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}<span class="vh"> position</span></span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}<span class="vh"> points</span></span>${res.source === 'app' ? dropChev : ''}</span>`;
-    return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
+    return res.source === 'app' ? dropRow(sel, x, inner, `lrow${x.pos === 1 ? ' is-leader' : ''}`) : `<button class="lrow${x.pos === 1 ? ' is-leader' : ''}" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
   }).join(''))}</div>`, true);
   if (res.kb.length) { const low = E.kbLowest(res.kb); html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''))); }
   html += `<button class="btn quiet" data-act="results" data-rid="${sel}">Share results</button>`;

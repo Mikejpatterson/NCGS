@@ -2169,7 +2169,8 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .standings-head > :last-child { text-align: right; }
 .standings > .card { border-radius: 0; border: 0; box-shadow: none; background: transparent; overflow: visible; }
 .standings .lrow { min-height: 62px; padding-top: 10px; padding-bottom: 10px; background: transparent; border-top: 1px solid var(--line); }
-.standings .lrow:first-child { border-top: 2px solid var(--pine); background: var(--green-soft); }
+.standings .lrow:first-child { border-top: 2px solid var(--pine); }
+.standings .lrow.is-leader { background: var(--green-soft); }
 .standings .lrow .av { display: none; }
 .standings .lrow .lname { font-size: 1rem; font-weight: 600; }
 .standings .lrow > .sub { font-size: .9rem; font-weight: 500; }
@@ -2203,16 +2204,17 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .results-page .ct-l { max-width: none; width: 100%; display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; gap: 16px; font-size: .9rem; font-weight: 500; }
 .results-page .ct-l .sub { font-size: .8rem; white-space: nowrap; }
 .results-page .ct-r { align-items: flex-start; text-align: left; gap: 6px; }
-.results-page .ct-r .b { font-size: 1.5rem; line-height: 1.2; font-weight: 600; color: var(--pine); }
+.results-page .ct-r .b { font-size: 1.3rem; line-height: 1.2; font-weight: 600; color: var(--pine); }
 @media (min-width: 600px) {
   .results-page .sbadges { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
   .results-page .sbd:nth-child(2) { border-top: 2px solid var(--pine); }
 }
 
 .results-page > .sec { margin-top: 12px; }
-.results-page .standings-head > :last-child { padding-right: 20px; }
+.results-page .standings.expandable .standings-head > :last-child { padding-right: 20px; }
 
 .results-page .scr-standings .card { border-radius: 0; border: 0; box-shadow: none; background: transparent; }
 .results-page .scr-standings .scr-row { border-top: 1px solid var(--line); background: transparent; padding: 14px 12px; }
 .results-page .scr-standings .scr-row:first-child { border-top: 2px solid var(--pine); }
 .results-page .scr-standings .scr-row.low { background: var(--green-soft); border-left: 3px solid var(--pine); }
+.results-page .results-meta .pill { background: var(--green-soft); color: var(--pine); font-size: .7rem; letter-spacing: .04em; }
