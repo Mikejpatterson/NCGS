@@ -2154,3 +2154,65 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .drw-left { margin: 0 0 12px; text-align: center; font-size: 1rem; }
 /* Changes the server refused: a tappable notice on Home and the hole screens (structural review H1). */
 .rej-note { display: block; width: 100%; min-height: 44px; margin: 12px 0 0; text-align: left; font: inherit; font-size: var(--t-sub); font-weight: 600; border: 0; cursor: pointer; }
+
+/* Results: one competition masthead and a score ledger, with decoration subordinate to play. */
+.results-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; color: var(--pine); font: 600 .75rem/1.4 var(--font-body, system-ui); letter-spacing: .09em; text-transform: uppercase; }
+.results-live { display: inline-flex; align-items: center; gap: 5px; letter-spacing: .02em; }
+.results-page .lbhead { padding: 10px 0 14px; margin: 0; border-bottom: 2px solid var(--pine); }
+.results-page .lbhead .hrow2 h1.big { font-size: 2.25rem; line-height: 1.1; margin: 0; overflow-wrap: anywhere; }
+.results-page header.lbhead:not(:has(.is-name)) > p.sub:not(.names) { margin-top: 8px; font-size: .85rem; }
+.results-page > .seg.pills { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 0 0 8px; padding: 0; border-bottom: 1px solid var(--line); }
+.results-page > .seg.pills button { flex: 1 1 auto; width: auto; min-width: 44px; min-height: 48px; border-radius: 0; padding: 6px 0; background: transparent; box-shadow: none; border-bottom: 3px solid transparent; color: var(--sub); font-size: .85rem; font-weight: 500; }
+.results-page > .seg.pills button.on { color: var(--pine); background: transparent; box-shadow: none; border-bottom-color: var(--pine); font-weight: 700; }
+.standings-head, .standings .lrow { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr) 4.6rem; column-gap: 10px; padding-left: 12px; padding-right: 12px; }
+.standings-head { align-items: end; min-height: 32px; padding-top: 8px; padding-bottom: 8px; color: var(--sub); font-size: .7rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.standings-head > :last-child { text-align: right; }
+.standings > .card { border-radius: 0; border: 0; box-shadow: none; background: transparent; overflow: visible; }
+.standings .lrow { min-height: 62px; padding-top: 10px; padding-bottom: 10px; background: transparent; border-top: 1px solid var(--line); }
+.standings .lrow:first-child { border-top: 2px solid var(--pine); background: var(--green-soft); }
+.standings .lrow .av { display: none; }
+.standings .lrow .lname { font-size: 1rem; font-weight: 600; }
+.standings .lrow > .sub { font-size: .9rem; font-weight: 500; }
+.standings .lrow .ln { gap: 4px; }
+.standings .lrow .ln .cap { font-size: .78rem; color: var(--sub); }
+.standings .lrow .r { display: flex; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; }
+.standings .lrow .r .b, .standings .lrow.goy .tot { font-size: 1.5rem; font-weight: 650; letter-spacing: -.03em; }
+.standings .lrow .r .chev { width: 12px; flex: none; }
+.standings .lrow.goy .chipn { background: transparent; border-radius: 0; min-width: 0; height: auto; padding: 0; font-weight: 500; font-style: normal; color: var(--sub); }
+.standings .lrow.goy .chips { gap: 0; flex-wrap: wrap; }
+.standings .lrow.goy .chipn + .chipn::before { content: ' / '; white-space: pre; color: var(--sub); }
+.season-results .hero.s { padding-bottom: 16px; border-bottom: 2px solid var(--pine); }
+.season-results .hero.s h1.title { font-size: 2rem; line-height: 1.12; }
+.season-results .leadcard { margin-top: 16px; padding: 16px 18px; border-radius: 14px; gap: 8px; }
+.season-results .leadcard::after { display: none; }
+.season-results .lc-k { font-size: .7rem; font-weight: 600; }
+.season-results .lc-n { font-size: 1.65rem; font-weight: 600; line-height: 1.15; }
+.season-results .lc-p b { font-size: 2.2rem; font-weight: 650; }
+.season-results .lc-s { margin-top: 0; font-size: .8rem; }
+.results-page .sbadges { box-shadow: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; border: 0; border-radius: 0; padding: 0; background: transparent; }
+.results-page .sbd { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 14px; row-gap: 5px; text-align: left; align-items: start; padding: 18px 0; border-top: 1px solid var(--line); }
+.results-page .sbd:first-child { border-top: 2px solid var(--pine); }
+.results-page .sbm { grid-column: 1; grid-row: 1 / 4; width: 24px; height: 24px; margin: 0; border-radius: 0; color: var(--pine); background: transparent !important; }
+.results-page .sbm svg { width: 24px; height: 24px; }
+.results-page .sbt { grid-column: 2; font-size: .7rem; font-weight: 600; letter-spacing: .06em; line-height: 1.4; }
+.results-page .sbw { grid-column: 2; font-size: 1.2rem; font-weight: 600; line-height: 1.2; }
+.results-page .sbn { grid-column: 2; font-size: .85rem; line-height: 1.4; }
+.results-page .contest-results > .card { box-shadow: none; background: transparent; border: 0; border-radius: 0; }
+.results-page .contest-results .crow { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 18px 0; border-top: 1px solid var(--line); }
+.results-page .contest-results .crow:first-child { border-top: 2px solid var(--pine); }
+.results-page .ct-l { max-width: none; width: 100%; display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; gap: 16px; font-size: .9rem; font-weight: 500; }
+.results-page .ct-l .sub { font-size: .8rem; white-space: nowrap; }
+.results-page .ct-r { align-items: flex-start; text-align: left; gap: 6px; }
+.results-page .ct-r .b { font-size: 1.5rem; line-height: 1.2; font-weight: 600; color: var(--pine); }
+@media (min-width: 600px) {
+  .results-page .sbadges { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+  .results-page .sbd:nth-child(2) { border-top: 2px solid var(--pine); }
+}
+
+.results-page > .sec { margin-top: 12px; }
+.results-page .standings-head > :last-child { padding-right: 20px; }
+
+.results-page .scr-standings .card { border-radius: 0; border: 0; box-shadow: none; background: transparent; }
+.results-page .scr-standings .scr-row { border-top: 1px solid var(--line); background: transparent; padding: 14px 12px; }
+.results-page .scr-standings .scr-row:first-child { border-top: 2px solid var(--pine); }
+.results-page .scr-standings .scr-row.low { background: var(--green-soft); border-left: 3px solid var(--pine); }

@@ -313,10 +313,10 @@ VIEWS.goy = () => {
   const season = yearOn();
   const table = goy(season);
   return {
-    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Golfer of the Year</h1></div>
-      <p class="sub">${season} · best ${D.goyBest()} scores count</p>${yearPicker()}</header>
+    html: `<div class="season-results"><header class="hero s">${navBack(backLabel())}<p class="results-meta">Season ${season}</p><div class="head"><h1 class="title">Golfer of the Year</h1></div>
+      <p class="sub">Best ${D.goyBest()} scores count</p>${yearPicker()}</header>
       ${table[0] ? `<div class="leadcard"><span class="lc-k">LEADING</span><span class="lc-row"><span class="lc-n">${esc(table[0].name)}</span><span class="lc-p"><b>${table[0].total}</b> pts</span></span>${table[1] ? `<span class="lc-s">${table[0].total - table[1].total === 0 ? 'Level with' : (table[0].total - table[1].total) + ' point' + (table[0].total - table[1].total === 1 ? '' : 's') + ' clear of'} ${esc(table[1].name)}</span>` : ''}</div>` : ''}
-      ${table.length ? sec('', cardOf(table.map(x => goyRow(x, season)).join('')), false) : sec('', `<div class="prose">No rounds played in ${season} yet. The table starts with the first round.</div>`, false)}`
+      ${table.length ? sec('', `<div class="standings"><div class="standings-head" aria-hidden="true"><span>Pos</span><span>Player</span><span>Pts</span></div>${cardOf(table.map(x => goyRow(x, season)).join(''))}</div>`, false) : sec('', `<div class="prose">No rounds played in ${season} yet. The table starts with the first round.</div>`, false)}</div>`
   };
 };
 
