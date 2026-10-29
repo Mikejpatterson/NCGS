@@ -21,6 +21,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: The live app (site/) was rebuilt from this source
+        run: node tools/check-site.js
       - name: Engine and server tests (CLAUDE.md)
         run: node --test test/engine.test.js test/server.test.js
       - name: Every unit test
