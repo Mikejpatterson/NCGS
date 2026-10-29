@@ -306,7 +306,7 @@ VIEWS.players = () => {
 };
 
 function goyRow(x, season) {
-  return `<button class="lrow goy${x.pos === 1 ? ' is-leader' : ''}" aria-label="${esc(x.name)}, position ${esc(x.posLabel)}, ${x.total} points. Counting scores: ${x.counting.map(c => c.pts).join(', ')}" data-act="player" data-pid="${x.id}" data-year="${season}"><span class="sub">${x.posLabel}</span>${avName(x, `<span class="chips">${x.counting.map(c => `<i class="chipn">${c.pts}</i>`).join('')}</span>`, false, true)}<span class="b r tot">${x.total}</span></button>`;
+  return `<button class="lrow goy${x.pos === 1 ? ' is-leader' : ''}" aria-label="${x.id === DB.prefs.me ? 'You, ' : ''}${esc(x.name)}, position ${esc(x.posLabel)}, ${x.total} points. Counting scores: ${x.counting.map(c => c.pts).join(', ')}" data-act="player" data-pid="${x.id}" data-year="${season}"><span class="sub">${x.posLabel}</span>${avName(x, `<span class="chips">${x.counting.map(c => `<i class="chipn">${c.pts}</i>`).join('')}</span>`, false, true)}<span class="b r tot">${x.total}</span></button>`;
 }
 
 VIEWS.goy = () => {

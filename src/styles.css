@@ -2218,3 +2218,6 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .results-page .scr-standings .scr-row:first-child { border-top: 2px solid var(--pine); }
 .results-page .scr-standings .scr-row.low { background: var(--green-soft); border-left: 3px solid var(--pine); }
 .results-page .results-meta .pill { background: var(--green-soft); color: var(--pine); font-size: .7rem; letter-spacing: .04em; }
+
+/* The existing :has(.av.is-me) row tint/left rule remains, even with its decorative badge hidden. */
+.standings .lrow .lname.b { font-weight: 800; }
