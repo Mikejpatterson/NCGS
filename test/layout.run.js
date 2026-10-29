@@ -225,4 +225,9 @@ const titleCheck = ({ sel, want, max }) => {
     [...process.execArgv, require('path').join(__dirname, 'home-day.run.js')], { stdio: 'inherit', env: subEnv });
   if (hd.error) console.error(hd.error);
   if (hd.status !== 0) process.exit(hd.status || 1);
+  // Whole-app screen audit: returns after finalisation retain saves, plus visual/control regressions.
+  const audit = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'screen-audit.run.js')], { stdio: 'inherit', env: subEnv });
+  if (audit.error) console.error(audit.error);
+  if (audit.status !== 0) process.exit(audit.status || 1);
 })();

@@ -86,7 +86,7 @@ VIEWS.scramble = () => {
   const left = gc.left, tight = gc.atRisk || gc.impossible;
   html += sec(label('Drive'), `<div class="scr-drives" role="radiogroup" aria-label="Whose drive was used">${gc.team.map(pid => {
     const on = d.driver === pid, k = gc.drives[pid] || 0;
-    return `<button class="scr-drv${on ? ' on' : ''}" role="radio" aria-checked="${on}" data-act="scr-driver" data-pid="${pid}" aria-label="${esc(D.nameOf(pid))}, ${plural(k, 'drive')}"><span class="scr-dn">${esc(D.nameOf(pid))}</span>${scrDots(k, gc.minDrives, tight && k < gc.minDrives)}</button>`;
+    return `<button class="scr-drv${on ? ' on' : ''}" role="radio" aria-checked="${on}" data-act="scr-driver" data-pid="${pid}" aria-label="${esc(D.nameOf(pid))}, ${plural(k, 'drive')}"${final ? ' disabled' : ''}><span class="scr-dn">${esc(D.nameOf(pid))}</span>${scrDots(k, gc.minDrives, tight && k < gc.minDrives)}</button>`;
   }).join('')}</div>`);
   // Say who still needs drives (UX review F13): amber while it can still be done, red once it can't.
   if (tight) {
@@ -102,14 +102,14 @@ VIEWS.scramble = () => {
   const v = d.score;
   const pts = E.isEntered(v) ? E.stablefordPoints(v, h.par, shots) : null;
   html += sec(label('Score'), `<div class="scr-score card" aria-label="Team score">
-    <div class="scr-step"><button class="scr-st" data-act="scr-score" data-dir="down" aria-label="One less for the team">−</button>
-    <button class="scr-val num" data-act="scr-clear" aria-label="Team score ${E.isEntered(v) ? (v === 'P' ? 'picked up' : v) : 'not set'}">${E.isEntered(v) ? (v === 'P' ? '–' : v) : `<small>Par ${h.par}</small>`}</button>
-    <button class="scr-st" data-act="scr-score" data-dir="up" aria-label="One more for the team">+</button></div>
-    <div class="scr-meta"><span class="sub">${pts !== null ? `${pts} pts` : ''}${shots ? `${pts !== null ? ' · ' : ''}${plural(shots, 'shot')}` : ''}</span><button class="link" data-act="scr-pickup">${v === 'P' ? 'Picked up' : 'Pick up'}</button></div></div>`);
+    <div class="scr-step"><button class="scr-st" data-act="scr-score" data-dir="down" aria-label="One less for the team"${final ? ' disabled' : ''}>−</button>
+    <button class="scr-val num" data-act="scr-clear" aria-label="Team score ${E.isEntered(v) ? (v === 'P' ? 'picked up' : v) : 'not set'}"${final ? ' disabled' : ''}>${E.isEntered(v) ? (v === 'P' ? '–' : v) : `<small>Par ${h.par}</small>`}</button>
+    <button class="scr-st" data-act="scr-score" data-dir="up" aria-label="One more for the team"${final ? ' disabled' : ''}>+</button></div>
+    <div class="scr-meta"><span class="sub">${pts !== null ? `${pts} pts` : ''}${shots ? `${pts !== null ? ' · ' : ''}${plural(shots, 'shot')}` : ''}</span><button class="link" data-act="scr-pickup"${final ? ' disabled' : ''}>${v === 'P' ? 'Picked up' : 'Pick up'}</button></div></div>`);
 
   const ready = E.isEntered(d.score) && d.driver;
   const lbl = ctx.mode === 'org' ? 'Save correction' : ctx.edit || gc.holes[n].complete ? 'Save changes' : `Save hole ${n}`;
-  html += `<div class="savebar"><button class="btn ${ready ? '' : 'quiet'}" data-act="scr-save">${lbl}</button>${saveWarning()}</div></div>`;
+  html += `<div class="savebar">${final && ctx.mode === 'player' ? `<button class="btn" data-act="leaderboard" data-rid="${rid}">See the results</button>` : `<button class="btn ${ready ? '' : 'quiet'}" data-act="scr-save"${final ? ' disabled' : ''}>${lbl}</button>`}${saveWarning()}</div></div>`;
   if (ctx.mode === 'player') html += holesSheet(rid, gc, n);
   if (ctx.mode === 'player' && !ctx.edit && !UI.holeSheet && !gc.holes[n].complete && r.status === 'live') html += contestIntro(rid, gc, n);
   return ctx.mode === 'player' ? { html, tabs: 'hole' } : { html };
