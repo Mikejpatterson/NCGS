@@ -14,9 +14,9 @@ The correction is limited to `src/styles.css`. No application handlers, scoring/
 
 `test/player-columns.run.js` opens round details through the actual Home link and Players tab. It checks rendered geometry, not CSS implementation details: numeric values share their heading's right edge, stay alongside the same player's identity, names do not overlap those columns, rows remain at least44px tall, ordinary rows remain compact, and tapping a player still opens their handicap calculation.
 
-Coverage:360/390/393/430px phones,135% text at360/390, and unusually long fictional names at ordinary/enlarged text.30 checks pass on the correction. Against an untouched main preview, the same test produces10 failures, reproducing the defect. It runs through the existing screen-audit/layout entry point, so it is covered by the established CI without a workflow edit.
+Coverage:360/390/393/430px phones,135% text at360/390, and unusually long fictional names at ordinary/enlarged text.38 checks pass on the correction, including actual heading text bounds inside each numeric track (added after independent review). Against an untouched main preview, the same test produces10 failures, reproducing the defect. It runs through the existing screen-audit/layout entry point, so it is covered by the established CI without a workflow edit.
 
-The required engine/server checks and member UI91/91 pass. The existing strict layout/chained suites are also run; the PR records their final result. Genuine before/after captures are retained in the working workspace with invented data. Chromium evidence does not establish physical iPhone/Safari rendering.
+The required engine/server checks and member UI91/91 pass. The full strict layout/chained suites completed with338 passes and zero failures before the additional8 header-bound checks; the focused regression then passed38/38 on identical CSS. Genuine before/after captures are retained in the working workspace with invented data. Chromium evidence does not establish physical iPhone/Safari rendering.
 
 ## Integration
 

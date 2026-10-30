@@ -23,13 +23,14 @@ const check = (name, value) => { console.log((value ? 'PASS  ' : 'FAIL  ') + nam
       const metrics=await p.locator('.rp-players').evaluate(list=>{
         const rect=e=>e.getBoundingClientRect(),mid=e=>{const r=rect(e);return(r.top+r.bottom)/2;};
         const head=list.querySelector('.cols'),heads=[...head.children],rows=[...list.querySelectorAll('.pl-row:not(.cols)')];
-        return {count:rows.length,aligned:rows.every(row=>{
+        return {count:rows.length,headingsFit:heads.slice(2,4).every(e=>{const range=document.createRange();range.selectNodeContents(e);const t=range.getBoundingClientRect(),cell=rect(e);return t.left>=cell.left-1&&t.right<=cell.right+1;}),aligned:rows.every(row=>{
           const c=[...row.children],name=c[1],index=c[2],playing=c[3];
           return Math.abs(rect(index).right-rect(heads[2]).right)<1&&Math.abs(rect(playing).right-rect(heads[3]).right)<1&&Math.abs(mid(index)-mid(name))<2&&Math.abs(mid(playing)-mid(name))<2&&rect(name).right<=rect(index).left-4;
         }),fits:rows.every(row=>[...row.querySelectorAll('.pl-n,.num')].every(e=>e.scrollWidth<=e.clientWidth+1))&&document.querySelector('main').scrollWidth<=innerWidth,
         targets:rows.every(row=>rect(row).height>=44),compact:rows.every(row=>rect(row).height<=64)};
       });
       check(label+': every index/playing value aligns with its heading and player',metrics.count>0&&metrics.aligned);
+      check(label+': both column headings fit inside their numeric tracks',metrics.headingsFit);
       check(label+': names and numbers fit without sideways overflow',metrics.fits);
       check(label+': whole player rows remain full-size targets',metrics.targets);
       if (!long&&scale===1) check(label+': ordinary names keep compact rows',metrics.compact);
