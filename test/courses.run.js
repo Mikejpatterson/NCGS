@@ -23,7 +23,7 @@ const check = (n, c, extra) => { console.log((c ? 'PASS  ' : 'FAIL  ') + n + (!c
       && c.holes.map(h => h.si).sort((a, b) => a - b).join() === Array.from({ length: 18 }, (_, i) => i + 1).join()
       && c.holes[6].si === 1 && c.holes[9].si === 18 && c.tees.white.slope === 124 && c.tees.white.rating === 71.2 && c.tees.green.slope === 117 && c.tees.green.rating === 69.2;
     check('the added course has par 70, every index once (7th is 1, 10th is 18) and both tees rated', good(c), JSON.stringify(c && c.tees));
-    check('once added it is no longer offered', !/Ready to add/.test(await text()));
+    check('once added it is no longer offered', !(await pg.$('[data-act="course-add-lib"][data-name="Athenry"]')));
 
     // 2. Already made by hand with no card (as on the owner's phone): one tap fills it in, keeping its id.
     await pg.evaluate(() => { const n = window.__ncgs; const a = n.D.courses().find(x => x.name === 'Athenry'); n.send({ op: 'remove', table: 'courses', rows: [{ id: a.id }], pin: '1234' }); n.put('courses', [{ id: 'athenry-hand', name: 'Athenry', area: '', about: '', tees: null, holes: null }]); });
@@ -42,6 +42,31 @@ const check = (n, c, extra) => { console.log((c ? 'PASS  ' : 'FAIL  ') + n + (!c
     await pg.waitForTimeout(150);
     const tees = await pg.$$eval('#f-tee option', o => o.map(x => x.textContent));
     check('a new round at Athenry offers White and Green with their ratings', tees.some(t => /White · 124 \/ 71.2/.test(t)) && tees.some(t => /Green · 117 \/ 69.2/.test(t)), tees.join(' | '));
+
+    // 3. All five society venues are ready-made, each a complete card; Rosses Point is found by the name the owner uses.
+    await org('courses', {});
+    for (const name of ['Westport', 'Ballinrobe', 'Rosses Point', 'Strandhill']) {
+      check(`${name} is offered ready-made`, !!(await pg.$(`[data-act="course-add-lib"][data-name="${name}"]`)));
+    }
+    const pars = { Westport: 73, Ballinrobe: 73, 'Rosses Point': 71, Strandhill: 70 };
+    for (const name of Object.keys(pars)) {
+      await pg.click(`[data-act="course-add-lib"][data-name="${name}"]`); await pg.waitForTimeout(150);
+    }
+    await sync();
+    const cards = await pg.evaluate(names => names.map(n => window.__ncgs.D.courses().find(c => c.name === n)), Object.keys(pars));
+    for (const c of cards) {
+      const ok = c && c.holes.length === 18 && c.holes.reduce((t, h) => t + h.par, 0) === pars[c.name]
+        && c.holes.map(h => h.si).sort((a, b) => a - b).join() === Array.from({ length: 18 }, (_, i) => i + 1).join()
+        && Object.values(c.tees).every(t => t.slope >= 55 && t.slope <= 155 && t.rating > 60 && t.rating < 80 && t.par === pars[c.name])
+        && !('check' in c) && !('aliases' in c);
+      check(`${c ? c.name : '?'}: par ${c ? pars[c.name] : '?'}, every index once, rated tees, nothing extra stored`, ok);
+    }
+    check('nothing left to add once all are in', !/Ready to add/.test(await text()));
+    // a hand-made course called "Ross's Point" is recognised and can be filled in
+    await pg.evaluate(() => { const n = window.__ncgs; const a = n.D.courses().find(x => x.name === 'Rosses Point'); n.send({ op: 'remove', table: 'courses', rows: [{ id: a.id }], pin: '1234' }); n.put('courses', [{ id: 'rp-hand', name: "Ross's Point", area: '', about: '', tees: null, holes: null }]); });
+    await sync();
+    await org('course', { cid: 'rp-hand' });
+    check("a course typed as \"Ross's Point\" offers the Rosses Point card", /Fill in the Rosses Point card/.test(await text()));
     check('no script errors', errs.length === 0, errs.join(' | '));
   } catch (e) { console.error(e); ok = false; } finally { await b.close(); }
   console.log(ok ? 'all passed' : 'SOME FAILED'); process.exit(ok ? 0 : 1);
