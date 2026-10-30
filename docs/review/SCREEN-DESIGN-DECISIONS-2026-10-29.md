@@ -20,11 +20,39 @@ This register is an assessment of the current application, not a new task queue.
 - Manual nine-card comparison keeps named column headings visible while the golfer scrolls.
 - Form errors are keyboard-focusable alerts brought into view. Only edited ordinary fields are preserved on the same route; no PIN/password/file, read-only export, durable store or score queue is copied. Text selection also survives an incidental redraw.
 
-## Before and after evidence
+## Before and after
 
-Actual Chromium fixture screenshots and eight before/after comparisons have been captured and inspected locally. They cover round detail, course editing, ready organiser Home, round setup, backup/export, Settings, fresh-season Home and trip results, plus validation, expanded-group, restore-confirmation and archived-profile interaction states. No image is generated, and the preview was verified against the invented fixture seed.
+All images are actual Chromium app screenshots with invented golfers, never generated mockups or live member data. Comparisons use the frozen #63 baseline. The eight before/after pairs are final selected captures; the full inventory contact sheets were captured before the final optional-check/error-focus/Home polish. Those final changes are verified by the selected captures and regression journeys.
 
-Automatic approval review rejected public publication of the screenshot collection over possible private app data and insufficient payload-specific authorization. This source/test/documentation PR therefore includes no new images. The complete image collection and visual evidence document remain in the isolated local workspace for the human to inspect and approve separately. This does not block code review or erase the screen decisions below. The existing #63 screenshots remain available for the earlier shared-identity baseline.
+### Composition comparisons at 390px
+
+| Round detail: more content in view | Course: card entry comes forward |
+|---|---|
+| ![Round Groups before/after](assets/screen-design-20261029/round-groups.jpg) | ![Course editor before/after](assets/screen-design-20261029/org-course.jpg) |
+
+| Ready organiser round | Schedule and contests |
+|---|---|
+| ![Organiser before/after](assets/screen-design-20261029/org-home.jpg) | ![Round Details before/after](assets/screen-design-20261029/org-details.jpg) |
+
+| Backup and export | Season first in Settings |
+|---|---|
+| ![Backup before/after](assets/screen-design-20261029/org-export.jpg) | ![Settings before/after](assets/screen-design-20261029/org-settings.jpg) |
+
+| Fresh season with a clear archive route | Archived trip with season context |
+|---|---|
+| ![New-season Home before/after](assets/screen-design-20261029/home-preseason.jpg) | ![Trip before/after](assets/screen-design-20261029/member-trip.jpg) |
+
+### Actual interaction states
+
+[Expanded personal group](assets/screen-design-20261029/round-expanded.jpg), [validation with retained course work](assets/screen-design-20261029/course-error.jpg), [round validation](assets/screen-design-20261029/details-error.jpg), [restore’s second confirmation](assets/screen-design-20261029/restore-confirm.jpg), [archived round → trip](assets/screen-design-20261029/archive-round.jpg), [trip → correct-season profile](assets/screen-design-20261029/archive-profile.jpg). The regression checks the actual values in both nines, not only what is visible in the screenshot.
+
+### Whole-app visual contact sheets
+
+These support the purpose decisions below. **Generic helper fallback images are explicitly not valid intended-screen evidence**; use the populated supplemental/real-journey captures described under verification. The labels retain actual renderer names for traceability.
+
+[Sheet 1](assets/screen-design-20261029/sheet-1.jpg) [Sheet 2](assets/screen-design-20261029/sheet-2.jpg) [Sheet 3](assets/screen-design-20261029/sheet-3.jpg) [Sheet 4](assets/screen-design-20261029/sheet-4.jpg) [Sheet 5](assets/screen-design-20261029/sheet-5.jpg) [Sheet 6](assets/screen-design-20261029/sheet-6.jpg) [Sheet 7](assets/screen-design-20261029/sheet-7.jpg) [Sheet 8](assets/screen-design-20261029/sheet-8.jpg) [Sheet 9](assets/screen-design-20261029/sheet-9.jpg) [Sheet 10](assets/screen-design-20261029/sheet-10.jpg)
+
+The human Product Owner explicitly approved attaching this invented-data screenshot collection to public PR #64 on 30 October ("Yes you can" in response to that exact publication request). The preview seed was verified against the invented fixture; no real seed, private preview address, access key or live data is included.
 
 ## Every current renderer
 
@@ -121,3 +149,5 @@ The main layout suite already invokes the existing draw, groups, Home-day and sc
 Before coding, the frozen #63 app was exercised with the same failing workflows. A partial course-card validation reset the typed name/par/index to empty; changing course reset the typed date to empty; an archived-trip profile showed current-season GOY context. The new regression verifies the before/after behavior via actual inputs/navigation, checks that errors do not write invalid data, verifies the corrected save, and confirms restore makes no request until its explicit second confirmation. These are workflow tests, not assertions mirroring the new helper’s implementation.
 
 The full-grid review has 228 configured observations before and 228 after, plus 42 populated supplemental states, 8 baseline/final comparison states each, and 36 final public-family captures. The linked CSV contains all 550 configured observations. Font/color/contrast checks and visual inspection were combined; a heuristic alone is not an aesthetic sign-off or formal accessibility certification.
+
+Claude’s automated code review approved `16118a16bf4e0d6c5f1b75a95c3d6e9893d68be8` ([review](https://github.com/Mikejpatterson/NCGS/pull/64#issuecomment-6517357704)); its independent test job passed 66 engine/server checks. The subsequent screenshot attachment commit changes only evidence files and this document; source and tests remain byte-identical to that approved code. This code approval is distinct from independent visual review of the new attachments.
