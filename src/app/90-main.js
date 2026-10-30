@@ -347,6 +347,26 @@ ACT['course-add-lib'] = el => {
   put('courses', [Object.assign({}, card, { id })], { action: 'Course added', detail: `${lib.name} (ready-made card)` });
   render(); toast(`${lib.name} added`);
 };
+/* Ready-made courses are put in place automatically when the organiser unlocks: any library course not yet in the
+   list is added, and one already there without its card (no tees or no holes) is filled in. A course that already has
+   its card is never changed. Nothing happens until this phone has the society's data, so nothing is added twice. */
+function ensureLibraryCourses() {
+  if (!DB.loaded || !ORGPIN.pin) return 0;
+  const rows = [], names = [];
+  for (const lib of COURSE_LIBRARY) {
+    const { aliases, check, ...card } = lib;
+    const have = D.courses().find(c => libraryFor(c.name) === lib);
+    if (!have) {
+      rows.push(Object.assign({}, card, { id: D.course(lib.id) ? lib.id + '-' + Date.now().toString(36).slice(-3) : lib.id }));
+      names.push(lib.name);
+    } else if (!have.holes || !have.tees || !Object.keys(have.tees).length) {
+      rows.push(Object.assign({}, have, { tees: lib.tees, holes: lib.holes, area: have.area || lib.area, about: have.about || lib.about }));
+      names.push(have.name);
+    }
+  }
+  if (rows.length) put('courses', rows, { action: 'Course cards added', detail: names.join(', ') + ' (ready-made cards)' });
+  return rows.length;
+}
 ACT.rejected = () => go('rejected');
 ACT['rejected-clear'] = () => { if (UI.confirm !== 'rej-clear') { UI.confirm = 'rej-clear'; render(); return; } UI.confirm = null; clearRejected(); render(); toast('Cleared'); };
 Object.assign(ACT, DRAW_ACT, GROUP_ACT);
@@ -356,7 +376,7 @@ const FORMS = {
   pin: () => {
     const v = val('pin');
     call({ op: 'checkPin', pin: v }).then(res => {
-      if (res.ok) { ORGPIN.pin = v; ORGPIN.weak = v === '1234'; UI.orgUnlocked = true; UI.pinError = false; replaceTop('home'); }
+      if (res.ok) { ORGPIN.pin = v; ORGPIN.weak = v === '1234'; UI.orgUnlocked = true; UI.pinError = false; ensureLibraryCourses(); replaceTop('home'); }
       else { UI.pinError = res.locked ? 'Too many wrong PINs. Wait ten minutes and try again.' : 'That PIN did not match.'; render(); const el = document.getElementById('pin'); if (el) el.focus(); }
     }).catch(() => { UI.pinError = 'The organiser needs signal to unlock.'; render(); });
   },
@@ -793,7 +813,7 @@ if (window.claude && typeof window.claude.use === 'function') {
   sync().then(() => flush());
 })();
 if ('serviceWorker' in navigator && BOOT.mode === 'live' && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
-window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, resultsOf, goy, seasonOf, fmtDate, daysFromToday, todayIso, send, holeOf, computeR, myGroup, liveRid, refreshThread };
+window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, ensureLibraryCourses, resultsOf, goy, seasonOf, fmtDate, daysFromToday, todayIso, send, holeOf, computeR, myGroup, liveRid, refreshThread };
 
 /* A finger or wheel scroll after a redraw means the reader moved on purpose, so render() stops putting the old position back. */
 ['touchmove', 'wheel'].forEach(t => app.addEventListener(t, () => { UI.userScrolled = true; }, { passive: true }));

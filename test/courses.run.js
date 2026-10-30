@@ -67,6 +67,31 @@ const check = (n, c, extra) => { console.log((c ? 'PASS  ' : 'FAIL  ') + n + (!c
     await sync();
     await org('course', { cid: 'rp-hand' });
     check("a course typed as \"Ross's Point\" offers the Rosses Point card", /Fill in the Rosses Point card/.test(await text()));
+
+    // 4. Owner, 30 October: no tapping at all. Entering the organiser PIN puts every ready-made card in place.
+    await pg.evaluate(() => localStorage.clear()); await pg.reload(); await pg.waitForSelector('.brand');
+    await pg.evaluate(() => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; n.put('courses', [{ id: 'wp-hand', name: 'Westport', area: 'Mayo', about: '', tees: null, holes: null }]); n.ORGPIN.pin = null; });
+    await sync();
+    const before = await pg.evaluate(() => window.__ncgs.D.courses().filter(c => c.holes && c.tees).map(c => JSON.stringify(c)));
+    const unlock = async () => {
+      await pg.evaluate(() => { const n = window.__ncgs; n.UI.org = true; n.UI.orgUnlocked = false; n.ORGPIN.pin = null; n.UI.orgStack = [{ v: 'home', p: {} }]; n.render(); });
+      await pg.fill('#pin', '1234'); await pg.press('#pin', 'Enter'); await pg.waitForTimeout(400); await sync();
+    };
+    await unlock();
+    const all = await pg.evaluate(() => window.__ncgs.D.courses());
+    for (const [name, par] of Object.entries({ Athenry: 70, Westport: 73, Ballinrobe: 73, 'Rosses Point': 71, Strandhill: 70 })) {
+      const mine = all.filter(c => c.name === name);
+      const c = mine[0];
+      check(`after the PIN, ${name} is there once with its full card`, mine.length === 1 && c.holes && c.holes.length === 18 && c.holes.reduce((t, h) => t + h.par, 0) === par && Object.keys(c.tees).length >= 2 && !('check' in c), String(mine.length));
+    }
+    check('the card-less Westport was filled in on the same course', all.some(c => c.id === 'wp-hand' && c.holes && c.tees && c.area === 'Mayo'));
+    check('courses that already had a card are unchanged', before.every(b => all.some(c => JSON.stringify(c) === b)));
+    const n1 = all.length; await unlock();
+    check('unlocking again adds nothing more', (await pg.evaluate(() => window.__ncgs.D.courses().length)) === n1);
+    await pg.evaluate(() => { const n = window.__ncgs; n.UI.formState = { course: n.D.courses().find(c => c.name === 'Strandhill').id }; n.UI.orgStack = [{ v: 'home', p: {} }, { v: 'details', p: {} }]; n.render(); });
+    await pg.waitForTimeout(150);
+    const st = await pg.$$eval('#f-tee option', o => o.map(x => x.textContent));
+    check('a new round at Strandhill offers its rated tees straight away', st.some(t => /White · 125 \/ 70.7/.test(t)), st.join(' | '));
     check('no script errors', errs.length === 0, errs.join(' | '));
   } catch (e) { console.error(e); ok = false; } finally { await b.close(); }
   console.log(ok ? 'all passed' : 'SOME FAILED'); process.exit(ok ? 0 : 1);
