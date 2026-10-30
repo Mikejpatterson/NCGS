@@ -341,9 +341,10 @@ ACT['course-fill'] = el => {
 };
 ACT['course-add-lib'] = el => {
   const lib = libraryFor(el.dataset.name);
-  if (!lib || D.courses().some(c => c.name.toLowerCase() === lib.name.toLowerCase())) return;
+  if (!lib || D.courses().some(c => libraryFor(c.name) === lib)) return;
   const id = D.course(lib.id) ? lib.id + '-' + Date.now().toString(36).slice(-3) : lib.id;
-  put('courses', [Object.assign({}, lib, { id })], { action: 'Course added', detail: `${lib.name} (ready-made card)` });
+  const { aliases, check, ...card } = lib;   // the course row keeps only the card itself
+  put('courses', [Object.assign({}, card, { id })], { action: 'Course added', detail: `${lib.name} (ready-made card)` });
   render(); toast(`${lib.name} added`);
 };
 ACT.rejected = () => go('rejected');
