@@ -138,5 +138,11 @@ const textContrast = locator => locator.evaluate(e => {
     await shot('scramble-final-return');
     check('no script errors', errors.length === 0, errors.join(' | '));
   } catch (e) { console.error(e); ok = false; } finally { await browser.close(); }
+  if (ok) {
+    const columns = require('child_process').spawnSync(process.execPath,
+      [...process.execArgv, path.join(__dirname, 'player-columns.run.js')], { stdio: 'inherit', env: process.env });
+    if (columns.error) console.error(columns.error);
+    if (columns.status !== 0) ok = false;
+  }
   console.log(ok ? 'all passed' : 'SOME FAILED'); process.exit(ok ? 0 : 1);
 })();
