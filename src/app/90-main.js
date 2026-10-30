@@ -349,7 +349,12 @@ ACT['course-add-lib'] = el => {
 };
 /* Ready-made courses are put in place automatically when the organiser unlocks: any library course not yet in the
    list is added, and one already there without its card (no tees or no holes) is filled in. A course that already has
-   its card is never changed. Nothing happens until this phone has the society's data, so nothing is added twice. */
+   its card is never changed. It runs only straight after a successful sync (afterFreshSync), so a course another phone added is seen first. */
+/* Run fn only once this phone has just heard from the server, so it works from the latest list, not a stale copy. */
+function afterFreshSync(fn) {
+  const t0 = Date.now();
+  return flush().then(() => sync()).then(() => { if (DB.online && DB.lastSync >= t0 && fn()) render(); }).catch(() => {});
+}
 function ensureLibraryCourses() {
   if (!DB.loaded || !ORGPIN.pin) return 0;
   const rows = [], names = [];
@@ -376,7 +381,7 @@ const FORMS = {
   pin: () => {
     const v = val('pin');
     call({ op: 'checkPin', pin: v }).then(res => {
-      if (res.ok) { ORGPIN.pin = v; ORGPIN.weak = v === '1234'; UI.orgUnlocked = true; UI.pinError = false; ensureLibraryCourses(); replaceTop('home'); }
+      if (res.ok) { ORGPIN.pin = v; ORGPIN.weak = v === '1234'; UI.orgUnlocked = true; UI.pinError = false; replaceTop('home'); afterFreshSync(ensureLibraryCourses); }
       else { UI.pinError = res.locked ? 'Too many wrong PINs. Wait ten minutes and try again.' : 'That PIN did not match.'; render(); const el = document.getElementById('pin'); if (el) el.focus(); }
     }).catch(() => { UI.pinError = 'The organiser needs signal to unlock.'; render(); });
   },
@@ -813,7 +818,7 @@ if (window.claude && typeof window.claude.use === 'function') {
   sync().then(() => flush());
 })();
 if ('serviceWorker' in navigator && BOOT.mode === 'live' && (location.protocol === 'https:' || location.hostname === 'localhost')) navigator.serviceWorker.register('sw.js').catch(() => {});
-window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, ensureLibraryCourses, resultsOf, goy, seasonOf, fmtDate, daysFromToday, todayIso, send, holeOf, computeR, myGroup, liveRid, refreshThread };
+window.__ncgs = { DB, UI, D, view, sync, flush, render, put, ORGPIN, ensureLibraryCourses, localServer, resultsOf, goy, seasonOf, fmtDate, daysFromToday, todayIso, send, holeOf, computeR, myGroup, liveRid, refreshThread };
 
 /* A finger or wheel scroll after a redraw means the reader moved on purpose, so render() stops putting the old position back. */
 ['touchmove', 'wheel'].forEach(t => app.addEventListener(t, () => { UI.userScrolled = true; }, { passive: true }));
