@@ -264,7 +264,7 @@ VIEWS.home = () => {
   const tripList = tripFor ? tripRounds(tripFor) : [];
   const goyHidden = lead ? `<span class="vh">Golfer of the Year ${esc(lead.name)} leads on ${lead.total}</span>` : '';
   const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
-  const lastRound = pastAll.find(r => !isDemo(r));
+  const lastRound = played.slice().reverse().find(r => !isDemo(r));
   /* The season block under the round card (owner chose option C, 22 October): one list headed "The season", each row
      with an icon and a useful second line (who leads, how many rounds played). */
   const second = table[1];
@@ -278,7 +278,7 @@ VIEWS.home = () => {
     !inPlay && lastRound && lastRound !== doneToday ? rrow('round', 'flagpin', 'Last round', esc(roundName(lastRound)), lastRound.id) : '',
     rrow('goy', 'trophy', 'Golfer of the Year', goyLine),
     tripList.length > 1 ? (tripBoardOn(tripFor) ? rrow('trip', 'course', 'Trip standings', tripLine, tripFor.id) : rrow('trip', 'course', esc(tripFor.trip), esc(tripDays(tripList)), tripFor.id)) : '',
-    rrow('rounds', 'history', 'Past rounds', played.length ? `${plural(played.length, 'round')} played` : 'None played yet'),
+    rrow('rounds', 'history', 'Past rounds', played.length ? `${plural(played.length, 'round')} played` : pastAll.length ? 'Browse past seasons' : 'None played yet'),
     rrow('stats', 'bars', 'Stats', 'KBs, birdies, averages'),
     rrow('players', 'users', 'Players', plural(D.regulars().length, 'golfer'))].join('')), true)}`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
@@ -565,9 +565,9 @@ VIEWS.round = p => {
     const res = resultsOf(r.id);
     if (res && res.rows.length) {
       const back = html.slice(0, html.indexOf('<div class="head">')) + '</header>';
-      return { html: `<div class="fin">${back}${finishedCard(r, res)}${finishedBody(r, res)}</div>` };
+      return { html: `<div class="fin">${back}${finishedCard(r, res)}${roundTripLink(r)}${finishedBody(r, res)}</div>` };
     }
-    html += resultsBlock(r);
+    html += roundTripLink(r) + resultsBlock(r);
     if (r.groups && r.groups.length) html += groupsBlock(r, false);
     return { html };
   }
@@ -602,8 +602,12 @@ VIEWS.round = p => {
     if (me && mine) { const gc = progressOf(r.id).groups.find(g => g.id === mine.id); lbl = inPlay || gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now'; }
     go = `<button class="go" data-act="play" data-rid="${r.id}">${lbl}</button>`;
   } else if (live) go = `<button class="go" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>`;
-  html = `<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">${isScramble(r) ? 'Scramble' : 'Stableford'}</span></div>
-    <h1 class="rp-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
+  const groupKey = `round-you-${r.id}`, groupOpen = !!UI.open[groupKey];
+  const groupLabel = mine ? `${mine.teeTime || r.first_tee || ''}${mine.teeTime || r.first_tee ? ' · ' : ''}${isScramble(r) ? mine.name || 'Team ' + mine.n : 'Group ' + mine.n}` : '';
+  html = `<header class="hero pine rp-card rp-compact"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">${isScramble(r) ? 'Scramble' : 'Stableford'}</span></div>
+    <h1 class="rp-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>
+    <div class="rp-actionbar">${mine ? `<button class="rp-your-toggle" data-act="toggle" data-key="${groupKey}" aria-expanded="${groupOpen}" aria-controls="round-your-group"><span>${esc(groupLabel)}<small>Your group</small></span><span class="chev dn${groupOpen ? ' up' : ''}">${chev}</span></button>` : ''}${go ? `<div class="rp-go">${go}</div>` : ''}</div>
+    ${you ? `<div id="round-your-group"${groupOpen ? '' : ' hidden'}>${you}</div>` : ''}</header>`;
   if (playable && me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
 
   // Breakfast draw: the pots (then the draw) come first; a scramble has no KB pairs, so no KBs tab.
@@ -619,6 +623,7 @@ VIEWS.round = p => {
   else if (rt === 'kb') html += r.kb && r.kb.length ? `<div class="card rp-kbs">${r.kb.map(pr => `<span class="pk${pr.includes(me) ? ' me' : ''}">${pairNames(pr)}</span>`).join('')}</div>` : quiet(E.kbOff(r) ? 'No KBs in this round' : 'KB pairs are not drawn yet');
   else if (rt === 'weather') html += forecast(r, true) || quiet(r.date ? 'The forecast appears in the 9 days before the round.' : 'The forecast appears once the round has a date.');
   else html += roundCourse(r, c, tee, holes);
+  html += roundTripLink(r);
   return { html, tabs: 'home' };
 };
 

@@ -2,7 +2,7 @@
 const ORG = {};
 const orgTop = () => `<header class="hero s"><div class="nav"><span class="sub" style="display:inline-flex;align-items:center;gap:6px;margin:0">${sized(ICON.lock, 16)} PIN protected</span><button class="link" data-act="org-exit">Done</button></div><div class="head"><h1 class="title">Organiser</h1></div></header>`;
 const field = (id, lbl, value, attrs = '') => `<div class="fld"><label class="sub" for="${id}">${lbl}</label><input id="${id}" class="field" value="${esc(value === null || value === undefined ? '' : value)}" ${attrs}></div>`;
-const formErr = () => (UI.formError ? `<p class="err">${esc(UI.formError)}</p>` : '');
+const formErr = () => (UI.formError ? `<p class="err" role="alert" tabindex="-1">${esc(UI.formError)}</p>` : '');
 const slug = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'x';
 const val = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
 const num = id => { const v = val(id).replace(',', '.'); return v === '' ? null : Number(v); };
@@ -41,6 +41,13 @@ function nextChecklist(r) {
   ].concat(isScramble(r) ? [] : [{ ok: !!(E.kbOff(r) || (r.kb && r.kb.length)), t: 'KBs', go: ['kb', r.id], need: false }]);
   const left = items.filter(i => i.need && !i.ok).length;
   const head = `<span class="two"><span>${esc(roundName(r))}</span><span class="sub">${left ? `${plural(left, 'thing')} to do` : 'Ready to go'}</span></span>`;
+  if (!left) {
+    const key = `setup-checks-${r.id}`, open = !!UI.open[key];
+    const meta = [r.date ? fmtDate(r.date, true) : '', r.first_tee ? 'First tee ' + r.first_tee : ''].filter(Boolean).join(' · ');
+    return sec(label('Next up'), cardOf(`<button class="row tall" data-act="org-go" data-v="round" data-rid="${r.id}"><span class="two"><span class="b">${esc(roundName(r))}</span><span class="sub">${esc(meta)}</span></span><span class="right"><span class="pill g">Ready</span>${chev}</span></button>
+      <div class="setup-actions"><button class="link" data-act="org-go" data-v="groups" data-rid="${r.id}">Groups</button><button class="link" data-act="org-go" data-v="details" data-rid="${r.id}">Details</button><button class="link" data-act="toggle" data-key="${key}" aria-expanded="${open}">${open ? 'Hide checks' : 'Setup checks'}</button></div>
+      ${open ? items.map(i => `<button class="row" data-act="org-go" data-v="${i.go[0]}" data-rid="${i.go[1]}"><span>${i.t}</span>${i.ok ? `<span class="c-g">${sized(ICON.check, 18)}</span>` : '<span class="sub">optional</span>'}</button>`).join('') : ''}`), true);
+  }
   return sec(label('Next up'), cardOf(`<div class="row tall">${head}<span class="pill ${left ? 'w' : 'g'}">${left ? 'To do' : 'Ready'}</span></div>` +
     items.map(i => `<button class="row" data-act="org-go" data-v="${i.go[0]}" data-rid="${i.go[1]}"><span style="display:flex;align-items:center;gap:10px"><span class="chk${i.ok ? ' on' : ''}" aria-hidden="true">${i.ok ? sized(ICON.check, 16) : ''}</span>${i.t}${i.need ? '' : ' <span class="sub">optional</span>'}</span>${chev}</button>`).join('')), true);
 }
@@ -152,14 +159,14 @@ ORG.details = p => {
   const ld = r && r.contests ? r.contests.filter(x => x.type === 'ld').map(x => x.hole).join(', ') : '';
   return {
     html: `<header class="hero s">${navBack(r ? roundName(r) : 'Organiser')}<div class="head"><h1 class="title">${r ? 'Details' : 'New round'}</h1></div></header>
-    <form data-form="details" autocomplete="off" class="sec near">
+    <form data-form="details" autocomplete="off" class="sec near">${formErr()}
       <div class="fld"><label class="sub" for="f-course">Course</label><select id="f-course" class="field" data-change="details-course">${D.courses().map(x => `<option value="${x.id}"${x.id === st.course ? ' selected' : ''}>${esc(x.name)}${x.holes ? '' : ' (no card yet)'}</option>`).join('')}</select></div>
       <div class="fld"><label class="sub" for="f-tee">Tees</label><select id="f-tee" class="field">${tees.length ? tees.map(([k, t]) => `<option value="${k}"${r && r.tee === k ? ' selected' : ''}>${esc(t.name)} · ${t.slope} / ${t.rating}</option>`).join('') : '<option value="">Add tees to the course first</option>'}</select></div>
-      ${field('f-date', 'Date', r ? r.date : '', 'type="date"')}
-      <div class="two-col">${field('f-tee-time', 'First tee', r ? r.first_tee : '10:00', 'type="time"')}${field('f-interval', 'Minutes apart', r && r.interval ? r.interval : 8, 'inputmode="numeric"')}</div>
-      <div class="two-col">${field('f-trip', 'Trip', r ? r.trip : '', 'placeholder="None"')}${field('f-day', 'Day', r ? r.trip_day : '', 'inputmode="numeric"')}</div>
-      <div class="two-col">${field('f-ntp', 'Nearest the pin holes', ntp, 'inputmode="numeric" placeholder="7, 15"')}${field('f-ld', 'Longest drive holes', ld, 'inputmode="numeric" placeholder="12"')}</div>
-      ${formErr()}
+      <section class="editor-section"><h2 class="editor-label">Schedule</h2>${field('f-date', 'Date', r ? r.date : '', 'type="date"')}
+      <div class="two-col">${field('f-tee-time', 'First tee', r ? r.first_tee : '10:00', 'type="time"')}${field('f-interval', 'Minutes apart', r && r.interval ? r.interval : 8, 'inputmode="numeric"')}</div></section>
+
+      <section class="editor-section"><h2 class="editor-label">Contests</h2><div class="two-col">${field('f-ntp', 'Nearest the pin holes', ntp, 'inputmode="numeric" placeholder="7, 15"')}${field('f-ld', 'Longest drive holes', ld, 'inputmode="numeric" placeholder="12"')}</div></section>
+      <details class="course-fold" id="round-trip-options" data-preserve-open${r && r.trip ? ' open' : ''}><summary>Trip details</summary><div class="course-fold-body"><div class="two-col">${field('f-trip', 'Trip', r ? r.trip : '', 'placeholder="None"')}${field('f-day', 'Day', r ? r.trip_day : '', 'inputmode="numeric"')}</div></div></details>
       <button class="btn" type="submit">Save</button>
     </form>`
   };
@@ -371,20 +378,23 @@ ORG.course = p => {
   const holeRows = holes.map((h, i) => `<div class="hole-row"><span class="b">${i + 1}</span>
     <select id="h-par-${i}" class="field sm" aria-label="Par hole ${i + 1}"><option value=""></option>${[3, 4, 5].map(v => `<option${h.par === v ? ' selected' : ''}>${v}</option>`).join('')}</select>
     <input id="h-si-${i}" class="field sm" inputmode="numeric" value="${h.si || ''}" aria-label="Index hole ${i + 1}">
-    <input id="h-m-${i}" class="field sm" inputmode="numeric" value="${h.m || ''}" aria-label="Metres hole ${i + 1}"></div>`).join('');
+    <input id="h-m-${i}" class="field sm" inputmode="numeric" value="${h.m || ''}" aria-label="Metres hole ${i + 1}"></div>`);
+  const nine = (from, title, open) => `<details class="course-fold" id="course-${from ? 'back' : 'front'}" data-preserve-open${open ? ' open' : ''}><summary>${title}<span class="sub">${from + 1}–${from + 9}</span></summary><div class="course-fold-body"><div class="hole-row cols"><span class="cap">Hole</span><span class="cap">Par</span><span class="cap">Index</span><span class="cap">Metres</span></div>${holeRows.slice(from, from + 9).join('')}</div></details>`;
   // A course with no card yet whose card is ready-made: fill it in with one tap (owner, 27 October).
   const lib = c && (!c.holes || !c.tees || !Object.keys(c.tees).length) ? libraryFor(c.name) : null;
   const fill = lib ? `<button class="btn" data-act="course-fill" data-cid="${c.id}">Fill in the ${esc(lib.name)} card</button><p class="cap" style="margin:8px 0 0">Par and stroke index for all 18 holes, and the ${Object.values(lib.tees).map(t => t.name).join(' and ')} tees' slope and rating. You can change any of it afterwards.</p>` : '';
   return {
     html: `<header class="hero s">${navBack('Courses')}<div class="head"><h1 class="title">${c ? esc(c.name) : 'New course'}</h1></div></header>${fill ? `<section class="sec near">${fill}</section>` : ''}
     <form data-form="course" autocomplete="off" class="sec near">
+      ${formErr()}
       ${field('c-name', 'Name', c ? c.name : '')}
       ${field('c-area', 'Area', c ? c.area : '', 'placeholder="Mayo"')}
-      <div class="fld"><label class="sub" for="c-about">About the course</label><textarea id="c-about" class="field area" rows="3">${esc(c ? c.about : '')}</textarea></div>
-      <div class="two-col">${field('c-lat', 'Latitude', c ? c.lat : '', 'inputmode="decimal" placeholder="53.81"')}${field('c-lon', 'Longitude', c ? c.lon : '', 'inputmode="decimal" placeholder="-9.57"')}</div>
-      <div class="sec near">${teeRows}</div>
-      <div class="sec"><div class="hole-row cols"><span class="cap">Hole</span><span class="cap">Par</span><span class="cap">Index</span><span class="cap">Metres</span></div>${holeRows}</div>
-      ${formErr()}
+      <section class="editor-section"><h2 class="editor-label">Tees and ratings</h2>${teeRows}</section>
+      <section class="editor-section"><h2 class="editor-label">Scorecard</h2>${nine(0, 'Front nine', true)}${nine(9, 'Back nine', false)}</section>
+      <details class="course-fold" id="course-about" data-preserve-open><summary>About and location</summary><div class="course-fold-body">
+        <div class="fld"><label class="sub" for="c-about">About the course</label><textarea id="c-about" class="field area" rows="3">${esc(c ? c.about : '')}</textarea></div>
+        <div class="two-col">${field('c-lat', 'Latitude', c ? c.lat : '', 'inputmode="decimal" placeholder="53.81"')}${field('c-lon', 'Longitude', c ? c.lon : '', 'inputmode="decimal" placeholder="-9.57"')}</div>
+      </div></details>
       <div class="savebar"><button class="btn" type="submit">Save</button></div>
     </form>`
   };
@@ -406,13 +416,13 @@ function seasonSection() {
 
 ORG.settings = () => ({
   html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Settings</h1></div></header>
-  <form data-form="settings" autocomplete="off" class="sec near">
+  ${seasonSection()}
+  <form data-form="settings" autocomplete="off" class="sec"><h2 class="editor-label">Society settings</h2>
     ${field('s-name', 'Society', D.society())}
     <div class="two-col">${field('s-best', 'Golfer of the Year: scores that count', D.goyBest(), 'inputmode="numeric"')}${field('s-allow', 'Handicap allowance %', Math.round(D.allowance() * 100), 'inputmode="numeric"')}</div>
     ${formErr()}
     <button class="btn" type="submit">Save</button>
   </form>
-  ${seasonSection()}
   ${sec(label('About'), cardOf(`<div class="row"><span>App</span><span class="sub num">${esc(String(BOOT.version || 'preview'))}</span></div><div class="row"><span>Server</span><span class="${serverStale() ? 'c-b b' : 'sub'} num">${BOOT.mode !== 'live' ? 'In this preview' : !DB.lastSync ? 'Not checked yet' : DB.serverBuild === 'old' ? 'Old version' : serverStale() ? 'Out of date' : 'Up to date'}</span></div>`))}
   ${sec(label('Testing'), cardOf(`<button class="row tall" data-act="testing-toggle" role="switch" aria-checked="${D.testing()}"><span class="two"><span>Testing mode</span><span class="sub">${D.testing() ? 'On: any round can be deleted, even one with scores. Turn this off before real rounds.' : 'Off: only rounds that have not started can be deleted.'}</span></span><span class="switch${D.testing() ? ' on' : ''}" aria-hidden="true"><i></i></span></button>`))}
   <form data-form="newpin" autocomplete="off" class="sec">
@@ -447,11 +457,11 @@ function exportCsv() {
 ORG.export = () => ({
   html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Backup and export</h1></div></header>
   ${sec(label('Backup'), cardOf(`<button class="row tall" data-act="backup-now"><span class="two"><span>Back up now</span><span class="sub">${BOOT.mode === 'live' ? 'Saves a copy of the whole sheet in Drive' : 'Preview: nothing is saved to Drive'}</span></span>${chev}</button>`), true)}
-  ${sec(label('Restore'), `<p class="cap note">Paste an export below to put back anything that has gone missing. Anything that is there now is left alone, so no newer score can be lost.</p><textarea class="export" id="restorejson" placeholder="Paste the export here" aria-label="Export to restore from"></textarea><button class="btn quiet" data-act="restore">${UI.confirm === 'restore' ? 'Tap again to restore' : 'Restore missing data'}</button>`)}
-  ${sec(label('Everything (JSON)'), `<textarea class="export" id="exjson" readonly aria-label="All data as JSON">${esc(JSON.stringify(exportData(), null, 1))}</textarea>
-    <button class="btn quiet" data-act="copy" data-target="exjson">Copy</button>`, true)}
-  ${sec(label('Hole-by-hole scores (CSV)'), `<textarea class="export" id="excsv" readonly aria-label="Scores as CSV">${esc(exportCsv())}</textarea>
-    <button class="btn quiet" data-act="copy" data-target="excsv">Copy</button>`)}`
+  <details class="course-fold export-fold" id="export-restore" data-preserve-open><summary>Restore a backup</summary><div class="course-fold-body">${sec('', `<div data-preserve-fields="restore"><p class="cap note">Paste an export below to put back anything that has gone missing. Anything that is there now is left alone, so no newer score can be lost.</p><textarea class="export" id="restorejson" placeholder="Paste the export here" aria-label="Export to restore from"></textarea><button class="btn quiet" data-act="restore">${UI.confirm === 'restore' ? 'Tap again to restore' : 'Restore missing data'}</button></div>`)}</div></details>
+  <details class="course-fold export-fold" id="export-json" data-preserve-open><summary>Everything (JSON)</summary><div class="course-fold-body">${sec('', `<textarea class="export" id="exjson" readonly aria-label="All data as JSON">${esc(JSON.stringify(exportData(), null, 1))}</textarea>
+    <button class="btn quiet" data-act="copy" data-target="exjson">Copy</button>`, true)}</div></details>
+  <details class="course-fold export-fold" id="export-csv" data-preserve-open><summary>Hole-by-hole scores (CSV)</summary><div class="course-fold-body">${sec('', `<textarea class="export" id="excsv" readonly aria-label="Scores as CSV">${esc(exportCsv())}</textarea>
+    <button class="btn quiet" data-act="copy" data-target="excsv">Copy</button>`)}</div></details>`
 });
 
 /* ----- Preview only: finish the other groups ----- */

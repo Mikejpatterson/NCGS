@@ -110,6 +110,7 @@ const textContrast = locator => locator.evaluate(e => {
         if (v === 'card') check(label + ': scorecard round link has a full-size target', await p.locator('.cardlink').evaluate(e => { const r = e.getBoundingClientRect(); return r.width >= 44 && r.height >= 44; }));
       }
       await show('course', true);
+      for (const id of await p.locator('details.course-fold:not([open])').evaluateAll(es => es.map(e => e.id))) await p.locator('#' + id + ' > summary').click();
       check(label + ': course hole fields are at least 44px high', await p.locator('.hole-row .field').evaluateAll(es => es.length > 0 && es.every(e => e.getBoundingClientRect().height >= 44)));
     }
     await p.setViewportSize({ width: 390, height: 844 }); await fresh('eventday');

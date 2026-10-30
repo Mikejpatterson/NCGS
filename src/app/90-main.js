@@ -367,8 +367,10 @@ const FORMS = {
     const date = val('f-date') || null;
     const firstTee = val('f-tee-time') || null;
     const interval = num('f-interval') || 8;
-    const holesList = s => s.split(/[^0-9]+/).filter(Boolean).map(Number).filter(n => n >= 1 && n <= 18);
-    const contests = holesList(val('f-ntp')).map(h => ({ type: 'ntp', hole: h })).concat(holesList(val('f-ld')).map(h => ({ type: 'ld', hole: h }))).sort((a, b) => a.hole - b.hole);
+    const holesList = s => s.trim() ? s.trim().split(/[\s,;]+/).map(Number) : [];
+    const ntpText = val('f-ntp'), ldText = val('f-ld'), ntp = holesList(ntpText), ld = holesList(ldText);
+    if ((ntpText && !ntp.length) || (ldText && !ld.length) || ntp.concat(ld).some(n => !Number.isInteger(n) || n < 1 || n > 18)) { UI.formError = 'Contest holes must be whole numbers from 1 to 18, separated by commas.'; render(); return; }
+    const contests = ntp.map(h => ({ type: 'ntp', hole: h })).concat(ld.map(h => ({ type: 'ld', hole: h }))).sort((a, b) => a.hole - b.hole);
     if (new Set(contests.map(c => c.hole)).size !== contests.length) { UI.formError = 'One contest per hole.'; render(); return; }
     const season = date ? Number(date.slice(0, 4)) : (r ? r.season : new Date().getFullYear());
     const seq = r && r.season === season ? r.seq : Math.max(0, ...D.rounds().filter(x => x.season === season).map(x => x.seq || 0)) + 1;
@@ -410,6 +412,9 @@ const FORMS = {
     const c = p.cid ? D.course(p.cid) : null;
     const name = val('c-name');
     if (!name) { UI.formError = 'Enter the course name.'; render(); return; }
+    const latitude = num('c-lat'), longitude = num('c-lon');
+    if (latitude !== null && (!Number.isFinite(latitude) || Math.abs(latitude) > 90)) { UI.formError = 'Latitude must be a number from −90 to 90.'; render(); return; }
+    if (longitude !== null && (!Number.isFinite(longitude) || Math.abs(longitude) > 180)) { UI.formError = 'Longitude must be a number from −180 to 180.'; render(); return; }
     const tees = {};
     for (let i = 0; document.getElementById(`t-name-${i}`); i++) {
       const tn = val(`t-name-${i}`);
@@ -436,7 +441,7 @@ const FORMS = {
     const par = holeData ? holeData.reduce((s, h) => s + h.par, 0) : null;
     Object.values(tees).forEach(t => { if (par) t.par = par; });
     const id = c ? c.id : (D.course(slug(name)) ? slug(name) + '-' + Date.now().toString(36).slice(-3) : slug(name));
-    put('courses', [{ id, name, area: val('c-area') || null, about: val('c-about') || null, lat: num('c-lat'), lon: num('c-lon'), tees, holes: holeData }], { action: c ? 'Course changed' : 'Course added', detail: name });
+    put('courses', [{ id, name, area: val('c-area') || null, about: val('c-about') || null, lat: latitude, lon: longitude, tees, holes: holeData }], { action: c ? 'Course changed' : 'Course added', detail: name });
     toast('Saved');
     back();
   },
@@ -490,6 +495,34 @@ const FORMS = {
 const app = document.getElementById('app');
 const tabs = document.getElementById('tabs');
 
+/* Preserve only fields the organiser has actually edited when the same screen redraws.
+   Values stay in the current DOM only: no storage, PIN/file copying, route carry-over or score-queue changes. */
+function editedFormFields(root) {
+  const edits = [];
+  for (const form of root.querySelectorAll('form[data-form], [data-preserve-fields]')) {
+    const changedCourse = form.dataset.form === 'details' && (() => {
+      const e = form.querySelector('#f-course');
+      return e && e.value !== (Array.from(e.options).find(o => o.defaultSelected) || e.options[0] || {}).value;
+    })();
+    for (const e of form.querySelectorAll('input[id], select[id], textarea[id]')) {
+      if (e.disabled || e.readOnly || ['password', 'file', 'submit', 'button'].includes(e.type) || (changedCourse && e.id === 'f-tee')) continue;
+      const isCheck = e.type === 'checkbox' || e.type === 'radio';
+      const original = e.tagName === 'SELECT' ? (Array.from(e.options).find(o => o.defaultSelected) || e.options[0] || {}).value : e.defaultValue;
+      if (isCheck ? e.checked !== e.defaultChecked : e.value !== original) edits.push({ form: form.dataset.form || form.dataset.preserveFields, id: e.id, check: isCheck, value: isCheck ? e.checked : e.value });
+    }
+  }
+  return edits;
+}
+function restoreFormFields(root, edits) {
+  for (const x of edits) {
+    const e = document.getElementById(x.id);
+    const owner = e && e.closest('form[data-form], [data-preserve-fields]');
+    if (!e || !root.contains(e) || e.disabled || e.readOnly || !owner || (owner.dataset.form || owner.dataset.preserveFields) !== x.form) continue;
+    if (x.check) e.checked = x.value;
+    else if (e.tagName !== 'SELECT' || Array.from(e.options).some(o => o.value === x.value)) e.value = x.value;
+  }
+}
+
 let renderGuard = 0;
 function render() {
   if (!DB.loaded && !view().members.length) {
@@ -527,8 +560,15 @@ function render() {
   if (UI.fix) overlay += fixSheet();
   if (UI.photoFull) overlay += `<div class="full" data-act="photo-close" role="dialog" aria-label="Card photo"><img src="${UI.photoFull}" alt="Card photo"><button class="link full-close" data-act="photo-close">Close</button></div>`;
   if (UI.shareImg) overlay += `<div class="full" role="dialog" aria-label="Results image"><img src="${UI.shareImg}" alt="Results"><a class="btn dl" href="${UI.shareImg}" download="results.png">Save image</a><button class="link full-close" data-act="share-close">Close</button></div>`;
+  const newFormError = !!UI.formError && UI.formError !== app._lastFormError;
+  if (newFormError) UI.scrollTop = true;
+  const formRoute = JSON.stringify([!!UI.org, cur().v, cur().p || {}]);
+  const sameFormRoute = app._formRoute === formRoute;
+  const formEdits = sameFormRoute ? editedFormFields(app) : [];
+  const disclosures = sameFormRoute ? Array.from(app.querySelectorAll('details[id][data-preserve-open]')).map(e => ({ id: e.id, open: e.open })) : [];
   const active = document.activeElement;
-  const keepFocus = active && active.id && app.contains(active) && /INPUT|TEXTAREA|SELECT/.test(active.tagName) ? active.id : null;
+  const keepFocus = !newFormError && active && active.id && app.contains(active) && /INPUT|TEXTAREA|SELECT/.test(active.tagName) ? active.id : null;
+  const keepSelection = keepFocus && typeof active.selectionStart === 'number' ? [active.selectionStart, active.selectionEnd, active.selectionDirection || 'none'] : null;
   /* Keep the reader's place when a screen redraws in place (a + or - on the hole screen). Some phones (iOS Safari, and
      the app shown inside another page) can jump to the top when the whole screen's content is swapped, so the scroll
      position is put back unless this redraw asked to go to the top or to the current hole. */
@@ -538,6 +578,10 @@ function render() {
   app.dataset.view = cur().v;
   app.dataset.context = UI.org ? 'organiser' : 'member';
   app.innerHTML = out.html + overlay;
+  app._formRoute = formRoute;
+  restoreFormFields(app, formEdits);
+  for (const x of disclosures) { const e = document.getElementById(x.id); if (e && app.contains(e) && e.tagName === 'DETAILS') e.open = x.open; }
+
   if (keepY !== null) {
     if (sc.scrollTop !== keepY) sc.scrollTop = keepY;
     if (window.scrollY !== keepDocY) window.scrollTo(0, keepDocY);
@@ -547,7 +591,7 @@ function render() {
     UI.userScrolled = false;
     requestAnimationFrame(back); setTimeout(back, 60); setTimeout(back, 250);
   }
-  if (keepFocus) { const el = document.getElementById(keepFocus); if (el) el.focus(); }
+  if (keepFocus) { const el = document.getElementById(keepFocus); if (el) { el.focus(); if (keepSelection && typeof el.setSelectionRange === 'function') el.setSelectionRange(...keepSelection); } }
   /* The tab bar only shows while a round is in play (live, or booked for today). The rest of the time Home is the hub. */
   const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
   const showTabs = !UI.org && !!out.tabs && inPlay;
@@ -581,6 +625,8 @@ function render() {
   });
   if (UI.scrollCur) { UI.scrollCur = false; const c = document.getElementById('cur'); if (c) c.scrollIntoView({ block: 'center' }); else scroller().scrollTop = 0; }
   else if (UI.scrollTop) { UI.scrollTop = false; scroller().scrollTop = 0; }
+  app._lastFormError = UI.formError || null;
+  if (newFormError) { const err = app.querySelector('[role="alert"].err'); if (err) { err.focus({ preventScroll: true }); err.scrollIntoView({ block: 'nearest' }); } }
   renderToast();
   syncHistory();
 }
@@ -632,6 +678,7 @@ document.addEventListener('submit', e => {
   if (!f) return;
   e.preventDefault();
   UI.formError = null;
+  app._lastFormError = null;
   const fn = FORMS[f.dataset.form];
   if (fn) fn();
 });

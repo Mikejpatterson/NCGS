@@ -60,5 +60,10 @@ const { chromium } = require('playwright');
   if (spill.length) console.log('  spilling:', spill.join(', '));
   check('no script errors', errs.length === 0);
   if (errs.length) console.log(errs);
-  await b.close(); console.log(ok ? 'all passed' : 'SOME FAILED'); process.exit(ok ? 0 : 1);
+  await b.close(); console.log(ok ? 'all passed' : 'SOME FAILED');
+  if (!ok) process.exit(1);
+  const journeys = require('child_process').spawnSync(process.execPath,
+    [...process.execArgv, require('path').join(__dirname, 'screen-journeys.run.js')], { stdio: 'inherit', env: process.env });
+  if (journeys.error) console.error(journeys.error);
+  process.exit(journeys.status === 0 ? 0 : journeys.status || 1);
 })();
