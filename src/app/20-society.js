@@ -264,7 +264,7 @@ VIEWS.home = () => {
   const tripList = tripFor ? tripRounds(tripFor) : [];
   const goyHidden = lead ? `<span class="vh">Golfer of the Year ${esc(lead.name)} leads on ${lead.total}</span>` : '';
   const inPlay = D.rounds().some(r => r.status === 'live' || (r.status === 'upcoming' && r.date && daysFromToday(r.date) === 0));
-  const lastRound = pastAll.find(r => !isDemo(r));
+  const lastRound = played.slice().reverse().find(r => !isDemo(r));
   /* The season block under the round card (owner chose option C, 22 October): one list headed "The season", each row
      with an icon and a useful second line (who leads, how many rounds played). */
   const second = table[1];
@@ -278,7 +278,7 @@ VIEWS.home = () => {
     !inPlay && lastRound && lastRound !== doneToday ? rrow('round', 'flagpin', 'Last round', esc(roundName(lastRound)), lastRound.id) : '',
     rrow('goy', 'trophy', 'Golfer of the Year', goyLine),
     tripList.length > 1 ? (tripBoardOn(tripFor) ? rrow('trip', 'course', 'Trip standings', tripLine, tripFor.id) : rrow('trip', 'course', esc(tripFor.trip), esc(tripDays(tripList)), tripFor.id)) : '',
-    rrow('rounds', 'history', 'Past rounds', played.length ? `${plural(played.length, 'round')} played` : 'None played yet'),
+    rrow('rounds', 'history', 'Past rounds', played.length ? `${plural(played.length, 'round')} played` : pastAll.length ? 'Browse past seasons' : 'None played yet'),
     rrow('stats', 'bars', 'Stats', 'KBs, birdies, averages'),
     rrow('players', 'users', 'Players', plural(D.regulars().length, 'golfer'))].join('')), true)}`;
   if (more.length) html += sec(label('Also on'), cardOf(more.map(r => roundRow(r, statusPill(r) || (r.first_tee ? `<span class="sub">${esc(r.first_tee)}</span>` : ''))).join('')));
@@ -306,17 +306,17 @@ VIEWS.players = () => {
 };
 
 function goyRow(x, season) {
-  return `<button class="lrow goy" data-act="player" data-pid="${x.id}" data-year="${season}"><span class="sub">${x.posLabel}</span>${avName(x, `<span class="chips">${x.counting.map(c => `<i class="chipn">${c.pts}</i>`).join('')}</span>`, false, true)}<span class="b r tot">${x.total}</span></button>`;
+  return `<button class="lrow goy${x.pos === 1 ? ' is-leader' : ''}" aria-label="${x.id === DB.prefs.me ? 'You, ' : ''}${esc(x.name)}, position ${esc(x.posLabel)}, ${x.total} points. Counting scores: ${x.counting.map(c => c.pts).join(', ')}" data-act="player" data-pid="${x.id}" data-year="${season}"><span class="sub">${x.posLabel}</span>${avName(x, `<span class="chips">${x.counting.map(c => `<i class="chipn">${c.pts}</i>`).join('')}</span>`, false, true)}<span class="b r tot">${x.total}</span></button>`;
 }
 
 VIEWS.goy = () => {
   const season = yearOn();
   const table = goy(season);
   return {
-    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Golfer of the Year</h1></div>
-      <p class="sub">${season} · best ${D.goyBest()} scores count</p>${yearPicker()}</header>
+    html: `<div class="season-results"><header class="hero s">${navBack(backLabel())}<p class="results-meta">Season ${season}</p><div class="head"><h1 class="title">Golfer of the Year</h1></div>
+      <p class="sub">Best ${D.goyBest()} scores count</p>${yearPicker()}</header>
       ${table[0] ? `<div class="leadcard"><span class="lc-k">LEADING</span><span class="lc-row"><span class="lc-n">${esc(table[0].name)}</span><span class="lc-p"><b>${table[0].total}</b> pts</span></span>${table[1] ? `<span class="lc-s">${table[0].total - table[1].total === 0 ? 'Level with' : (table[0].total - table[1].total) + ' point' + (table[0].total - table[1].total === 1 ? '' : 's') + ' clear of'} ${esc(table[1].name)}</span>` : ''}</div>` : ''}
-      ${table.length ? sec('', cardOf(table.map(x => goyRow(x, season)).join('')), false) : sec('', `<div class="prose">No rounds played in ${season} yet. The table starts with the first round.</div>`, false)}`
+      ${table.length ? sec('', `<div class="standings"><div class="standings-head" aria-hidden="true"><span>Pos</span><span>Player</span><span>Pts</span></div>${cardOf(table.map(x => goyRow(x, season)).join(''))}</div>`, false) : sec('', `<div class="prose">No rounds played in ${season} yet. The table starts with the first round.</div>`, false)}</div>`
   };
 };
 
@@ -565,9 +565,9 @@ VIEWS.round = p => {
     const res = resultsOf(r.id);
     if (res && res.rows.length) {
       const back = html.slice(0, html.indexOf('<div class="head">')) + '</header>';
-      return { html: `<div class="fin">${back}${finishedCard(r, res)}${finishedBody(r, res)}</div>` };
+      return { html: `<div class="fin">${back}${finishedCard(r, res)}${roundTripLink(r)}${finishedBody(r, res)}</div>` };
     }
-    html += resultsBlock(r);
+    html += roundTripLink(r) + resultsBlock(r);
     if (r.groups && r.groups.length) html += groupsBlock(r, false);
     return { html };
   }
@@ -602,8 +602,12 @@ VIEWS.round = p => {
     if (me && mine) { const gc = progressOf(r.id).groups.find(g => g.id === mine.id); lbl = inPlay || gc.holesDone ? (gc.nextHole ? `Hole ${gc.nextHole}` : 'Group card') : 'Play now'; }
     go = `<button class="go" data-act="play" data-rid="${r.id}">${lbl}</button>`;
   } else if (live) go = `<button class="go" data-act="leaderboard" data-rid="${r.id}">Leaderboard</button>`;
-  html = `<header class="hero pine rp-card"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">${isScramble(r) ? 'Scramble' : 'Stableford'}</span></div>
-    <h1 class="rp-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>${you}${go ? `<div class="rp-go">${go}</div>` : ''}</header>`;
+  const groupKey = `round-you-${r.id}`, groupOpen = !!UI.open[groupKey];
+  const groupLabel = mine ? `${mine.teeTime || r.first_tee || ''}${mine.teeTime || r.first_tee ? ' · ' : ''}${isScramble(r) ? mine.name || 'Team ' + mine.n : 'Group ' + mine.n}` : '';
+  html = `<header class="hero pine rp-card rp-compact"><div class="rp-top"><span class="rp-kind">${esc(kind)}</span><span class="rp-fmt">${isScramble(r) ? 'Scramble' : 'Stableford'}</span></div>
+    <h1 class="rp-name" ${lenStyle(roundName(r))}>${esc(roundName(r))}</h1><p class="rp-line">${esc(line)}</p>
+    <div class="rp-actionbar">${mine ? `<button class="rp-your-toggle" data-act="toggle" data-key="${groupKey}" aria-expanded="${groupOpen}" aria-controls="round-your-group"><span>${esc(groupLabel)}<small>Your group</small></span><span class="chev dn${groupOpen ? ' up' : ''}">${chev}</span></button>` : ''}${go ? `<div class="rp-go">${go}</div>` : ''}</div>
+    ${you ? `<div id="round-your-group"${groupOpen ? '' : ' hidden'}>${you}</div>` : ''}</header>`;
   if (playable && me && !mine) html += `<p class="cap" style="text-align:center;margin-top:8px">${esc(D.nameOf(me))} is not in a group · <button class="link sm" data-act="who">Change</button></p>`;
 
   // Breakfast draw: the pots (then the draw) come first; a scramble has no KB pairs, so no KBs tab.
@@ -619,6 +623,7 @@ VIEWS.round = p => {
   else if (rt === 'kb') html += r.kb && r.kb.length ? `<div class="card rp-kbs">${r.kb.map(pr => `<span class="pk${pr.includes(me) ? ' me' : ''}">${pairNames(pr)}</span>`).join('')}</div>` : quiet(E.kbOff(r) ? 'No KBs in this round' : 'KB pairs are not drawn yet');
   else if (rt === 'weather') html += forecast(r, true) || quiet(r.date ? 'The forecast appears in the 9 days before the round.' : 'The forecast appears once the round has a date.');
   else html += roundCourse(r, c, tee, holes);
+  html += roundTripLink(r);
   return { html, tabs: 'home' };
 };
 

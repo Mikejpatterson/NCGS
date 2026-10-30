@@ -637,7 +637,7 @@ VIEWS.check = () => {
     const pids = gc.teams.flat();
     const rows = E.SEGMENTS[seg].map(n => `<button class="orow" data-act="edit-hole" data-n="${n}" aria-label="Change hole ${n}"><span class="b">${n}</span>${pids.map(pid => { const v = comp.players[pid].holes[n].gross; return `<span>${v === null ? '–' : v === 'P' ? 'P' : v}</span>`; }).join('')}</button>`).join('');
     html += `<p class="sub head-sub">Compare the app with the photo</p>${thumb}
-      ${sec('', cardOf(`<div class="orow"><span class="cap">Hole</span>${pids.map((pid, i) => `<span class="cap b ${i < 2 ? 'c-a' : 'c-b'}">${esc(D.nameOf(pid))}</span>`).join('')}</div>${rows}`), true)}
+      ${sec('', `<div class="manual-card">${cardOf(`<div class="orow check-columns"><span class="cap">Hole</span>${pids.map((pid, i) => `<span class="cap b ${i < 2 ? 'c-a' : 'c-b'}">${esc(D.nameOf(pid))}</span>`).join('')}</div>${rows}`)}</div>`, true)}
       ${chk.resolved ? `<p class="sub c-g" style="text-align:center;margin-top:24px">Checked</p>` : `<button class="btn" data-act="manual-ok" data-seg="${seg}">All correct</button>`}`;
   } else {
     const r = chk.result;
@@ -796,6 +796,13 @@ function buggyView(rid) {
 /* ----- Leaderboard ----- */
 function tripRounds(r) { return r && r.trip ? D.rounds().filter(x => x.trip === r.trip && x.season === r.season && !isDemo(x) === !isDemo(r)).sort((a, b) => (a.trip_day || 0) - (b.trip_day || 0)) : [r]; }
 
+/* The round remains connected to its trip, including when opened from a past season. */
+function roundTripLink(r) {
+  if (!r.trip || tripRounds(r).length < 2) return '';
+  const text = tripBoardOn(r) ? 'Trip standings' : 'Daily results';
+  return `<button class="round-trip-link" data-act="trip" data-rid="${r.id}"><span class="two"><span class="b">${esc(r.trip)}</span><span class="sub">${r.season || seasonOf()} · ${text}</span></span>${chev}</button>`;
+}
+
 /* ----- Fun facts from the hole-by-hole scores ----- */
 function statsOf(rid) {
   return memo('stats:' + rid, () => {
@@ -806,7 +813,7 @@ function statsOf(rid) {
     return any ? s : null;
   });
 }
-/* The round in numbers: one pine medal per stat with a champagne line icon, drawn like the app's other icons. */
+/* Small line marks accompany the match report; the names and performance carry the hierarchy. */
 const BADGE = inner => `<span class="sbm" aria-hidden="true"><svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">${inner}</svg></span>`;
 const STAT_BADGE = {
   birdie: '<path d="M8 21V9"/><path d="M8 11h9l-2.2 2.8L17 16.6H8z"/><path d="M5 21h6"/><path d="M3 6.8c0-2.6 2-4.6 4.6-4.6 1.5 0 2.7.6 3.5 1.7l2.5.5-2.1 1.3c-.3 2.3-2.2 4-4.5 4H3.5z"/><circle cx="9.2" cy="4.4" r=".7" fill="currentColor" stroke="none"/><path d="M4.8 7.4c1.3.2 2.7-.3 3.4-1.4"/>',
@@ -855,44 +862,44 @@ VIEWS.board = () => {
   // Opened from somewhere (a trip day, a round, Home's "See the results"): a back link, so it isn't a dead end (journey 4).
   const fromSt = typeof stackOf === 'function' ? stackOf() : UI.stack;
   const backTo = fromSt && fromSt.length > 1 && fromSt[fromSt.length - 1].v === 'board' ? navBack(backLabel()) : '';
-  let html = `${backTo}<header class="hero c lbhead">${live0 ? `<p class="eyebrow"><span class="pulse"></span>LIVE${thru0 ? ' \u00b7 THRU ' + thru0 : ''}</p>` : ''}<div class="hrow2"><h1 class="big">Leaderboard</h1></div><p class="sub">${esc(roundName(r))} \u00b7 ${isScramble(r) ? 'Team scramble' : 'Stableford'}</p></header>`;
+  const page = html => ({ tabs: 'board', html: `<div class="results-page">${html}</div>` });
+  let html = `${backTo}<header class="hero c lbhead"><div class="results-meta"><span>Leaderboard</span>${live0 ? `<span class="results-live"><span class="pulse"></span>Live${thru0 ? ' · thru ' + thru0 : ''}</span>` : r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r)}</div><div class="hrow2"><h1 class="big">${esc(roundName(r))}</h1></div><p class="sub">${isScramble(r) ? 'Team scramble' : 'Stableford'}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''}</p></header>`;
   if (avail.length > 1) {
     const names = { lb: 'Scores', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
     html += `<div class="seg pills${avail.length > 3 ? ' four' : ''}" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
   }
-  if (pillSel === 'bw') return { tabs: 'board', html: html + buggyView(sel).html };
-  if (pillSel === 'st') return { tabs: 'board', html: html + statsView(stats) };
+  if (pillSel === 'bw') return page(html + buggyView(sel).html);
+  if (pillSel === 'st') return page(html + statsView(stats));
   if (r.status === 'upcoming') {
     html += sec(label(esc(roundWhen(r) || roundName(r))), r.groups ? cardOf(r.groups.map(g => `<div class="grow"><span class="b num">${esc(g.teeTime || '')}</span><span class="teams">${g.teams.map((t, i) => `<span>${dot(i)}${esc(t.map(D.nameOf).join(' & '))}</span>`).join('')}</span><span></span></div>`).join('')) : cardOf('<div class="row sub">Groups to be drawn</div>'), true);
-    return { tabs: 'board', html };
+    return page(html);
   }
   const res = res0;
   const comp = res.comp;
   if (pillSel === 'ct') {
-    html += sec(label('Contests'), cardOf(res.contests.map(c => {
+    html += sec(label('Contests'), `<div class="contest-results">${cardOf(res.contests.map(c => {
       const st = c.status, tag = !st ? '' : st.confirmed ? '<span class="pill g">Confirmed</span>' : '<span class="pill n">To be confirmed</span>';
       const who = c.winner || (c.lead && c.lead.pid);
       const right = who ? (st && st.confirmed ? `<span class="b ct-won">${esc(D.nameOf(who))}${CUP}</span>` : `<span class="b">${esc(D.nameOf(who))}</span>${tag}`) : st && st.confirmed ? `<span class="sub">Nobody</span>${tag}` : `<span class="sub">${st && st.answered ? 'Nobody yet' : contestPassed(r.id, c.hole) ? 'Waiting for groups' : 'Not yet played'}</span>${tag}`;
       return `<div class="row crow"><span class="ct-l"><span>${CONTEST[c.type]}</span>${c.hole ? `<span class="sub">Hole ${c.hole}</span>` : ''}</span><span class="ct-r">${right}</span></div>`;
-    }).join('')));
-    return { tabs: 'board', html };
+    }).join(''))}</div>`);
+    return page(html);
   }
 
-  const pillTxt = r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r);
-  if (res.source === 'scramble') return { tabs: 'board', html: html + scrambleTable(r, res) };
-  html += sec(`${label(esc(roundName(r)))}${pillTxt}`, cardOf(res.rows.map(x => {
-    const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${res.source === 'app' ? dropChev : ''}</span>`;
-    return res.source === 'app' ? dropRow(sel, x, inner) : `<button class="lrow" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
-  }).join('')), true);
+  if (res.source === 'scramble') return page(html + scrambleTable(r, res));
+  html += sec('', `<div class="standings${res.source === 'app' ? ' expandable' : ''}"><div class="standings-head" aria-hidden="true"><span>Pos</span><span>Player</span><span>Pts</span></div>${cardOf(res.rows.map(x => {
+    const inner = `<span class="sub">${x.posLabel}<span class="vh"> position</span></span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}<span class="vh"> points</span></span>${res.source === 'app' ? dropChev : ''}</span>`;
+    return res.source === 'app' ? dropRow(sel, x, inner, `lrow${x.pos === 1 ? ' is-leader' : ''}`) : `<button class="lrow${x.pos === 1 ? ' is-leader' : ''}" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
+  }).join(''))}</div>`, true);
   if (res.kb.length) { const low = E.kbLowest(res.kb); html += sec(label('KBs'), cardOf(res.kb.map(k => `<div class="lrow${low.includes(k) ? ' low' : ''}"><span class="sub">${k.posLabel}</span><span>${esc(k.name)}</span><span class="b r">${k.total}</span></div>`).join(''))); }
   html += `<button class="btn quiet" data-act="results" data-rid="${sel}">Share results</button>`;
-  return { tabs: 'board', html };
+  return page(html);
 };
 
 VIEWS.trip = p => {
   const list = tripRounds(D.round(p.rid));
   const r0 = D.round(p.rid);
-  let html = `${navBack(backLabel())}<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">${esc(r0.trip || 'Trip standings')}</h1></div></header>`;
+  let html = `${navBack(backLabel())}<header class="hero c"><div class="hrow2"><h1 class="big" style="font-size:1.9rem">${esc(r0.trip || 'Trip standings')}</h1></div><p class="sub">${r0.season || seasonOf()} · ${plural(list.length, 'round')}</p></header>`;
   if (tripBoardOn(r0)) html += tripTable(list);
   else html += `<p class="cap note" style="margin:8px 4px 0">No combined leaderboard for this trip: each day has its own results.</p>`;
   html += sec(label('Each day'), cardOf(list.map(x => {
@@ -921,7 +928,7 @@ function tripTable(list) {
      (owner, 22 October). A trip is at most three rounds. */
   const dayLine = row => row.per.map((v, i) => `D${list[i].trip_day || list[i].seq} ${v === null ? '–' : v}`).join(' \u00b7 ');
   return sec(`${label(`All ${list.length} rounds count`)}${allFinal ? '<span class="pill g">Final</span>' : '<span class="pill w">In progress</span>'}`,
-    cardOf(rows.map(row => `<button class="lrow trip2" data-act="player" data-pid="${row.id}"><span class="sub">${row.posLabel}</span>${avName(row, dayLine(row), row.pos === 1)}<span class="r"><span class="b">${row.total}</span></span></button>`).join('')), true);
+    cardOf(rows.map(row => `<button class="lrow trip2" data-act="player" data-pid="${row.id}" data-year="${list[0].season || seasonOf()}"><span class="sub">${row.posLabel}</span>${avName(row, dayLine(row), row.pos === 1)}<span class="r"><span class="b">${row.total}</span></span></button>`).join('')), true);
 }
 
 /* ----- Results card ----- */

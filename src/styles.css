@@ -1,7 +1,6 @@
-/* Layout: one calm column on iOS system grey.
-   Type: title 28, lead 20, body 17, secondary 15, caption 13; display sizes only for hero numbers. Weights: 400 text, 600 labels and buttons, 700 headings, 800 big numbers.
-   Spacing: 4 / 8 / 16 / 24. One left edge: the 16px page gutter; text inside cards sits 16px in.
-   One pill style. Light only, because it is read outdoors. */
+/* NCGS visual system: Modern Club Character.
+   The shared palette, typography, surfaces and control roles are documented in docs/design/APP-IDENTITY.md.
+   Existing Home, live-play and draw compositions are retained; shared component roles are consolidated below. */
 :root {
   --bg: #E5ECE6;
   --card: #FFFFFF;
@@ -62,7 +61,7 @@ body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--
 * { box-sizing: border-box; }
 button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; text-align: inherit; touch-action: manipulation; }
 h1, h2, p { margin: 0; }
-:focus-visible { outline: 3px solid #5B9CF0; outline-offset: 2px; border-radius: 8px; }
+:focus-visible { outline: 3px solid var(--pine); outline-offset: 2px; border-radius: 8px; }
 
 #app { max-width: 480px; margin: 0 auto; padding-inline: 16px; padding-block: 8px calc(72px + env(safe-area-inset-bottom, 0px)); }
 #app.no-tabs { padding-block-end: 16px; }
@@ -2154,3 +2153,187 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .drw-left { margin: 0 0 12px; text-align: center; font-size: 1rem; }
 /* Changes the server refused: a tappable notice on Home and the hole screens (structural review H1). */
 .rej-note { display: block; width: 100%; min-height: 44px; margin: 12px 0 0; text-align: left; font: inherit; font-size: var(--t-sub); font-weight: 600; border: 0; cursor: pointer; }
+
+/* Results: one competition masthead and a score ledger, with decoration subordinate to play. */
+.results-meta { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin: 0 0 8px; color: var(--pine); font: 600 .75rem/1.4 var(--font-body, system-ui); letter-spacing: .09em; text-transform: uppercase; }
+.results-live { display: inline-flex; align-items: center; gap: 5px; letter-spacing: .02em; }
+.results-page .lbhead { padding: 10px 0 14px; margin: 0; border-bottom: 2px solid var(--pine); }
+.results-page .lbhead .hrow2 h1.big { font-size: 2.25rem; line-height: 1.1; margin: 0; overflow-wrap: anywhere; }
+.results-page header.lbhead:not(:has(.is-name)) > p.sub:not(.names) { margin-top: 8px; font-size: .85rem; }
+.results-page > .seg.pills { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 0 0 8px; padding: 0; border-bottom: 1px solid var(--line); }
+.results-page > .seg.pills button { flex: 1 1 auto; width: auto; min-width: 44px; min-height: 48px; border-radius: 0; padding: 6px 0; background: transparent; box-shadow: none; border-bottom: 3px solid transparent; color: var(--sub); font-size: .85rem; font-weight: 500; }
+.results-page > .seg.pills button.on { color: var(--pine); background: transparent; box-shadow: none; border-bottom-color: var(--pine); font-weight: 700; }
+.standings-head, .standings .lrow { display: grid; grid-template-columns: 2.2rem minmax(0, 1fr) 4.6rem; column-gap: 10px; padding-left: 12px; padding-right: 12px; }
+.standings-head { align-items: end; min-height: 32px; padding-top: 8px; padding-bottom: 8px; color: var(--sub); font-size: .7rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.standings-head > :last-child { text-align: right; }
+.standings > .card { border-radius: 0; border: 0; box-shadow: none; background: transparent; overflow: visible; }
+.standings .lrow { min-height: 62px; padding-top: 10px; padding-bottom: 10px; background: transparent; border-top: 1px solid var(--line); }
+.standings .lrow:first-child { border-top: 2px solid var(--pine); }
+.standings .lrow.is-leader { background: var(--green-soft); }
+.standings .lrow .av { display: none; }
+.standings .lrow .lname { font-size: 1rem; font-weight: 600; }
+.standings .lrow > .sub { font-size: .9rem; font-weight: 500; }
+.standings .lrow .ln { gap: 4px; }
+.standings .lrow .ln .cap { font-size: .78rem; color: var(--sub); }
+.standings .lrow .r { display: flex; align-items: center; justify-content: flex-end; gap: 8px; min-width: 0; }
+.standings .lrow .r .b, .standings .lrow.goy .tot { font-size: 1.5rem; font-weight: 650; letter-spacing: -.03em; }
+.standings .lrow .r .chev { width: 12px; flex: none; }
+.standings .lrow.goy .chipn { background: transparent; border-radius: 0; min-width: 0; height: auto; padding: 0; font-weight: 500; font-style: normal; color: var(--sub); }
+.standings .lrow.goy .chips { gap: 0; flex-wrap: wrap; }
+.standings .lrow.goy .chipn + .chipn::before { content: ' / '; white-space: pre; color: var(--sub); }
+.season-results .hero.s { padding-bottom: 16px; border-bottom: 2px solid var(--pine); }
+.season-results .hero.s h1.title { font-size: 2rem; line-height: 1.12; }
+.season-results .leadcard { margin-top: 16px; padding: 16px 18px; border-radius: 14px; gap: 8px; }
+.season-results .leadcard::after { display: none; }
+.season-results .lc-k { font-size: .7rem; font-weight: 600; }
+.season-results .lc-n { font-size: 1.65rem; font-weight: 600; line-height: 1.15; }
+.season-results .lc-p b { font-size: 2.2rem; font-weight: 650; }
+.season-results .lc-s { margin-top: 0; font-size: .8rem; }
+.results-page .sbadges { box-shadow: none; display: grid; grid-template-columns: minmax(0, 1fr); gap: 0; border: 0; border-radius: 0; padding: 0; background: transparent; }
+.results-page .sbd { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 14px; row-gap: 5px; text-align: left; align-items: start; padding: 18px 0; border-top: 1px solid var(--line); }
+.results-page .sbd:first-child { border-top: 2px solid var(--pine); }
+.results-page .sbm { grid-column: 1; grid-row: 1 / 4; width: 24px; height: 24px; margin: 0; border-radius: 0; color: var(--pine); background: transparent !important; }
+.results-page .sbm svg { width: 24px; height: 24px; }
+.results-page .sbt { grid-column: 2; font-size: .7rem; font-weight: 600; letter-spacing: .06em; line-height: 1.4; }
+.results-page .sbw { grid-column: 2; font-size: 1.2rem; font-weight: 600; line-height: 1.2; }
+.results-page .sbn { grid-column: 2; font-size: .85rem; line-height: 1.4; }
+.results-page .contest-results > .card { box-shadow: none; background: transparent; border: 0; border-radius: 0; }
+.results-page .contest-results .crow { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 18px 0; border-top: 1px solid var(--line); }
+.results-page .contest-results .crow:first-child { border-top: 2px solid var(--pine); }
+.results-page .ct-l { max-width: none; width: 100%; display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; gap: 16px; font-size: .9rem; font-weight: 500; }
+.results-page .ct-l .sub { font-size: .8rem; white-space: nowrap; }
+.results-page .ct-r { align-items: flex-start; text-align: left; gap: 6px; }
+.results-page .ct-r .b { font-size: 1.3rem; line-height: 1.2; font-weight: 600; color: var(--pine); }
+@media (min-width: 600px) {
+  .results-page .sbadges { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
+  .results-page .sbd:nth-child(2) { border-top: 2px solid var(--pine); }
+}
+
+.results-page > .sec { margin-top: 12px; }
+.results-page .standings.expandable .standings-head > :last-child { padding-right: 20px; }
+
+.results-page .scr-standings .card { border-radius: 0; border: 0; box-shadow: none; background: transparent; }
+.results-page .scr-standings .scr-row { border-top: 1px solid var(--line); background: transparent; padding: 14px 12px; }
+.results-page .scr-standings .scr-row:first-child { border-top: 2px solid var(--pine); }
+.results-page .scr-standings .scr-row.low { background: var(--green-soft); border-left: 3px solid var(--pine); }
+.results-page .results-meta .pill { background: var(--green-soft); color: var(--pine); font-size: .7rem; letter-spacing: .04em; }
+
+/* The existing :has(.av.is-me) row tint/left rule remains, even with its decorative badge hidden. */
+.standings .lrow .lname.b { font-weight: 800; }
+
+/* App-wide identity: shared component roles across member and organiser journeys.
+   Home's editorial masthead, pine play panels and the draw stage retain their dedicated compositions. */
+:root {
+  --surface-page: var(--bg);
+  --surface-panel: var(--card);
+  --surface-soft: var(--action-tint);
+  --panel-radius: 16px;
+  --field-radius: 12px;
+  --sheet-radius: 24px;
+  --section-space: 24px;
+  --list-inset: 12px;
+  --page-heading-size: 2rem;
+  --ledger-total-size: 1.5rem;
+}
+#app[data-view] > .sec { margin-top: var(--section-space); }
+#app[data-view] > .sec.near { margin-top: 16px; }
+#app[data-view] .hero.s:has(h1) { padding-bottom: 18px; border-bottom: 2px solid var(--pine); }
+#app[data-view] .hero.s h1.title:not(.is-name) { font-size: var(--page-heading-size); line-height: 1.14; }
+#app[data-view] .hero.s > .nav { margin-bottom: 12px; }
+#app[data-view] .hero.s + .sec { margin-top: 20px; }
+#app[data-view] .hero.s .pill { color: var(--pine); background: var(--surface-soft); }
+#app[data-view] .card { border-radius: var(--panel-radius); }
+/* A collection is read down a shared edge; a chart, photograph or play panel keeps a contained surface. */
+#app[data-view] .card:has(> :is(.row, .lrow, .srow, .grow)) {
+  border: 0; border-radius: 0; box-shadow: none; background: transparent; overflow: visible;
+}
+#app[data-view] .card > :is(.row, .srow, .grow) { padding-left: var(--list-inset); padding-right: var(--list-inset); border-top: 1px solid var(--line); }
+#app[data-view] .card > :is(.row, .srow, .grow):first-child { border-top: 0; }
+#app[data-view] .sec > .sec-label + .card > :is(.row, .srow, .grow):first-child { border-top: 2px solid var(--pine); }
+#app[data-view] .card > .row { min-height: 52px; }
+#app[data-view] .row .two { gap: 4px; }
+#app[data-view] .row .two > .sub { line-height: 1.4; }
+/* Numeric standings use the same name/position/total grammar on round, trip, archive and season pages. */
+.standings { --ledger-columns: 2.2rem minmax(0, 1fr) 4.6rem; }
+#app[data-view] .lrow:not(.scr-row) {
+  grid-template-columns: var(--ledger-columns, 2.2rem minmax(0, 1fr) auto); gap: 10px;
+  min-height: 62px; padding: 10px var(--list-inset); border-top: 1px solid var(--line); background: transparent;
+}
+#app[data-view] .card > .lrow:first-child { border-top: 2px solid var(--pine); }
+#app[data-view] .lrow:not(.scr-row) .av { display: none; }
+#app[data-view] .lrow .lname { font-size: 1rem; font-weight: 600; }
+#app[data-view] .lrow .lname.b { font-weight: 800; }
+#app[data-view] .lrow > .sub { font-size: .9rem; font-weight: 500; }
+#app[data-view] .lrow .r .b, #app[data-view] .lrow .b.r { font-size: var(--ledger-total-size); font-weight: 650; letter-spacing: -.03em; }
+#app[data-view] .lrow:has(.av.is-lead), #app[data-view] .standings .lrow.is-leader { background: var(--surface-soft); }
+#app[data-view] .lrow:has(.av.is-me) { background: var(--action-tint); box-shadow: inset 3px 0 0 var(--pine); }
+#app[data-view] .lrow.low { background: var(--action-tint); }
+#app[data-view] .srow { grid-template-columns: 2.2rem minmax(0, 1fr) auto; gap: 10px; min-height: 62px; }
+#app[data-view] .srow > .av { display: none; }
+#app[data-view] .srow .rk { background: transparent; color: var(--sub); font-size: .9rem; font-weight: 500; }
+#app[data-view] .srow .sv { font-size: var(--ledger-total-size); font-weight: 650; }
+/* Page-local navigation is visually distinct from choice controls and main action pills. */
+#app[data-view] .seg[role="tablist"] { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 0 0 12px; padding: 0; border-radius: 0; background: transparent; border-bottom: 1px solid var(--line); }
+#app[data-view] .seg[role="tablist"] button { flex: 1 1 auto; width: auto; min-width: 44px; min-height: 48px; padding: 6px 0; border-radius: 0; box-shadow: none; border-bottom: 3px solid transparent; background: transparent; color: var(--sub); font-size: .85rem; font-weight: 500; }
+#app[data-view] .seg[role="tablist"] button[aria-selected="true"] { color: var(--pine); border-bottom-color: var(--pine); font-weight: 700; }
+/* Profiles and scorecards: numbers form a metric strip, rather than a cluster of competing tiles. */
+#app:is([data-view="player"], [data-view="card"]) .tiles { gap: 16px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+#app:is([data-view="player"], [data-view="card"]) .tiles > .tile { padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; color: var(--text); }
+#app:is([data-view="player"], [data-view="card"]) .tile .bignum { color: var(--pine); font-size: 1.8rem; font-weight: 650; }
+#app:is([data-view="player"], [data-view="card"]) .tile .cap { color: var(--sub); font-weight: 500; }
+#app[data-view="stats"] .sumtiles { gap: 16px; padding: 16px 0; border-block: 1px solid var(--line); }
+#app[data-view="stats"] .sumtiles > div { padding: 0; border-radius: 0; background: transparent !important; box-shadow: none; }
+#app[data-view="stats"] .sumtiles b { font-size: 1.8rem; font-weight: 650; }
+/* Forms, field labels and sheets belong to the same identity in every role. */
+#app[data-view] .field { border-radius: var(--field-radius); border-color: var(--line); min-height: 48px; background-color: var(--surface-panel); }
+#app[data-view] .field.sm { min-height: 44px; }
+#app[data-view] .field.area { min-height: 88px; }
+#app[data-view] .fld > label { color: var(--sub); font-weight: 600; font-size: .85rem; line-height: 1.4; }
+#app[data-context="organiser"] form > .btn { margin-top: 20px; }
+#app[data-view] .sheet:not(.introcard) { border-radius: var(--sheet-radius) var(--sheet-radius) 0 0; }
+#app[data-view] :focus-visible { outline: 3px solid var(--pine); outline-offset: 3px; }
+#app[data-view] .hero.pine :focus-visible { outline-color: var(--action-inverse); }
+/* The results foundation uses the same spacing and tokens; it is not a separate visual theme. */
+#app[data-view] .results-page > .sec { margin-top: 12px; }
+#app[data-view] .season-results .hero.s { padding-bottom: 16px; }
+
+/* Shared sheets keep their close targets and reference labels usable at enlarged text sizes. */
+#app[data-view] [data-act="holes-close"] { min-width: 44px; }
+#app[data-view] .hs > .hs-tag { right: 3px; }
+#app[data-view] .orow > .cap { min-width: 0; white-space: normal; overflow-wrap: anywhere; }
+
+/* Screen-specific composition: round orientation stays compact while content gets the space. */
+.rp-compact .rp-line { font-size: .85rem; }
+.rp-actionbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-top: 12px; }
+.rp-your-toggle { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; min-width: 44px; padding: 4px 0; flex: 1 1 9rem; background: transparent; color: var(--action-inverse); text-align: left; font-size: 1rem; font-weight: 650; }
+.rp-your-toggle small { display: block; margin-top: 3px; font-size: .75rem; font-weight: 400; color: #CFE0D6; }
+.rp-your-toggle > .chev { color: #CFE0D6; flex: none; transform: rotate(90deg); transition: transform .2s; }
+.rp-your-toggle[aria-expanded="true"] > .chev { transform: rotate(-90deg); }
+.rp-actionbar .rp-go { margin: 0; display: block; }
+.rp-actionbar .go { min-height: 48px; padding: 10px 18px; font-size: 1rem; }
+.rp-compact .rp-you { margin-top: 12px; padding-top: 12px; }
+.setup-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 20px; padding: 4px var(--list-inset); border-bottom: 1px solid var(--line); }
+.setup-actions .link { min-height: 48px; min-width: 44px; padding: 8px 0; }
+.editor-section { margin-top: 24px; }
+.editor-label { margin: 0 0 12px; color: var(--pine); font: 650 1rem/1.4 var(--font); }
+.course-fold { margin: 0; border-top: 1px solid var(--line); }
+.course-fold > summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 52px; padding: 10px 0; color: var(--text); font-size: 1rem; font-weight: 600; cursor: pointer; list-style: none; }
+.course-fold > summary::-webkit-details-marker { display: none; }
+.course-fold > summary::after { content: '+'; color: var(--pine); font-size: 1.3rem; font-weight: 400; }
+.course-fold[open] > summary::after { content: '−'; }
+.course-fold > summary .sub { margin-left: auto; font-size: .8rem; font-weight: 400; }
+.course-fold-body { padding: 0 0 16px; }
+.course-fold .hole-row { min-height: 52px; }
+form[data-form="course"] { padding-bottom: 80px; }
+form[data-form="course"] > .course-fold { margin-top: 24px; }
+form[data-form="course"] > .err, form[data-form="details"] > .err { padding: 12px; border-radius: 12px; background: #FBE9E7; }
+.export-fold { margin-top: 20px; }
+.export-fold .sec { margin-top: 0; }
+#app[data-view] .manual-card > .card { overflow: visible; }
+#app[data-view] .manual-card .check-columns { position: sticky; top: 0; z-index: 2; background: var(--card); border-radius: var(--panel-radius) var(--panel-radius) 0 0; box-shadow: 0 1px 0 var(--line); }
+
+form[data-form="details"] > .course-fold { margin-top: 20px; }
+
+.round-trip-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 56px; margin-top: 12px; padding: 10px 4px; color: var(--pine); text-align: left; border-bottom: 1px solid var(--line); }
+.round-trip-link .two { display: flex; flex-direction: column; gap: 3px; }
+.round-trip-link .sub { color: var(--sub); font-size: .8rem; }
