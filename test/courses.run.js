@@ -75,7 +75,7 @@ const check = (n, c, extra) => { console.log((c ? 'PASS  ' : 'FAIL  ') + n + (!c
     const before = await pg.evaluate(() => window.__ncgs.D.courses().filter(c => c.holes && c.tees).map(c => JSON.stringify(c)));
     const unlock = async () => {
       await pg.evaluate(() => { const n = window.__ncgs; n.UI.org = true; n.UI.orgUnlocked = false; n.ORGPIN.pin = null; n.UI.orgStack = [{ v: 'home', p: {} }]; n.render(); });
-      await pg.fill('#pin', '1234'); await pg.press('#pin', 'Enter'); await pg.waitForTimeout(400); await sync();
+      await pg.fill('#pin', '1234'); await pg.press('#pin', 'Enter'); await pg.waitForTimeout(900); await sync();
     };
     await unlock();
     const all = await pg.evaluate(() => window.__ncgs.D.courses());
@@ -93,6 +93,23 @@ const check = (n, c, extra) => { console.log((c ? 'PASS  ' : 'FAIL  ') + n + (!c
     await pg.waitForTimeout(150);
     const st = await pg.$$eval('#f-tee option', o => o.map(x => x.textContent));
     check('a new round at Strandhill offers its rated tees straight away', st.some(t => /White · 125 \/ 70.7/.test(t)), st.join(' | '));
+
+    // 5. Reviewer: the Strand Hill card's stroke index is not confirmed, so its check note shows while the card is as supplied.
+    await org('courses', {});
+    check('the Courses list shows the Strand Hill check note', /Stroke index NOT confirmed/.test(await text()));
+    await org('course', { cid: 'sh-hand' });
+    check('the Strand Hill screen says to check the printed card', !!(await pg.$('[data-check-note]')) && /NOT confirmed/.test(await text()));
+    await pg.evaluate(() => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const c = n.D.course('sh-hand'); const holes = c.holes.map(h => Object.assign({}, h)); const a = holes[0].si; holes[0].si = holes[1].si; holes[1].si = a; n.put('courses', [Object.assign({}, c, { holes })]); });
+    await sync(); await org('course', { cid: 'sh-hand' });
+    check('once the organiser has corrected the card, the note goes', !(await pg.$('[data-check-note]')));
+
+    // 6. Reviewer: a phone with an old copy syncs before filling in, so a course another phone added isn't doubled.
+    await pg.evaluate(() => localStorage.clear()); await pg.reload(); await pg.waitForSelector('.brand'); await sync();
+    await pg.evaluate(() => window.__ncgs.localServer().api({ op: 'put', table: 'courses', pin: '1234', rows: [{ id: 'other-phone', name: 'Strand Hill', area: '', about: '', tees: null, holes: null }] }));
+    check('this phone has not yet seen the course the other phone added', await pg.evaluate(() => !window.__ncgs.D.course('other-phone')));
+    await unlock();
+    const sh = await pg.evaluate(() => window.__ncgs.D.courses().filter(c => /^strand\s*hill$/i.test(c.name)));
+    check('after the PIN there is one Strand Hill, the other phone\'s, now with its card', sh.length === 1 && sh[0].id === 'other-phone' && !!sh[0].holes, sh.map(c => c.id).join());
     check('no script errors', errs.length === 0, errs.join(' | '));
   } catch (e) { console.error(e); ok = false; } finally { await b.close(); }
   console.log(ok ? 'all passed' : 'SOME FAILED'); process.exit(ok ? 0 : 1);

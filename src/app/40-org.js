@@ -365,7 +365,7 @@ ORG.member = p => {
 /* ----- Courses ----- */
 ORG.courses = () => ({
   html: `<header class="hero s">${navBack('Organiser')}<div class="head"><h1 class="title">Courses</h1></div></header>
-  ${sec('', cardOf(D.courses().map(c => `<button class="row tall" data-act="org-go" data-v="course" data-cid="${c.id}"><span class="two"><span>${esc(c.name)}</span><span class="sub">${esc([c.area, c.holes ? 'Par ' + c.holes.reduce((s, h) => s + h.par, 0) : 'No card yet'].filter(Boolean).join(' · '))}</span></span>${chev}</button>`).join('') +
+  ${sec('', cardOf(D.courses().map(c => `<button class="row tall" data-act="org-go" data-v="course" data-cid="${c.id}"><span class="two"><span>${esc(c.name)}</span><span class="sub">${esc([c.area, c.holes ? 'Par ' + c.holes.reduce((s, h) => s + h.par, 0) : 'No card yet'].filter(Boolean).join(' · '))}${libraryNote(c) ? `<br>${esc(libraryNote(c))}` : ''}</span></span>${chev}</button>`).join('') +
     `<button class="row" data-act="org-go" data-v="course" data-cid=""><span class="c-g" style="display:inline-flex;align-items:center;gap:8px">${sized(ICON.plus, 20)}Add course</span></button>`), true)}
   ${(() => { const ready = COURSE_LIBRARY.filter(x => !D.courses().some(c => libraryFor(c.name) === x));
     return ready.length ? sec(label('Ready to add'), cardOf(ready.map(x => `<button class="row tall" data-act="course-add-lib" data-name="${esc(x.name)}"><span class="two"><span>${esc(x.name)}</span><span class="sub">${esc(x.area)} · par ${x.holes.reduce((t, h) => t + h.par, 0)} · ${Object.values(x.tees).map(t => t.name).join(', ')} tees${x.check ? `<br>${esc(x.check)}` : ''}</span></span><span class="c-g">${sized(ICON.plus, 20)}</span></button>`).join(''))) : ''; })()}`
@@ -384,7 +384,7 @@ ORG.course = p => {
   const lib = c && (!c.holes || !c.tees || !Object.keys(c.tees).length) ? libraryFor(c.name) : null;
   const fill = lib ? `<button class="btn" data-act="course-fill" data-cid="${c.id}">Fill in the ${esc(lib.name)} card</button><p class="cap" style="margin:8px 0 0">Par and stroke index for all 18 holes, and the slope and rating of the ${Object.values(lib.tees).map(t => t.name).join(', ')} tees. You can change any of it afterwards.</p>${lib.check ? `<p class="cap" style="margin:6px 0 0"><b>${esc(lib.check)}</b></p>` : ''}` : '';
   return {
-    html: `<header class="hero s">${navBack('Courses')}<div class="head"><h1 class="title">${c ? esc(c.name) : 'New course'}</h1></div></header>${fill ? `<section class="sec near">${fill}</section>` : ''}
+    html: `<header class="hero s">${navBack('Courses')}<div class="head"><h1 class="title">${c ? esc(c.name) : 'New course'}</h1></div></header>${fill ? `<section class="sec near">${fill}</section>` : ''}${!fill && libraryNote(c) ? `<section class="sec near"><p class="cap" data-check-note><b>Check against the printed card:</b> ${esc(libraryNote(c))}</p></section>` : ''}
     <form data-form="course" autocomplete="off" class="sec near">
       ${formErr()}
       ${field('c-name', 'Name', c ? c.name : '')}
