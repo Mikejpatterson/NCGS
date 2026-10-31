@@ -21,3 +21,9 @@ The required engine/server checks and member UI91/91 pass. The full strict layou
 ## Integration
 
 This is a source correction for independent review. The generated-site consistency safeguard remains in place: a reviewed companion site rebuild is required before any release merge. No source-only bypass, main merge or live deployment is authorized by this correction. Claude is notified directly on Issue1 to review and prepare that build in the normal workflow; a plain issue comment is not proof a native agent has executed it.
+
+## Companion build integration — 31 October
+
+The release build is now prepared on the same isolated PR branch as a separate integration step. Current main `bd50fb7e06a4312d5b5993db76c614c04c9fb3a9` is retained, including the newer course auto-completion changes from68. The approved CSS and geometry tests are unchanged. Only the generated frontend index and service-worker version are rebuilt; production API and server fingerprints remain exactly those of main. The new cache version permits the existing update mechanism to retrieve the corrected shell.
+
+The normal build uses only a temporary copy of the invented fixture seed. No starting scores/members or fixture scenario payload is embedded into the live-mode frontend, and no real data is used. The temporary seed, local build config and generated backend/setup outputs are excluded from the commit. `tools/check-site.js` verifies all18 frontend source embeddings. Core/unit checks pass. The final integration head is independently reviewed and the existing CI remains required; no guard, workflow or deployment configuration is relaxed. This is a candidate build on a contribution branch, not authorization to merge or deploy.
