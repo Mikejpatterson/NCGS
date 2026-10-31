@@ -1686,14 +1686,14 @@ body { font-variant-numeric: tabular-nums; }
 .now-link + .now-acts { margin-top: 12px; }
 
 /* Round page: Players tab */
-.rp-players .pl-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 3.2rem 3.4rem 14px; gap: 8px; align-items: center; width: 100%; min-height: 56px; padding: 6px 14px; text-align: left; font-variant-numeric: tabular-nums; }
+.rp-players .pl-row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 2.7rem 2.9rem 14px; gap: 8px; align-items: center; width: 100%; min-height: 56px; padding: 6px 14px; text-align: left; font-variant-numeric: tabular-nums; }
 .rp-players .pl-row + .pl-row { border-top: .5px solid var(--line); }
 .rp-players.scr .pl-row { grid-template-columns: 34px minmax(0, 1fr) 14px; }
 .rp-players .pl-row.cols { min-height: 30px; padding-top: 10px; padding-bottom: 0; }
 .rp-players .pl-row.me { background: var(--action-tint); }
 .rp-players .pl-n { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
 .rp-players .pl-row .r { text-align: right; }
-.rp-players .pl-row .b.num { font-size: 1.15rem; font-weight: 800; }
+.rp-players .pl-row .b.num { font-size: 1rem; font-weight: 600; }
 .rp-players .av { width: 34px; height: 34px; font-size: .68rem; }
 .rp-players .chev svg { width: 14px; height: 14px; }
 
@@ -2151,15 +2151,6 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .link.inline.cardlink { display: inline-flex; min-width: 44px; min-height: 44px; vertical-align: middle; }
 /* Read-only nines keep their compact scoreboard; editable holes get full-width touch targets. */
 .bw-board.editable { grid-template-columns: repeat(5, minmax(44px, 1fr)); gap: 6px; }
-/* Give a golfer's name the row width; keep the existing labelled number columns below it. */
-@media (max-width: 420px) {
-  .rp-players:not(.scr) .pl-row:not(.cols) { grid-template-rows: auto auto; row-gap: 4px; }
-  .rp-players:not(.scr) .pl-row:not(.cols) > :first-child { grid-column: 1; grid-row: 1 / 3; }
-  .rp-players:not(.scr) .pl-row:not(.cols) .pl-n { grid-column: 2 / 5; grid-row: 1; }
-  .rp-players:not(.scr) .pl-row:not(.cols) > :nth-child(3) { grid-column: 3; grid-row: 2; }
-  .rp-players:not(.scr) .pl-row:not(.cols) > :nth-child(4) { grid-column: 4; grid-row: 2; }
-  .rp-players:not(.scr) .pl-row:not(.cols) > :last-child { grid-column: 5; grid-row: 1 / 3; }
-}
 .drw-left { margin: 0 0 12px; text-align: center; font-size: 1rem; }
 /* Changes the server refused: a tappable notice on Home and the hole screens (structural review H1). */
 .rej-note { display: block; width: 100%; min-height: 44px; margin: 12px 0 0; text-align: left; font: inherit; font-size: var(--t-sub); font-weight: 600; border: 0; cursor: pointer; }
@@ -2349,7 +2340,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .round-trip-link .sub { color: var(--sub); font-size: .8rem; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610302306","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202610310755","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
