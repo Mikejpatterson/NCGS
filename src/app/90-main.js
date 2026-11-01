@@ -549,6 +549,15 @@ function restoreFormFields(root, edits) {
   }
 }
 
+/* A screen that fails to draw is noted in the change log (reviewer's stress test, 1 November), so it is seen the same day
+   without anyone describing it. Only the screen's name and the error: no ids, names or scores. Once per fault per visit. */
+const faultsNoted = new Set();
+function noteFault(screen, err) {
+  const detail = `${screen}: ${String((err && err.message) || err).replace(/\s+/g, ' ').slice(0, 100)}`;
+  if (faultsNoted.has(detail) || faultsNoted.size >= 5) return;
+  faultsNoted.add(detail);
+  try { send({ op: 'put', table: 'log', rows: [{ id: `fault:${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`, at: new Date().toISOString(), by: 'App', action: 'Screen problem', detail: detail + ` (app ${BOOT.version || "preview"})` }] }); } catch (e) { /* noting must never break the app */ }
+}
 let renderGuard = 0;
 function render() {
   if (!DB.loaded && !view().members.length) {
@@ -565,12 +574,13 @@ function render() {
     console.warn(err);
     DB.renderFaults = (DB.renderFaults || 0) + 1;
     (DB.faultLog = DB.faultLog || []).push((UI.org ? 'org:' : '') + e.v + ' ' + JSON.stringify(e.p || {}).slice(0, 40) + ' ' + String(err && err.message).slice(0, 80));
+    noteFault((UI.org ? 'Organiser ' : '') + e.v, err);
     const st = stackOf();
     if (st.length > 1) st.pop(); else { UI.stack = [{ v: 'home', p: {} }]; UI.org = false; }
     UI.confirm = null; UI.holeSheet = false;
     if ((renderGuard || 0) < 4) {
       renderGuard = (renderGuard || 0) + 1;
-      try { toast('That screen is not available any more'); render(); } finally { renderGuard -= 1; }
+      try { toast('Something went wrong on that screen. It has been noted.'); render(); } finally { renderGuard -= 1; }
       return;
     }
     UI.stack = [{ v: 'home', p: {} }]; UI.org = false;
