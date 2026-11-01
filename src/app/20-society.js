@@ -846,10 +846,18 @@ VIEWS.card = p => {
 };
 
 /* ----- Who are you ----- */
+/* Reached on the way into a round (p.then), only that round's players can score, so only they are listed. Picking anyone
+   else used to send you straight back here, round and round (owner, 31 October). */
 VIEWS.who = p => {
-  const list = D.regulars();
+  const r = p && p.then ? D.round(p.then) : null;
+  const inRound = r ? (r.groups || []).flatMap(g => g.teams.flat()) : null;
+  const list = inRound ? inRound.map(id => D.member(id)).filter(Boolean) : D.regulars();
+  const me = DB.prefs.me ? D.member(DB.prefs.me) : null;
+  const head = `<header class="hero s">${UI.stack.length > 1 ? navBack(backLabel()) : '<div class="nav"></div>'}<div class="head"><h1 class="title">Who are you?</h1></div><p class="sub">${r ? 'Pick yourself, or anyone in the group you\'re keeping score for.' : 'So your scores and card are yours.'}</p></header>`;
+  if (r && !list.length) return { html: head + `<section class="sec near"><p data-who-note>There are no groups for ${esc(roundName(r))} yet, so nobody can put in scores. The organiser makes them in Organiser, under the round, in Groups.</p></section>` };
+  const note = r && me && !inRound.includes(me.id) ? `<section class="sec near"><p class="cap" data-who-note>${esc(me.name)} isn't in a group for ${esc(roundName(r))}. To put in scores, pick a player from the group you're with.</p></section>` : '';
   return {
-    html: `<header class="hero s">${UI.stack.length > 1 ? navBack(backLabel()) : '<div class="nav"></div>'}<div class="head"><h1 class="title">Who are you?</h1></div><p class="sub">So your scores and card are yours.</p></header>
+    html: head + note + `
       ${sec('', cardOf(list.map(m => `<button class="row" data-act="pick" data-id="${m.id}"><span class="lname${m.id === DB.prefs.me ? ' b' : ''}">${avBadge(m.id, m.id === DB.prefs.me ? 'is-me' : '')}<span class="ln"><span class="n">${esc(m.name)}</span>${m.full && m.full !== m.name ? `<span class="cap">${esc(m.full)}</span>` : ''}</span></span>${m.id === DB.prefs.me ? `<span class="c-g">${sized(ICON.check, 20)}</span>` : chev}</button>`).join('')), false)}`
   };
 };
