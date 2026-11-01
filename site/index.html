@@ -2340,7 +2340,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .round-trip-link .sub { color: var(--sub); font-size: .8rem; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611010831","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611010930","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -3206,7 +3206,10 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
     return {
       pots, teams, left, next, current, conflicts, dup: [...new Set(dup)], stray,
       done: !open.length && !conflicts.length,
-      started: teams.some(tm => tm.slots.some(s => s.pid || s.conflict)),
+      // Started means someone was really drawn. The players-left team on its own (fewer players than two teams) is not a
+      // draw, so it must not lock the pots (owner, 1 November: one name in pot A locked them).
+      started: teams.some(tm => tm.slots.some(s => (s.pid && !s.auto) || s.conflict)),
+      filled: teams.some(tm => tm.slots.some(s => s.pid)),
       short: open.length ? [] : short
     };
   }
@@ -3233,7 +3236,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
   /** Can the groups be made? Every reason that blocks it, in plain words. shortOk: team numbers the committee agreed play short. */
   function blockers(st, opts) {
     const o = opts || {}, why = [];
-    if (!st.started) why.push('Nobody has been drawn yet.');
+    if (!st.filled) why.push('Nobody has been drawn yet.');
     if (st.next.length) why.push('The draw is not finished.');
     if (st.conflicts.length) why.push(`Two devices drew ${st.conflicts.length === 1 ? 'the same place' : st.conflicts.length + ' of the same places'}. Restart the draw.`);
     if (st.dup.length || st.stray.length) why.push('Someone was drawn twice or from the wrong pot. Restart the draw.');
@@ -7829,8 +7832,11 @@ function drawPick(rid) {
   DB.prefs.drawBusy = { rid, at: Date.now() }; savePrefs(); render();
   sync().catch(() => {}).then(() => { DB.prefs.drawBusy = null; savePrefs(); drawPickNow(rid); });
 }
+/* The pots must be sound before anyone is drawn: at least two pots, none empty, nobody in two pots. */
+function potsBad(d) { const w = d.pots.some(x => x.length) ? DR.potProblems(d.pots.filter(x => x.length)) : ['Put players in the pots first.']; return w.length ? w[0] + ' Fix the pots first.' : null; }
 function drawPickNow(rid) {
   const d = drawOf(rid);
+  if (potsBad(d) && !d.st.started) { toast(potsBad(d)); render(); return; }
   if (!d.mine || spinOf(rid) || !d.st.next.length || d.made || hasScores(rid) || d.st.conflicts.length) { render(); return; }
   const slots = d.pace === 'all' ? d.st.next : d.st.next.slice(0, 1);
   const rand = () => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0]; };
@@ -7861,6 +7867,8 @@ const DRAW_ACT = {
   'draw-pace': el => { put('settings', [{ key: 'drawpace:' + el.dataset.rid, value: el.dataset.v === 'all' ? 'all' : 'one' }]); render(); },
   'draw-claim': el => {
     const rid = el.dataset.rid, d = drawOf(rid);
+    const bad = potsBad(d);
+    if (bad) { toast(bad); return; }
     if (!DB.online || DB.outbox.length) { toast('Connect to the internet first.'); return; }
     if (d.made || hasScores(rid)) { toast('The groups are made, so the draw is closed.'); return; }
     // Starting the draw is one tap; taking it over from another device is two.
