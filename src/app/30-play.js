@@ -878,10 +878,10 @@ VIEWS.board = () => {
   const comp = res.comp;
   if (pillSel === 'ct') {
     html += sec(label('Contests'), `<div class="contest-results">${cardOf(res.contests.map(c => {
-      const st = c.status, tag = !st ? '' : st.confirmed ? '<span class="pill g">Confirmed</span>' : '<span class="pill n">To be confirmed</span>';
-      const who = c.winner || (c.lead && c.lead.pid);
+      const st = c.status, who = c.winner || (c.lead && c.lead.pid);
+      const tag = !st ? '' : st.confirmed ? '<span class="pill g">Confirmed</span>' : who || st.answered ? '<span class="pill n">To be confirmed</span>' : '';
       const right = who ? (st && st.confirmed ? `<span class="b ct-won">${esc(D.nameOf(who))}${CUP}</span>` : `<span class="b">${esc(D.nameOf(who))}</span>${tag}`) : st && st.confirmed ? `<span class="sub">Nobody</span>${tag}` : `<span class="sub">${st && st.answered ? 'Nobody yet' : contestPassed(r.id, c.hole) ? 'Waiting for groups' : 'Not yet played'}</span>${tag}`;
-      return `<div class="row crow"><span class="ct-l"><span>${CONTEST[c.type]}</span>${c.hole ? `<span class="sub">Hole ${c.hole}</span>` : ''}</span><span class="ct-r">${right}</span></div>`;
+      return `<div class="row crow">${contestHeading(c)}<span class="ct-r">${right}</span></div>`;
     }).join(''))}</div>`);
     return page(html);
   }

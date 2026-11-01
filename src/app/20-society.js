@@ -213,6 +213,11 @@ function contestPassed(rid, hole) {
   return !!(pr && pr.groups.some(g => g.holes && g.holes[hole] && g.holes[hole].complete));
 }
 /* Home borrows the existing result/claim state. It never awards a contest or writes scores. */
+/* A shared reading order for a contest label; the hole number stays with its word. */
+function contestHeading(c) {
+  return `<span class="contest-heading"><span class="contest-title">${esc(CONTEST[c.type])}</span>${c.hole ? `<span class="contest-hole">Hole&nbsp;${esc(c.hole)}</span>` : ''}</span>`;
+}
+
 function homeMatchday(r) {
   const res = resultsOf(r.id);
   if (!res) return '';
@@ -226,7 +231,7 @@ function homeMatchday(r) {
       const passed = contestPassed(r.id, c.hole);
       const state = confirmed ? 'Confirmed' : who || answered ? 'To be confirmed' : passed ? 'Waiting for groups' : 'Not yet played';
       const name = who ? D.nameOf(who) : confirmed ? 'Nobody' : answered ? 'Nobody yet' : passed ? 'No report yet' : 'No claim yet';
-      return `<div class="home-contest"><span class="hs-ic" aria-hidden="true">${sized(ICON.flagpin, 20)}</span><span class="home-contest-copy"><span class="b">${CONTEST[c.type]}${c.hole ? ` <span class="sub">· Hole ${c.hole}</span>` : ''}</span><span class="sub">${esc(name)}</span></span><span class="home-contest-state">${state}</span></div>`;
+      return `<div class="home-contest"><span class="hs-ic" aria-hidden="true">${sized(ICON.flagpin, 20)}</span><span class="home-contest-copy">${contestHeading(c)}<span class="home-contest-detail"><span class="sub">${esc(name)}</span><span class="home-contest-state">${state}</span></span></span></div>`;
     }).join('')}</div></section>`;
   }
   return html;
