@@ -139,10 +139,12 @@ const textContrast = locator => locator.evaluate(e => {
     check('no script errors', errors.length === 0, errors.join(' | '));
   } catch (e) { console.error(e); ok = false; } finally { await browser.close(); }
   if (ok) {
-    const columns = require('child_process').spawnSync(process.execPath,
-      [...process.execArgv, path.join(__dirname, 'player-columns.run.js')], { stdio: 'inherit', env: process.env });
-    if (columns.error) console.error(columns.error);
-    if (columns.status !== 0) ok = false;
+    for (const file of ['player-columns.run.js', 'contest-labels.run.js']) {
+      const result = require('child_process').spawnSync(process.execPath,
+        [...process.execArgv, path.join(__dirname, file)], { stdio: 'inherit', env: process.env });
+      if (result.error) console.error(result.error);
+      if (result.status !== 0) { ok = false; break; }
+    }
   }
   console.log(ok ? 'all passed' : 'SOME FAILED'); process.exit(ok ? 0 : 1);
 })();

@@ -1889,8 +1889,12 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .home-contest-list { border-top: 1px solid var(--line); }
 .home-contest { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); padding: 14px 0; }
 .home-contest-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
-.home-contest-copy > .b { font-size: .9rem; }
-.home-contest-copy > .sub { font-size: .85rem; }
+.contest-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; min-width: 0; width: 100%; }
+.contest-title { min-width: 0; color: var(--pine); font: 600 .9rem/1.35 var(--font); }
+.contest-hole { flex: none; color: var(--sub); font-size: .8rem; font-weight: 400; white-space: nowrap; }
+.home-contest-detail { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; }
+.home-contest-detail > .sub { flex: 1 1 8rem; min-width: 0; font-size: .85rem; }
+.home-contest-detail > .home-contest-state { margin-left: auto; }
 .home-contest-state { color: var(--sub); font-size: .7rem; max-width: 7rem; text-align: right; }
 .home-contests .hs-ic { color: var(--pine); background: var(--fill); width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .hero.home ~ .sec .hs-row .hs-ic { color: var(--card); background: var(--pine); }
@@ -2191,8 +2195,6 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .results-page .contest-results > .card { box-shadow: none; background: transparent; border: 0; border-radius: 0; }
 .results-page .contest-results .crow { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 18px 0; border-top: 1px solid var(--line); }
 .results-page .contest-results .crow:first-child { border-top: 2px solid var(--pine); }
-.results-page .ct-l { max-width: none; width: 100%; display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; gap: 16px; font-size: .9rem; font-weight: 500; }
-.results-page .ct-l .sub { font-size: .8rem; white-space: nowrap; }
 .results-page .ct-r { align-items: flex-start; text-align: left; gap: 6px; }
 .results-page .ct-r .b { font-size: 1.3rem; line-height: 1.2; font-weight: 600; color: var(--pine); }
 @media (min-width: 600px) {

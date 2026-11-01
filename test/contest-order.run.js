@@ -24,7 +24,7 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
     check('claims are read in playing order, not arrival order', order === 'g1,g2,g3');
     // Home's live contest list (the player is in g1)
     await page.evaluate(() => { const n = window.__ncgs; const r = n.D.rounds().find(x => x.status === 'live'); n.DB.prefs.me = r.groups[0].teams[0][0]; n.UI.stack = [{ v: 'home', p: {} }]; n.DB._view = null; n.DB._memo = {}; n.render(); });
-    const home = await page.locator('.home-contests').innerText().catch(() => '');
+    const home = (await page.locator('.home-contests').innerText().catch(() => '')).replace(/\u00a0/g, ' ');
     check('Home shows B leading hole 7, not the late-arriving A', new RegExp(`Hole 7[\\s\\S]*${info.nameB}`).test(home) && !new RegExp(`Hole 7\\s*\\n\\s*${info.nameA}`).test(home));
     // A group correcting its earlier nominee later still can't overtake a later group.
     await setClaims([
@@ -39,7 +39,7 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
       { grp: 'g2', player: '_nobody', at: '2026-05-14T10:30:00Z' },
       { grp: 'g3', player: '_nobody', at: '2026-05-14T10:40:00Z' }]);
     check('a removed group\'s claim is left out', await page.evaluate(rid => window.__ncgs.D.claims(rid)[7].every(c => c.gid !== 'g-removed'), info.rid));
-    const home2 = await page.locator('.home-contests').innerText().catch(() => '');
+    const home2 = (await page.locator('.home-contests').innerText().catch(() => '')).replace(/\u00a0/g, ' ');
     check('Home shows Nobody for hole 7, not the removed group\'s player', !new RegExp(`Hole 7\\s*\\n\\s*${await page.evaluate(id => window.__ncgs.D.nameOf(id), info.C)}`).test(home2));
     check('no script errors', errors.length === 0); if (errors.length) console.log(errors);
   } catch (e) { console.error(e); ok = false; } finally { await browser.close(); }
