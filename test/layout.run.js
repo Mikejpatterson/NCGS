@@ -52,6 +52,9 @@ const scenarios = [
   ['board-st', async p => { await clickAny(p, '#tabs .tab:nth-child(3)'); await clickAny(p, '[data-act="respill"][data-p="st"]'); }],
   ['rules', async p => { await clickAny(p, '#tabs .tab:nth-child(4)'); }],
   ['hole-pick', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); }],
+  // One phone per group keeps the score (owner's option A): the question, and the read-only view for a phone that follows.
+  ['hole-scorer', async p => { await p.evaluate(() => { const n = window.__ncgs; n.DB.prefs.me = n.D.round(n.liveRid()).groups[0].teams.flat()[1]; n.render(); }); await clickAny(p, '#tabs .tab:nth-child(2)'); }],
+  ['hole-follow', async p => { await p.evaluate(() => { const n = window.__ncgs; n.DB.prefs.me = n.D.round(n.liveRid()).groups[0].teams.flat()[1]; n.render(); }); await clickAny(p, '#tabs .tab:nth-child(2)'); await clickAny(p, '[data-act="scorer-no"]'); }],
   ['hole-intro', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); await clickAny(p, '[data-act="pick"]'); await p.waitForTimeout(200); }],
   ['hole-tee', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); }],
   ['entry', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); await clickAny(p, '[data-act="pick"]'); await clickAny(p, '[data-act="intro-go"]').catch(() => {}); }],

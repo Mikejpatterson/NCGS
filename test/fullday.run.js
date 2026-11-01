@@ -72,6 +72,7 @@ const grossFor = (i, n, par, round) => par + ((i + n + round) % 3) - 1;   // par
     await ph.sync();
     await ph.pg.evaluate(p => { const n = window.__ncgs; n.DB.prefs.me = p; n.UI.org = false; n.UI.stack = [{ v: 'home', p: {} }]; n.render(); }, groups[0].teams[0][0]);
     await ph.pg.click('#tabs .tab:nth-child(2)'); await ph.pg.waitForTimeout(250);
+    if (await ph.pg.$('[data-act="scorer-yes"]')) { await ph.pg.click('[data-act="scorer-yes"]'); await ph.pg.waitForTimeout(250); }   // this phone keeps the score
     let queuedInOutage = 0;
     for (let n = 1; n <= 18; n++) {
       if (n === 7) await fault('down');

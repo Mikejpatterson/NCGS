@@ -2343,7 +2343,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .round-trip-link .sub { color: var(--sub); font-size: .8rem; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611011833","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611012136","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -5187,7 +5187,7 @@ function dropRow(rid, x, inner, cls = 'lrow') {
   if (!r || !pl) return `<button class="${cls}" data-act="player" data-pid="${x.id}" data-year="${(r && r.season) || ''}">${inner}</button>`;
   const key = `bd-${rid}-${x.id}`, open = !!UI.open[key];
   const mine = myGroup(rid);
-  const fix = r.status === 'live' && !!mine && mine.teams.flat().includes(x.id);
+  const fix = r.status === 'live' && !followingOnly(rid) && !!mine && mine.teams.flat().includes(x.id);
   return `<button class="${cls} drop${open ? ' open' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}">${inner}</button>${open ? `<div class="dropcard">${cardParts(r, pl, fix, x.id).table}${fix ? '<p class="cap sc-note">Tap a score to change it</p>' : ''}</div>` : ''}`;
 }
 const dropChev = `<span class="chev dn">${chev}</span>`;
@@ -5608,6 +5608,9 @@ function playHomeView(rid) {
   const g = myGroup(rid);
   const comp = progressOf(rid);
   if (!g || !comp) return 'round';
+  // One phone per group keeps the score: ask once, and a phone that is only following gets the read-only view.
+  if (scorerAnswer(rid) === undefined) return 'scorer';
+  if (followingOnly(rid)) return 'follow';
   const gc = comp.groups.find(x => x.id === g.id);
   return gc.nextHole || askPending(rid, gc, g.id) ? 'tee' : 'finish';
 }
@@ -5784,7 +5787,7 @@ function entryRow(pid, val, shots, par, rid) {
   const mid = base === null
     ? `<div class="stv none" data-pid="${pid}" data-n="" aria-live="polite">Par ${par}</div>`
     : `<button class="stv${scratch ? ' out' : ''}" data-act="clear" data-pid="${pid}" data-n="${base}" aria-label="${name}: ${base} strokes. Tap to clear and start again from par"${readOnly ? ' disabled' : ''}><b${base > 99 ? ' class="wide"' : ''}>${base}<sup>${pts}</sup></b><small>${word}</small></button>`;
-  const drop = dopen && dpl ? `<div class="dropcard in"><p class="cap dropwho">${name}</p>${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : '';
+  const drop = dopen && dpl ? `<div class="dropcard in"><p class="cap dropwho">${name}</p>${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !followingOnly(rid) && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : '';
   const tile = `<div class="pr ptile${flash}">
     <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span class="nmrow"><span>${name}</span>${dpl ? dropChev : ''}</span><span class="pr-dots" role="img" aria-label="${shots} ${shots === 1 ? 'shot' : 'shots'}">${dots(shots, true)}</span></button>
       <button class="pu ${scratch ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="P" aria-pressed="${scratch}"${readOnly ? ' disabled' : ''}>Pick up</button></div>
@@ -6366,7 +6369,7 @@ function buggyView(rid) {
   const inMatch = !!(mine && groups.find(g => g.id === mine.id));
   const gid = inMatch ? mine.id : (UI.matchGroup && groups.find(g => g.id === UI.matchGroup) ? UI.matchGroup : groups[0].id);
   const gc = comp.groups.find(g => g.id === gid);
-  const canEdit = mine && mine.id === gid && r.status === 'live';
+  const canEdit = mine && mine.id === gid && r.status === 'live' && !followingOnly(rid);
   const live = r.status === 'live';
   const badges = bwBadges;
   const pillOf = m => bwPill(gc, m);
@@ -6639,6 +6642,82 @@ function fixSave() {
   render();
   toast(`${D.nameOf(f.pid)}, hole ${f.n}: ${f.v === 'P' ? 'picked up' : f.v}`);
 }
+
+/* ---- 31-scorer.js ---- */
+/* ----- Who keeps the score (owner, 1 November: option A from the reviewer's stress test) -----
+   One phone per group keeps the score. The first time a phone whose player is in a group opens Hole in a round, it asks
+   once. Yes: the scoring screens as before. No: a read-only view of the group (where it is, its card, Buggy Wars), with
+   no scoring controls and no contest card, and a plain link to switch. The answer is kept on this phone only, per round. */
+const scorerAnswer = rid => (DB.prefs.scorer || {})[rid];
+const followingOnly = rid => !!rid && scorerAnswer(rid) === false;
+function setScorer(rid, yes) {
+  DB.prefs.scorer = Object.assign({}, DB.prefs.scorer, { [rid]: !!yes });
+  savePrefs();
+}
+
+VIEWS.scorer = () => {
+  const rid = playRid(), g = myGroup(rid);
+  if (!g) return VIEWS.round({ rid });
+  const r = D.round(rid);
+  const what = isScramble(r) ? 'team' : 'group';
+  return {
+    tabs: 'hole',
+    html: `<header class="hero s">${navBack('Home', 'home')}<div class="head"><h1 class="title">Are you keeping the score for Group ${g.n}?</h1></div><p class="sub">One phone per ${what} keeps the score. Everyone else can follow along.</p></header>
+      <section class="sec near scorer-q">
+        <button class="btn" data-act="scorer-yes" data-rid="${rid}">Yes, I'm keeping score</button>
+        <button class="btn quiet" data-act="scorer-no" data-rid="${rid}">No, just following</button>
+      </section>`
+  };
+};
+
+VIEWS.follow = () => {
+  const rid = playRid(), r = D.round(rid), g = myGroup(rid);
+  if (!r || !g) return VIEWS.round({ rid });
+  const switchLink = `<div class="foot follow-switch"><p class="cap">One phone per group keeps the score.</p><button class="link" data-act="scorer-yes" data-rid="${rid}">I'm keeping score</button></div>`;
+  const results = `<button class="btn" data-act="tab" data-tab="board">Results</button>`;
+  if (isScramble(r)) {
+    const s = scrambleOf(rid), t = s && s.standings.find(x => x.id === g.id);
+    if (!t) return VIEWS.round({ rid });
+    const where = t.complete ? 'Finished' : t.played ? `Thru ${t.played}` : 'Not started';
+    return {
+      tabs: 'hole',
+      html: `<header class="hero c pine entcard follow-top"><div class="entrow"><div class="entl"><small>${esc(t.name.toUpperCase())}</small><b class="entn num">${t.total}</b></div><div class="entr"><b>${where}</b><span>Team Stableford</span></div></div></header>
+        <p class="sub" style="margin:12px 0 0">You're following. The team's scorer puts in the scores.</p>
+        ${results}${switchLink}`
+    };
+  }
+  const comp = computeR(rid);
+  const gc = comp && comp.groups.find(x => x.id === g.id);
+  if (!gc) return VIEWS.round({ rid });
+  const where = !gc.holesDone ? 'Not started' : gc.nextHole ? `Thru ${gc.holesDone}` : 'Finished';
+  const next = gc.nextHole && gc.holesDone ? `Next: hole ${gc.nextHole}` : gc.nextHole ? `Starts on hole ${gc.nextHole}` : 'All 18 holes in';
+  const buggies = gc.teams.length === 2;
+  const players = gc.teams.map((t, i) => t.map(pid => dropRow(rid, { id: pid }, `<span style="display:flex;align-items:center;gap:8px">${buggies ? dot(i) : ''}${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${comp.players[pid].total}</span>${dropChev}</span>`, 'row')).join('')).join('');
+  const bw = buggies ? ['front', 'back', 'overall'].map(s => `<div class="row"><span>${segName(s)}</span>${statusPills(gc.matches[s].status)}</div>`).join('') : '';
+  return {
+    tabs: 'hole',
+    html: `<header class="hero c pine entcard follow-top"><div class="entrow"><div class="entl"><small>GROUP</small><b class="entn num">${gc.n}</b></div><div class="entr"><b>${where}</b><span>${next}</span></div></div></header>
+      <p class="sub" style="margin:12px 0 0">You're following. Your group's scorer puts in the scores. Tap a name for their card.</p>
+      ${sec(label('Stableford points'), cardOf(players), true)}
+      ${buggies ? sec(label('Buggy Wars'), cardOf(bw)) : ''}
+      ${results}${switchLink}`
+  };
+};
+
+const SCORER_ACT = {
+  'scorer-yes': el => {
+    const rid = el.dataset.rid || playRid();
+    setScorer(rid, true);
+    UI.playRid = rid; UI.edit = false; UI.after = null; UI.teeHole = null;
+    replaceTop(playHomeView(rid), { rid });
+  },
+  'scorer-no': el => {
+    const rid = el.dataset.rid || playRid();
+    setScorer(rid, false);
+    UI.playRid = rid; UI.contestSheet = false;
+    replaceTop('follow', { rid });
+  }
+};
 
 /* ---- 32-scramble.js ---- */
 /* ----- Scramble (Westport day two, owner brief §6) -----
@@ -8149,7 +8228,7 @@ const ACT = {
     DB.prefs.me = el.dataset.id;
     savePrefs();
     const then = cur().p.then;
-    if (then) { UI.stack.pop(); ACT.play({ dataset: { rid: then } }); } else back();
+    if (then) { setScorer(then, true); UI.stack.pop(); ACT.play({ dataset: { rid: then } }); } else back();
   },
   play: el => {
     const rid = el.dataset.rid;
@@ -8157,7 +8236,7 @@ const ACT = {
     UI.edit = false;
     UI.after = null;
     UI.teeHole = null;
-    if (backTo(e => ['tee', 'match', 'board', 'rules', 'finish'].includes(e.v))) { UI.playRid = rid; replaceTop(playHomeView(rid), { rid }); return; }
+    if (backTo(e => ['tee', 'match', 'board', 'rules', 'finish', 'scorer', 'follow'].includes(e.v))) { UI.playRid = rid; replaceTop(playHomeView(rid), { rid }); return; }
     UI.playRid = rid;
     go(playHomeView(rid), { rid });
   },
@@ -8177,13 +8256,13 @@ const ACT = {
     const rid = playRid() || liveRid() || (announced()[0] || {}).id || ((D.rounds().filter(r => r.status === 'final').slice(-1)[0]) || {}).id;
     if (!rid) { toast('No round yet'); return; }
     if (cur().v === 'home' && t === 'hole') { ACT.play({ dataset: { rid } }); return; }
-    while (UI.stack.length > 1 && !['tee', 'match', 'board', 'rules', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();
+    while (UI.stack.length > 1 && !['tee', 'match', 'board', 'rules', 'finish', 'after', 'entry', 'check', 'scorer', 'follow'].includes(cur().v)) UI.stack.pop();
     if (t === 'hole') { UI.edit = false; UI.after = null; UI.teeHole = null; replaceTop(playHomeView(rid), { rid }); }
     else if (t === 'rules') { replaceTop('rules', { rid }); }
     else if (t === 'match') { UI.board = null; UI.res = 'bw'; UI.scrollTop = true; replaceTop('board', { rid }); }
     else { UI.board = null; UI.res = UI.res === 'bw' || UI.res === 'ct' ? UI.res : 'lb'; replaceTop('board', { rid }); }
   },
-  enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },
+  enter: () => { if (followingOnly(playRid())) { replaceTop('follow', { rid: playRid() }); return; } UI.edit = false; go('entry', { rid: playRid() }); },
   set: el => setScore(el.dataset.pid, el.dataset.v),
   clear: el => clearScore(el.dataset.pid),
   'ask-mic': () => askListen(),
@@ -8242,6 +8321,7 @@ const ACT = {
   'holes-close': () => { UI.holeSheet = false; render(); },
   'holes-scrim': (el, e) => { if (e.target !== el) return; UI.holeSheet = false; render(); },
   'goto-hole': el => {
+    if (followingOnly(playRid())) { UI.holeSheet = false; replaceTop('follow', { rid: playRid() }); return; }
     const rid = playRid(), g = myGroup(rid), comp = progressOf(rid);
     UI.holeSheet = false;
     if (!g || !comp) { render(); return; }
@@ -8253,7 +8333,7 @@ const ACT = {
   undo: () => undoSave(),
   next: () => { UI.after = null; UI.teeHole = null; replaceTop('tee', { rid: playRid() }); },
   'to-finish': () => { UI.after = null; replaceTop('finish', { rid: playRid() }); },
-  conflict: el => { UI.hole = Number(el.dataset.n); UI.edit = true; const ctx = entryCtx(); clearDraft(ctx); go('entry', { rid: playRid() }); },
+  conflict: el => { if (followingOnly(playRid())) return; UI.hole = Number(el.dataset.n); UI.edit = true; const ctx = entryCtx(); clearDraft(ctx); go('entry', { rid: playRid() }); },
   submit: () => {
     const rid = playRid();
     const g = myGroup(rid);
@@ -8265,6 +8345,7 @@ const ACT = {
   },
   mgroup: el => { UI.matchGroup = el.dataset.gid; UI.scrollCur = true; render(); },
   'fix-hole': el => {
+    if (followingOnly(el.dataset.rid)) return;
     const rid = el.dataset.rid, pid = el.dataset.pid, n = Number(el.dataset.n);
     const cur = (D.scores(rid)[pid] || {})[n];
     UI.fix = { rid, pid, n, v: E.isEntered(cur) ? cur : null, base: cur === undefined ? null : cur };
@@ -8282,7 +8363,7 @@ const ACT = {
   'fix-save': () => { if (UI.fix && UI.fix.v !== UI.fix.base) fixSave(); },
   'fix-cancel': () => { UI.fix = null; render(); },
   'fix-scrim': (el, e) => { if (e.target !== el) return; UI.fix = null; render(); },
-  'edit-hole': el => { UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: playRid() }); },
+  'edit-hole': el => { if (followingOnly(playRid())) return; UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: playRid() }); },
   results: el => go('results', { rid: el.dataset.rid }),
   'share-card': el => shareCard(el.dataset.rid),
   'share-close': () => { UI.shareImg = null; render(); },
@@ -8508,7 +8589,7 @@ function ensureLibraryCourses() {
 }
 ACT.rejected = () => go('rejected');
 ACT['rejected-clear'] = () => { if (UI.confirm !== 'rej-clear') { UI.confirm = 'rej-clear'; render(); return; } UI.confirm = null; clearRejected(); render(); toast('Cleared'); };
-Object.assign(ACT, DRAW_ACT, GROUP_ACT);
+Object.assign(ACT, DRAW_ACT, GROUP_ACT, SCORER_ACT);
 
 const FORMS = {
   ask: () => { const i = document.getElementById('askin'); askQuestion(i ? i.value : UI.askDraft); },
