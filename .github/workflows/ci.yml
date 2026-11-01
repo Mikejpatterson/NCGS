@@ -62,5 +62,6 @@ jobs:
           node test/screen-journeys.run.js
           node test/who.run.js
           node test/checklist-draw.run.js
+          node test/pots.run.js
       - name: The app opens quickly on a weak signal
         run: if [ -f test/sw-open.run.js ]; then node test/sw-open.run.js; else echo "sw-open.run.js arrives with fix 1"; fi
