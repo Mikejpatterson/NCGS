@@ -4,6 +4,21 @@ Written by the Claude Code session that did the planning and Stage 0 (18–19 Oc
 Claude runs started from GitHub know what that session knows. Read this after `CLAUDE.md`. The full debate
 and every decision is on GitHub issue #1. Decisions there are tagged **DECIDED**.
 
+## Roles from November 2026 (Codex stepping back)
+The owner's ChatGPT subscription ends around 7 November 2026, and Codex goes with it. From then:
+- **Claude builds.** One change per pull request into `main`, with `site/` rebuilt and `tools/check-site.js` passing.
+- **An independent Claude reviewer checks every pull request head** and gives a binding PASS or BLOCK. That is the
+  standing reviewer session, which did not build the change: it builds it, runs the suites (including old against
+  new where a bug is fixed) and checks data against outside sources. `/claude-review` on a PR is a lighter,
+  read-only check of the diff plus the engine and server tests. It is fine on its own for docs-only and purely
+  visual changes with a green `ci.yml`, but not for changes to scoring, saving, the server, course data, or anything
+  that writes data without the organiser tapping. **Owner decision, 1 November 2026: agreed, that is the line.**
+  The builder never marks its own work.
+- **The owner merges.** Nothing reaches `main` or the live app without the owner's merge.
+- The OpenAI API reviewer in the agent cycle (`agent-cycle.yml`, `openai-design-review.yml`) stays off. **Owner
+  decision, 1 November 2026:** leave it off rather than switch it to Claude, so there is one provider.
+- Older text about Codex leading implementation or reviewing is history, kept for context.
+
 ## Where things stand (design branch `design/crest-editorial-prototype`)
 Status refreshed 20 October 2026 (task `handover-current`) against design `ad957cf` and main `9e4cfc5`. Re-read
 the remote refs, the queue and issue #1 before acting; these lines go out of date.
