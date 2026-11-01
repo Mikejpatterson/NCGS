@@ -63,3 +63,33 @@ jobs:
           node test/who.run.js
       - name: The app opens quickly on a weak signal
         run: if [ -f test/sw-open.run.js ]; then node test/sw-open.run.js; else echo "sw-open.run.js arrives with fix 1"; fi
+  crawl:
+    # Taps every visible control on every reachable screen, from ordinary and awkward starting points (reviewer's stress
+    # test, 1 November). Fails on a dead end, a dead button, a script error or "undefined"/"NaN" on screen.
+    # Split into parallel jobs, as all of it takes about 40 minutes on one machine.
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        scenarios:
+          - player,known
+          - organiser,deep
+          - nogroups,nogroups-org,pots1,pots1-org
+          - outsider,allfinal,nocard,nocard-org,newseason,newseason-org
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install browser
+        run: npm install --no-save --no-package-lock playwright@1.56.1 && npx playwright install --with-deps chromium
+      - name: Build the preview from invented data
+        run: NCGS_FIXTURE=1 node build.js
+      - name: Tap every button (${{ matrix.scenarios }})
+        run: |
+          python3 -m http.server 8765 -d dist > /dev/null 2>&1 &
+          sleep 2
+          node test/crawl.run.js "${{ matrix.scenarios }}"
