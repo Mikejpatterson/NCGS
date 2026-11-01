@@ -2343,7 +2343,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .round-trip-link .sub { color: var(--sub); font-size: .8rem; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611011704","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611011833","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -7164,7 +7164,11 @@ function nextChecklist(r) {
     // A scramble's teams come from the breakfast draw, and it has no KB pairs to set up (UX review F01).
     isScramble(r)
       ? { ok: !!(r.groups && r.groups.length), t: !hasPots(r.id) ? 'Breakfast draw: set the pots' : r.groups && r.groups.length ? 'Teams drawn' : 'Breakfast draw', go: ['drawhome', r.id], need: true }
-      : { ok: !!(r.groups && r.groups.length), t: 'Players and groups', go: ['groups', r.id], need: true },
+      // A round with pots gets its groups from the breakfast draw, so the line opens the draw, not the ordinary Groups
+      // screen (which would say "Playing · 0" with everyone already in the pots; stress test 2b, 1 November).
+      : hasPots(r.id) && !(r.groups && r.groups.length)
+        ? { ok: false, t: `Breakfast draw · ${plural(drawOf(r.id).pots.reduce((t, x) => t + x.length, 0), 'player')} in the pots`, go: ['drawhome', r.id], need: true }
+        : { ok: !!(r.groups && r.groups.length), t: 'Players and groups', go: ['groups', r.id], need: true },
     { ok: !!r.first_tee, t: 'First tee time', go: ['details', r.id], need: true },
     { ok: !!(r.contests && r.contests.length), t: 'Contests', go: ['details', r.id], need: false }
   ].concat(isScramble(r) ? [] : [{ ok: !!(E.kbOff(r) || (r.kb && r.kb.length)), t: 'KBs', go: ['kb', r.id], need: false }]);
