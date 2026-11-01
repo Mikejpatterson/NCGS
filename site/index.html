@@ -2343,7 +2343,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .round-trip-link .sub { color: var(--sub); font-size: .8rem; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611012136","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611012212","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -5679,6 +5679,7 @@ function myConflicts(rid, gid) { return DB.conflicts.filter(c => c.round === rid
    a hole saved on two phones) shows under the players on that screen. */
 VIEWS.tee = () => {
   const rid = playRid();
+  if (followingOnly(rid)) return VIEWS.follow();   // a phone that is only following never gets the scoring screens
   if (isScramble(D.round(rid))) return VIEWS.scramble();
   const comp = computeR(rid);
   const g = myGroup(rid);
@@ -5831,6 +5832,7 @@ if (window.ResizeObserver) {
 }
 
 VIEWS.entry = () => {
+  if (followingOnly(playRid())) return VIEWS.follow();
   const ctx = entryCtx();
   if (isScramble(D.round(ctx.rid))) return VIEWS.scramble();
   const comp = computeR(ctx.rid);

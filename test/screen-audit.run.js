@@ -28,6 +28,7 @@ const textContrast = locator => locator.evaluate(e => {
     const finaliseDisplay = () => p.evaluate(() => { const n = window.__ncgs; n.DB.server.tables.rounds.forEach(r => { r.status = 'final'; }); n.DB._view = null; n.DB._memo = {}; n.render(); });
     for (const tab of ['rules', 'board', 'hole']) {
       await fresh(); await p.locator(`#tabs [data-act="tab"][data-tab="${tab}"]`).click();
+      if (await p.locator('[data-act="scorer-yes"]').count()) await p.locator('[data-act="scorer-yes"]').first().click();   // this phone keeps the score
       if (await p.locator('[data-act="intro-go"]').count()) await p.locator('[data-act="intro-go"]').click();
       check(tab + ': no extra return bar during live play', await p.locator('.context-return').count() === 0);
       if (tab === 'hole') check('active score-entry par reference has readable contrast', (await textContrast(p.locator('.stv.none').first())).ratio >= 4.5);
@@ -42,6 +43,7 @@ const textContrast = locator => locator.evaluate(e => {
     // Actual Save creates a persisted request; only saveHole responses are faulted with a retryable
     // server error. Sync and the independent simulated organiser write still use the real local server.
     await fresh(); await p.locator('#tabs [data-tab="hole"]').click();
+    if (await p.locator('[data-act="scorer-yes"]').count()) await p.locator('[data-act="scorer-yes"]').first().click();   // this phone keeps the score
     if (await p.locator('[data-act="intro-go"]').count()) await p.locator('[data-act="intro-go"]').click();
     await p.evaluate(() => { window.__auditCreate = window.NCGS.createServer; window.NCGS.createServer = (...args) => {
       const server = window.__auditCreate(...args), api = server.api;
@@ -131,6 +133,7 @@ const textContrast = locator => locator.evaluate(e => {
     check('Westport day links name the course, day and state', days.some(x => /Ballinrobe/.test(x) && /Day 1/.test(x) && /Final/.test(x)) && days.some(x => /Westport/.test(x) && /Day 2/.test(x) && /Live/.test(x) && /Team scramble/.test(x)));
     check('Westport keeps separate daily results', /No combined leaderboard/.test(await p.locator('main').innerText())); await shot('westport-days');
     await fresh('westport'); await p.locator('#tabs [data-tab="hole"]').click();
+    if (await p.locator('[data-act="scorer-yes"]').count()) await p.locator('[data-act="scorer-yes"]').first().click();   // this phone keeps the score
     for (let i = 0; i < 3 && await p.locator('[data-act="ask-pick"]').count(); i++) { await p.locator('[data-act="ask-pick"]').last().click(); await p.locator('[data-act="ask-confirm"]').click(); }
     if (await p.locator('[data-act="intro-go"]').count()) await p.locator('[data-act="intro-go"]').click();
     await finaliseDisplay();
