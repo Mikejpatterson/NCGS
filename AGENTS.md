@@ -9,8 +9,11 @@ instruction supersedes older role descriptions. Read its sections for both agent
 - The human Product Owner alone has final authority over product direction, material aesthetic/scope changes,
   priorities and release approval. ChatGPT is not the owner and has no continuing approval, arbitration or
   supervisory role. Its earlier handover is a reference whose ideas both agents may challenge.
-- Codex initially leads implementation and tests. Claude initially provides independent design, UX and engineering
-  review and may contribute original solutions. Neither agent has authority over the other. Agree task ownership
+- **From about 7 November 2026 Codex steps back** (the owner's ChatGPT subscription ends). Claude builds; an
+  independent Claude reviewer (a separate session, or `/claude-review` on the PR) passes or blocks every PR head;
+  the owner merges. See "Roles from November 2026" in `docs/CLAUDE-HANDOVER.md`. Until then, the earlier split
+  stood: Codex initially led implementation and tests, and Claude provided independent design, UX and engineering
+  review and could contribute original solutions. Neither agent has authority over the other. Agree task ownership
   on Issue #1; the division may change by mutual agreement. Resolve ordinary design decisions together within
   Option 2; refer genuinely unresolved significant product choices to the human with a recommendation.
 - Option 2 — Modern Club Character is the broad app-wide aesthetic, not a fixed screen template. The later light,
