@@ -1899,9 +1899,13 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .home-contest-list { border-top: 1px solid var(--line); }
 .home-contest { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--line); padding: 14px 0; }
 .home-contest-copy { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; overflow-wrap: anywhere; }
-.home-contest-copy > .b { font-size: .9rem; }
-.home-contest-copy > .sub { font-size: .85rem; }
-.home-contest-state { color: var(--sub); font-size: .7rem; max-width: 7rem; text-align: right; }
+.contest-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; min-width: 0; width: 100%; font: 400 1.1rem/1.35 var(--font); }
+.contest-title { min-width: 0; color: var(--pine); font: inherit; font-weight: 600; }
+.contest-hole { flex: none; color: var(--sub); font: inherit; white-space: nowrap; }
+.home-contest-detail { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; }
+.home-contest-detail > .sub { flex: 1 1 8rem; min-width: 0; color: var(--text); font-size: 1rem; }
+.home-contest-detail > .home-contest-state { margin-left: auto; }
+.home-contest-state { color: var(--sub); font-size: .85rem; max-width: 8rem; text-align: right; }
 .home-contests .hs-ic { color: var(--pine); background: var(--fill); width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .hero.home ~ .sec .hs-row .hs-ic { color: var(--card); background: var(--pine); }
 
@@ -2201,10 +2205,9 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .results-page .contest-results > .card { box-shadow: none; background: transparent; border: 0; border-radius: 0; }
 .results-page .contest-results .crow { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 18px 0; border-top: 1px solid var(--line); }
 .results-page .contest-results .crow:first-child { border-top: 2px solid var(--pine); }
-.results-page .ct-l { max-width: none; width: 100%; display: flex; flex-direction: row; justify-content: space-between; align-items: baseline; gap: 16px; font-size: .9rem; font-weight: 500; }
-.results-page .ct-l .sub { font-size: .8rem; white-space: nowrap; }
 .results-page .ct-r { align-items: flex-start; text-align: left; gap: 6px; }
-.results-page .ct-r .b { font-size: 1.3rem; line-height: 1.2; font-weight: 600; color: var(--pine); }
+.results-page .ct-r > .b, .results-page .ct-r > .sub { font-size: 1rem; line-height: 1.35; font-weight: 400; color: var(--text); }
+.results-page .ct-r .pill { font-size: .85rem; font-weight: 500; }
 @media (min-width: 600px) {
   .results-page .sbadges { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 32px; }
   .results-page .sbd:nth-child(2) { border-top: 2px solid var(--pine); }
@@ -2340,7 +2343,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .round-trip-link .sub { color: var(--sub); font-size: .8rem; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611010831","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611011304","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -4935,6 +4938,11 @@ function contestPassed(rid, hole) {
   return !!(pr && pr.groups.some(g => g.holes && g.holes[hole] && g.holes[hole].complete));
 }
 /* Home borrows the existing result/claim state. It never awards a contest or writes scores. */
+/* A shared reading order for a contest label; the hole number stays with its word. */
+function contestHeading(c) {
+  return `<span class="contest-heading"><span class="contest-title">${esc(CONTEST[c.type])}</span>${c.hole ? `<span class="contest-hole">Hole&nbsp;${esc(c.hole)}</span>` : ''}</span>`;
+}
+
 function homeMatchday(r) {
   const res = resultsOf(r.id);
   if (!res) return '';
@@ -4948,7 +4956,7 @@ function homeMatchday(r) {
       const passed = contestPassed(r.id, c.hole);
       const state = confirmed ? 'Confirmed' : who || answered ? 'To be confirmed' : passed ? 'Waiting for groups' : 'Not yet played';
       const name = who ? D.nameOf(who) : confirmed ? 'Nobody' : answered ? 'Nobody yet' : passed ? 'No report yet' : 'No claim yet';
-      return `<div class="home-contest"><span class="hs-ic" aria-hidden="true">${sized(ICON.flagpin, 20)}</span><span class="home-contest-copy"><span class="b">${CONTEST[c.type]}${c.hole ? ` <span class="sub">· Hole ${c.hole}</span>` : ''}</span><span class="sub">${esc(name)}</span></span><span class="home-contest-state">${state}</span></div>`;
+      return `<div class="home-contest"><span class="hs-ic" aria-hidden="true">${sized(ICON.flagpin, 20)}</span><span class="home-contest-copy">${contestHeading(c)}<span class="home-contest-detail"><span class="sub">${esc(name)}</span><span class="home-contest-state">${state}</span></span></span></div>`;
     }).join('')}</div></section>`;
   }
   return html;
@@ -6465,10 +6473,10 @@ VIEWS.board = () => {
   const comp = res.comp;
   if (pillSel === 'ct') {
     html += sec(label('Contests'), `<div class="contest-results">${cardOf(res.contests.map(c => {
-      const st = c.status, tag = !st ? '' : st.confirmed ? '<span class="pill g">Confirmed</span>' : '<span class="pill n">To be confirmed</span>';
-      const who = c.winner || (c.lead && c.lead.pid);
+      const st = c.status, who = c.winner || (c.lead && c.lead.pid);
+      const tag = !st ? '' : st.confirmed ? '<span class="pill g">Confirmed</span>' : who || st.answered ? '<span class="pill n">To be confirmed</span>' : '';
       const right = who ? (st && st.confirmed ? `<span class="b ct-won">${esc(D.nameOf(who))}${CUP}</span>` : `<span class="b">${esc(D.nameOf(who))}</span>${tag}`) : st && st.confirmed ? `<span class="sub">Nobody</span>${tag}` : `<span class="sub">${st && st.answered ? 'Nobody yet' : contestPassed(r.id, c.hole) ? 'Waiting for groups' : 'Not yet played'}</span>${tag}`;
-      return `<div class="row crow"><span class="ct-l"><span>${CONTEST[c.type]}</span>${c.hole ? `<span class="sub">Hole ${c.hole}</span>` : ''}</span><span class="ct-r">${right}</span></div>`;
+      return `<div class="row crow">${contestHeading(c)}<span class="ct-r">${right}</span></div>`;
     }).join(''))}</div>`);
     return page(html);
   }
