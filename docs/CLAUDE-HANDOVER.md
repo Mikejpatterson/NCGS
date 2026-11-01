@@ -7,9 +7,13 @@ and every decision is on GitHub issue #1. Decisions there are tagged **DECIDED**
 ## Roles from November 2026 (Codex stepping back)
 The owner's ChatGPT subscription ends around 7 November 2026, and Codex goes with it. From then:
 - **Claude builds.** One change per pull request into `main`, with `site/` rebuilt and `tools/check-site.js` passing.
-- **An independent Claude reviewer checks every pull request head** and gives a binding PASS or BLOCK on the PR.
-  It is a separate standing Claude session that did not build the change; `/claude-review` on a PR (from the
-  owner's account) runs the same kind of review as a GitHub workflow. Either way the builder never marks its own work.
+- **An independent Claude reviewer checks every pull request head** and gives a binding PASS or BLOCK. That is the
+  standing reviewer session, which did not build the change: it builds it, runs the suites (including old against
+  new where a bug is fixed) and checks data against outside sources. `/claude-review` on a PR is a lighter,
+  read-only check of the diff plus the engine and server tests. It is fine on its own for docs-only and purely
+  visual changes with a green `ci.yml`, but not for changes to scoring, saving, the server, course data, or anything
+  that writes data without the organiser tapping. Where that line sits is the owner's decision. The builder never
+  marks its own work.
 - **The owner merges.** Nothing reaches `main` or the live app without the owner's merge.
 - The OpenAI API reviewer in the agent cycle (`agent-cycle.yml`, `openai-design-review.yml`) is paused. Whether
   to switch it to Claude, so there is one provider, is the owner's decision.

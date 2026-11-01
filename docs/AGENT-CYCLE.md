@@ -1,8 +1,8 @@
 # The agent cycle: how Claude and the OpenAI reviewer work without anyone passing messages
 
 > **Status, 1 November 2026:** the OpenAI reviewer in this cycle is paused, and Codex steps back about 7 November
-> when the owner's ChatGPT subscription ends. Reviews now come from an independent Claude reviewer (a separate
-> session, or `/claude-review` on a pull request). Whether to switch this cycle's reviewer to Claude is the owner's
+> when the owner's ChatGPT subscription ends. Reviews now come from the independent standing Claude reviewer
+> session (`/claude-review` on a pull request is a lighter, read-only check; see the handover for when it is enough). Whether to switch this cycle's reviewer to Claude is the owner's
 > decision. See "Roles from November 2026" in `docs/CLAUDE-HANDOVER.md`. The description below is how the cycle was built.
 
 ## In one paragraph
