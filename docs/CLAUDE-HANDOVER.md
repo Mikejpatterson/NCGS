@@ -12,11 +12,11 @@ The owner's ChatGPT subscription ends around 7 November 2026, and Codex goes wit
   new where a bug is fixed) and checks data against outside sources. `/claude-review` on a PR is a lighter,
   read-only check of the diff plus the engine and server tests. It is fine on its own for docs-only and purely
   visual changes with a green `ci.yml`, but not for changes to scoring, saving, the server, course data, or anything
-  that writes data without the organiser tapping. Where that line sits is the owner's decision. The builder never
-  marks its own work.
+  that writes data without the organiser tapping. **Owner decision, 1 November 2026: agreed, that is the line.**
+  The builder never marks its own work.
 - **The owner merges.** Nothing reaches `main` or the live app without the owner's merge.
-- The OpenAI API reviewer in the agent cycle (`agent-cycle.yml`, `openai-design-review.yml`) is paused. Whether
-  to switch it to Claude, so there is one provider, is the owner's decision.
+- The OpenAI API reviewer in the agent cycle (`agent-cycle.yml`, `openai-design-review.yml`) stays off. **Owner
+  decision, 1 November 2026:** leave it off rather than switch it to Claude, so there is one provider.
 - Older text about Codex leading implementation or reviewing is history, kept for context.
 
 ## Where things stand (design branch `design/crest-editorial-prototype`)
