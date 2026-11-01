@@ -163,3 +163,13 @@ test('the last team is not drawn: it is whoever is left in each pot (owner, 26 O
   const clash = D.state(pots, D.picksFrom(rows.concat([row('r', 1, 0, 0, 'phone', 'a4')]), 'r', 1));
   assert.ok(!clash.teams[3].slots.some(s => s.auto));
 });
+
+test('owner, 1 November: the first names put in the pots do not lock them', () => {
+  const one = D.state([['brian'], [], [], []], {});
+  assert.ok(!one.started, 'one name in pot A is not a started draw');
+  const four = D.state([['a'], ['b'], ['c'], ['d']], {});
+  assert.ok(!four.started, 'one team made only of the players left is not a started draw');
+  assert.ok(four.filled && four.done);
+  assert.ok(!D.blockers(four).some(w => /Nobody has been drawn/.test(w)), 'a single players-left team can still be made into a group');
+  assert.deepStrictEqual(D.potProblems([['brian']]), ['At least two pots are needed.']);
+});

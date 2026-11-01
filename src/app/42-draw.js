@@ -215,8 +215,11 @@ function drawPick(rid) {
   DB.prefs.drawBusy = { rid, at: Date.now() }; savePrefs(); render();
   sync().catch(() => {}).then(() => { DB.prefs.drawBusy = null; savePrefs(); drawPickNow(rid); });
 }
+/* The pots must be sound before anyone is drawn: at least two pots, none empty, nobody in two pots. */
+function potsBad(d) { const w = d.pots.some(x => x.length) ? DR.potProblems(d.pots.filter(x => x.length)) : ['Put players in the pots first.']; return w.length ? w[0] + ' Fix the pots first.' : null; }
 function drawPickNow(rid) {
   const d = drawOf(rid);
+  if (potsBad(d) && !d.st.started) { toast(potsBad(d)); render(); return; }
   if (!d.mine || spinOf(rid) || !d.st.next.length || d.made || hasScores(rid) || d.st.conflicts.length) { render(); return; }
   const slots = d.pace === 'all' ? d.st.next : d.st.next.slice(0, 1);
   const rand = () => { const a = new Uint32Array(1); crypto.getRandomValues(a); return a[0]; };
@@ -247,6 +250,8 @@ const DRAW_ACT = {
   'draw-pace': el => { put('settings', [{ key: 'drawpace:' + el.dataset.rid, value: el.dataset.v === 'all' ? 'all' : 'one' }]); render(); },
   'draw-claim': el => {
     const rid = el.dataset.rid, d = drawOf(rid);
+    const bad = potsBad(d);
+    if (bad) { toast(bad); return; }
     if (!DB.online || DB.outbox.length) { toast('Connect to the internet first.'); return; }
     if (d.made || hasScores(rid)) { toast('The groups are made, so the draw is closed.'); return; }
     // Starting the draw is one tap; taking it over from another device is two.
