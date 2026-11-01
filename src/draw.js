@@ -68,7 +68,10 @@
     return {
       pots, teams, left, next, current, conflicts, dup: [...new Set(dup)], stray,
       done: !open.length && !conflicts.length,
-      started: teams.some(tm => tm.slots.some(s => s.pid || s.conflict)),
+      // Started means someone was really drawn. The players-left team on its own (fewer players than two teams) is not a
+      // draw, so it must not lock the pots (owner, 1 November: one name in pot A locked them).
+      started: teams.some(tm => tm.slots.some(s => (s.pid && !s.auto) || s.conflict)),
+      filled: teams.some(tm => tm.slots.some(s => s.pid)),
       short: open.length ? [] : short
     };
   }
@@ -95,7 +98,7 @@
   /** Can the groups be made? Every reason that blocks it, in plain words. shortOk: team numbers the committee agreed play short. */
   function blockers(st, opts) {
     const o = opts || {}, why = [];
-    if (!st.started) why.push('Nobody has been drawn yet.');
+    if (!st.filled) why.push('Nobody has been drawn yet.');
     if (st.next.length) why.push('The draw is not finished.');
     if (st.conflicts.length) why.push(`Two devices drew ${st.conflicts.length === 1 ? 'the same place' : st.conflicts.length + ' of the same places'}. Restart the draw.`);
     if (st.dup.length || st.stray.length) why.push('Someone was drawn twice or from the wrong pot. Restart the draw.');
