@@ -7,7 +7,8 @@ The owner's two phone screenshots showed different contest-title treatment on Ho
 - One presentation-only `contestHeading` helper supplies the same sans-serif title and smaller secondary hole label to both surfaces.
 - Home gives that heading the full content width, with claimant and status beneath it. The flag, claimant, report status and navigation remain.
 - Hole labels use a nonbreaking space and remain an intact unit even if the heading needs to wrap. Normal and enlarged-text phone layouts are measured.
-- Results uses the same title family/size/weight/colour. It preserves the established claimant/winner hierarchy.
+- Results uses the same heading family, size and colour, with a body-size claimant beneath. Confirmed winners retain their cup and existing status semantics.
+- Owner feedback exposed an unbalanced hierarchy in the initial versions: an enlarged claimant dominated a small hole label. Contest and hole now share one readable heading size; weight distinguishes the contest rather than shrinking the hole. The claimant uses normal body size on both surfaces, and status remains legible beneath. This composition was checked together on Home and Results, including long names and enlarged text; the earlier size-only iteration is superseded.
 - A contest that has no report no longer gets the contradictory “To be confirmed” badge alongside “Not yet played”. The badge remains for reported results awaiting confirmation; confirmed winners retain their existing display. This is a view-only condition, using existing status fields; no claims, winner selection or confirmation rules change.
 
 No scoring, storage, sync, course data, automatic data writes, workflows or controller files change. This is not implementation of the exploratory leaderboard mockups.
