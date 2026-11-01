@@ -35,7 +35,11 @@ function nextChecklist(r) {
     // A scramble's teams come from the breakfast draw, and it has no KB pairs to set up (UX review F01).
     isScramble(r)
       ? { ok: !!(r.groups && r.groups.length), t: !hasPots(r.id) ? 'Breakfast draw: set the pots' : r.groups && r.groups.length ? 'Teams drawn' : 'Breakfast draw', go: ['drawhome', r.id], need: true }
-      : { ok: !!(r.groups && r.groups.length), t: 'Players and groups', go: ['groups', r.id], need: true },
+      // A round with pots gets its groups from the breakfast draw, so the line opens the draw, not the ordinary Groups
+      // screen (which would say "Playing · 0" with everyone already in the pots; stress test 2b, 1 November).
+      : hasPots(r.id) && !(r.groups && r.groups.length)
+        ? { ok: false, t: `Breakfast draw · ${plural(drawOf(r.id).pots.reduce((t, x) => t + x.length, 0), 'player')} in the pots`, go: ['drawhome', r.id], need: true }
+        : { ok: !!(r.groups && r.groups.length), t: 'Players and groups', go: ['groups', r.id], need: true },
     { ok: !!r.first_tee, t: 'First tee time', go: ['details', r.id], need: true },
     { ok: !!(r.contests && r.contests.length), t: 'Contests', go: ['details', r.id], need: false }
   ].concat(isScramble(r) ? [] : [{ ok: !!(E.kbOff(r) || (r.kb && r.kb.length)), t: 'KBs', go: ['kb', r.id], need: false }]);
