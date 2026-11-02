@@ -48,7 +48,7 @@ function scrTeamCard(r, t) {
   const cell = h => { const x = hs[h.n] || {}; return `<td class="hn">${h.n}${x.shots ? ` <span class="sd">${x.shots > 0 ? '\u25CF'.repeat(x.shots) : '\u25CB'.repeat(-x.shots)}</span>` : ''}</td><td class="par">${h.par}</td><td>${Number.isInteger(x.gross) ? markCell(x.gross, h.par, 0) : ''}</td><td class="sub drv">${x.driver && Number.isInteger(x.gross) ? ini(x.driver) : ''}</td>`; };
   const tot = list => { const g = list.filter(h => hs[h.n] && Number.isInteger(hs[h.n].gross)); return { par: list.reduce((a, h) => a + h.par, 0), strokes: g.length ? g.reduce((a, h) => a + hs[h.n].gross, 0) : '\u2013' }; };
   const F = tot(front), B = tot(back);
-  const table = `<table class="sc scr-sc"><thead><tr><th class="hn">Hole</th><th>Par</th><th>Score</th><th>Drive</th><th class="gap"></th><th class="hn">Hole</th><th>Par</th><th>Score</th><th>Drive</th></tr></thead>
+  const table = `<table class="sc scr-sc"><thead><tr><th class="hn">Hole</th><th>Par</th><th>Score</th><th aria-label="Whose drive">By</th><th class="gap"></th><th class="hn">Hole</th><th>Par</th><th>Score</th><th aria-label="Whose drive">By</th></tr></thead>
     <tbody>${front.map((h, i) => `<tr>${cell(h)}<td class="gap"></td>${back[i] ? cell(back[i]) : '<td></td><td></td><td></td><td></td>'}</tr>`).join('')}
     <tr class="tot"><td class="hn">Out</td><td>${F.par}</td><td>${F.strokes}</td><td></td><td class="gap"></td><td class="hn">In</td><td>${B.par}</td><td>${B.strokes}</td><td></td></tr></tbody></table>`;
   const sum = [t.played ? `${t.strokes} strokes` : 'No holes yet', t.teamShots ? (t.teamShots > 0 ? `${t.teamShots} team ${t.teamShots === 1 ? 'shot' : 'shots'} off` : `${-t.teamShots} added`) : '', E.toParLabel(t.toPar)].filter(Boolean).join(' \u00B7 ');

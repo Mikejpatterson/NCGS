@@ -52,6 +52,8 @@ const scenarios = [
   ['board-st', async p => { await clickAny(p, '#tabs .tab:nth-child(3)'); await clickAny(p, '[data-act="respill"][data-p="st"]'); }],
   ['rules', async p => { await clickAny(p, '#tabs .tab:nth-child(4)'); }],
   ['hole-pick', async p => { await clickAny(p, '#tabs .tab:nth-child(2)'); }],
+  // A scramble team opened to its card (owner, 2 November).
+  ['scramble-card', async p => { await p.goto(URL.replace(/#.*$/, '') + '#scenario=westport'); await p.waitForFunction(() => window.__ncgs && window.__ncgs.D.round('fx-wp2')); await p.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.board = 'fx-wp2'; n.UI.res = 'lb'; n.UI.stack = [{ v: 'home', p: {} }, { v: 'board', p: {} }]; n.render(); }); await clickAny(p, '.scr-row'); }],
   // One phone per group keeps the score (owner's option A): the question, and the read-only view for a phone that follows.
   ['hole-scorer', async p => { await p.evaluate(() => { const n = window.__ncgs; n.DB.prefs.me = n.D.round(n.liveRid()).groups[0].teams.flat()[1]; n.render(); }); await clickAny(p, '#tabs .tab:nth-child(2)'); }],
   ['hole-follow', async p => { await p.evaluate(() => { const n = window.__ncgs; n.DB.prefs.me = n.D.round(n.liveRid()).groups[0].teams.flat()[1]; n.render(); }); await clickAny(p, '#tabs .tab:nth-child(2)'); await clickAny(p, '[data-act="scorer-no"]'); }],

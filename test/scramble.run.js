@@ -116,6 +116,11 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
     const cells = await page.$$eval('.scr-standings .dropcard td.drv', e => e.filter(x => x.textContent.trim()).length);
     check(`tapping ${teamName} opens its card: strokes, whose drive and the score against par`, /Hole/.test(dc) && /Drive/.test(dc) && cells > 0 && /strokes/.test(dc) && /(E|[+\u2212]\d+)\s*$/.test(dc.trim()), dc.slice(-80));
     check('the open card fits the phone', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    // Reviewer: at 360px and 135% text every heading and cell in the open card stays whole.
+    await page.setViewportSize({ width: 360, height: 800 }); await page.addStyleTag({ content: 'html{font-size:135%}' }); await page.waitForTimeout(150);
+    const clipped = await page.$$eval('.scr-standings .dropcard th, .scr-standings .dropcard td', e => e.filter(x => x.scrollWidth > x.clientWidth + 1).map(x => x.textContent.trim() + ' ' + x.scrollWidth + '/' + x.clientWidth));
+    check('at 360px and 135% text the open card\'s headings and cells all fit' + (clipped.length ? ' [' + clipped.join(', ') + ']' : ''), clipped.length === 0 && await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    await page.evaluate(() => { document.querySelectorAll('style').forEach(x => { if (x.textContent === 'html{font-size:135%}') x.remove(); }); }); await page.setViewportSize({ width: 390, height: 844 });
     await page.click('.scr-row >> nth=0'); await page.waitForTimeout(150);
     check('tapping again closes it', !(await page.$('.scr-standings .dropcard')));
     // Owner, 2 November: the share card for a scramble, teams by score against par.
