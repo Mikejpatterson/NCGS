@@ -10,6 +10,9 @@ function playHomeView(rid) {
   const g = myGroup(rid);
   const comp = progressOf(rid);
   if (!g || !comp) return 'round';
+  // One phone per group keeps the score: ask once, and a phone that is only following gets the read-only view.
+  if (scorerAnswer(rid) === undefined) return 'scorer';
+  if (followingOnly(rid)) return 'follow';
   const gc = comp.groups.find(x => x.id === g.id);
   return gc.nextHole || askPending(rid, gc, g.id) ? 'tee' : 'finish';
 }
@@ -78,6 +81,7 @@ function myConflicts(rid, gid) { return DB.conflicts.filter(c => c.round === rid
    a hole saved on two phones) shows under the players on that screen. */
 VIEWS.tee = () => {
   const rid = playRid();
+  if (!UI.org && followingOnly(rid)) return VIEWS.follow();   // a phone only following never gets the scoring screens (the organiser still corrects)
   if (isScramble(D.round(rid))) return VIEWS.scramble();
   const comp = computeR(rid);
   const g = myGroup(rid);
@@ -186,7 +190,7 @@ function entryRow(pid, val, shots, par, rid) {
   const mid = base === null
     ? `<div class="stv none" data-pid="${pid}" data-n="" aria-live="polite">Par ${par}</div>`
     : `<button class="stv${scratch ? ' out' : ''}" data-act="clear" data-pid="${pid}" data-n="${base}" aria-label="${name}: ${base} strokes. Tap to clear and start again from par"${readOnly ? ' disabled' : ''}><b${base > 99 ? ' class="wide"' : ''}>${base}<sup>${pts}</sup></b><small>${word}</small></button>`;
-  const drop = dopen && dpl ? `<div class="dropcard in"><p class="cap dropwho">${name}</p>${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : '';
+  const drop = dopen && dpl ? `<div class="dropcard in"><p class="cap dropwho">${name}</p>${cardParts(D.round(rid), dpl, D.round(rid).status === 'live' && !followingOnly(rid) && !!myGroup(rid) && myGroup(rid).teams.flat().includes(pid), pid).table}<p class="cap sc-note">Tap a score to change it</p></div>` : '';
   const tile = `<div class="pr ptile${flash}">
     <div class="pr-top"><button class="nm drop${dopen ? ' open' : ''}" data-act="toggle" data-key="${dkey}" aria-expanded="${dopen}"><span class="nmrow"><span>${name}</span>${dpl ? dropChev : ''}</span><span class="pr-dots" role="img" aria-label="${shots} ${shots === 1 ? 'shot' : 'shots'}">${dots(shots, true)}</span></button>
       <button class="pu ${scratch ? 'on' : ''}" data-act="set" data-pid="${pid}" data-v="P" aria-pressed="${scratch}"${readOnly ? ' disabled' : ''}>Pick up</button></div>
@@ -230,6 +234,7 @@ if (window.ResizeObserver) {
 }
 
 VIEWS.entry = () => {
+  if (!UI.org && followingOnly(playRid())) return VIEWS.follow();
   const ctx = entryCtx();
   if (isScramble(D.round(ctx.rid))) return VIEWS.scramble();
   const comp = computeR(ctx.rid);
@@ -768,7 +773,7 @@ function buggyView(rid) {
   const inMatch = !!(mine && groups.find(g => g.id === mine.id));
   const gid = inMatch ? mine.id : (UI.matchGroup && groups.find(g => g.id === UI.matchGroup) ? UI.matchGroup : groups[0].id);
   const gc = comp.groups.find(g => g.id === gid);
-  const canEdit = mine && mine.id === gid && r.status === 'live';
+  const canEdit = mine && mine.id === gid && r.status === 'live' && !followingOnly(rid);
   const live = r.status === 'live';
   const badges = bwBadges;
   const pillOf = m => bwPill(gc, m);

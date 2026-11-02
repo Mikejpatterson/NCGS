@@ -34,6 +34,7 @@ const check = (name, value) => { console.log((value ? 'PASS  ' : 'FAIL  ') + nam
     await redraw();
     check('your explicit group disclosure choice survives a redraw', await p.locator('#round-your-group').isVisible());
     await p.locator('.rp-go [data-act="play"]').click();
+    if (await p.$('[data-act="scorer-yes"]')) { await p.click('[data-act="scorer-yes"]'); await p.waitForTimeout(250); }   // this phone keeps the score
     check('the compact header still resumes the actual scoring screen', await p.locator('.entry, .ask').count() > 0);
 
     await fresh('westport');

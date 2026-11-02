@@ -15,7 +15,7 @@ const ACT = {
     DB.prefs.me = el.dataset.id;
     savePrefs();
     const then = cur().p.then;
-    if (then) { UI.stack.pop(); ACT.play({ dataset: { rid: then } }); } else back();
+    if (then) { setScorer(then, true); UI.stack.pop(); ACT.play({ dataset: { rid: then } }); } else back();
   },
   play: el => {
     const rid = el.dataset.rid;
@@ -23,7 +23,7 @@ const ACT = {
     UI.edit = false;
     UI.after = null;
     UI.teeHole = null;
-    if (backTo(e => ['tee', 'match', 'board', 'rules', 'finish'].includes(e.v))) { UI.playRid = rid; replaceTop(playHomeView(rid), { rid }); return; }
+    if (backTo(e => ['tee', 'match', 'board', 'rules', 'finish', 'scorer', 'follow'].includes(e.v))) { UI.playRid = rid; replaceTop(playHomeView(rid), { rid }); return; }
     UI.playRid = rid;
     go(playHomeView(rid), { rid });
   },
@@ -43,13 +43,13 @@ const ACT = {
     const rid = playRid() || liveRid() || (announced()[0] || {}).id || ((D.rounds().filter(r => r.status === 'final').slice(-1)[0]) || {}).id;
     if (!rid) { toast('No round yet'); return; }
     if (cur().v === 'home' && t === 'hole') { ACT.play({ dataset: { rid } }); return; }
-    while (UI.stack.length > 1 && !['tee', 'match', 'board', 'rules', 'finish', 'after', 'entry', 'check'].includes(cur().v)) UI.stack.pop();
+    while (UI.stack.length > 1 && !['tee', 'match', 'board', 'rules', 'finish', 'after', 'entry', 'check', 'scorer', 'follow'].includes(cur().v)) UI.stack.pop();
     if (t === 'hole') { UI.edit = false; UI.after = null; UI.teeHole = null; replaceTop(playHomeView(rid), { rid }); }
     else if (t === 'rules') { replaceTop('rules', { rid }); }
     else if (t === 'match') { UI.board = null; UI.res = 'bw'; UI.scrollTop = true; replaceTop('board', { rid }); }
     else { UI.board = null; UI.res = UI.res === 'bw' || UI.res === 'ct' ? UI.res : 'lb'; replaceTop('board', { rid }); }
   },
-  enter: () => { UI.edit = false; go('entry', { rid: playRid() }); },
+  enter: () => { if (followingOnly(playRid())) { replaceTop('follow', { rid: playRid() }); return; } UI.edit = false; go('entry', { rid: playRid() }); },
   set: el => setScore(el.dataset.pid, el.dataset.v),
   clear: el => clearScore(el.dataset.pid),
   'ask-mic': () => askListen(),
@@ -107,6 +107,7 @@ const ACT = {
   'holes-close': () => { UI.holeSheet = false; render(); },
   'holes-scrim': (el, e) => { if (e.target !== el) return; UI.holeSheet = false; render(); },
   'goto-hole': el => {
+    if (followingOnly(playRid())) { UI.holeSheet = false; replaceTop('follow', { rid: playRid() }); return; }
     const rid = playRid(), g = myGroup(rid), comp = progressOf(rid);
     UI.holeSheet = false;
     if (!g || !comp) { render(); return; }
@@ -118,7 +119,7 @@ const ACT = {
   undo: () => undoSave(),
   next: () => { UI.after = null; UI.teeHole = null; replaceTop('tee', { rid: playRid() }); },
   'to-finish': () => { UI.after = null; replaceTop('finish', { rid: playRid() }); },
-  conflict: el => { UI.hole = Number(el.dataset.n); UI.edit = true; const ctx = entryCtx(); clearDraft(ctx); go('entry', { rid: playRid() }); },
+  conflict: el => { if (followingOnly(playRid())) return; UI.hole = Number(el.dataset.n); UI.edit = true; const ctx = entryCtx(); clearDraft(ctx); go('entry', { rid: playRid() }); },
   submit: () => {
     const rid = playRid();
     const g = myGroup(rid);
@@ -130,6 +131,7 @@ const ACT = {
   },
   mgroup: el => { UI.matchGroup = el.dataset.gid; UI.scrollCur = true; render(); },
   'fix-hole': el => {
+    if (followingOnly(el.dataset.rid)) return;
     const rid = el.dataset.rid, pid = el.dataset.pid, n = Number(el.dataset.n);
     const cur = (D.scores(rid)[pid] || {})[n];
     UI.fix = { rid, pid, n, v: E.isEntered(cur) ? cur : null, base: cur === undefined ? null : cur };
@@ -147,7 +149,7 @@ const ACT = {
   'fix-save': () => { if (UI.fix && UI.fix.v !== UI.fix.base) fixSave(); },
   'fix-cancel': () => { UI.fix = null; render(); },
   'fix-scrim': (el, e) => { if (e.target !== el) return; UI.fix = null; render(); },
-  'edit-hole': el => { UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: playRid() }); },
+  'edit-hole': el => { if (followingOnly(playRid())) return; UI.hole = Number(el.dataset.n); UI.edit = true; go('entry', { rid: playRid() }); },
   results: el => go('results', { rid: el.dataset.rid }),
   'share-card': el => shareCard(el.dataset.rid),
   'share-close': () => { UI.shareImg = null; render(); },
@@ -373,7 +375,7 @@ function ensureLibraryCourses() {
 }
 ACT.rejected = () => go('rejected');
 ACT['rejected-clear'] = () => { if (UI.confirm !== 'rej-clear') { UI.confirm = 'rej-clear'; render(); return; } UI.confirm = null; clearRejected(); render(); toast('Cleared'); };
-Object.assign(ACT, DRAW_ACT, GROUP_ACT);
+Object.assign(ACT, DRAW_ACT, GROUP_ACT, SCORER_ACT);
 
 const FORMS = {
   ask: () => { const i = document.getElementById('askin'); askQuestion(i ? i.value : UI.askDraft); },
