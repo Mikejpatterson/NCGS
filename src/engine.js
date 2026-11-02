@@ -586,6 +586,8 @@
      `minDrives` drives used (normally 3).
      Stroke play, not Stableford (owner, 2 November): the team's strokes count against par, lowest wins. Team shots move
      the team's starting point: they come off the total, and a minus number adds strokes (a strong team can start at +1).
+     During play the shots come off as the team plays the holes they fall on, hardest first by stroke index (owner's
+     choice B), so the live board is fair mid-round; after 18 holes it is exactly the total less the shots.
      There is no pick-up in a scramble: a hole counts only once it has a number of strokes. */
   function scrambleTeam(team, holes, strokesOf, teamShots, minDrives) {
     const min = minDrives === undefined ? 3 : minDrives;
@@ -595,17 +597,19 @@
     holes.forEach(h => {
       const filled = team.filter(p => isEntered(strokesOf(p, h.n)));
       if (filled.length > 1) doubles.push(h.n);   // two drives recorded (two phones at once): shown, never guessed
-      if (filled.length !== 1) { per[h.n] = { gross: null, driver: null, par: h.par, toPar: null }; return; }
+      const shots = shotsOnHole(ts, h.si);
+      if (filled.length !== 1) { per[h.n] = { gross: null, driver: null, par: h.par, shots, toPar: null }; return; }
       const d = filled[0], gross = strokesOf(d, h.n);
       drives[d]++;
       // A pick-up saved before the change has no stroke count, so the hole is not counted until it is corrected.
-      per[h.n] = Number.isInteger(gross) ? { gross, driver: d, par: h.par, toPar: gross - h.par } : { gross, driver: d, par: h.par, toPar: null };
+      per[h.n] = Number.isInteger(gross) ? { gross, driver: d, par: h.par, shots, toPar: gross - h.par } : { gross, driver: d, par: h.par, shots, toPar: null };
     });
     const counted = holes.filter(h => per[h.n].toPar !== null);
     const played = counted.length;
     const strokes = counted.reduce((t, h) => t + per[h.n].gross, 0);
     const parPlayed = counted.reduce((t, h) => t + h.par, 0);
-    const toPar = strokes - parPlayed - ts;           // where the team stands: E, +1, -2 ...
+    const shotsUsed = counted.reduce((t, h) => t + per[h.n].shots, 0);
+    const toPar = strokes - parPlayed - shotsUsed;    // where the team stands: E, +1, -2 ... (all 18 in: strokes - par - shots)
     const left = holes.length - played;
     const short = team.filter(p => drives[p] < min);
     const needed = team.reduce((t, p) => t + Math.max(0, min - drives[p]), 0);

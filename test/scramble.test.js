@@ -17,10 +17,19 @@ test('one team score per hole, from the driver\'s row, counted against par', () 
   assert.equal(t.holes[1].points, undefined, 'no Stableford points in a scramble');
 });
 test('team shots come off the total; a minus number adds strokes', () => {
-  assert.equal(play({ 1: ['a', 4], 3: ['a', 4] }, 2).toPar, -2);   // level with par after two holes, starts at 2 under
-  assert.equal(play({ 1: ['a', 4] }, -1).toPar, 1);                 // a strong team starts at 1 over
   const t = play(full(4, team), 3);
   assert.equal(t.strokes, 72); assert.equal(t.net, 69); assert.equal(t.toPar, -3);
+  assert.equal(play(full(4, team), -1).toPar, 1);                  // a strong team finishes 1 over for level-par golf
+});
+test('during play the shots come off on the holes they fall on, hardest first (owner\'s choice B)', () => {
+  assert.equal(play({}, 2).toPar, 0, 'nobody is under par before teeing off');
+  assert.equal(play({ 1: ['a', 4] }, 2).toPar, -1);                 // index 1: one shot used
+  assert.equal(play({ 1: ['a', 4], 3: ['a', 4] }, 2).toPar, -1);   // index 3: no shot there
+  assert.equal(play({ 1: ['a', 4], 2: ['a', 4] }, 2).toPar, -2);   // index 1 and 2: both shots used
+  assert.equal(play({ 1: ['a', 4] }, -1).toPar, 0);                 // a plus shot falls on the easiest hole (index 18)
+  assert.equal(play({ 18: ['a', 4] }, -1).toPar, 1);
+  // However the shots fall during play, all 18 in is exactly strokes - par - shots, so the result never depends on it.
+  for (const ts of [-3, -1, 0, 2, 5, 20]) { const f = play(full(5, team), ts); assert.equal(f.toPar, f.strokes - 72 - ts); }
 });
 test('a pick-up saved before the change does not count until the hole has a stroke count', () => {
   const t = play({ 1: ['a', 'P'], 2: ['a', 4] }, 0);
