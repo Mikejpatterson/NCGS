@@ -1,6 +1,6 @@
 // Scramble saves against the real server code (src/server.js, memory store). Codex's challenge on issue #1, 24 October:
 // saveHole checks each player's row on its own, so a team can end up with two drives on a hole. That hole must stay
-// unresolved (no points, no drive counted, team not complete, no KBs) until a phone that has seen both picks one.
+// unresolved (no score counted, no drive counted, team not complete, no KBs) until a phone that has seen both picks one.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const N = require('../src/server.js');
@@ -31,13 +31,13 @@ test('Codex\'s sequence: a stale driver change leaves two drives, kept and unres
   assert.deepEqual(r.conflicts.map(c => [c.player, c.server]), [['a', 6]]);   // A's row is protected
   const st = stored(s); assert.equal(st.a[1], 6); assert.equal(st.b[1], 4);   // both kept, nothing dropped
   let t = team(s);
-  assert.deepEqual(t.doubles, [1]); assert.equal(t.holes[1].points, null); assert.equal(t.drives.a + t.drives.b, 0);
+  assert.deepEqual(t.doubles, [1]); assert.equal(t.holes[1].toPar, null); assert.equal(t.drives.a + t.drives.b, 0);
   assert.equal(t.complete, false); assert.equal(t.played, 0);
   // A phone that has seen both picks B 4: A is cleared with its own value as the base.
   const fix = phoneSave(s, 1, 'b', 4, seen(s, 1));
   assert.equal(fix.ok, true); assert.deepEqual(fix.conflicts || [], []);
   t = team(s);
-  assert.deepEqual(t.doubles, []); assert.equal(t.holes[1].driver, 'b'); assert.equal(t.holes[1].points, 2); assert.equal(t.drives.b, 1);
+  assert.deepEqual(t.doubles, []); assert.equal(t.holes[1].driver, 'b'); assert.equal(t.holes[1].toPar, 0); assert.equal(t.drives.b, 1);
 });
 
 test('two offline phones choose different drivers from the same starting point: flagged, not guessed', () => {
@@ -47,7 +47,7 @@ test('two offline phones choose different drivers from the same starting point: 
   phoneSave(s, 2, 'c', 5, base);                              // phone 1: it was C's drive
   phoneSave(s, 2, 'd', 5, base);                              // phone 2: no, D's
   const st = stored(s); assert.equal((st.a || {})[2], undefined); assert.equal(st.c[2], 5); assert.equal(st.d[2], 5);
-  const t = team(s); assert.deepEqual(t.doubles, [2]); assert.equal(t.holes[2].points, null);
+  const t = team(s); assert.deepEqual(t.doubles, [2]); assert.equal(t.holes[2].toPar, null);
 });
 
 test('two phones change the same driver\'s score: the later one is told, one row remains', () => {

@@ -33,11 +33,12 @@ const check = (name, good) => { console.log((good ? 'PASS  ' : 'FAIL  ') + name)
     check(label + ': four drive choices form two rows of two', layout.grid);
     check(label + ': score and Save fit together above nav without scrolling', layout.fit);
     check(label + ': every input has a 44px target and names fit', layout.targets && layout.text);
-    check(label + ': team strokes and points use the shared score-row hierarchy', await p.locator('.scr-score .scr-val').innerText() === '4' && await p.locator('.scr-score .stv sup').count() === 1);
+    // Stroke play (owner, 2 November): strokes only, no points and no Pick up.
+    check(label + ': team strokes use the shared score row, with no points', await p.locator('.scr-score .scr-val').innerText() === '4' && await p.locator('.scr-score .stv sup').count() === 0);
+    check(label + ': no Pick up in a scramble', await p.locator('[data-act="scr-pickup"]').count() === 0);
+    check(label + ': the team\'s score against par sits by its name and fits', await p.locator('.scr-score .scr-topar').evaluate(e => /^(E|[+\u2212]\d+)( thru \d+)?$/.test(e.textContent.trim()) && e.scrollWidth <= e.clientWidth && e.getBoundingClientRect().right <= innerWidth));
     await p.locator('[data-act="scr-score"][data-dir="up"]').click();
     check(label + ': changing strokes keeps the chosen drive', await p.locator('.scr-score .scr-val').innerText() === '5' && await p.locator('[data-act="scr-driver"][aria-checked="true"]').count() === 1);
-    await p.locator('[data-act="scr-pickup"]').click();
-    check(label + ': Pick up displays zero points and retains the drive', await p.locator('.scr-score .stv sup').innerText() === '0' && await p.locator('[data-act="scr-driver"][aria-checked="true"]').count() === 1);
     await p.locator('[data-act="scr-clear"]').click();
     check(label + ': clearing the team score makes Save wait again', await p.locator('[data-act="scr-save"]').evaluate(e=>e.classList.contains('quiet')));
     await p.evaluate(() => { const n=window.__ncgs; n.UI.board='fx-wp2'; n.UI.res='lb'; n.UI.stack=[{v:'home',p:{}},{v:'board',p:{}}]; n.render(); });

@@ -46,7 +46,7 @@ function scrambleTable(r, res) {
   const rows = teams.map(t => {
     const thru = t.complete ? 'finished' : t.played ? `thru ${t.played}` : '';
     const flag = t.doubles.length ? ` <span class="pill w" title="Two drives saved">Check ${t.doubles.join(', ')}</span>` : '';
-    return `<div class="lrow scr-row${t.kb ? ' low' : ''}"><span class="sub scr-pos">${esc(t.posLabel)}</span><span class="scr-name"><b>${esc(t.name)}</b> <small>${esc(thru)}</small>${t.kb ? ' <span class="pill w">KBs</span>' : ''}${flag}</span><b class="scr-pts num">${t.total}</b>${scrDriveChips(t)}</div>`;
+    return `<div class="lrow scr-row${t.kb ? ' low' : ''}"><span class="sub scr-pos">${esc(t.posLabel)}</span><span class="scr-name"><b>${esc(t.name)}</b> <small>${esc(thru)}</small>${t.kb ? ' <span class="pill w">KBs</span>' : ''}${flag}</span><b class="scr-pts num" aria-label="${esc(t.toPar === 0 ? 'level par' : E.toParLabel(t.toPar))}">${E.toParLabel(t.toPar)}</b>${scrDriveChips(t)}</div>`;
   }).join('');
   return `<div class="scr-standings">${sec(label('Teams') + `<span class="scr-legend">Drives · ${teams[0].minDrives} each</span>`, cardOf(rows))}</div>`;
 }
@@ -71,7 +71,6 @@ VIEWS.scramble = () => {
   }
   const n = ctx.n, h = holeOf(rid, n), d = scrDraft(ctx, gc);
   const final = r.status === 'final';
-  const shots = gc.scramble[n] ? gc.scramble[n].shots : 0;
   const st = scrStored(rid, gc, n);
   let html = '<div class="entry scr">';
   if (ctx.mode === 'org') html += `<div class="entnav"><button class="entback" data-act="entry-back" aria-label="Back">${ICON.back}<span>Back</span></button><span class="entgrp">Correcting ${esc(gc.name)}</span></div>`;
@@ -100,19 +99,18 @@ VIEWS.scramble = () => {
   }
 
   const v = d.score;
-  const pts = E.isEntered(v) ? E.stablefordPoints(v, h.par, shots) : null;
-  const shown = v === 'P' ? E.pickupStrokes(h.par, shots) : v;
-  const scoreWord = pts === 0 ? 'Scratch' : Number.isInteger(v) ? E.scoreName(v, h.par) : '';
+  // Stroke play (owner, 2 November): the team's strokes against par, no points and no pick-up.
+  const num = Number.isInteger(v);
+  const scoreWord = num ? E.scoreName(v, h.par) : '';
   html += sec(label('Score'), `<div class="bugs b0 scr-score" aria-label="Team score"><div class="pr ptile">
-    <div class="pr-top"><span class="nm"><span class="nmrow">${esc(gc.name)}</span></span>
-    <button class="pu ${v === 'P' ? 'on' : ''}" data-act="scr-pickup"${final ? ' disabled' : ''}>${v === 'P' ? 'Picked up' : 'Pick up'}</button></div>
+    <div class="pr-top"><span class="nm"><span class="nmrow">${esc(gc.name)}</span></span><span class="sub scr-topar num">${E.toParLabel(gc.toPar)}${gc.played ? ` thru ${gc.played}` : ''}</span></div>
     <div class="stepper" role="group" aria-label="Team strokes">
-    ${E.isEntered(v) ? `<button class="stv${pts === 0 ? ' out' : ''}" data-act="scr-clear" aria-label="Team score ${shown} strokes, ${plural(pts, 'point')}. Tap to clear"${final ? ' disabled' : ''}><b><span class="scr-val">${shown}</span><sup>${pts}</sup></b><small>${scoreWord}</small></button>` : `<div class="stv none">Par ${h.par}</div>`}
+    ${num ? `<button class="stv" data-act="scr-clear" aria-label="Team score ${v} strokes, ${esc(scoreWord)}. Tap to clear"${final ? ' disabled' : ''}><b><span class="scr-val">${v}</span></b><small>${scoreWord}</small></button>` : `<div class="stv none">Par ${h.par}</div>`}
     <button class="st" data-act="scr-score" data-dir="down" aria-label="One less for the team"${final ? ' disabled' : ''}>−</button>
     <button class="st" data-act="scr-score" data-dir="up" aria-label="One more for the team"${final ? ' disabled' : ''}>+</button></div>
     </div></div>`);
 
-  const ready = E.isEntered(d.score) && d.driver;
+  const ready = Number.isInteger(d.score) && d.driver;
   const lbl = ctx.mode === 'org' ? 'Save correction' : ctx.edit || gc.holes[n].complete ? 'Save changes' : `Save hole ${n}`;
   html += `<div class="savebar">${final && ctx.mode === 'player' ? `<button class="btn" data-act="leaderboard" data-rid="${rid}">See the results</button>` : `<button class="btn ${ready ? '' : 'quiet'}" data-act="scr-save"${final ? ' disabled' : ''}>${lbl}</button>`}${saveWarning()}</div></div>`;
   if (ctx.mode === 'player') html += holesSheet(rid, gc, n);
@@ -136,7 +134,6 @@ const scrScore = dir => scrEdit(({ d, h }) => {
   if (!E.isEntered(d.score) || d.score === 'P') { d.score = h.par; return; }
   d.score = Math.max(1, Math.min(15, d.score + (dir === 'up' ? 1 : -1)));
 });
-const scrPickup = () => scrEdit(({ d }) => { d.score = d.score === 'P' ? undefined : 'P'; });
 const scrClear = () => scrEdit(({ d }) => { delete d.score; });
 const scrDriver = pid => scrEdit(({ d }) => { d.driver = d.driver === pid ? undefined : pid; });
 
@@ -145,7 +142,8 @@ function scrSave() {
   if (!x) return;
   const { ctx, gc, d } = x;
   const r = D.round(ctx.rid);
-  if (!E.isEntered(d.score) || !d.driver) { toast(E.isEntered(d.score) ? 'Pick whose drive was used' : 'Set the team score first'); return; }
+  // Stroke play: only a number of strokes is saved, never a pick-up (a draft from before 2 November may still hold one).
+  if (!Number.isInteger(d.score) || !d.driver) { toast(Number.isInteger(d.score) ? 'Pick whose drive was used' : 'Set the team score first'); return; }
   if (r.status === 'final') { toast('This round is final. Reopen it to change scores.'); return; }
   const st = scrStored(ctx.rid, gc, ctx.n);
   const scores = {};
@@ -174,8 +172,8 @@ VIEWS.scrambleFinish = () => {
   if (!gc) return VIEWS.round({ rid });
   const t = s.standings.find(x => x.id === gc.id) || gc;
   const drives = gc.team.map(pid => `<div class="row"><span>${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${gc.drives[pid]}</span>${gc.drives[pid] < gc.minDrives ? '<span class="pill w">Short</span>' : ''}</span></div>`).join('');
-  const html = `<div class="after scr-finish"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>${esc(gc.name.toUpperCase())}</small><b class="entn">${t.total}</b></div><div class="entr"><b>Finished</b><span>Team Stableford</span></div></div></header>
-    ${gc.failed ? `<div class="banner warn" style="margin-top:12px">Not everyone has ${gc.minDrives} drives, so the team is KBs whatever its points.</div>` : ''}
+  const html = `<div class="after scr-finish"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>${esc(gc.name.toUpperCase())}</small><b class="entn num">${E.toParLabel(t.toPar)}</b></div><div class="entr"><b>Finished</b><span>${t.strokes} strokes${t.teamShots ? ` · ${t.teamShots > 0 ? t.teamShots + ' shots off' : -t.teamShots + ' added'}` : ''}</span></div></div></header>
+    ${gc.failed ? `<div class="banner warn" style="margin-top:12px">Not everyone has ${gc.minDrives} drives, so the team is KBs whatever its score.</div>` : ''}
     ${sec(label('Drives used'), cardOf(drives))}
     <button class="btn" data-act="leaderboard" data-rid="${rid}">See the teams</button></div>`;
   return { html, tabs: 'hole' };

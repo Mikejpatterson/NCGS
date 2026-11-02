@@ -2,6 +2,7 @@
 
 - A hole score entered on a phone must never be lost or silently overwritten. Any change to `src/server.js` (saveHole, versions, since) or `src/app/10-data.js` (outbox, sync) needs a test.
 - Scoring rules live only in `src/engine.js`: WHS course handicap kept unrounded, 100% allowance by default, Stableford = max(0, par + shots - gross + 2), a pick-up scores 0.
+- The scramble is stroke play, not Stableford (owner, 2 November 2026): team strokes against par, lowest wins; team shots come off the team's total and a minus number adds strokes; no pick-up; ties by the usual countback on strokes. The KBs rule and its exclusion from Golfer of the Year are unchanged.
 - Countback is back 9, back 6, back 3, then the 18th hole and backwards. Do not invent other tie-break rules. GameBook is no longer used; imported 2026 rounds keep the order recorded at the time.
 - Golfer of the Year: best 3 scores count. Ties compare counting scores best to worst, then the 4th best, and so on.
 - KBs is a pair competition with partners in different groups. Call it "KBs" and do not explain it in the app.
