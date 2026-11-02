@@ -101,11 +101,16 @@ VIEWS.scramble = () => {
 
   const v = d.score;
   const pts = E.isEntered(v) ? E.stablefordPoints(v, h.par, shots) : null;
-  html += sec(label('Score'), `<div class="scr-score card" aria-label="Team score">
-    <div class="scr-step"><button class="scr-st" data-act="scr-score" data-dir="down" aria-label="One less for the team"${final ? ' disabled' : ''}>−</button>
-    <button class="scr-val num" data-act="scr-clear" aria-label="Team score ${E.isEntered(v) ? (v === 'P' ? 'picked up' : v) : 'not set'}"${final ? ' disabled' : ''}>${E.isEntered(v) ? (v === 'P' ? '–' : v) : `<small>Par ${h.par}</small>`}</button>
-    <button class="scr-st" data-act="scr-score" data-dir="up" aria-label="One more for the team"${final ? ' disabled' : ''}>+</button></div>
-    <div class="scr-meta"><span class="sub">${pts !== null ? `${pts} pts` : ''}${shots ? `${pts !== null ? ' · ' : ''}${plural(shots, 'shot')}` : ''}</span><button class="link" data-act="scr-pickup"${final ? ' disabled' : ''}>${v === 'P' ? 'Picked up' : 'Pick up'}</button></div></div>`);
+  const shown = v === 'P' ? E.pickupStrokes(h.par, shots) : v;
+  const scoreWord = pts === 0 ? 'Scratch' : Number.isInteger(v) ? E.scoreName(v, h.par) : '';
+  html += sec(label('Score'), `<div class="bugs b0 scr-score" aria-label="Team score"><div class="pr ptile">
+    <div class="pr-top"><span class="nm"><span class="nmrow">${esc(gc.name)}</span></span>
+    <button class="pu ${v === 'P' ? 'on' : ''}" data-act="scr-pickup"${final ? ' disabled' : ''}>${v === 'P' ? 'Picked up' : 'Pick up'}</button></div>
+    <div class="stepper" role="group" aria-label="Team strokes">
+    ${E.isEntered(v) ? `<button class="stv${pts === 0 ? ' out' : ''}" data-act="scr-clear" aria-label="Team score ${shown} strokes, ${plural(pts, 'point')}. Tap to clear"${final ? ' disabled' : ''}><b><span class="scr-val">${shown}</span><sup>${pts}</sup></b><small>${scoreWord}</small></button>` : `<div class="stv none">Par ${h.par}</div>`}
+    <button class="st" data-act="scr-score" data-dir="down" aria-label="One less for the team"${final ? ' disabled' : ''}>−</button>
+    <button class="st" data-act="scr-score" data-dir="up" aria-label="One more for the team"${final ? ' disabled' : ''}>+</button></div>
+    </div></div>`);
 
   const ready = E.isEntered(d.score) && d.driver;
   const lbl = ctx.mode === 'org' ? 'Save correction' : ctx.edit || gc.holes[n].complete ? 'Save changes' : `Save hole ${n}`;
@@ -175,3 +180,4 @@ VIEWS.scrambleFinish = () => {
     <button class="btn" data-act="leaderboard" data-rid="${rid}">See the teams</button></div>`;
   return { html, tabs: 'hole' };
 };
+

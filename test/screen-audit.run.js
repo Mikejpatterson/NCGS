@@ -139,7 +139,7 @@ const textContrast = locator => locator.evaluate(e => {
     check('no script errors', errors.length === 0, errors.join(' | '));
   } catch (e) { console.error(e); ok = false; } finally { await browser.close(); }
   if (ok) {
-    for (const file of ['player-columns.run.js', 'contest-labels.run.js']) {
+    for (const file of ['player-columns.run.js', 'contest-labels.run.js', 'scramble-layout.run.js']) {
       const result = require('child_process').spawnSync(process.execPath,
         [...process.execArgv, path.join(__dirname, file)], { stdio: 'inherit', env: process.env });
       if (result.error) console.error(result.error);
