@@ -1,10 +1,14 @@
+// Stress crawl (reviewer, 1 November 2026): test/crawl.run.js with the tab-bar Home counted as a way out, the microphone skipped,
+// and awkward starting situations added (nogroups, pots1, outsider, allfinal, nocard, newseason; add -org for the organiser view).
+// Run: NCGS_FIXTURE=1 node build.js, serve dist on 8765, then: node test/crawl.run.js nogroups,pots1-org,outsider
+// CI runs every scenario, split across parallel jobs (ci.yml, job "crawl").
 // Click-through crawler: walks the app from the front page, tapping EVERY visible control on every screen it can reach.
 // For each tap it checks: no script error, something visibly happened (no dead buttons), no "undefined"/"NaN" on screen,
 // and that every screen it reaches has a way back to the front page (no dead ends, no loops).
-//   node test/crawl.run.js [scenario]      scenario = player | known | organiser   (default: all three, one after another)
+//   node test/crawl.run.js [scenarios]    comma-separated; default: player, known, organiser, deep
 const { chromium } = require('playwright');
 const URL = process.env.CRAWL_URL || 'http://localhost:8765/preview.html';
-const SCEN = process.argv[2] ? [process.argv[2]] : ['player', 'known', 'organiser', 'deep'];
+const SCEN = process.argv[2] ? process.argv[2].split(',') : ['player', 'known', 'organiser', 'deep'];
 const MAXDEPTH = 5;
 const findings = [];
 const note = (sc, kind, where, what) => { findings.push({ sc, kind, where, what }); console.log(`  ${kind.padEnd(10)} ${where} :: ${what}`); };
@@ -16,7 +20,7 @@ const INPAGE = {
     const vis = e => { const r = e.getBoundingClientRect(); const st = getComputedStyle(e); return r.width > 0 && r.height > 0 && st.visibility !== 'hidden' && st.display !== 'none' && !e.closest('[hidden]') && !e.closest('[aria-hidden="true"]'); };
     const out = [];
     document.querySelectorAll('button, a[href], [data-act], [data-v], [role="button"]').forEach(e => {
-      if (e.closest('.askbar') && e.matches('.mic,.send,.stop,.x')) return; // speech needs a real microphone
+      if ((e.closest('.askbar') && e.matches('.mic,.send,.stop,.x')) || e.dataset.act === 'ask-mic') return; // speech needs a real microphone
       if (!vis(e) || e.disabled) return;
       if (out.some(o => o.el === e)) return;
       out.push({ el: e });
@@ -51,17 +55,30 @@ const INPAGE = {
         });
         n.render();
       }); await pg.waitForTimeout(500);
+
+      // Awkward states (stress test, owner 1 November): each starts from a real-looking but untidy situation.
+      const AWK = {
+        nogroups: () => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const b = n.D.round('fx-r3'); n.put('rounds', [Object.assign({}, b, { id: 'aw-ng', name: 'Today no groups', date: n.todayIso(), status: 'upcoming', groups: null, kb: null })]); n.put('rounds', [Object.assign({}, n.D.round('demo-cabopino'), { status: 'final' })]); n.DB.prefs.me = 'brian'; },
+        pots1: () => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const b = n.D.round('fx-r3'); n.put('rounds', [Object.assign({}, b, { id: 'aw-p1', name: 'Breakfast draw day', date: n.todayIso(), status: 'upcoming', groups: null, kb: null })]); n.put('settings', [{ key: 'pots:aw-p1', value: JSON.stringify({ pots: [['sean'], ['colin'], [], []], show: true }) }]); n.put('rounds', [Object.assign({}, n.D.round('demo-cabopino'), { status: 'final' })]); n.DB.prefs.me = 'brian'; },
+        outsider: () => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; n.put('members', [{ id: 'zz-out', name: 'Zed', full: 'Zed Outsider', index: 20, active: true }]); n.DB.prefs.me = 'zz-out'; },
+        allfinal: () => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; n.put('rounds', [Object.assign({}, n.D.round('demo-cabopino'), { status: 'final' })]); n.DB.prefs.me = 'brian'; },
+        nocard: () => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; n.put('courses', [{ id: 'aw-nc', name: 'Carne', area: 'Mayo', tees: null, holes: null }]); const b = n.D.round('fx-r3'); n.put('rounds', [Object.assign({}, b, { id: 'aw-nc-r', name: 'Carne day', course: 'aw-nc', tee: null, date: n.todayIso(), status: 'upcoming', kb: null })]); n.put('rounds', [Object.assign({}, n.D.round('demo-cabopino'), { status: 'final' })]); n.DB.prefs.me = 'brian'; },
+        newseason: () => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; n.put('rounds', [Object.assign({}, n.D.round('demo-cabopino'), { status: 'final' })]); n.put('settings', [{ key: 'season', value: String(new Date().getFullYear() + 1) }]); n.DB.prefs.me = 'brian'; },
+      };
+      const awk = sc.replace(/-org$/, '');
+      if (AWK[awk]) { await pg.evaluate(AWK[awk].toString().replace(/^\(\) => /, '() => ') === '' ? '' : `(${AWK[awk].toString()})()`); await pg.evaluate(() => window.__ncgs.flush().then(() => window.__ncgs.sync())); await pg.evaluate(() => { try { localStorage.setItem('x', '1'); } catch (e) {} window.__ncgs.render(); }); await pg.waitForTimeout(300);
+        if (sc.endsWith('-org')) await pg.evaluate(() => { const n = window.__ncgs; n.UI.org = true; n.UI.orgUnlocked = true; n.UI.orgStack = [{ v: 'home', p: {} }]; n.render(); }); }
       if (sc === 'known') await pg.evaluate(() => { const n = window.__ncgs; n.DB.prefs.me = 'brian'; try { localStorage.setItem('ncgs-prefs', JSON.stringify(n.DB.prefs)); } catch (e) {} n.render(); });
       if (sc === 'organiser') await pg.evaluate(() => { const n = window.__ncgs; n.DB.prefs.me = 'brian'; n.ORGPIN.pin = '1234'; n.UI.org = true; n.UI.orgUnlocked = true; n.UI.orgStack = [{ v: 'home', p: {} }]; n.render(); });
       await pg.evaluate(() => { window.__ncgs.DB.renderFaults = 0; window.__ncgs.DB.faultLog = []; });
       return pg;
     };
     const desc = (pg, i) => pg.evaluate(i => {
-      const e = [...document.querySelectorAll('button, a[href], [data-act], [data-v], [role="button"]')].filter(x => { const r = x.getBoundingClientRect(); const st = getComputedStyle(x); return r.width > 0 && r.height > 0 && st.visibility !== 'hidden' && st.display !== 'none' && !x.closest('[hidden]') && !x.closest('[aria-hidden="true"]') && !x.disabled && !(x.closest('.askbar') && x.matches('.mic,.send,.stop,.x')); });
+      const e = [...document.querySelectorAll('button, a[href], [data-act], [data-v], [role="button"]')].filter(x => { const r = x.getBoundingClientRect(); const st = getComputedStyle(x); return r.width > 0 && r.height > 0 && st.visibility !== 'hidden' && st.display !== 'none' && !x.closest('[hidden]') && !x.closest('[aria-hidden="true"]') && !x.disabled && !(x.closest('.askbar') && x.matches('.mic,.send,.stop,.x')) && x.dataset.act !== 'ask-mic'; });
       const x = e[i]; if (!x) return null;
       return (x.dataset.act || x.dataset.v || x.tagName.toLowerCase()) + ' "' + (x.innerText || x.getAttribute('aria-label') || '').trim().replace(/\s+/g, ' ').slice(0, 40) + '"';
     }, i);
-    const count = pg => pg.evaluate(() => [...document.querySelectorAll('button, a[href], [data-act], [data-v], [role="button"]')].filter(x => { const r = x.getBoundingClientRect(); const st = getComputedStyle(x); return r.width > 0 && r.height > 0 && st.visibility !== 'hidden' && st.display !== 'none' && !x.closest('[hidden]') && !x.closest('[aria-hidden="true"]') && !x.disabled && !(x.closest('.askbar') && x.matches('.mic,.send,.stop,.x')); }).length);
+    const count = pg => pg.evaluate(() => [...document.querySelectorAll('button, a[href], [data-act], [data-v], [role="button"]')].filter(x => { const r = x.getBoundingClientRect(); const st = getComputedStyle(x); return r.width > 0 && r.height > 0 && st.visibility !== 'hidden' && st.display !== 'none' && !x.closest('[hidden]') && !x.closest('[aria-hidden="true"]') && !x.disabled && !(x.closest('.askbar') && x.matches('.mic,.send,.stop,.x')) && x.dataset.act !== 'ask-mic'; }).length);
     const fillForms = pg => pg.evaluate(() => {
       const fut = new Date(Date.now() + 20 * 864e5).toISOString().slice(0, 10);
       document.querySelectorAll('#app input, #app textarea, #app select, .sheet input, .sheet textarea, .sheet select').forEach(f => {
@@ -77,7 +94,7 @@ const INPAGE = {
     const visibleControls = async pg => {
       const els = await pg.$$('button, a[href], [data-act], [data-v], [role="button"]');
       const list = [];
-      for (const e of els) { if (await e.evaluate(x => { const r = x.getBoundingClientRect(); const st = getComputedStyle(x); return r.width > 0 && r.height > 0 && st.visibility !== 'hidden' && st.display !== 'none' && !x.closest('[hidden]') && !x.closest('[aria-hidden="true"]') && !x.disabled && !(x.closest('.askbar') && x.matches('.mic,.send,.stop,.x')); }).catch(() => false)) list.push(e); }
+      for (const e of els) { if (await e.evaluate(x => { const r = x.getBoundingClientRect(); const st = getComputedStyle(x); return r.width > 0 && r.height > 0 && st.visibility !== 'hidden' && st.display !== 'none' && !x.closest('[hidden]') && !x.closest('[aria-hidden="true"]') && !x.disabled && !(x.closest('.askbar') && x.matches('.mic,.send,.stop,.x')) && x.dataset.act !== 'ask-mic'; }).catch(() => false)) list.push(e); }
       return list;
     };
     const tap = async (pg, step) => {
@@ -105,7 +122,7 @@ const INPAGE = {
       for (let k = 0; k < 8; k++) {
         const s = await pg.evaluate(() => { const n = window.__ncgs; const st = n.UI.org ? n.UI.orgStack : n.UI.stack; return { top: (st[st.length - 1] || {}).v, org: n.UI.org, len: st.length, conf: !!n.UI.confirm }; });
         if (!s.org && s.top === 'home' && s.len === 1) return true;
-        const sel = ['[data-act="holes-close"]', '[data-act="contest-close"]', '[data-act="sheet-close"]', '[data-act="share-close"]', '[data-act="photo-close"]', '[data-act="fix-cancel"]', '[data-act="late-cancel"]', '[data-act="ask-cancel"]', '[data-act="entry-back"]', '[data-act="org-exit"]', '[data-act="back"]', '[data-act="home"]', '.tab[data-tab="hole"]'];
+        const sel = ['[data-act="holes-close"]', '[data-act="contest-close"]', '[data-act="sheet-close"]', '[data-act="share-close"]', '[data-act="photo-close"]', '[data-act="fix-cancel"]', '[data-act="late-cancel"]', '[data-act="ask-cancel"]', '[data-act="entry-back"]', '[data-act="org-exit"]', '[data-act="back"]', '[data-act="home"]', '#tabs:not([hidden]) .tab[data-tab="home"]', '.tab[data-tab="hole"]'];
         let hit = null;
         for (const q of sel) { const e = await pg.$(q); if (e && await e.isVisible()) { hit = e; break; } }
         if (!hit) return false;
@@ -195,7 +212,7 @@ const INPAGE = {
   await b.close();
   const bad = findings.filter(f => !['INFO', 'FLAKY'].includes(f.kind));
   console.log(`\n${bad.length} problems, ${findings.length - bad.length} notes`);
-  require('fs').writeFileSync('/tmp/crawl-findings.json', JSON.stringify(findings, null, 1));
+  require('fs').writeFileSync(process.env.CRAWL_OUT || require('path').join(require('os').tmpdir(), 'crawl-findings.json'), JSON.stringify(findings, null, 1));
   console.log(bad.length ? 'FAIL crawl' : 'all passed');
   process.exit(bad.length ? 1 : 0);
 })();
