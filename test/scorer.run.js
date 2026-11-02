@@ -68,6 +68,19 @@ const SCORING = '[data-act="set"], [data-act="save"], [data-act="pickup"], [data
     check('a scramble round asks the same question', sv === 'scorer' && /One phone per team keeps the score/.test(await pg.locator('main').innerText()), sv);
     if (sv === 'scorer') { await pg.click('[data-act="scorer-no"]'); await pg.waitForTimeout(250); }
     check('and following a scramble shows the team, with no scoring controls', /Team Stableford/.test(await pg.locator('main').innerText()) && !(await pg.$(SCORING)));
+    // Reviewer: on a phone that answered No, the organiser's Correct hole is still the correction screen (individual and scramble).
+    for (const fmt of ['individual', 'scramble']) {
+      await pg.evaluate(() => { localStorage.clear(); });
+      await pg.reload(); await pg.waitForFunction(() => window.__ncgs && window.__ncgs.DB.loaded);
+      await pg.evaluate(fmt => { const n = window.__ncgs, rid = n.liveRid(); n.ORGPIN.pin = '1234'; if (fmt === 'scramble') n.put('settings', [{ key: 'format:' + rid, value: 'scramble' }]); n.DB.prefs.me = n.D.round(rid).groups[0].teams.flat()[0]; n.DB.prefs.scorer = { [rid]: false }; }, fmt);
+      await pg.evaluate(() => window.__ncgs.flush().then(() => window.__ncgs.sync()));
+      await pg.evaluate(() => { const n = window.__ncgs, rid = n.liveRid(); n.UI.org = true; n.UI.orgUnlocked = true; n.UI.orgStack = [{ v: 'home', p: {} }, { v: 'round', p: { rid } }, { v: 'group', p: { rid, gid: 'g1' } }]; n.render(); });
+      await pg.waitForTimeout(200);
+      const btn = await pg.$('[data-act="org-go"][data-v="correct"]');
+      if (btn) { await btn.click(); await pg.waitForTimeout(300); }
+      const ok2 = !!btn && !!(await pg.$('[data-act="save"], [data-act="scr-save"]')) && !!(await pg.$('.stepper, [data-act="set"], [data-act="scr-score"]'));
+      check(`after No, the organiser's Correct hole still shows the score controls and Save (${fmt})`, ok2, `button ${!!btn}`);
+    }
     check('no script errors', errs.length === 0, errs.join(' | '));
   } catch (e) { console.error(e); ok = false; } finally { await b.close(); }
   console.log(ok ? 'all passed' : 'SOME FAILED'); process.exit(ok ? 0 : 1);

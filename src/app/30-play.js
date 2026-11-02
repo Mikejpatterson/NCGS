@@ -81,7 +81,7 @@ function myConflicts(rid, gid) { return DB.conflicts.filter(c => c.round === rid
    a hole saved on two phones) shows under the players on that screen. */
 VIEWS.tee = () => {
   const rid = playRid();
-  if (followingOnly(rid)) return VIEWS.follow();   // a phone that is only following never gets the scoring screens
+  if (!UI.org && followingOnly(rid)) return VIEWS.follow();   // a phone only following never gets the scoring screens (the organiser still corrects)
   if (isScramble(D.round(rid))) return VIEWS.scramble();
   const comp = computeR(rid);
   const g = myGroup(rid);
@@ -234,7 +234,7 @@ if (window.ResizeObserver) {
 }
 
 VIEWS.entry = () => {
-  if (followingOnly(playRid())) return VIEWS.follow();
+  if (!UI.org && followingOnly(playRid())) return VIEWS.follow();
   const ctx = entryCtx();
   if (isScramble(D.round(ctx.rid))) return VIEWS.scramble();
   const comp = computeR(ctx.rid);
