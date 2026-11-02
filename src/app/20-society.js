@@ -459,7 +459,7 @@ function dropRow(rid, x, inner, cls = 'lrow') {
   if (!r || !pl) return `<button class="${cls}" data-act="player" data-pid="${x.id}" data-year="${(r && r.season) || ''}">${inner}</button>`;
   const key = `bd-${rid}-${x.id}`, open = !!UI.open[key];
   const mine = myGroup(rid);
-  const fix = r.status === 'live' && !!mine && mine.teams.flat().includes(x.id);
+  const fix = r.status === 'live' && !followingOnly(rid) && !!mine && mine.teams.flat().includes(x.id);
   return `<button class="${cls} drop${open ? ' open' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}">${inner}</button>${open ? `<div class="dropcard">${cardParts(r, pl, fix, x.id).table}${fix ? '<p class="cap sc-note">Tap a score to change it</p>' : ''}</div>` : ''}`;
 }
 const dropChev = `<span class="chev dn">${chev}</span>`;
