@@ -1961,6 +1961,9 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .scr-dots.warn i:not(.on) { box-shadow: inset 0 0 0 1.5px var(--team-b); }
 .scr .scr-drv { grid-template-columns: minmax(0, 1fr); grid-template-areas: "nm" "dc"; row-gap: 6px; min-height: 64px; }
 .scr .scr-drv .scr-dots { grid-area: dc; }
+.scr .scr-drive-progress { grid-area: dc; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 8px; min-width: 0; }
+.scr .scr-drive-order { font-size: .8rem; font-weight: 500; line-height: 1.25; color: var(--sub); white-space: nowrap; }
+.scr .scr-drv.on .scr-drive-order { color: #fff; }
 .scr .scr-drv.on .scr-dots i { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.6); }
 .scr .scr-drv.on .scr-dots i.on { background: #fff; box-shadow: none; }
 .scr .scr-warn { margin: 8px 4px 0; font-size: .95rem; }
@@ -2348,7 +2351,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .round-trip-link .sub { color: var(--sub); font-size: .8rem; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611012235","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611021852","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -6732,9 +6735,14 @@ VIEWS.scramble = () => {
   /* In the order it happens (owner, 25 October): whose drive is picked walking off the tee, the score added on holing out.
      The drive choice is kept on this phone (it survives closing the app) until the score is saved with it. */
   const left = gc.left, tight = gc.atRisk || gc.impossible;
+  // Preview the selected hole once: remove its stored contribution before adding the draft choice.
+  // Official counts, minimum-drive warnings and saves still use the unchanged stored scores.
+  const savedDriver = gc.scramble[n] && gc.scramble[n].driver;
   html += sec(label('Drive'), `<div class="scr-drives" role="radiogroup" aria-label="Whose drive was used">${gc.team.map(pid => {
-    const on = d.driver === pid, k = gc.drives[pid] || 0;
-    return `<button class="scr-drv${on ? ' on' : ''}" role="radio" aria-checked="${on}" data-act="scr-driver" data-pid="${pid}" aria-label="${esc(D.nameOf(pid))}, ${plural(k, 'drive')}"${final ? ' disabled' : ''}><span class="scr-dn">${esc(D.nameOf(pid))}</span>${scrDots(k, gc.minDrives, tight && k < gc.minDrives)}</button>`;
+    const on = d.driver === pid, stored = gc.drives[pid] || 0;
+    const k = !final && d.driver ? stored - (savedDriver === pid ? 1 : 0) + (on ? 1 : 0) : stored;
+    const note = on && k > 0 ? ctx.edit || final || gc.holes[n].complete ? plural(k, 'drive') : `${ordinal(k)} drive` : '';
+    return `<button class="scr-drv${on ? ' on' : ''}" role="radio" aria-checked="${on}" data-act="scr-driver" data-pid="${pid}" aria-label="${esc(D.nameOf(pid))}, ${plural(k, 'drive')}${!final && d.driver ? ' after this selection' : ''}"${final ? ' disabled' : ''}><span class="scr-dn">${esc(D.nameOf(pid))}</span><span class="scr-drive-progress">${scrDots(k, gc.minDrives, tight && k < gc.minDrives)}${note ? `<span class="scr-drive-order">${note}</span>` : ''}</span></button>`;
   }).join('')}</div>`);
   // Say who still needs drives (UX review F13): amber while it can still be done, red once it can't.
   if (tight) {
