@@ -1931,7 +1931,7 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .scr .scr-val small { font-size: var(--t-body); font-weight: 600; color: var(--faint); }
 .scr .scr-meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 8px; min-height: 44px; }
 .scr .scr-meta .link { min-height: 44px; padding: 0 4px; font-weight: 700; }
-.scr .scr-drives { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 8px; }
+.scr .scr-drives { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .scr .scr-drv { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "av nm" "av dc"; column-gap: 10px; align-items: center; text-align: left; min-height: 64px; padding: 10px 12px; border-radius: 16px; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line); }
 .scr .scr-drv .av { grid-area: av; }
 .scr .scr-drv .scr-dn { grid-area: nm; font-weight: 700; overflow-wrap: break-word; min-width: 0; }
@@ -1988,8 +1988,8 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .scr > .sec .sec-label, .scr-finish > .sec .sec-label { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
 .scr > .sec .sec-label::after, .scr-finish > .sec .sec-label::after { content: ""; height: 1px; flex: 1; background: var(--pine); opacity: .3; }
 .scr .scr-drives { gap: 8px; }
-.scr .scr-drv { min-height: 72px; padding: 13px 14px; row-gap: 9px; border-radius: 14px; background: transparent; box-shadow: inset 0 0 0 1px #BCCAC0; }
-.scr .scr-drv .scr-dn { font-size: 1rem; font-weight: 600; }
+.scr .scr-drv { min-height: 72px; padding: 10px 12px; row-gap: 6px; border-radius: 14px; background: transparent; box-shadow: inset 0 0 0 1px #BCCAC0; }
+.scr .scr-drv .scr-dn { font-size: 1rem; font-weight: 600; overflow-wrap: anywhere; }
 .scr .scr-drv.on { background: var(--pine); box-shadow: inset 0 0 0 2px var(--pine); }
 .scr .scr-score { border-radius: 20px; padding: 16px; box-shadow: inset 0 0 0 1px var(--line); }
 .scr .scr-step { grid-template-columns: 60px minmax(0, 1fr) 60px; gap: 14px; }
@@ -1999,7 +1999,12 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .scr .scr-meta { margin-top: 4px; }
 .scr .scr-meta .sub { color: var(--pine); font-weight: 600; }
 .scr .scr-meta .link { font-weight: 500; }
-.scr .savebar { margin-top: 20px; }
+/* One team score uses the same compact row and controls as individual Stableford entry. */
+.scr .scr-score.bugs { padding: 0; border-radius: 20px; box-shadow: none; }
+.scr .scr-score .pr-top .nm { font-size: 1rem; font-weight: 600; }
+.scr .scr-score .pr.ptile { padding-block: 8px; }
+.scr .scr-score .scr-val { display: inline; min-height: 0; font: inherit; border-radius: 0; }
+.scr .savebar { margin-top: 20px; position: static; }
 .scr .scr-warn { margin: 10px 0 0; font-size: .85rem; line-height: 1.45; font-weight: 600; }
 .scr-standings > .sec { margin-top: 25px; }
 .scr-standings .sec-label { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; padding-bottom: 9px; border-bottom: 2px solid var(--pine); }
@@ -2010,10 +2015,10 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .scr-standings .scr-row .scr-name > b { color: var(--pine); font-size: 1.05rem; font-weight: 650; }
 .scr-standings .scr-row .scr-name small { display: inline-block; margin-left: 5px; font-size: .72rem; }
 .scr-standings .scr-row b.scr-pts { color: var(--pine); font-size: 1.45rem; font-weight: 650; line-height: 1.1; }
-.scr-standings .scr-row .scr-chips { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 7.5rem), 1fr)); gap: 8px 16px; margin-top: 10px; }
+.scr-standings .scr-row .scr-chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 16px; margin-top: 10px; }
 /* Long surnames: never split mid-word. The dots drop under the name when the name needs the room. */
 .scr-standings .scr-pd { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 6px; min-width: 0; }
-.scr-standings .scr-pd b { flex: 1 1 auto; min-width: 0; color: var(--text); font-size: .78rem; font-weight: 500; letter-spacing: 0; overflow-wrap: break-word; }
+.scr-standings .scr-pd b { flex: 0 1 auto; min-width: 0; max-width: 100%; color: var(--text); font-size: .9rem; font-weight: 500; letter-spacing: 0; overflow-wrap: break-word; }
 .scr-standings .scr-dots { flex: none; gap: 3px; }
 .scr-standings .scr-dots i { width: 8px; height: 8px; }
 .scr-standings .scr-row.low { padding-left: 8px; padding-right: 8px; background: var(--lead-tint); }
@@ -2343,7 +2348,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .round-trip-link .sub { color: var(--sub); font-size: .8rem; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611012212","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611021834","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -6825,11 +6830,16 @@ VIEWS.scramble = () => {
 
   const v = d.score;
   const pts = E.isEntered(v) ? E.stablefordPoints(v, h.par, shots) : null;
-  html += sec(label('Score'), `<div class="scr-score card" aria-label="Team score">
-    <div class="scr-step"><button class="scr-st" data-act="scr-score" data-dir="down" aria-label="One less for the team"${final ? ' disabled' : ''}>−</button>
-    <button class="scr-val num" data-act="scr-clear" aria-label="Team score ${E.isEntered(v) ? (v === 'P' ? 'picked up' : v) : 'not set'}"${final ? ' disabled' : ''}>${E.isEntered(v) ? (v === 'P' ? '–' : v) : `<small>Par ${h.par}</small>`}</button>
-    <button class="scr-st" data-act="scr-score" data-dir="up" aria-label="One more for the team"${final ? ' disabled' : ''}>+</button></div>
-    <div class="scr-meta"><span class="sub">${pts !== null ? `${pts} pts` : ''}${shots ? `${pts !== null ? ' · ' : ''}${plural(shots, 'shot')}` : ''}</span><button class="link" data-act="scr-pickup"${final ? ' disabled' : ''}>${v === 'P' ? 'Picked up' : 'Pick up'}</button></div></div>`);
+  const shown = v === 'P' ? E.pickupStrokes(h.par, shots) : v;
+  const scoreWord = pts === 0 ? 'Scratch' : Number.isInteger(v) ? E.scoreName(v, h.par) : '';
+  html += sec(label('Score'), `<div class="bugs b0 scr-score" aria-label="Team score"><div class="pr ptile">
+    <div class="pr-top"><span class="nm"><span class="nmrow">${esc(gc.name)}</span></span>
+    <button class="pu ${v === 'P' ? 'on' : ''}" data-act="scr-pickup"${final ? ' disabled' : ''}>${v === 'P' ? 'Picked up' : 'Pick up'}</button></div>
+    <div class="stepper" role="group" aria-label="Team strokes">
+    ${E.isEntered(v) ? `<button class="stv${pts === 0 ? ' out' : ''}" data-act="scr-clear" aria-label="Team score ${shown} strokes, ${plural(pts, 'point')}. Tap to clear"${final ? ' disabled' : ''}><b><span class="scr-val">${shown}</span><sup>${pts}</sup></b><small>${scoreWord}</small></button>` : `<div class="stv none">Par ${h.par}</div>`}
+    <button class="st" data-act="scr-score" data-dir="down" aria-label="One less for the team"${final ? ' disabled' : ''}>−</button>
+    <button class="st" data-act="scr-score" data-dir="up" aria-label="One more for the team"${final ? ' disabled' : ''}>+</button></div>
+    </div></div>`);
 
   const ready = E.isEntered(d.score) && d.driver;
   const lbl = ctx.mode === 'org' ? 'Save correction' : ctx.edit || gc.holes[n].complete ? 'Save changes' : `Save hole ${n}`;
@@ -6899,6 +6909,7 @@ VIEWS.scrambleFinish = () => {
     <button class="btn" data-act="leaderboard" data-rid="${rid}">See the teams</button></div>`;
   return { html, tabs: 'hole' };
 };
+
 
 /* ---- 35-rules.js ---- */
 /* ----- Rules checker: ask about the Rules of Golf, checked live against the official rules ----- */
