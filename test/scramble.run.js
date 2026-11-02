@@ -97,6 +97,16 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
     check('during play a scramble\'s Groups says the teams are fixed, with nothing to tap', /teams are fixed/.test(await text()) && !(await page.locator('[data-act="grp-pick"]').count()));
 
     check('nothing runs off the side', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    // Stroke play (owner, 2 November): no pick-up. A draft from before the change holding one is never saved.
+    const pu = await page.evaluate(() => {
+      const n = window.__ncgs, r = n.D.round('fx-wp2'), g = r.groups[0], pid = g.teams.flat()[0], hole = 18;
+      n.DB.prefs.drafts = n.DB.prefs.drafts || {}; n.DB.prefs.drafts['fx-wp2'] = { [g.id]: { [hole]: { score: 'P', driver: pid } } };
+      n.UI.org = false; n.UI.hole = hole; n.UI.teeHole = hole; n.UI.edit = true; n.UI.stack = [{ v: 'home', p: {} }, { v: 'entry', p: { rid: 'fx-wp2' } }]; n.render();
+      return { before: n.DB.outbox.length, pickup: !!document.querySelector('[data-act="scr-pickup"]') };
+    });
+    if (await page.locator('[data-act="scr-save"]').count()) { await page.click('[data-act="scr-save"]'); await page.waitForTimeout(150); }
+    const after = await page.evaluate(() => window.__ncgs.DB.outbox.filter(i => i.req && i.req.op === 'saveHole' && Object.values(i.req.scores || {}).some(x => x && x.v === 'P')).length);
+    check('no Pick up button, and an old pick-up draft is never saved', !pu.pickup && after === 0);
     check('no script errors', errors.length === 0); if (errors.length) console.log(errors);
   } catch (e) { console.error(e); ok = false; } finally { await browser.close(); }
   console.log(ok ? 'all passed' : 'SOME FAILED'); process.exit(ok ? 0 : 1);

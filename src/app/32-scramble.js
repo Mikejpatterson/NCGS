@@ -110,7 +110,7 @@ VIEWS.scramble = () => {
     <button class="st" data-act="scr-score" data-dir="up" aria-label="One more for the team"${final ? ' disabled' : ''}>+</button></div>
     </div></div>`);
 
-  const ready = E.isEntered(d.score) && d.driver;
+  const ready = Number.isInteger(d.score) && d.driver;
   const lbl = ctx.mode === 'org' ? 'Save correction' : ctx.edit || gc.holes[n].complete ? 'Save changes' : `Save hole ${n}`;
   html += `<div class="savebar">${final && ctx.mode === 'player' ? `<button class="btn" data-act="leaderboard" data-rid="${rid}">See the results</button>` : `<button class="btn ${ready ? '' : 'quiet'}" data-act="scr-save"${final ? ' disabled' : ''}>${lbl}</button>`}${saveWarning()}</div></div>`;
   if (ctx.mode === 'player') html += holesSheet(rid, gc, n);
@@ -142,7 +142,8 @@ function scrSave() {
   if (!x) return;
   const { ctx, gc, d } = x;
   const r = D.round(ctx.rid);
-  if (!E.isEntered(d.score) || !d.driver) { toast(E.isEntered(d.score) ? 'Pick whose drive was used' : 'Set the team score first'); return; }
+  // Stroke play: only a number of strokes is saved, never a pick-up (a draft from before 2 November may still hold one).
+  if (!Number.isInteger(d.score) || !d.driver) { toast(Number.isInteger(d.score) ? 'Pick whose drive was used' : 'Set the team score first'); return; }
   if (r.status === 'final') { toast('This round is final. Reopen it to change scores.'); return; }
   const st = scrStored(ctx.rid, gc, ctx.n);
   const scores = {};
