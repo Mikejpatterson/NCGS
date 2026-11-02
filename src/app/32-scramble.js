@@ -83,9 +83,14 @@ VIEWS.scramble = () => {
   /* In the order it happens (owner, 25 October): whose drive is picked walking off the tee, the score added on holing out.
      The drive choice is kept on this phone (it survives closing the app) until the score is saved with it. */
   const left = gc.left, tight = gc.atRisk || gc.impossible;
+  // Preview the selected hole once: remove its stored contribution before adding the draft choice.
+  // Official counts, minimum-drive warnings and saves still use the unchanged stored scores.
+  const savedDriver = gc.scramble[n] && gc.scramble[n].driver;
   html += sec(label('Drive'), `<div class="scr-drives" role="radiogroup" aria-label="Whose drive was used">${gc.team.map(pid => {
-    const on = d.driver === pid, k = gc.drives[pid] || 0;
-    return `<button class="scr-drv${on ? ' on' : ''}" role="radio" aria-checked="${on}" data-act="scr-driver" data-pid="${pid}" aria-label="${esc(D.nameOf(pid))}, ${plural(k, 'drive')}"${final ? ' disabled' : ''}><span class="scr-dn">${esc(D.nameOf(pid))}</span>${scrDots(k, gc.minDrives, tight && k < gc.minDrives)}</button>`;
+    const on = d.driver === pid, stored = gc.drives[pid] || 0;
+    const k = !final && d.driver ? stored - (savedDriver === pid ? 1 : 0) + (on ? 1 : 0) : stored;
+    const note = on && k > 0 ? ctx.edit || final || gc.holes[n].complete ? plural(k, 'drive') : `${ordinal(k)} drive` : '';
+    return `<button class="scr-drv${on ? ' on' : ''}" role="radio" aria-checked="${on}" data-act="scr-driver" data-pid="${pid}" aria-label="${esc(D.nameOf(pid))}, ${plural(k, 'drive')}${!final && d.driver ? ' after this selection' : ''}"${final ? ' disabled' : ''}><span class="scr-dn">${esc(D.nameOf(pid))}</span><span class="scr-drive-progress">${scrDots(k, gc.minDrives, tight && k < gc.minDrives)}${note ? `<span class="scr-drive-order">${note}</span>` : ''}</span></button>`;
   }).join('')}</div>`);
   // Say who still needs drives (UX review F13): amber while it can still be done, red once it can't.
   if (tight) {

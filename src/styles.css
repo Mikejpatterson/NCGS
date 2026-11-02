@@ -1951,6 +1951,9 @@ h1.title:not(.is-name), h1.big, .hrow2 h1.big { font-variant-numeric: lining-num
 .scr-dots.warn i:not(.on) { box-shadow: inset 0 0 0 1.5px var(--team-b); }
 .scr .scr-drv { grid-template-columns: minmax(0, 1fr); grid-template-areas: "nm" "dc"; row-gap: 6px; min-height: 64px; }
 .scr .scr-drv .scr-dots { grid-area: dc; }
+.scr .scr-drive-progress { grid-area: dc; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 8px; min-width: 0; }
+.scr .scr-drive-order { font-size: .8rem; font-weight: 500; line-height: 1.25; color: var(--sub); white-space: nowrap; }
+.scr .scr-drv.on .scr-drive-order { color: #fff; }
 .scr .scr-drv.on .scr-dots i { box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.6); }
 .scr .scr-drv.on .scr-dots i.on { background: #fff; box-shadow: none; }
 .scr .scr-warn { margin: 8px 4px 0; font-size: .95rem; }
