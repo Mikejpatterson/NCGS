@@ -97,6 +97,15 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
     check('during play a scramble\'s Groups says the teams are fixed, with nothing to tap', /teams are fixed/.test(await text()) && !(await page.locator('[data-act="grp-pick"]').count()));
 
     check('nothing runs off the side', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    // Reviewer, 2 November: the organiser's team screen shows the score against par, not points.
+    await go([{ v: 'home', p: {} }, { v: 'round', p: { rid: 'fx-wp2' } }, { v: 'group', p: { rid: 'fx-wp2', gid: 'g1' } }], true);
+    const sub = await page.locator('header .sub').first().innerText();
+    check('the organiser\'s team header shows the score against par, not points', /(^|· )(E|[+\u2212]\d+)$/.test(sub.trim()) && !/pts/.test(sub), sub);
+    // A finished scramble has no share card yet, so it offers no Share button that would open "No results yet".
+    const shareOk = await page.evaluate(() => { const n = window.__ncgs, r = n.D.round('fx-wp2'); const was = r.status; r.status = 'final'; n.DB._view = null; n.DB._memo = {};
+      n.UI.org = false; n.UI.board = 'fx-wp2'; n.UI.res = 'lb'; n.UI.stack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'fx-wp2' } }]; n.render();
+      const has = !!document.querySelector('[data-act="results"]'); r.status = was; n.DB._view = null; n.DB._memo = {}; n.render(); return !has; });
+    check('a finished scramble shows no Share results button', shareOk);
     // Stroke play (owner, 2 November): no pick-up. A draft from before the change holding one is never saved.
     const pu = await page.evaluate(() => {
       const n = window.__ncgs, r = n.D.round('fx-wp2'), g = r.groups[0], pid = g.teams.flat()[0], hole = 18;

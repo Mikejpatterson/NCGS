@@ -253,7 +253,7 @@ ORG.group = p => {
       const h = gc.scramble[n], dbl = gc.holes[n].double;
       return `<button class="row" data-act="org-go" data-v="correct" data-rid="${p.rid}" data-gid="${gc.id}" data-n="${n}" aria-label="Correct hole ${n}"><span class="b num">${n}</span><span class="right">${dbl ? '<span class="pill w">Two drives</span>' : h.driver ? `<span class="sub">${esc(D.nameOf(h.driver))}</span><span class="b num">${Number.isInteger(h.gross) ? h.gross : '–'}</span>` : '<span class="sub">–</span>'}${chev}</span></button>`;
     }).join('');
-    return { html: `<header class="hero s">${navBack('Round')}<div class="head"><h1 class="title">${esc(gc.name)}</h1></div><p class="sub">${esc(gc.team.map(D.nameOf).join(', '))} · ${gc.total} pts</p></header>${sec(label('Holes'), cardOf(rows))}` };
+    return { html: `<header class="hero s">${navBack('Round')}<div class="head"><h1 class="title">${esc(gc.name)}</h1></div><p class="sub">${esc(gc.team.map(D.nameOf).join(', '))} · ${E.toParLabel(gc.toPar)}</p></header>${sec(label('Holes'), cardOf(rows))}` };
   }
   const comp = computeR(p.rid);
   const gc = comp.groups.find(g => g.id === p.gid);
