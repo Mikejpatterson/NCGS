@@ -106,6 +106,18 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
       n.UI.org = false; n.UI.board = 'fx-wp2'; n.UI.res = 'lb'; n.UI.stack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'fx-wp2' } }]; n.render();
       const has = !!document.querySelector('[data-act="results"]'); r.status = was; n.DB._view = null; n.DB._memo = {}; n.render(); return !has; });
     check('a finished scramble offers Share results', !shareOk);
+    // Owner, 2 November: one heavy rule under "Teams", the tab says Round, and a team opens to its hole-by-hole card.
+    await page.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.open = {}; n.UI.board = 'fx-wp2'; n.UI.res = 'lb'; n.UI.stack = [{ v: 'home', p: {} }, { v: 'board', p: {} }]; n.render(); });
+    check('the Results tab says Round, not Scores', /Round/.test(await page.locator('.pills').innerText().catch(() => '')) && !/Scores/.test(await page.locator('.pills').innerText().catch(() => '')));
+    check('one rule under Teams, not two', await page.evaluate(() => getComputedStyle(document.querySelector('.scr-standings .scr-row')).borderTopWidth === '0px'));
+    const teamName = await page.locator('.scr-row .scr-name b').first().innerText();
+    await page.click('.scr-row >> nth=0'); await page.waitForTimeout(200);
+    const dc = await page.locator('.scr-standings .dropcard').first().innerText().catch(() => '');
+    const cells = await page.$$eval('.scr-standings .dropcard td.drv', e => e.filter(x => x.textContent.trim()).length);
+    check(`tapping ${teamName} opens its card: strokes, whose drive and the score against par`, /Hole/.test(dc) && /Drive/.test(dc) && cells > 0 && /strokes/.test(dc) && /(E|[+\u2212]\d+)\s*$/.test(dc.trim()), dc.slice(-80));
+    check('the open card fits the phone', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
+    await page.click('.scr-row >> nth=0'); await page.waitForTimeout(150);
+    check('tapping again closes it', !(await page.$('.scr-standings .dropcard')));
     // Owner, 2 November: the share card for a scramble, teams by score against par.
     await page.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.stack = [{ v: 'home', p: {} }, { v: 'results', p: { rid: 'fx-wp2' } }]; n.render(); });
     const rcard = await page.locator('#rcard').innerText().catch(() => '');

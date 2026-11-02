@@ -870,7 +870,7 @@ VIEWS.board = () => {
   const page = html => ({ tabs: 'board', html: `<div class="results-page">${html}</div>` });
   let html = `${backTo}<header class="hero c lbhead"><div class="results-meta"><span>Leaderboard</span>${live0 ? `<span class="results-live"><span class="pulse"></span>Live${thru0 ? ' · thru ' + thru0 : ''}</span>` : r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r)}</div><div class="hrow2"><h1 class="big">${esc(roundName(r))}</h1></div><p class="sub">${isScramble(r) ? 'Team scramble' : 'Stableford'}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''}</p></header>`;
   if (avail.length > 1) {
-    const names = { lb: 'Scores', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
+    const names = { lb: 'Round', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };   // "Round", not "Scores" (owner, 2 November)
     html += `<div class="seg pills${avail.length > 3 ? ' four' : ''}" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
   }
   if (pillSel === 'bw') return page(html + buggyView(sel).html);

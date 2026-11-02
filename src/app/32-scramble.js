@@ -40,13 +40,29 @@ const scrOwed = t => t.team.reduce((s, pid) => s + Math.max(0, t.minDrives - (t.
 
 /* The team results, best first. The KBs are marked; there is no winners' presentation (owner: avoiding last place is
    the drama). Drives under the minimum and holes with two drives saved are shown plainly. */
+/* A team's card: strokes on each hole (birdies circled, as on a player's card), whose drive, and the totals against par. */
+function scrTeamCard(r, t) {
+  const holes = holesOf(r), front = holes.slice(0, 9), back = holes.slice(9);
+  const hs = t.scramble || t.holes;   // a team's per-hole strokes (scrambleOf keeps them under `scramble`)
+  const ini = pid => esc(initialsOf(D.member(pid) || { name: D.nameOf(pid) }));
+  const cell = h => { const x = hs[h.n] || {}; return `<td class="hn">${h.n}${x.shots ? ` <span class="sd">${x.shots > 0 ? '\u25CF'.repeat(x.shots) : '\u25CB'.repeat(-x.shots)}</span>` : ''}</td><td class="par">${h.par}</td><td>${Number.isInteger(x.gross) ? markCell(x.gross, h.par, 0) : ''}</td><td class="sub drv">${x.driver && Number.isInteger(x.gross) ? ini(x.driver) : ''}</td>`; };
+  const tot = list => { const g = list.filter(h => hs[h.n] && Number.isInteger(hs[h.n].gross)); return { par: list.reduce((a, h) => a + h.par, 0), strokes: g.length ? g.reduce((a, h) => a + hs[h.n].gross, 0) : '\u2013' }; };
+  const F = tot(front), B = tot(back);
+  const table = `<table class="sc scr-sc"><thead><tr><th class="hn">Hole</th><th>Par</th><th>Score</th><th>Drive</th><th class="gap"></th><th class="hn">Hole</th><th>Par</th><th>Score</th><th>Drive</th></tr></thead>
+    <tbody>${front.map((h, i) => `<tr>${cell(h)}<td class="gap"></td>${back[i] ? cell(back[i]) : '<td></td><td></td><td></td><td></td>'}</tr>`).join('')}
+    <tr class="tot"><td class="hn">Out</td><td>${F.par}</td><td>${F.strokes}</td><td></td><td class="gap"></td><td class="hn">In</td><td>${B.par}</td><td>${B.strokes}</td><td></td></tr></tbody></table>`;
+  const sum = [t.played ? `${t.strokes} strokes` : 'No holes yet', t.teamShots ? (t.teamShots > 0 ? `${t.teamShots} team ${t.teamShots === 1 ? 'shot' : 'shots'} off` : `${-t.teamShots} added`) : '', E.toParLabel(t.toPar)].filter(Boolean).join(' \u00B7 ');
+  return table + `<p class="cap scr-sum">${sum}</p>`;
+}
 function scrambleTable(r, res) {
   const teams = res.teams || [];
   if (!teams.length) return sec(label('Teams'), cardOf('<div class="row"><span class="sub">Teams are not drawn yet</span></div>'));
   const rows = teams.map(t => {
     const thru = t.complete ? 'finished' : t.played ? `thru ${t.played}` : '';
     const flag = t.doubles.length ? ` <span class="pill w" title="Two drives saved">Check ${t.doubles.join(', ')}</span>` : '';
-    return `<div class="lrow scr-row${t.kb ? ' low' : ''}"><span class="sub scr-pos">${esc(t.posLabel)}</span><span class="scr-name"><b>${esc(t.name)}</b> <small>${esc(thru)}</small>${t.kb ? ' <span class="pill w">KBs</span>' : ''}${flag}</span><b class="scr-pts num" aria-label="${esc(t.toPar === 0 ? 'level par' : E.toParLabel(t.toPar))}">${E.toParLabel(t.toPar)}</b>${scrDriveChips(t)}</div>`;
+    // Tap a team for its hole-by-hole card (owner, 2 November).
+    const key = `scr-${r.id}-${t.id}`, open = !!UI.open[key];
+    return `<button class="lrow scr-row drop${open ? ' open' : ''}${t.kb ? ' low' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}"><span class="sub scr-pos">${esc(t.posLabel)}</span><span class="scr-name"><b>${esc(t.name)}</b> <small>${esc(thru)}</small><span class="chev dn scr-chev">${chev}</span>${t.kb ? ' <span class="pill w">KBs</span>' : ''}${flag}</span><b class="scr-pts num" aria-label="${esc(t.toPar === 0 ? 'level par' : E.toParLabel(t.toPar))}">${E.toParLabel(t.toPar)}</b>${scrDriveChips(t)}</button>${open ? `<div class="dropcard">${scrTeamCard(r, t)}</div>` : ''}`;
   }).join('');
   return `<div class="scr-standings">${sec(label('Teams') + `<span class="scr-legend">Drives · ${teams[0].minDrives} each</span>`, cardOf(rows))}</div>`;
 }
