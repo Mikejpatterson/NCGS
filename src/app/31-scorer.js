@@ -35,7 +35,7 @@ VIEWS.follow = () => {
     const where = t.complete ? 'Finished' : t.played ? `Thru ${t.played}` : 'Not started';
     return {
       tabs: 'hole',
-      html: `<header class="hero c pine entcard follow-top"><div class="entrow"><div class="entl"><small>${esc(t.name.toUpperCase())}</small><b class="entn num">${t.total}</b></div><div class="entr"><b>${where}</b><span>Team Stableford</span></div></div></header>
+      html: `<header class="hero c pine entcard follow-top"><div class="entrow"><div class="entl"><small>${esc(t.name.toUpperCase())}</small><b class="entn num">${E.toParLabel(t.toPar)}</b></div><div class="entr"><b>${where}</b><span>${t.played ? `${t.strokes} strokes` : 'Stroke play'}</span></div></div></header>
         <p class="sub" style="margin:12px 0 0">You're following. The team's scorer puts in the scores.</p>
         ${results}${switchLink}`
     };

@@ -27,7 +27,7 @@ let ok=true; const check=(s,v)=>{console.log((v?'PASS  ':'FAIL  ')+s);if(!v)ok=f
  const tile=i=>p.locator('[data-act="scr-driver"]').nth(i), dots=async i=>tile(i).locator('.scr-dots i.on').count(),note=async i=>tile(i).locator('.scr-drive-order').allTextContents();
  const unchanged=async snapshot=>p.evaluate(s=>{const t=window.__ncgs.DB.server.tables;return s===JSON.stringify([t.rounds,t.scores,t.claims,t.winners]);},snapshot);
  for(const [label,width,size,long]of [['360',360,19,false],['390',390,19,false],['393',393,19,false],['large-long',393,25.65,true]]){
-  const f=await fresh({width,size,long,pickup:true});const oldHeight=await tile(0).evaluate(e=>e.getBoundingClientRect().height);
+  const f=await fresh({width,size,long});const oldHeight=await tile(0).evaluate(e=>e.getBoundingClientRect().height);
   check(label+': unselected tiles show the saved counts',await dots(0)===1&&await dots(1)===1&&await p.locator('.scr-drive-order').count()===0);
   await shot(label+'-unselected');
   await tile(0).click();
@@ -41,9 +41,10 @@ let ok=true; const check=(s,v)=>{console.log((v?'PASS  ':'FAIL  ')+s);if(!v)ok=f
   await tile(2).click();check(label+': a new driver gets a first-drive preview',await dots(2)===1&&(await note(2)).join()==='1st drive');
   check(label+': selections never change stored round/score/claim/winner data',await unchanged(f.snapshot));
   await p.evaluate(()=>{const n=window.__ncgs;n.UI.board='fx-wp2';n.UI.res='lb';n.UI.stack=[{v:'home',p:{}},{v:'board',p:{}}];n.render();});
-  check(label+': Results still shows actual saved counts',await p.locator('.scr-row').first().locator('.scr-pd').evaluateAll(es=>es.map(e=>e.querySelectorAll('i.on').length).join()==='1,1,0,0'));
+  check(label+': Results still shows actual saved counts',await p.locator('.scr-row').filter({hasText:'Team 1'}).locator('.scr-pd').evaluateAll(es=>es.map(e=>e.querySelectorAll('i.on').length).join()==='1,1,0,0'));
  }
- let f=await fresh({edit:true});check('opening a saved hole does not add another drive',await dots(0)===2&&(await note(0)).join()==='2 drives');
+ let f=await fresh({pickup:true});check('a legacy pick-up retains its recorded tee-shot count',await dots(0)===1);await tile(0).click();check('a legacy stroke score needing correction does not erase its drive from the preview',await dots(0)===2&&(await note(0)).join()==='2nd drive'&&await unchanged(f.snapshot));
+ f=await fresh({edit:true});check('opening a saved hole does not add another drive',await dots(0)===2&&(await note(0)).join()==='2 drives');
  await tile(1).click();check('replacing a saved driver removes the old contribution before adding the new one',await dots(0)===1&&await dots(1)===2&&(await note(1)).join()==='2 drives'&&await unchanged(f.snapshot));
  f=await fresh({clash:true});await tile(0).click();check('conflicting saved drives contribute nothing until resolved: the preview adds only one',await dots(0)===2&&await dots(1)===1&&/Two drives saved/.test(await p.locator('main').innerText())&&await unchanged(f.snapshot));
  for(const [count,word]of [[3,'4th'],[10,'11th'],[11,'12th'],[12,'13th']]){f=await fresh({count});await tile(0).click();check(word+' drive: ordinal stays explicit after the three-dot minimum is full',await dots(0)===3&&(await note(0)).join()===word+' drive'&&await unchanged(f.snapshot));}

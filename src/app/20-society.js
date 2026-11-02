@@ -54,7 +54,7 @@ function miniBoard(r) {
     let show = teams.slice(0, 3);
     const mine = g ? teams.find(t => t.id === g.id) : null;
     if (mine && !show.includes(mine)) show = [show[0], show[1], mine];
-    return `<div class="mini num">${show.map(t => `<div class="mr${mine === t ? ' me' : ''}"><span class="mp">${esc(t.posLabel)}</span><span class="mn">${esc(t.name)}</span><span class="mt">${t.total}</span></div>`).join('')}</div>`;
+    return `<div class="mini num">${show.map(t => `<div class="mr${mine === t ? ' me' : ''}"><span class="mp">${esc(t.posLabel)}</span><span class="mn">${esc(t.name)}</span><span class="mt">${E.toParLabel(t.toPar)}</span></div>`).join('')}</div>`;
   }
   const rows = res && res.rows ? res.rows : [];
   if (!rows.length) return '';
@@ -504,7 +504,7 @@ function finishedCard(r, res) {
     const kb = (res.teams || []).filter(t => t.kb);
     const sub = [roundName(r), r.date ? fmtDate(r.date, true) : ''].filter(Boolean).join(' · ');
     return `<div class="fincard"><div class="finrow"><span class="fink">KBS</span><span class="finfinal">Final</span></div>
-      <div class="finwin"><div class="finwho"><b class="finname">${esc(kb.map(t => t.name).join(' & ') || '–')}</b><h1 class="finsub">${esc(kb.map(scrNames).join(' · ') || sub)}</h1></div><b class="finpts">${kb.length ? kb[0].total : ''}</b></div></div>`;
+      <div class="finwin"><div class="finwho"><b class="finname">${esc(kb.map(t => t.name).join(' & ') || '–')}</b><h1 class="finsub">${esc(kb.map(scrNames).join(' · ') || sub)}</h1></div><b class="finpts">${kb.length ? E.toParLabel(kb[0].toPar) : ''}</b></div></div>`;
   }
   const top = res.rows.filter(x => x.pos === 1);
   const names = top.map(x => D.nameOf(x.id)).join(' & ');
@@ -513,7 +513,8 @@ function finishedCard(r, res) {
     <div class="finwin"><div class="finwho"><b class="finname">${esc(names)}${CUP}</b><h1 class="finsub">${esc(sub)}</h1></div><b class="finpts">${top[0].total}</b></div></div>`;
 }
 function finishedBody(r, res) {
-  if (res.source === 'scramble') return scrambleTable(r, res) + contestsBlock(res) + `<button class="btn" data-act="results" data-rid="${r.id}">Share results</button>`;
+  // No share card for a scramble yet, so no Share button: it opened "No results yet" (reviewer, 2 November).
+  if (res.source === 'scramble') return scrambleTable(r, res) + contestsBlock(res);
   const app = res.source === 'app';
   const all = !!UI.open['all-' + r.id], many = res.rows.length > 8;
   const shown = all || !many ? res.rows : res.rows.slice(0, 8);

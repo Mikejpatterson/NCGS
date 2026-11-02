@@ -67,7 +67,8 @@ const SCORING = '[data-act="set"], [data-act="save"], [data-act="pickup"], [data
     const sv = await pg.evaluate(() => { const s = window.__ncgs.UI.stack; return s[s.length - 1].v; });
     check('a scramble round asks the same question', sv === 'scorer' && /One phone per team keeps the score/.test(await pg.locator('main').innerText()), sv);
     if (sv === 'scorer') { await pg.click('[data-act="scorer-no"]'); await pg.waitForTimeout(250); }
-    check('and following a scramble shows the team, with no scoring controls', /Team Stableford/.test(await pg.locator('main').innerText()) && !(await pg.$(SCORING)));
+    const ft = await pg.locator('.follow-top').innerText().catch(() => '');
+    check('and following a scramble shows the team\'s score against par, with no points and no scoring controls', /(^|\n)(E|[+\u2212]\d+)(\n|$)/.test(ft) && /strokes|Stroke play/.test(ft) && !/pts|Stableford|points/i.test(await pg.locator('main').innerText()) && !(await pg.$(SCORING)), ft);
     // Reviewer: on a phone that answered No, the organiser's Correct hole is still the correction screen (individual and scramble).
     for (const fmt of ['individual', 'scramble']) {
       await pg.evaluate(() => { localStorage.clear(); });
