@@ -11,6 +11,7 @@ let ok = true; const check = (n, c, x) => { console.log((c ? 'PASS  ' : 'FAIL  '
   const tap = async s => { await pg.click(s, { timeout: 4000 }); await pg.waitForTimeout(140); };
   const have = async s => !!(await pg.$(s)) && await (await pg.$(s)).isVisible();
   await tap('#tabs .tab:nth-child(2)');
+  if (await pg.$('[data-act="scorer-yes"]')) { await pg.click('[data-act="scorer-yes"]'); await pg.waitForTimeout(250); }   // this phone keeps the score
   check('Hole tab opens the score entry', await top() === 'tee' && !!(await pg.$('.entry .stepper')), await top());
   let holes = 0, seen = new Set();
   for (let guard = 0; guard < 60; guard++) {
