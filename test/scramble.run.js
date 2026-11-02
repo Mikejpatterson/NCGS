@@ -114,7 +114,7 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
     await page.click('.scr-row >> nth=0'); await page.waitForTimeout(200);
     const dc = await page.locator('.scr-standings .dropcard').first().innerText().catch(() => '');
     const cells = await page.$$eval('.scr-standings .dropcard td.drv', e => e.filter(x => x.textContent.trim()).length);
-    check(`tapping ${teamName} opens its card: strokes, whose drive and the score against par`, /Hole/.test(dc) && /Drive/.test(dc) && cells > 0 && /strokes/.test(dc) && /(E|[+\u2212]\d+)\s*$/.test(dc.trim()), dc.slice(-80));
+    check(`tapping ${teamName} opens its card: strokes, whose drive and the score against par`, /Hole/.test(dc) && /By/.test(dc) && cells > 0 && /strokes/.test(dc) && /(E|[+\u2212]\d+)\s*$/.test(dc.trim()), dc.slice(-80));
     check('the open card fits the phone', await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth));
     // Reviewer: at 360px and 135% text every heading and cell in the open card stays whole.
     await page.setViewportSize({ width: 360, height: 800 }); await page.addStyleTag({ content: 'html{font-size:135%}' }); await page.waitForTimeout(150);
