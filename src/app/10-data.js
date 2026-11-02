@@ -338,7 +338,7 @@ function scrambleOf(rid) {
       const team = g.teams.flat();
       const res = E.scrambleTeam(team, holes, (pid, n) => (sc[pid] || {})[n], shots[g.id] || 0);
       const hs = {};
-      holes.forEach(h => { hs[h.n] = { complete: res.holes[h.n].points !== null, double: res.doubles.includes(h.n) }; });
+      holes.forEach(h => { hs[h.n] = { complete: res.holes[h.n].toPar !== null, double: res.doubles.includes(h.n) }; });
       const order = E.playOrder(g.startHole);
       return Object.assign({}, res, { id: g.id, n: g.n, name: 'Team ' + g.n, teams: g.teams, team, teeTime: g.teeTime, holes: hs, scramble: res.holes, holesDone: res.played, nextHole: order.find(n => !hs[n].complete) || null });
     });

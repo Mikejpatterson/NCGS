@@ -79,7 +79,6 @@ const ACT = {
   'intro-scrim': () => {},
   save: () => saveHole(),
   'scr-score': el => scrScore(el.dataset.dir),
-  'scr-pickup': () => scrPickup(),
   'scr-clear': () => scrClear(),
   'scr-driver': el => scrDriver(el.dataset.pid),
   'scr-save': () => scrSave(),
@@ -476,8 +475,8 @@ const FORMS = {
     const out = {};
     for (const g of r.groups || []) {
       const v = val('ts-' + g.id);
-      const k = v === '' ? 0 : Number(v);
-      if (!(Number.isInteger(k) && k >= 0 && k <= 36)) { UI.formError = `Team ${g.n}: a whole number of shots, 0 to 36.`; render(); return; }
+      const k = v === '' ? 0 : Number(String(v).trim().replace(/^[\u2212\u2013]/, '-'));
+      if (!(Number.isInteger(k) && k >= -18 && k <= 36)) { UI.formError = `Team ${g.n}: a whole number from -18 to 36 (a minus number adds strokes).`; render(); return; }
       out[g.id] = k;
     }
     put('settings', [{ key: 'teamshots:' + r.id, value: JSON.stringify(out) }], { action: 'Team shots', detail: `${roundName(r)}: ${(r.groups || []).map(g => `Team ${g.n} ${out[g.id]}`).join(', ')}` });

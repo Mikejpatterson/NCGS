@@ -582,39 +582,58 @@
    *  then the next best scores in turn. Only identical full records stay tied.
    *  results: [{ rid, scores: { pid: points } }]. */
   /* Scramble (Westport day two, owner brief §6): four players, one team score per hole. The team's strokes are saved in
-     the scores row of the player whose drive was used, so one row per hole records both. Team shots are the organiser's
-     manual allowance (normally 0). Each player must have at least `minDrives` drives used (normally 3). */
+     the scores row of the player whose drive was used, so one row per hole records both. Each player must have at least
+     `minDrives` drives used (normally 3).
+     Stroke play, not Stableford (owner, 2 November): the team's strokes count against par, lowest wins. Team shots move
+     the team's starting point: they come off the total, and a minus number adds strokes (a strong team can start at +1).
+     There is no pick-up in a scramble: a hole counts only once it has a number of strokes. */
   function scrambleTeam(team, holes, strokesOf, teamShots, minDrives) {
     const min = minDrives === undefined ? 3 : minDrives;
-    const ph = Number(teamShots) || 0;
+    const ts = Number(teamShots) || 0;
     const per = {}, drives = {}, doubles = [];
     team.forEach(p => { drives[p] = 0; });
     holes.forEach(h => {
-      const shots = shotsOnHole(ph, h.si);
       const filled = team.filter(p => isEntered(strokesOf(p, h.n)));
       if (filled.length > 1) doubles.push(h.n);   // two drives recorded (two phones at once): shown, never guessed
-      if (filled.length !== 1) { per[h.n] = { gross: null, driver: null, shots, points: null }; return; }
+      if (filled.length !== 1) { per[h.n] = { gross: null, driver: null, par: h.par, toPar: null }; return; }
       const d = filled[0], gross = strokesOf(d, h.n);
       drives[d]++;
-      per[h.n] = { gross, driver: d, shots, points: stablefordPoints(gross, h.par, shots) };
+      // A pick-up saved before the change has no stroke count, so the hole is not counted until it is corrected.
+      per[h.n] = Number.isInteger(gross) ? { gross, driver: d, par: h.par, toPar: gross - h.par } : { gross, driver: d, par: h.par, toPar: null };
     });
-    const played = holes.filter(h => per[h.n].points !== null).length;
-    const total = holes.reduce((t, h) => t + (per[h.n].points || 0), 0);
+    const counted = holes.filter(h => per[h.n].toPar !== null);
+    const played = counted.length;
+    const strokes = counted.reduce((t, h) => t + per[h.n].gross, 0);
+    const parPlayed = counted.reduce((t, h) => t + h.par, 0);
+    const toPar = strokes - parPlayed - ts;           // where the team stands: E, +1, -2 ...
     const left = holes.length - played;
     const short = team.filter(p => drives[p] < min);
     const needed = team.reduce((t, p) => t + Math.max(0, min - drives[p]), 0);
     const complete = played === holes.length && !doubles.length;
-    return { holes: per, total, played, left, complete, drives, doubles, short, minDrives: min,
+    return { holes: per, strokes, teamShots: ts, net: strokes - ts, toPar, total: toPar, played, left, complete, drives, doubles, short, minDrives: min,
       failed: complete && short.length > 0,            // the golden rule: finished without everyone's drives
       atRisk: !complete && needed > 0 && needed >= left,   // every remaining hole now has to go to someone short
       impossible: !complete && needed > left };            // can't be done any more: the team will be KBs
   }
 
-  /* Scramble teams ranked by Stableford with the normal countback. Once every team has finished, the KBs are any team
-     that finished without every player's minimum drives (automatic, whatever its points); otherwise the bottom team,
-     with anyone level. */
+  /** A score against par as golfers say it: E, +1, -2 (with a real minus sign). */
+  function toParLabel(n) { return n === 0 ? 'E' : n > 0 ? '+' + n : '\u2212' + Math.abs(n); }
+
+  /* Scramble teams ranked lowest first, with the usual countback on strokes: back 9, back 6, back 3, then the 18th and
+     backwards, lower winning; team shots counted pro rata on the 9, 6 and 3 (half, a third, a sixth). Once every team
+     has finished, the KBs are any team that finished without every player's minimum drives (automatic, whatever its
+     score); otherwise the bottom team, with anyone level. */
   function scrambleStandings(teams) {
-    const ranked = rankByKey(teams.map(t => Object.assign({}, t, { key: countbackKey(Object.fromEntries(Object.entries(t.holes).map(([n, h]) => [n, h.points]))) })));
+    const strokeKey = t => {
+      const g = n => (t.holes[n] && Number.isInteger(t.holes[n].gross)) ? t.holes[n].gross : 0;
+      const sum = (a, b) => { let x = 0; for (let n = a; n <= b; n++) x += g(n); return x; };
+      const ts = t.teamShots || 0;
+      const key = [sum(10, 18) - ts / 2, sum(13, 18) - ts / 3, sum(16, 18) - ts / 6];
+      for (let n = 18; n >= 1; n--) key.push(g(n));
+      return key.map(v => -v);                      // rankByKey favours higher: lower strokes rank first
+    };
+    const ranked = rankByKey(teams.map(t => Object.assign({}, t, { total: -t.toPar, key: strokeKey(t) })))
+      .map(t => Object.assign(t, { total: t.toPar }));
     // Decided only once every team has finished: during play nobody is labelled KBs.
     const done = ranked.length > 1 && ranked.every(t => t.complete);
     const failed = ranked.filter(t => t.failed);
@@ -783,7 +802,7 @@
   }
 
   return {
-    NOBODY, contestStatus, claimsInPlayOrder, scrambleTeam, scrambleStandings, SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
+    NOBODY, contestStatus, claimsInPlayOrder, scrambleTeam, scrambleStandings, toParLabel, SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,

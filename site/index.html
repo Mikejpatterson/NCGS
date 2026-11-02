@@ -2348,7 +2348,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .round-trip-link .sub { color: var(--sub); font-size: .8rem; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611012235","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611021906","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -2934,39 +2934,58 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
    *  then the next best scores in turn. Only identical full records stay tied.
    *  results: [{ rid, scores: { pid: points } }]. */
   /* Scramble (Westport day two, owner brief §6): four players, one team score per hole. The team's strokes are saved in
-     the scores row of the player whose drive was used, so one row per hole records both. Team shots are the organiser's
-     manual allowance (normally 0). Each player must have at least `minDrives` drives used (normally 3). */
+     the scores row of the player whose drive was used, so one row per hole records both. Each player must have at least
+     `minDrives` drives used (normally 3).
+     Stroke play, not Stableford (owner, 2 November): the team's strokes count against par, lowest wins. Team shots move
+     the team's starting point: they come off the total, and a minus number adds strokes (a strong team can start at +1).
+     There is no pick-up in a scramble: a hole counts only once it has a number of strokes. */
   function scrambleTeam(team, holes, strokesOf, teamShots, minDrives) {
     const min = minDrives === undefined ? 3 : minDrives;
-    const ph = Number(teamShots) || 0;
+    const ts = Number(teamShots) || 0;
     const per = {}, drives = {}, doubles = [];
     team.forEach(p => { drives[p] = 0; });
     holes.forEach(h => {
-      const shots = shotsOnHole(ph, h.si);
       const filled = team.filter(p => isEntered(strokesOf(p, h.n)));
       if (filled.length > 1) doubles.push(h.n);   // two drives recorded (two phones at once): shown, never guessed
-      if (filled.length !== 1) { per[h.n] = { gross: null, driver: null, shots, points: null }; return; }
+      if (filled.length !== 1) { per[h.n] = { gross: null, driver: null, par: h.par, toPar: null }; return; }
       const d = filled[0], gross = strokesOf(d, h.n);
       drives[d]++;
-      per[h.n] = { gross, driver: d, shots, points: stablefordPoints(gross, h.par, shots) };
+      // A pick-up saved before the change has no stroke count, so the hole is not counted until it is corrected.
+      per[h.n] = Number.isInteger(gross) ? { gross, driver: d, par: h.par, toPar: gross - h.par } : { gross, driver: d, par: h.par, toPar: null };
     });
-    const played = holes.filter(h => per[h.n].points !== null).length;
-    const total = holes.reduce((t, h) => t + (per[h.n].points || 0), 0);
+    const counted = holes.filter(h => per[h.n].toPar !== null);
+    const played = counted.length;
+    const strokes = counted.reduce((t, h) => t + per[h.n].gross, 0);
+    const parPlayed = counted.reduce((t, h) => t + h.par, 0);
+    const toPar = strokes - parPlayed - ts;           // where the team stands: E, +1, -2 ...
     const left = holes.length - played;
     const short = team.filter(p => drives[p] < min);
     const needed = team.reduce((t, p) => t + Math.max(0, min - drives[p]), 0);
     const complete = played === holes.length && !doubles.length;
-    return { holes: per, total, played, left, complete, drives, doubles, short, minDrives: min,
+    return { holes: per, strokes, teamShots: ts, net: strokes - ts, toPar, total: toPar, played, left, complete, drives, doubles, short, minDrives: min,
       failed: complete && short.length > 0,            // the golden rule: finished without everyone's drives
       atRisk: !complete && needed > 0 && needed >= left,   // every remaining hole now has to go to someone short
       impossible: !complete && needed > left };            // can't be done any more: the team will be KBs
   }
 
-  /* Scramble teams ranked by Stableford with the normal countback. Once every team has finished, the KBs are any team
-     that finished without every player's minimum drives (automatic, whatever its points); otherwise the bottom team,
-     with anyone level. */
+  /** A score against par as golfers say it: E, +1, -2 (with a real minus sign). */
+  function toParLabel(n) { return n === 0 ? 'E' : n > 0 ? '+' + n : '\u2212' + Math.abs(n); }
+
+  /* Scramble teams ranked lowest first, with the usual countback on strokes: back 9, back 6, back 3, then the 18th and
+     backwards, lower winning; team shots counted pro rata on the 9, 6 and 3 (half, a third, a sixth). Once every team
+     has finished, the KBs are any team that finished without every player's minimum drives (automatic, whatever its
+     score); otherwise the bottom team, with anyone level. */
   function scrambleStandings(teams) {
-    const ranked = rankByKey(teams.map(t => Object.assign({}, t, { key: countbackKey(Object.fromEntries(Object.entries(t.holes).map(([n, h]) => [n, h.points]))) })));
+    const strokeKey = t => {
+      const g = n => (t.holes[n] && Number.isInteger(t.holes[n].gross)) ? t.holes[n].gross : 0;
+      const sum = (a, b) => { let x = 0; for (let n = a; n <= b; n++) x += g(n); return x; };
+      const ts = t.teamShots || 0;
+      const key = [sum(10, 18) - ts / 2, sum(13, 18) - ts / 3, sum(16, 18) - ts / 6];
+      for (let n = 18; n >= 1; n--) key.push(g(n));
+      return key.map(v => -v);                      // rankByKey favours higher: lower strokes rank first
+    };
+    const ranked = rankByKey(teams.map(t => Object.assign({}, t, { total: -t.toPar, key: strokeKey(t) })))
+      .map(t => Object.assign(t, { total: t.toPar }));
     // Decided only once every team has finished: during play nobody is labelled KBs.
     const done = ranked.length > 1 && ranked.every(t => t.complete);
     const failed = ranked.filter(t => t.failed);
@@ -3135,7 +3154,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
   }
 
   return {
-    NOBODY, contestStatus, claimsInPlayOrder, scrambleTeam, scrambleStandings, SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
+    NOBODY, contestStatus, claimsInPlayOrder, scrambleTeam, scrambleStandings, toParLabel, SEGMENTS, roundStats, playerSummary, kbLowest, roundHandicap, handicapWorking, playingHandicap, shotsOnHole,
     isEntered, stablefordPoints, scoreName, metresToYards, playOrder, teamLabels,
     matchProgress, matchWinner, describeMatch, rankRows, computeRound, tripStandings,
     partnerHistory, repeatedPartners, proposeDraw, cardValue, matchCardRows, compareCard,
@@ -4560,7 +4579,7 @@ function scrambleOf(rid) {
       const team = g.teams.flat();
       const res = E.scrambleTeam(team, holes, (pid, n) => (sc[pid] || {})[n], shots[g.id] || 0);
       const hs = {};
-      holes.forEach(h => { hs[h.n] = { complete: res.holes[h.n].points !== null, double: res.doubles.includes(h.n) }; });
+      holes.forEach(h => { hs[h.n] = { complete: res.holes[h.n].toPar !== null, double: res.doubles.includes(h.n) }; });
       const order = E.playOrder(g.startHole);
       return Object.assign({}, res, { id: g.id, n: g.n, name: 'Team ' + g.n, teams: g.teams, team, teeTime: g.teeTime, holes: hs, scramble: res.holes, holesDone: res.played, nextHole: order.find(n => !hs[n].complete) || null });
     });
@@ -4787,7 +4806,7 @@ function miniBoard(r) {
     let show = teams.slice(0, 3);
     const mine = g ? teams.find(t => t.id === g.id) : null;
     if (mine && !show.includes(mine)) show = [show[0], show[1], mine];
-    return `<div class="mini num">${show.map(t => `<div class="mr${mine === t ? ' me' : ''}"><span class="mp">${esc(t.posLabel)}</span><span class="mn">${esc(t.name)}</span><span class="mt">${t.total}</span></div>`).join('')}</div>`;
+    return `<div class="mini num">${show.map(t => `<div class="mr${mine === t ? ' me' : ''}"><span class="mp">${esc(t.posLabel)}</span><span class="mn">${esc(t.name)}</span><span class="mt">${E.toParLabel(t.toPar)}</span></div>`).join('')}</div>`;
   }
   const rows = res && res.rows ? res.rows : [];
   if (!rows.length) return '';
@@ -5237,7 +5256,7 @@ function finishedCard(r, res) {
     const kb = (res.teams || []).filter(t => t.kb);
     const sub = [roundName(r), r.date ? fmtDate(r.date, true) : ''].filter(Boolean).join(' · ');
     return `<div class="fincard"><div class="finrow"><span class="fink">KBS</span><span class="finfinal">Final</span></div>
-      <div class="finwin"><div class="finwho"><b class="finname">${esc(kb.map(t => t.name).join(' & ') || '–')}</b><h1 class="finsub">${esc(kb.map(scrNames).join(' · ') || sub)}</h1></div><b class="finpts">${kb.length ? kb[0].total : ''}</b></div></div>`;
+      <div class="finwin"><div class="finwho"><b class="finname">${esc(kb.map(t => t.name).join(' & ') || '–')}</b><h1 class="finsub">${esc(kb.map(scrNames).join(' · ') || sub)}</h1></div><b class="finpts">${kb.length ? E.toParLabel(kb[0].toPar) : ''}</b></div></div>`;
   }
   const top = res.rows.filter(x => x.pos === 1);
   const names = top.map(x => D.nameOf(x.id)).join(' & ');
@@ -6694,7 +6713,7 @@ function scrambleTable(r, res) {
   const rows = teams.map(t => {
     const thru = t.complete ? 'finished' : t.played ? `thru ${t.played}` : '';
     const flag = t.doubles.length ? ` <span class="pill w" title="Two drives saved">Check ${t.doubles.join(', ')}</span>` : '';
-    return `<div class="lrow scr-row${t.kb ? ' low' : ''}"><span class="sub scr-pos">${esc(t.posLabel)}</span><span class="scr-name"><b>${esc(t.name)}</b> <small>${esc(thru)}</small>${t.kb ? ' <span class="pill w">KBs</span>' : ''}${flag}</span><b class="scr-pts num">${t.total}</b>${scrDriveChips(t)}</div>`;
+    return `<div class="lrow scr-row${t.kb ? ' low' : ''}"><span class="sub scr-pos">${esc(t.posLabel)}</span><span class="scr-name"><b>${esc(t.name)}</b> <small>${esc(thru)}</small>${t.kb ? ' <span class="pill w">KBs</span>' : ''}${flag}</span><b class="scr-pts num" aria-label="${esc(t.toPar === 0 ? 'level par' : E.toParLabel(t.toPar))}">${E.toParLabel(t.toPar)}</b>${scrDriveChips(t)}</div>`;
   }).join('');
   return `<div class="scr-standings">${sec(label('Teams') + `<span class="scr-legend">Drives · ${teams[0].minDrives} each</span>`, cardOf(rows))}</div>`;
 }
@@ -6719,7 +6738,6 @@ VIEWS.scramble = () => {
   }
   const n = ctx.n, h = holeOf(rid, n), d = scrDraft(ctx, gc);
   const final = r.status === 'final';
-  const shots = gc.scramble[n] ? gc.scramble[n].shots : 0;
   const st = scrStored(rid, gc, n);
   let html = '<div class="entry scr">';
   if (ctx.mode === 'org') html += `<div class="entnav"><button class="entback" data-act="entry-back" aria-label="Back">${ICON.back}<span>Back</span></button><span class="entgrp">Correcting ${esc(gc.name)}</span></div>`;
@@ -6748,14 +6766,13 @@ VIEWS.scramble = () => {
   }
 
   const v = d.score;
-  const pts = E.isEntered(v) ? E.stablefordPoints(v, h.par, shots) : null;
-  const shown = v === 'P' ? E.pickupStrokes(h.par, shots) : v;
-  const scoreWord = pts === 0 ? 'Scratch' : Number.isInteger(v) ? E.scoreName(v, h.par) : '';
+  // Stroke play (owner, 2 November): the team's strokes against par, no points and no pick-up.
+  const num = Number.isInteger(v);
+  const scoreWord = num ? E.scoreName(v, h.par) : '';
   html += sec(label('Score'), `<div class="bugs b0 scr-score" aria-label="Team score"><div class="pr ptile">
-    <div class="pr-top"><span class="nm"><span class="nmrow">${esc(gc.name)}</span></span>
-    <button class="pu ${v === 'P' ? 'on' : ''}" data-act="scr-pickup"${final ? ' disabled' : ''}>${v === 'P' ? 'Picked up' : 'Pick up'}</button></div>
+    <div class="pr-top"><span class="nm"><span class="nmrow">${esc(gc.name)}</span></span><span class="sub scr-topar num">${E.toParLabel(gc.toPar)}${gc.played ? ` thru ${gc.played}` : ''}</span></div>
     <div class="stepper" role="group" aria-label="Team strokes">
-    ${E.isEntered(v) ? `<button class="stv${pts === 0 ? ' out' : ''}" data-act="scr-clear" aria-label="Team score ${shown} strokes, ${plural(pts, 'point')}. Tap to clear"${final ? ' disabled' : ''}><b><span class="scr-val">${shown}</span><sup>${pts}</sup></b><small>${scoreWord}</small></button>` : `<div class="stv none">Par ${h.par}</div>`}
+    ${num ? `<button class="stv" data-act="scr-clear" aria-label="Team score ${v} strokes, ${esc(scoreWord)}. Tap to clear"${final ? ' disabled' : ''}><b><span class="scr-val">${v}</span></b><small>${scoreWord}</small></button>` : `<div class="stv none">Par ${h.par}</div>`}
     <button class="st" data-act="scr-score" data-dir="down" aria-label="One less for the team"${final ? ' disabled' : ''}>−</button>
     <button class="st" data-act="scr-score" data-dir="up" aria-label="One more for the team"${final ? ' disabled' : ''}>+</button></div>
     </div></div>`);
@@ -6784,7 +6801,6 @@ const scrScore = dir => scrEdit(({ d, h }) => {
   if (!E.isEntered(d.score) || d.score === 'P') { d.score = h.par; return; }
   d.score = Math.max(1, Math.min(15, d.score + (dir === 'up' ? 1 : -1)));
 });
-const scrPickup = () => scrEdit(({ d }) => { d.score = d.score === 'P' ? undefined : 'P'; });
 const scrClear = () => scrEdit(({ d }) => { delete d.score; });
 const scrDriver = pid => scrEdit(({ d }) => { d.driver = d.driver === pid ? undefined : pid; });
 
@@ -6822,8 +6838,8 @@ VIEWS.scrambleFinish = () => {
   if (!gc) return VIEWS.round({ rid });
   const t = s.standings.find(x => x.id === gc.id) || gc;
   const drives = gc.team.map(pid => `<div class="row"><span>${esc(D.nameOf(pid))}</span><span class="right"><span class="b num">${gc.drives[pid]}</span>${gc.drives[pid] < gc.minDrives ? '<span class="pill w">Short</span>' : ''}</span></div>`).join('');
-  const html = `<div class="after scr-finish"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>${esc(gc.name.toUpperCase())}</small><b class="entn">${t.total}</b></div><div class="entr"><b>Finished</b><span>Team Stableford</span></div></div></header>
-    ${gc.failed ? `<div class="banner warn" style="margin-top:12px">Not everyone has ${gc.minDrives} drives, so the team is KBs whatever its points.</div>` : ''}
+  const html = `<div class="after scr-finish"><header class="hero c pine entcard"><div class="entrow"><div class="entl"><small>${esc(gc.name.toUpperCase())}</small><b class="entn num">${E.toParLabel(t.toPar)}</b></div><div class="entr"><b>Finished</b><span>${t.strokes} strokes${t.teamShots ? ` · ${t.teamShots > 0 ? t.teamShots + ' shots off' : -t.teamShots + ' added'}` : ''}</span></div></div></header>
+    ${gc.failed ? `<div class="banner warn" style="margin-top:12px">Not everyone has ${gc.minDrives} drives, so the team is KBs whatever its score.</div>` : ''}
     ${sec(label('Drives used'), cardOf(drives))}
     <button class="btn" data-act="leaderboard" data-rid="${rid}">See the teams</button></div>`;
   return { html, tabs: 'hole' };
@@ -7250,7 +7266,7 @@ ORG.round = p => {
     <button class="row tall" data-act="org-go" data-v="details" data-rid="${r.id}"><span class="two"><span>Details</span><span class="sub">${esc(details)}</span></span>${chev}</button>
     ${drawRow}<button class="row tall" data-act="org-go" data-v="${r.status === 'final' ? 'groupsview' : 'groups'}" data-rid="${r.id}"><span class="two"><span>Groups</span><span class="sub">${r.groups && r.groups.length ? `${plural(nPlayers, 'player')} · ${plural(r.groups.length, isScramble(r) ? 'team' : 'group')}${locked && r.status !== 'final' ? isScramble(r) ? ' · teams fixed' : ' · withdraw only now' : ''}` : isScramble(r) || hasPots(r.id) ? 'Teams not drawn yet' : 'Not drawn'}</span></span>${chev}</button>
     <button class="row tall" data-act="org-format" data-rid="${r.id}"><span class="two"><span>Format</span><span class="sub">${isScramble(r) ? 'Scramble: one team score per group, drives recorded' : 'Individual Stableford'}</span></span><span class="pill ${isScramble(r) ? 'g' : 'n'}">${isScramble(r) ? 'Scramble' : 'Stableford'}</span></button>
-    ${isScramble(r) ? `<button class="row tall" data-act="org-go" data-v="teamshots" data-rid="${r.id}"><span class="two"><span>Team shots</span><span class="sub">${(r.groups || []).map(g => `Team ${g.n}: ${teamShotsOf(r)[g.id] || 0}`).join(' · ') || 'Draw the teams first'}</span></span>${chev}</button>` : ''}
+    ${isScramble(r) ? `<button class="row tall" data-act="org-go" data-v="teamshots" data-rid="${r.id}"><span class="two"><span>Team shots</span><span class="sub">${(r.groups || []).map(g => `Team ${g.n}: ${String(teamShotsOf(r)[g.id] || 0).replace('-', '\u2212')}`).join(' · ') || 'Draw the teams first'}</span></span>${chev}</button>` : ''}
     ${r.trip ? `<button class="row tall" data-act="org-tripboard" data-rid="${r.id}"><span class="two"><span>Trip leaderboard</span><span class="sub">${tripBoardOn(r) ? `${esc(r.trip)} adds up the days` : `No combined board for ${esc(r.trip)}: each day has its own results`}</span></span><span class="pill ${tripBoardOn(r) ? 'g' : 'n'}">${tripBoardOn(r) ? 'On' : 'Off'}</span></button>` : ''}
     ${isScramble(r) ? '' : `<button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${E.kbOff(r) ? 'Off' : r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`}`), true);
   // Scores a phone sent after this round was final (or otherwise refused): they never reached the scores (review H1).
@@ -7391,7 +7407,7 @@ ORG.group = p => {
     if (!gc) return { html: '' };
     const rows = E.playOrder(gc.teams && D.round(p.rid).groups.find(g => g.id === gc.id).startHole).map(n => {
       const h = gc.scramble[n], dbl = gc.holes[n].double;
-      return `<button class="row" data-act="org-go" data-v="correct" data-rid="${p.rid}" data-gid="${gc.id}" data-n="${n}" aria-label="Correct hole ${n}"><span class="b num">${n}</span><span class="right">${dbl ? '<span class="pill w">Two drives</span>' : h.driver ? `<span class="sub">${esc(D.nameOf(h.driver))}</span><span class="b num">${h.gross === 'P' ? '–' : h.gross}<sup>${h.points}</sup></span>` : '<span class="sub">–</span>'}${chev}</span></button>`;
+      return `<button class="row" data-act="org-go" data-v="correct" data-rid="${p.rid}" data-gid="${gc.id}" data-n="${n}" aria-label="Correct hole ${n}"><span class="b num">${n}</span><span class="right">${dbl ? '<span class="pill w">Two drives</span>' : h.driver ? `<span class="sub">${esc(D.nameOf(h.driver))}</span><span class="b num">${Number.isInteger(h.gross) ? h.gross : '–'}</span>` : '<span class="sub">–</span>'}${chev}</span></button>`;
     }).join('');
     return { html: `<header class="hero s">${navBack('Round')}<div class="head"><h1 class="title">${esc(gc.name)}</h1></div><p class="sub">${esc(gc.team.map(D.nameOf).join(', '))} · ${gc.total} pts</p></header>${sec(label('Holes'), cardOf(rows))}` };
   }
@@ -7415,11 +7431,12 @@ ORG.group = p => {
   };
 };
 ORG.correct = () => VIEWS.entry();
-// Team shots for a scramble (owner brief §6): normally 0; the committee may give some teams 2 or 3 to balance the field.
+// Team shots for a scramble (owner brief §6; stroke play from 2 November): strokes off a team's total, normally 0. A
+// minus number adds strokes, so the committee can start a strong team at +1 instead of the others under par.
 ORG.teamshots = p => {
   const r = D.round(p.rid), cur0 = teamShotsOf(r);
-  return { html: `<header class="hero s">${navBack(esc(roundName(r)))}<div class="head"><h1 class="title">Team shots</h1></div><p class="sub">Shots each team gets, given by stroke index. Usually 0.</p></header>
-    <form data-form="teamshots" autocomplete="off" class="sec near">${(r.groups || []).map(g => field('ts-' + g.id, `Team ${g.n} · ${g.teams.flat().map(D.nameOf).join(', ')}`, String(cur0[g.id] || 0), 'inputmode="numeric"')).join('')}
+  return { html: `<header class="hero s">${navBack(esc(roundName(r)))}<div class="head"><h1 class="title">Team shots</h1></div><p class="sub">Strokes taken off each team's total. Usually 0. A minus number adds strokes, so a strong team can start at +1.</p></header>
+    <form data-form="teamshots" autocomplete="off" class="sec near">${(r.groups || []).map(g => field('ts-' + g.id, `Team ${g.n} · ${g.teams.flat().map(D.nameOf).join(', ')}`, String(cur0[g.id] || 0), 'autocapitalize="off" autocorrect="off" spellcheck="false"')).join('')}
     ${formErr()}<button class="btn" type="submit">Save</button></form>` };
 };
 ORG.contest = p => {
@@ -8224,7 +8241,6 @@ const ACT = {
   'intro-scrim': () => {},
   save: () => saveHole(),
   'scr-score': el => scrScore(el.dataset.dir),
-  'scr-pickup': () => scrPickup(),
   'scr-clear': () => scrClear(),
   'scr-driver': el => scrDriver(el.dataset.pid),
   'scr-save': () => scrSave(),
@@ -8621,8 +8637,8 @@ const FORMS = {
     const out = {};
     for (const g of r.groups || []) {
       const v = val('ts-' + g.id);
-      const k = v === '' ? 0 : Number(v);
-      if (!(Number.isInteger(k) && k >= 0 && k <= 36)) { UI.formError = `Team ${g.n}: a whole number of shots, 0 to 36.`; render(); return; }
+      const k = v === '' ? 0 : Number(String(v).trim().replace(/^[\u2212\u2013]/, '-'));
+      if (!(Number.isInteger(k) && k >= -18 && k <= 36)) { UI.formError = `Team ${g.n}: a whole number from -18 to 36 (a minus number adds strokes).`; render(); return; }
       out[g.id] = k;
     }
     put('settings', [{ key: 'teamshots:' + r.id, value: JSON.stringify(out) }], { action: 'Team shots', detail: `${roundName(r)}: ${(r.groups || []).map(g => `Team ${g.n} ${out[g.id]}`).join(', ')}` });
