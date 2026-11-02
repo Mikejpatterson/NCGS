@@ -102,10 +102,24 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
     const sub = await page.locator('header .sub').first().innerText();
     check('the organiser\'s team header shows the score against par, not points', /(^|· )(E|[+\u2212]\d+)$/.test(sub.trim()) && !/pts/.test(sub), sub);
     // A finished scramble has no share card yet, so it offers no Share button that would open "No results yet".
-    const shareOk = await page.evaluate(() => { const n = window.__ncgs, r = n.D.round('fx-wp2'); const was = r.status; r.status = 'final'; n.DB._view = null; n.DB._memo = {};
+    const shareOk = await page.evaluate(() => { const n = window.__ncgs, r = n.DB.server.tables.rounds.find(x => x.id === 'fx-wp2'); const was = r.status; r.status = 'final'; n.DB._view = null; n.DB._memo = {};
       n.UI.org = false; n.UI.board = 'fx-wp2'; n.UI.res = 'lb'; n.UI.stack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'fx-wp2' } }]; n.render();
       const has = !!document.querySelector('[data-act="results"]'); r.status = was; n.DB._view = null; n.DB._memo = {}; n.render(); return !has; });
-    check('a finished scramble shows no Share results button', shareOk);
+    check('a finished scramble offers Share results', !shareOk);
+    // Owner, 2 November: the share card for a scramble, teams by score against par.
+    await page.evaluate(() => { const n = window.__ncgs; n.UI.org = false; n.UI.stack = [{ v: 'home', p: {} }, { v: 'results', p: { rid: 'fx-wp2' } }]; n.render(); });
+    const rcard = await page.locator('#rcard').innerText().catch(() => '');
+    const lines = await page.evaluate(() => [...document.querySelector('#rcard .blk').querySelectorAll('.ln .b')].map(x => x.textContent.trim()));
+    check('the scramble share card lists the teams by score against par, lowest first', /Scramble/.test(rcard) && lines.length >= 2 && lines.every(x => /^(E|[+\u2212]\d+)$/.test(x)) && !/No results yet|pts|points/i.test(rcard), rcard.slice(0, 160));
+    check('and has a Share button', !!(await page.$('[data-act="share-card"]')));
+    const ordered = await page.evaluate(() => { const v = [...document.querySelector('#rcard .blk').querySelectorAll('.ln .b')].map(e => { const t = e.textContent.trim(); return t === 'E' ? 0 : Number(t.replace('\u2212', '-')); }); return v.length >= 2 && v.every((x, i) => i === 0 || v[i - 1] <= x); });
+    check('teams run lowest score first', ordered);
+    for (const w of [360, 390]) {
+      await page.setViewportSize({ width: w, height: 800 });
+      const fits = await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth && [...document.querySelectorAll('#rcard .ln, #rcard .title, #rcard .cap')].every(e => e.scrollWidth <= e.clientWidth + 1 && e.getBoundingClientRect().right <= innerWidth + 1));
+      check(`the scramble share card fits a ${w}px phone`, fits);
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
     // Stroke play (owner, 2 November): no pick-up. A draft from before the change holding one is never saved.
     const pu = await page.evaluate(() => {
       const n = window.__ncgs, r = n.D.round('fx-wp2'), g = r.groups[0], pid = g.teams.flat()[0], hole = 18;
