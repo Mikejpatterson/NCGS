@@ -2339,3 +2339,15 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .round-trip-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 56px; margin-top: 12px; padding: 10px 4px; color: var(--pine); text-align: left; border-bottom: 1px solid var(--line); }
 .round-trip-link .two { display: flex; flex-direction: column; gap: 3px; }
 .round-trip-link .sub { color: var(--sub); font-size: .8rem; }
+
+/* Scramble team table (owner, 2 November): one heavy rule under "Teams", not two; each team opens to its card. */
+#app[data-view] .scr-standings .card > .lrow.scr-row:first-child, .results-page .scr-standings .scr-row:first-child { border-top: 0; }
+.scr-standings button.lrow.scr-row { width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.scr-standings .scr-chev { display: inline-flex; vertical-align: middle; margin-left: 4px; color: var(--sub); }
+.scr-standings .scr-row.open .scr-chev { transform: rotate(180deg); }
+.scr-standings .dropcard { padding: 4px 0 14px; border-bottom: 1px solid #CFD8CF; }
+.scr-sc td.drv { font-size: .78rem; font-variant-numeric: tabular-nums; }
+.scr-sum { margin: 8px 2px 0; font-variant-numeric: tabular-nums; }
+/* The team card has one more column than a player's: keep every heading whole at 360px and 135% text (reviewer). */
+.scr-sc thead th { padding-left: 1px; padding-right: 1px; }
+.scr-sc td:last-child, .scr-sc th:last-child { padding-right: 4px; }

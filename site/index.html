@@ -2349,9 +2349,21 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .round-trip-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 56px; margin-top: 12px; padding: 10px 4px; color: var(--pine); text-align: left; border-bottom: 1px solid var(--line); }
 .round-trip-link .two { display: flex; flex-direction: column; gap: 3px; }
 .round-trip-link .sub { color: var(--sub); font-size: .8rem; }
+
+/* Scramble team table (owner, 2 November): one heavy rule under "Teams", not two; each team opens to its card. */
+#app[data-view] .scr-standings .card > .lrow.scr-row:first-child, .results-page .scr-standings .scr-row:first-child { border-top: 0; }
+.scr-standings button.lrow.scr-row { width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.scr-standings .scr-chev { display: inline-flex; vertical-align: middle; margin-left: 4px; color: var(--sub); }
+.scr-standings .scr-row.open .scr-chev { transform: rotate(180deg); }
+.scr-standings .dropcard { padding: 4px 0 14px; border-bottom: 1px solid #CFD8CF; }
+.scr-sc td.drv { font-size: .78rem; font-variant-numeric: tabular-nums; }
+.scr-sum { margin: 8px 2px 0; font-variant-numeric: tabular-nums; }
+/* The team card has one more column than a player's: keep every heading whole at 360px and 135% text (reviewer). */
+.scr-sc thead th { padding-left: 1px; padding-right: 1px; }
+.scr-sc td:last-child, .scr-sc th:last-child { padding-right: 4px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611022132","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611030658","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -5230,7 +5242,7 @@ function contestsBlock(res) {
 function resultsBlock(r) {
   const res = resultsOf(r.id);
   if (!res) return '';
-  if (res.source === 'scramble') return scrambleTable(r, res) + contestsBlock(res);
+  if (res.source === 'scramble') return scrambleTable(r, res) + contestsBlock(res) + ((res.teams || []).some(t => t.played) ? `<button class="btn quiet" data-act="results" data-rid="${r.id}">Share results</button>` : '');
   const app = res.source === 'app';
   let html = sec(label('Stableford'), cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}</span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}</span>${app ? dropChev : ''}</span>`;
@@ -5272,8 +5284,7 @@ function finishedCard(r, res) {
     <div class="finwin"><div class="finwho"><b class="finname">${esc(names)}${CUP}</b><h1 class="finsub">${esc(sub)}</h1></div><b class="finpts">${top[0].total}</b></div></div>`;
 }
 function finishedBody(r, res) {
-  // No share card for a scramble yet, so no Share button: it opened "No results yet" (reviewer, 2 November).
-  if (res.source === 'scramble') return scrambleTable(r, res) + contestsBlock(res);
+  if (res.source === 'scramble') return scrambleTable(r, res) + contestsBlock(res) + `<button class="btn" data-act="results" data-rid="${r.id}">Share results</button>`;
   const app = res.source === 'app';
   const all = !!UI.open['all-' + r.id], many = res.rows.length > 8;
   const shown = all || !many ? res.rows : res.rows.slice(0, 8);
@@ -6500,7 +6511,7 @@ VIEWS.board = () => {
   const page = html => ({ tabs: 'board', html: `<div class="results-page">${html}</div>` });
   let html = `${backTo}<header class="hero c lbhead"><div class="results-meta"><span>Leaderboard</span>${live0 ? `<span class="results-live"><span class="pulse"></span>Live${thru0 ? ' · thru ' + thru0 : ''}</span>` : r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r)}</div><div class="hrow2"><h1 class="big">${esc(roundName(r))}</h1></div><p class="sub">${isScramble(r) ? 'Team scramble' : 'Stableford'}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''}</p></header>`;
   if (avail.length > 1) {
-    const names = { lb: 'Scores', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
+    const names = { lb: 'Round', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };   // "Round", not "Scores" (owner, 2 November)
     html += `<div class="seg pills${avail.length > 3 ? ' four' : ''}" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
   }
   if (pillSel === 'bw') return page(html + buggyView(sel).html);
@@ -6521,7 +6532,7 @@ VIEWS.board = () => {
     return page(html);
   }
 
-  if (res.source === 'scramble') return page(html + scrambleTable(r, res));
+  if (res.source === 'scramble') return page(html + scrambleTable(r, res) + ((res.teams || []).some(t => t.played) ? `<button class="btn quiet" data-act="results" data-rid="${sel}">Share results</button>` : ''));
   html += sec('', `<div class="standings${res.source === 'app' ? ' expandable' : ''}"><div class="standings-head" aria-hidden="true"><span>Pos</span><span>Player</span><span>Pts</span></div>${cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}<span class="vh"> position</span></span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}<span class="vh"> points</span></span>${res.source === 'app' ? dropChev : ''}</span>`;
     return res.source === 'app' ? dropRow(sel, x, inner, `lrow${x.pos === 1 ? ' is-leader' : ''}`) : `<button class="lrow${x.pos === 1 ? ' is-leader' : ''}" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
@@ -6567,9 +6578,33 @@ function tripTable(list) {
 }
 
 /* ----- Results card ----- */
+/* The share card for a scramble (owner, 2 November): teams by score against par, lowest first, with the players' names,
+   the KBs and the contests. Same card and Share button as a normal round. */
+function scrambleShare(r, res) {
+  const teams = (res.teams || []).filter(t => t.played);
+  if (!teams.length) return { html: `${navBack(backLabel())}<p class="sub">No results yet</p>` };
+  const final = r.status === 'final';
+  const leaders = teams.filter(t => t.pos === 1), lead = E.toParLabel(leaders[0].toPar);
+  const names = leaders.map(t => t.name).join(' and ');
+  const headline = final ? (leaders.length > 1 ? `${names} tie on ${lead}` : `${names} win on ${lead}`) : (leaders.length > 1 ? `${names} lead on ${lead}` : `${names} lead on ${lead}`);
+  const minThru = Math.min(...(res.teams || []).map(t => t.played));
+  const rows = teams.map(t => `<div class="ln"><span><span class="sub" style="display:inline-block;width:32px">${t.posLabel}</span>${esc(t.name)} <span class="sub">${esc(scrNames(t))}</span></span><span class="b num">${E.toParLabel(t.toPar)}</span></div>`).join('');
+  const kbs = teams.filter(t => t.kb);
+  const kb = kbs.length ? `<div class="blk"><div class="cap">KBs</div>${kbs.map(t => `<div class="ln"><span>${esc(t.name)} <span class="sub">${esc(scrNames(t))}</span></span><span class="b num">${E.toParLabel(t.toPar)}</span></div>`).join('')}</div>` : '';
+  const contests = res.contests.filter(c => c.winner || (c.lead && c.lead.pid)).map(c => `<div class="ln"><span class="sub">${CONTEST[c.type]}${c.hole ? ' ' + c.hole : ''}</span><span>${c.winner ? esc(D.nameOf(c.winner)) + ' ' + CUP : `${esc(D.nameOf(c.lead.pid))} <span class="sub">so far</span>`}</span></div>`).join('');
+  const card = `<div class="rcard" id="rcard">
+    <div class="top"><div class="cap">${esc(D.society())} · ${esc(roundName(r))}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''} · Scramble · ${final ? 'Final' : `Thru ${minThru}`}</div><div class="title">${esc(headline)}</div></div>
+    <div class="blk">${rows}</div>
+    ${kb}
+    ${contests ? `<div class="blk">${contests}</div>` : ''}
+    ${isDemo(r) ? '<div class="blk cap">Demo scores</div>' : ''}
+  </div>`;
+  return { html: `${navBack(backLabel())}<div style="margin-top:8px">${card}</div><button class="btn" data-act="share-card" data-rid="${r.id}">${sized(ICON.share, 20)}<span>Share</span></button>` };
+}
 VIEWS.results = p => {
   const r = D.round(p.rid);
   const res = resultsOf(p.rid);
+  if (res && res.source === 'scramble') return scrambleShare(r, res);
   const lb = res.rows;
   if (!lb.length) return { html: `${navBack(backLabel())}<p class="sub">No results yet</p>` };
   const top = lb[0];
@@ -6796,13 +6831,29 @@ const scrOwed = t => t.team.reduce((s, pid) => s + Math.max(0, t.minDrives - (t.
 
 /* The team results, best first. The KBs are marked; there is no winners' presentation (owner: avoiding last place is
    the drama). Drives under the minimum and holes with two drives saved are shown plainly. */
+/* A team's card: strokes on each hole (birdies circled, as on a player's card), whose drive, and the totals against par. */
+function scrTeamCard(r, t) {
+  const holes = holesOf(r), front = holes.slice(0, 9), back = holes.slice(9);
+  const hs = t.scramble || t.holes;   // a team's per-hole strokes (scrambleOf keeps them under `scramble`)
+  const ini = pid => esc(initialsOf(D.member(pid) || { name: D.nameOf(pid) }));
+  const cell = h => { const x = hs[h.n] || {}; return `<td class="hn">${h.n}${x.shots ? ` <span class="sd">${x.shots > 0 ? '\u25CF'.repeat(x.shots) : '\u25CB'.repeat(-x.shots)}</span>` : ''}</td><td class="par">${h.par}</td><td>${Number.isInteger(x.gross) ? markCell(x.gross, h.par, 0) : ''}</td><td class="sub drv">${x.driver && Number.isInteger(x.gross) ? ini(x.driver) : ''}</td>`; };
+  const tot = list => { const g = list.filter(h => hs[h.n] && Number.isInteger(hs[h.n].gross)); return { par: list.reduce((a, h) => a + h.par, 0), strokes: g.length ? g.reduce((a, h) => a + hs[h.n].gross, 0) : '\u2013' }; };
+  const F = tot(front), B = tot(back);
+  const table = `<table class="sc scr-sc"><thead><tr><th class="hn">Hole</th><th>Par</th><th>Score</th><th aria-label="Whose drive">By</th><th class="gap"></th><th class="hn">Hole</th><th>Par</th><th>Score</th><th aria-label="Whose drive">By</th></tr></thead>
+    <tbody>${front.map((h, i) => `<tr>${cell(h)}<td class="gap"></td>${back[i] ? cell(back[i]) : '<td></td><td></td><td></td><td></td>'}</tr>`).join('')}
+    <tr class="tot"><td class="hn">Out</td><td>${F.par}</td><td>${F.strokes}</td><td></td><td class="gap"></td><td class="hn">In</td><td>${B.par}</td><td>${B.strokes}</td><td></td></tr></tbody></table>`;
+  const sum = [t.played ? `${t.strokes} strokes` : 'No holes yet', t.teamShots ? (t.teamShots > 0 ? `${t.teamShots} team ${t.teamShots === 1 ? 'shot' : 'shots'} off` : `${-t.teamShots} added`) : '', E.toParLabel(t.toPar)].filter(Boolean).join(' \u00B7 ');
+  return table + `<p class="cap scr-sum">${sum}</p>`;
+}
 function scrambleTable(r, res) {
   const teams = res.teams || [];
   if (!teams.length) return sec(label('Teams'), cardOf('<div class="row"><span class="sub">Teams are not drawn yet</span></div>'));
   const rows = teams.map(t => {
     const thru = t.complete ? 'finished' : t.played ? `thru ${t.played}` : '';
     const flag = t.doubles.length ? ` <span class="pill w" title="Two drives saved">Check ${t.doubles.join(', ')}</span>` : '';
-    return `<div class="lrow scr-row${t.kb ? ' low' : ''}"><span class="sub scr-pos">${esc(t.posLabel)}</span><span class="scr-name"><b>${esc(t.name)}</b> <small>${esc(thru)}</small>${t.kb ? ' <span class="pill w">KBs</span>' : ''}${flag}</span><b class="scr-pts num" aria-label="${esc(t.toPar === 0 ? 'level par' : E.toParLabel(t.toPar))}">${E.toParLabel(t.toPar)}</b>${scrDriveChips(t)}</div>`;
+    // Tap a team for its hole-by-hole card (owner, 2 November).
+    const key = `scr-${r.id}-${t.id}`, open = !!UI.open[key];
+    return `<button class="lrow scr-row drop${open ? ' open' : ''}${t.kb ? ' low' : ''}" data-act="toggle" data-key="${key}" aria-expanded="${open}"><span class="sub scr-pos">${esc(t.posLabel)}</span><span class="scr-name"><b>${esc(t.name)}</b> <small>${esc(thru)}</small><span class="chev dn scr-chev">${chev}</span>${t.kb ? ' <span class="pill w">KBs</span>' : ''}${flag}</span><b class="scr-pts num" aria-label="${esc(t.toPar === 0 ? 'level par' : E.toParLabel(t.toPar))}">${E.toParLabel(t.toPar)}</b>${scrDriveChips(t)}</button>${open ? `<div class="dropcard">${scrTeamCard(r, t)}</div>` : ''}`;
   }).join('');
   return `<div class="scr-standings">${sec(label('Teams') + `<span class="scr-legend">Drives · ${teams[0].minDrives} each</span>`, cardOf(rows))}</div>`;
 }

@@ -870,7 +870,7 @@ VIEWS.board = () => {
   const page = html => ({ tabs: 'board', html: `<div class="results-page">${html}</div>` });
   let html = `${backTo}<header class="hero c lbhead"><div class="results-meta"><span>Leaderboard</span>${live0 ? `<span class="results-live"><span class="pulse"></span>Live${thru0 ? ' · thru ' + thru0 : ''}</span>` : r.status === 'final' ? '<span class="pill g">Final</span>' : statusPill(r)}</div><div class="hrow2"><h1 class="big">${esc(roundName(r))}</h1></div><p class="sub">${isScramble(r) ? 'Team scramble' : 'Stableford'}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''}</p></header>`;
   if (avail.length > 1) {
-    const names = { lb: 'Scores', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };
+    const names = { lb: 'Round', bw: 'Buggy Wars', ct: 'Contests', st: 'Stats' };   // "Round", not "Scores" (owner, 2 November)
     html += `<div class="seg pills${avail.length > 3 ? ' four' : ''}" role="tablist">${avail.map(k => `<button class="${pillSel === k ? 'on' : ''}" role="tab" data-act="respill" data-p="${k}" aria-selected="${pillSel === k}">${names[k]}</button>`).join('')}</div>`;
   }
   if (pillSel === 'bw') return page(html + buggyView(sel).html);
@@ -891,7 +891,7 @@ VIEWS.board = () => {
     return page(html);
   }
 
-  if (res.source === 'scramble') return page(html + scrambleTable(r, res));
+  if (res.source === 'scramble') return page(html + scrambleTable(r, res) + ((res.teams || []).some(t => t.played) ? `<button class="btn quiet" data-act="results" data-rid="${sel}">Share results</button>` : ''));
   html += sec('', `<div class="standings${res.source === 'app' ? ' expandable' : ''}"><div class="standings-head" aria-hidden="true"><span>Pos</span><span>Player</span><span>Pts</span></div>${cardOf(res.rows.map(x => {
     const inner = `<span class="sub">${x.posLabel}<span class="vh"> position</span></span>${avName(x, lbSub(res.rows, x, r), x.pos === 1)}<span class="r"><span class="b">${x.total}<span class="vh"> points</span></span>${res.source === 'app' ? dropChev : ''}</span>`;
     return res.source === 'app' ? dropRow(sel, x, inner, `lrow${x.pos === 1 ? ' is-leader' : ''}`) : `<button class="lrow${x.pos === 1 ? ' is-leader' : ''}" data-act="player" data-pid="${x.id}" data-year="${r.season || ''}">${inner}</button>`;
@@ -937,9 +937,33 @@ function tripTable(list) {
 }
 
 /* ----- Results card ----- */
+/* The share card for a scramble (owner, 2 November): teams by score against par, lowest first, with the players' names,
+   the KBs and the contests. Same card and Share button as a normal round. */
+function scrambleShare(r, res) {
+  const teams = (res.teams || []).filter(t => t.played);
+  if (!teams.length) return { html: `${navBack(backLabel())}<p class="sub">No results yet</p>` };
+  const final = r.status === 'final';
+  const leaders = teams.filter(t => t.pos === 1), lead = E.toParLabel(leaders[0].toPar);
+  const names = leaders.map(t => t.name).join(' and ');
+  const headline = final ? (leaders.length > 1 ? `${names} tie on ${lead}` : `${names} win on ${lead}`) : (leaders.length > 1 ? `${names} lead on ${lead}` : `${names} lead on ${lead}`);
+  const minThru = Math.min(...(res.teams || []).map(t => t.played));
+  const rows = teams.map(t => `<div class="ln"><span><span class="sub" style="display:inline-block;width:32px">${t.posLabel}</span>${esc(t.name)} <span class="sub">${esc(scrNames(t))}</span></span><span class="b num">${E.toParLabel(t.toPar)}</span></div>`).join('');
+  const kbs = teams.filter(t => t.kb);
+  const kb = kbs.length ? `<div class="blk"><div class="cap">KBs</div>${kbs.map(t => `<div class="ln"><span>${esc(t.name)} <span class="sub">${esc(scrNames(t))}</span></span><span class="b num">${E.toParLabel(t.toPar)}</span></div>`).join('')}</div>` : '';
+  const contests = res.contests.filter(c => c.winner || (c.lead && c.lead.pid)).map(c => `<div class="ln"><span class="sub">${CONTEST[c.type]}${c.hole ? ' ' + c.hole : ''}</span><span>${c.winner ? esc(D.nameOf(c.winner)) + ' ' + CUP : `${esc(D.nameOf(c.lead.pid))} <span class="sub">so far</span>`}</span></div>`).join('');
+  const card = `<div class="rcard" id="rcard">
+    <div class="top"><div class="cap">${esc(D.society())} · ${esc(roundName(r))}${r.date ? ' · ' + esc(fmtDate(r.date, true)) : ''} · Scramble · ${final ? 'Final' : `Thru ${minThru}`}</div><div class="title">${esc(headline)}</div></div>
+    <div class="blk">${rows}</div>
+    ${kb}
+    ${contests ? `<div class="blk">${contests}</div>` : ''}
+    ${isDemo(r) ? '<div class="blk cap">Demo scores</div>' : ''}
+  </div>`;
+  return { html: `${navBack(backLabel())}<div style="margin-top:8px">${card}</div><button class="btn" data-act="share-card" data-rid="${r.id}">${sized(ICON.share, 20)}<span>Share</span></button>` };
+}
 VIEWS.results = p => {
   const r = D.round(p.rid);
   const res = resultsOf(p.rid);
+  if (res && res.source === 'scramble') return scrambleShare(r, res);
   const lb = res.rows;
   if (!lb.length) return { html: `${navBack(backLabel())}<p class="sub">No results yet</p>` };
   const top = lb[0];
