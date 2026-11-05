@@ -182,7 +182,9 @@ const serverScores = async () => (await state()).tables.scores.filter(s => s.rou
     const o = await phone(R.g2[0]);
     await o.sync();
     await o.pg.evaluate(() => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; n.UI.org = true; n.UI.orgUnlocked = true; n.UI.orgStack = [{ v: 'home', p: {} }, { v: 'round', p: { rid: 'e2e' } }]; n.render(); });
-    check('7. the organiser\'s round page shows the score that was not saved', /1 score sent by a phone was not saved/.test(await o.pg.locator('main').innerText()));
+    check('7. the organiser\'s round page shows the score that didn\'t reach the scores', /1 score sent by a phone didn.t reach the scores/.test(await o.pg.locator('main').innerText()));
+    await o.pg.click('[data-act="rej-dealt"]'); await o.pg.waitForTimeout(200); await o.sync(); await o.pg.waitForTimeout(200);
+    check('7. after Dealt with, the organiser\'s warning goes away and the change log says so', !/didn.t reach the scores/.test(await o.pg.locator('main').innerText()) && (await state()).tables.log.some(l => l.action === 'Scores not saved: dealt with'));
     await o.close();
     await a.pg.click('[data-act="rejected-clear"]'); await a.pg.click('[data-act="rejected-clear"]'); await a.pg.waitForTimeout(150);
     check('7. the phone\'s list can be cleared', (await a.pg.evaluate(() => (window.__ncgs.DB.prefs.rejected || []).length)) === 0);

@@ -128,7 +128,7 @@ VIEWS.rejected = () => {
   const list = (DB.prefs.rejected || []).slice().reverse();
   const when = at => { const d = new Date(at); return isNaN(d) ? '' : d.toLocaleString('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit' }); };
   return {
-    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Not saved</h1></div><p class="sub">${list.length ? 'The server refused these, so they are only on this phone. The organiser can see them in the log.' : 'Nothing waiting.'}</p></header>
+    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Not saved</h1></div><p class="sub">${list.length ? 'These didn\'t reach the scores, so they are only on this phone. The organiser can see them too and will correct the card if they should count.' : 'Nothing waiting.'}</p></header>
       ${list.length ? sec('', cardOf(list.map(x => `<div class="row tall"><span class="two"><span>${esc(x.what || rejectedWhat(x.req))}</span><span class="sub">Not saved because ${esc(x.why || x.message || x.error)}${when(x.at) ? ` · ${esc(when(x.at))}` : ''}</span></span></div>`).join('')), true) +
         `<button class="btn quiet" data-act="rejected-clear">${UI.confirm === 'rej-clear' ? 'Tap again: the organiser has these' : 'Clear this list'}</button>` : ''}`
   };

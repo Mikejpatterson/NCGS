@@ -374,6 +374,14 @@ function ensureLibraryCourses() {
   return rows.length;
 }
 ACT.rejected = () => go('rejected');
+ACT['rej-dealt'] = el => {
+  const rid = el.dataset.rid;
+  let dealt = []; try { dealt = JSON.parse(D.setting('rejdealt:' + rid, '[]')); } catch (e) { dealt = []; }
+  const ids = D.log().filter(l => String(l.id).startsWith(`rej:${rid}:`)).map(l => l.id);
+  const all = [...new Set(dealt.concat(ids))];
+  put('settings', [{ key: 'rejdealt:' + rid, value: JSON.stringify(all) }], { action: 'Scores not saved: dealt with', detail: `${roundName(D.round(rid))}: ${plural(ids.length - dealt.filter(i => ids.includes(i)).length, 'score')}` });
+  render(); toast('Marked as dealt with');
+};
 ACT['rejected-clear'] = () => { if (UI.confirm !== 'rej-clear') { UI.confirm = 'rej-clear'; render(); return; } UI.confirm = null; clearRejected(); render(); toast('Cleared'); };
 Object.assign(ACT, DRAW_ACT, GROUP_ACT, SCORER_ACT);
 
