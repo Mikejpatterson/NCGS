@@ -107,7 +107,8 @@ const INPAGE = {
       const href = await el.evaluate(x => x.getAttribute('href') || '').catch(() => ''); const actName = await el.evaluate(x => x.dataset.act || '').catch(() => '');
       if (/^(https?:|mailto:|tel:|sms:|whatsapp:)/i.test(href) && !href.includes('localhost')) return 'external';
       for (let tries = 0; ; tries++) {
-        try { await el.evaluate(x => x.scrollIntoView({ block: 'center' })); await el.click({ timeout: 4000, noWaitAfter: true }); break; }
+        // a scrim (the dark area round a card) is tapped outside the card, near its top-left corner, as a person would
+        try { await el.evaluate(x => x.scrollIntoView({ block: 'center' })); await el.click(/-scrim$/.test(actName) ? { timeout: 4000, noWaitAfter: true, position: { x: 6, y: 6 } } : { timeout: 4000, noWaitAfter: true }); break; }
         catch (e) {
           if (tries < 3 && /not attached|detached|Execution context/.test(e.message)) { await pg.waitForTimeout(250); el = (await visibleControls(pg))[step.i]; if (!el) return false; continue; }
           if (/intercepts pointer|Timeout/.test(e.message)) { pg.covered = true; } else pg.errs.push('click failed: ' + e.message.split('\n')[0]);
@@ -126,7 +127,7 @@ const INPAGE = {
       for (let k = 0; k < 8; k++) {
         const s = await pg.evaluate(() => { const n = window.__ncgs; const st = n.UI.org ? n.UI.orgStack : n.UI.stack; return { top: (st[st.length - 1] || {}).v, org: n.UI.org, len: st.length, conf: !!n.UI.confirm }; });
         if (!s.org && s.top === 'home' && s.len === 1) return true;
-        const sel = ['[data-act="holes-close"]', '[data-act="contest-close"]', '[data-act="sheet-close"]', '[data-act="share-close"]', '[data-act="photo-close"]', '[data-act="fix-cancel"]', '[data-act="late-cancel"]', '[data-act="ask-cancel"]', '[data-act="entry-back"]', '[data-act="org-exit"]', '[data-act="back"]', '[data-act="home"]', '#tabs:not([hidden]) .tab[data-tab="home"]', '.tab[data-tab="hole"]'];
+        const sel = ['[data-act="holes-close"]', '[data-act="intro-go"]', '[data-act="contest-close"]', '[data-act="sheet-close"]', '[data-act="share-close"]', '[data-act="photo-close"]', '[data-act="fix-cancel"]', '[data-act="late-cancel"]', '[data-act="ask-cancel"]', '[data-act="entry-back"]', '[data-act="org-exit"]', '[data-act="back"]', '[data-act="home"]', '#tabs:not([hidden]) .tab[data-tab="home"]', '.tab[data-tab="hole"]'];
         let hit = null;
         for (const q of sel) { const e = await pg.$(q); if (e && await e.isVisible()) { hit = e; break; } }
         if (!hit) return false;
