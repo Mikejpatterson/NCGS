@@ -117,7 +117,9 @@ ORG.round = p => {
   // Once the organiser has dealt with them (corrected the card, or decided they don't count) they stop showing (owner follow-up).
   const dealt = (() => { try { return JSON.parse(D.setting('rejdealt:' + r.id, '[]')); } catch (e) { return []; } })();
   const refused = D.log().filter(l => String(l.id).startsWith(`rej:${r.id}:`) && !dealt.includes(l.id));
-  if (refused.length) html += `<div class="banner warn rej-org"><b>${plural(refused.length, 'score')} sent by a phone ${refused.length === 1 ? 'didn\'t' : 'didn\'t'} reach the scores.</b>${refused.map(l => `<br>${esc(l.by)}: ${esc(l.detail)}`).join('')}<br>Correct the card here if ${refused.length === 1 ? 'it should' : 'they should'} count, then tap Dealt with.<div><button class="btn quiet" data-act="rej-dealt" data-rid="${r.id}">Dealt with</button></div></div>`;
+  // Two taps, like clearing a phone's list: one stray tap must not hide a lost-score warning (reviewer). Only the scores
+  // on screen are marked, so a refusal that arrives later shows the warning again.
+  if (refused.length) html += `<div class="banner warn rej-org"><b>${plural(refused.length, 'score')} sent by a phone didn't reach the scores.</b>${refused.map(l => `<br>${esc(l.by)}: ${esc(l.detail)}`).join('')}<br>Correct the card here if ${refused.length === 1 ? 'it should' : 'they should'} count, then tap Dealt with.<div><button class="btn quiet" data-act="rej-dealt" data-rid="${r.id}" data-ids="${esc(JSON.stringify(refused.map(l => l.id)))}">${UI.confirm === 'rejdealt-' + r.id ? 'Tap again: these are dealt with' : 'Dealt with'}</button></div></div>`;
   if (c && (!c.holes || !tee)) html += `<div class="banner note">${esc(c.name)} needs ${!c.holes ? 'its par and stroke index for each hole' : 'tee details'} before scores can be entered. <button class="link inline" data-act="org-go" data-v="course" data-cid="${c.id}">Add them</button></div>`;
   const comp = progressOf(r.id);
   if (comp && r.status !== 'upcoming') {

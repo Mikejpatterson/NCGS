@@ -376,10 +376,12 @@ function ensureLibraryCourses() {
 ACT.rejected = () => go('rejected');
 ACT['rej-dealt'] = el => {
   const rid = el.dataset.rid;
+  if (UI.confirm !== 'rejdealt-' + rid) { UI.confirm = 'rejdealt-' + rid; render(); return; }
+  UI.confirm = null;
   let dealt = []; try { dealt = JSON.parse(D.setting('rejdealt:' + rid, '[]')); } catch (e) { dealt = []; }
-  const ids = D.log().filter(l => String(l.id).startsWith(`rej:${rid}:`)).map(l => l.id);
-  const all = [...new Set(dealt.concat(ids))];
-  put('settings', [{ key: 'rejdealt:' + rid, value: JSON.stringify(all) }], { action: 'Scores not saved: dealt with', detail: `${roundName(D.round(rid))}: ${plural(ids.length - dealt.filter(i => ids.includes(i)).length, 'score')}` });
+  let ids = []; try { ids = JSON.parse(el.dataset.ids || '[]'); } catch (e) { ids = []; }   // only the scores that were on screen
+  const fresh = ids.filter(i => !dealt.includes(i));
+  put('settings', [{ key: 'rejdealt:' + rid, value: JSON.stringify(dealt.concat(fresh)) }], { action: 'Scores not saved: dealt with', detail: `${roundName(D.round(rid))}: ${plural(fresh.length, 'score')}` });
   render(); toast('Marked as dealt with');
 };
 ACT['rejected-clear'] = () => { if (UI.confirm !== 'rej-clear') { UI.confirm = 'rej-clear'; render(); return; } UI.confirm = null; clearRejected(); render(); toast('Cleared'); };
