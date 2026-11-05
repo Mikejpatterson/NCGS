@@ -188,7 +188,8 @@ const INPAGE = {
           else note(sc, 'FLAKY', label, 'did nothing at first, worked on a second try');
         }
         // two-step confirm: tap the same control again
-        if (await cur.evaluate(() => !!window.__ncgs.UI.confirm)) {
+        // only a confirm this tap started (one already open before it is not this control's second step)
+        if (after.confirm && after.confirm !== before.confirm) {
           const again = await tap(cur, step);
           await cur.waitForTimeout(150);
           const a2 = await snap(cur);
