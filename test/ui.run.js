@@ -143,6 +143,8 @@ const check = (name, ok, extra) => { results.push([ok ? 'PASS' : 'FAIL', name, e
   check('picking a row ticks it and switches Confirm on', (await page.$eval('.askrow.on', e => e.textContent)) === 'Nobody' && !(await page.$eval('[data-act="ask-confirm"]', e => e.disabled)));
   await tap('[data-act="ask-confirm"]');
   await page.waitForSelector('[data-act="undo"]');
+  // wait for the after-hole screen to finish drawing before reading it (reviewer: a race here could fail CI at random)
+  await page.waitForFunction(() => /Saved/.test(document.body.innerText) && /Hole 16/.test(document.body.innerText), null, { timeout: 4000 }).catch(() => {});
   t = await text();
   check('after: result and next hole', /Saved/.test(t) && /Hole 16/.test(t));
   check('after save: one card with the hole result and one line per match (back nine, overall), no Was lines, no pills', (await page.$$('.aftercard .afres')).length === 1 && (await page.$$('.aftercard .bw-row:not(.afres)')).length === 2 && !/Was /.test(t) && !(await page.$('.aftercard .pill')), await page.$$eval('.aftercard .bw-row', e => e.map(x => x.textContent.trim()).join(' | ')).catch(() => 'no .aftercard'));
