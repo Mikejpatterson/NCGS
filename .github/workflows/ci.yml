@@ -81,7 +81,7 @@ jobs:
       fail-fast: false
       matrix:
         scenarios:
-          - player,known
+          - player,known,follower
           - organiser,deep
           - nogroups,nogroups-org,pots1,pots1-org
           - outsider,allfinal,nocard
