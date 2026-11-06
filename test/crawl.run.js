@@ -103,8 +103,8 @@ const INPAGE = {
       if (step.fill) { await fillForms(pg); await pg.waitForTimeout(200); }
       let el = (await visibleControls(pg))[step.i]; if (!el) return false;
       // (1) a control that is already the selected one (tab, pill, choice) is allowed to do nothing
-      // Only tabs and pills count: a toggle (aria-pressed/checked, .on) must still do something when tapped again (reviewer).
-      pg.wasActive = await el.evaluate(x => x.getAttribute('aria-selected') === 'true' || !!x.getAttribute('aria-current') || ((x.getAttribute('role') === 'tab' || /\b(tab|pill)\b/.test(x.className) || ['tab', 'rtab', 'respill', 'year'].includes(x.dataset.act)) && (x.classList.contains('on') || x.classList.contains('active') || x.classList.contains('sel')))).catch(() => false);
+      // Only tabs, pills and one-of-two switches (.seg) count: an on/off toggle must still do something when tapped again (reviewer).
+      pg.wasActive = await el.evaluate(x => x.getAttribute('aria-selected') === 'true' || !!x.getAttribute('aria-current') || ((x.getAttribute('role') === 'tab' || /\b(tab|pill)\b/.test(x.className) || !!x.closest('.seg, .pills') || ['tab', 'rtab', 'respill', 'year'].includes(x.dataset.act)) && (x.classList.contains('on') || x.classList.contains('active') || x.classList.contains('sel')))).catch(() => false);
       const href = await el.evaluate(x => x.getAttribute('href') || '').catch(() => ''); const actName = await el.evaluate(x => x.dataset.act || '').catch(() => '');
       if (/^(https?:|mailto:|tel:|sms:|whatsapp:)/i.test(href) && !href.includes('localhost')) return 'external';
       for (let tries = 0; ; tries++) {
