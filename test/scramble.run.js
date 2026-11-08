@@ -137,15 +137,18 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
       check(`the scramble share card fits a ${w}px phone`, fits);
     }
     await page.setViewportSize({ width: 390, height: 844 });
-    // Owner, 8 November: the line under the team name says where the team stands in plain words, not "E thru 1".
-    const words = [];
+    // Owner, 8 November: the team's score so far keeps its wording ("E thru 1", "−2 thru 5") and sits flush under the
+    // team name, whole and readable, not as a small indented label.
+    const teamLines = [];
     for (const g of ['g1', 'g2', 'g3', 'g4']) {
-      const w = await page.evaluate(gid => { const n = window.__ncgs, r = n.D.round('fx-wp2'), grp = r.groups.find(x => x.id === gid); if (!grp) return null; n.DB.prefs.me = grp.teams.flat()[0]; n.DB.prefs.scorer = { 'fx-wp2': true }; n.DB.prefs.intro = { all: true }; n.UI.org = false; n.UI.edit = false; n.UI.teeHole = null; n.UI.stack = [{ v: 'home', p: {} }, { v: 'tee', p: { rid: 'fx-wp2' } }]; n.render(); const e = document.querySelector('.scr-score .scr-topar'); return e ? e.textContent.trim() : ''; }, g);
-      if (w !== null) words.push(w);
+      const w = await page.evaluate(gid => { const n = window.__ncgs, r = n.D.round('fx-wp2'), grp = r.groups.find(x => x.id === gid); if (!grp) return null; n.DB.prefs.me = grp.teams.flat()[0]; n.DB.prefs.scorer = { 'fx-wp2': true }; n.DB.prefs.intro = { all: true }; n.UI.org = false; n.UI.edit = false; n.UI.teeHole = null; n.UI.stack = [{ v: 'home', p: {} }, { v: 'tee', p: { rid: 'fx-wp2' } }]; n.render();
+        const e = document.querySelector('.scr-score .scr-topar'), nm = document.querySelector('.scr-score .nmrow'); if (!e || !nm) return { text: '', ok: false };
+        const rb = e.getBoundingClientRect(), q = nm.getBoundingClientRect(), cs = getComputedStyle(e);
+        return { text: e.textContent.trim(), ok: Math.abs(rb.left - q.left) < 2 && rb.top >= q.bottom - 1 && e.scrollWidth <= e.clientWidth + 1 && rb.right <= innerWidth && parseFloat(cs.fontSize) >= 15 && cs.fontVariantNumeric.includes('tabular-nums') }; }, g);
+      if (w) teamLines.push(w);
     }
-    check('the team line reads Level / N under / N over after N holes', words.length > 0 && words.every(w => w === '' || /^(Level|\d+ (under|over)) after \d+ holes?$/.test(w)) && words.some(w => /^Level /.test(w)) && words.some(w => / under /.test(w)) && words.some(w => / over /.test(w)), JSON.stringify(words));
-    const none = await page.evaluate(() => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const b = n.D.round('fx-wp2'); n.put('rounds', [Object.assign({}, b, { id: 'wp-new', name: 'Fresh scramble', status: 'live' })]); n.put('settings', [{ key: 'format:wp-new', value: 'scramble' }]); n.DB.prefs.me = b.groups[0].teams.flat()[0]; n.DB.prefs.scorer = { 'wp-new': true }; n.UI.stack = [{ v: 'home', p: {} }, { v: 'tee', p: { rid: 'wp-new' } }]; n.render(); return { line: !!document.querySelector('.scr-score .scr-topar'), entry: !!document.querySelector('.scr-score') }; });
-    check('before the first hole is saved there is no standing line', none.entry && !none.line, JSON.stringify(none));
+    check('the team line keeps its wording (E / \u2212n / +n thru n)', teamLines.length > 0 && teamLines.every(l => /^(E|[+\u2212]\d+)( thru \d+)?$/.test(l.text)), JSON.stringify(teamLines.map(l => l.text)));
+    check('and sits flush under the team name, whole, readable size, tabular figures', teamLines.every(l => l.ok), JSON.stringify(teamLines));
     // Stroke play (owner, 2 November): no pick-up. A draft from before the change holding one is never saved.
     const pu = await page.evaluate(() => {
       const n = window.__ncgs, r = n.D.round('fx-wp2'), g = r.groups[0], pid = g.teams.flat()[0], hole = 18;

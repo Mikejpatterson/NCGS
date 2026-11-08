@@ -54,13 +54,6 @@ function scrTeamCard(r, t) {
   const sum = [t.played ? `${t.strokes} strokes` : 'No holes yet', t.teamShots ? (t.teamShots > 0 ? `${t.teamShots} team ${t.teamShots === 1 ? 'shot' : 'shots'} off` : `${-t.teamShots} added`) : '', E.toParLabel(t.toPar)].filter(Boolean).join(' \u00B7 ');
   return table + `<p class="cap scr-sum">${sum}</p>`;
 }
-/* Where a team stands, in plain words (owner, 8 November): "Level after 1 hole", "1 under after 3 holes",
-   "2 over after 5 holes". Nothing before the first hole is saved. toPar already counts the team shots used so far. */
-function scrStanding(t) {
-  if (!t || !t.played) return '';
-  const after = `after ${plural(t.played, 'hole')}`;
-  return t.toPar === 0 ? `Level ${after}` : `${Math.abs(t.toPar)} ${t.toPar < 0 ? 'under' : 'over'} ${after}`;
-}
 function scrambleTable(r, res) {
   const teams = res.teams || [];
   if (!teams.length) return sec(label('Teams'), cardOf('<div class="row"><span class="sub">Teams are not drawn yet</span></div>'));
@@ -131,7 +124,7 @@ VIEWS.scramble = () => {
   const num = Number.isInteger(v);
   const scoreWord = num ? E.scoreName(v, h.par) : '';
   html += sec(label('Score'), `<div class="bugs b0 scr-score" aria-label="Team score"><div class="pr ptile">
-    <div class="pr-top"><span class="nm"><span class="nmrow">${esc(gc.name)}</span></span></div>${scrStanding(gc) ? `<span class="sub scr-topar">${scrStanding(gc)}</span>` : ''}
+    <div class="pr-top"><span class="nm"><span class="nmrow">${esc(gc.name)}</span></span></div><span class="scr-topar num">${E.toParLabel(gc.toPar)}${gc.played ? ` thru ${gc.played}` : ''}</span>
     <div class="stepper" role="group" aria-label="Team strokes">
     ${num ? `<button class="stv" data-act="scr-clear" aria-label="Team score ${v} strokes, ${esc(scoreWord)}. Tap to clear"${final ? ' disabled' : ''}><b><span class="scr-val">${v}</span></b><small>${scoreWord}</small></button>` : `<div class="stv none">Par ${h.par}</div>`}
     <button class="st" data-act="scr-score" data-dir="down" aria-label="One less for the team"${final ? ' disabled' : ''}>−</button>

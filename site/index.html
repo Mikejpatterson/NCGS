@@ -2362,14 +2362,14 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .scr-sc thead th { padding-left: 1px; padding-right: 1px; }
 .scr-sc td:last-child, .scr-sc th:last-child { padding-right: 4px; }
 
-/* The team's standing sits on its own line directly under the team name (owner, 8 November), in the slot a scramble no
-   longer uses for Pick up, so it adds no height to the screen. */
+/* The team's score so far ("E thru 1", "−2 thru 5") on its own line, flush with the team name, readable outdoors
+   (owner, 8 November). It sits in the grid slot a scramble no longer uses for Pick up, so the screen gets no taller. */
 .entry .bugs.scr-score .pr.ptile:not(.long) { grid-template-columns: minmax(0, 1fr) 48px minmax(64px, max-content) 48px; grid-template-areas: "nm dn sc up" "pu dn sc up"; }
-.entry .bugs.scr-score .scr-topar { grid-area: pu; align-self: start; margin: 1px 0 0; text-align: left; font-size: var(--t-cap); line-height: 1.15; font-variant-numeric: tabular-nums; min-width: 0; }
+.entry .bugs.scr-score .scr-topar { grid-area: pu; align-self: start; justify-self: start; margin: 2px 0 0; padding: 0; font-size: var(--t-body); font-weight: 650; line-height: 1.15; color: var(--pine); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .entry .bugs.scr-score .pr.ptile { padding-block: 5px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611080932","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611080941","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -6851,13 +6851,6 @@ function scrTeamCard(r, t) {
   const sum = [t.played ? `${t.strokes} strokes` : 'No holes yet', t.teamShots ? (t.teamShots > 0 ? `${t.teamShots} team ${t.teamShots === 1 ? 'shot' : 'shots'} off` : `${-t.teamShots} added`) : '', E.toParLabel(t.toPar)].filter(Boolean).join(' \u00B7 ');
   return table + `<p class="cap scr-sum">${sum}</p>`;
 }
-/* Where a team stands, in plain words (owner, 8 November): "Level after 1 hole", "1 under after 3 holes",
-   "2 over after 5 holes". Nothing before the first hole is saved. toPar already counts the team shots used so far. */
-function scrStanding(t) {
-  if (!t || !t.played) return '';
-  const after = `after ${plural(t.played, 'hole')}`;
-  return t.toPar === 0 ? `Level ${after}` : `${Math.abs(t.toPar)} ${t.toPar < 0 ? 'under' : 'over'} ${after}`;
-}
 function scrambleTable(r, res) {
   const teams = res.teams || [];
   if (!teams.length) return sec(label('Teams'), cardOf('<div class="row"><span class="sub">Teams are not drawn yet</span></div>'));
@@ -6928,7 +6921,7 @@ VIEWS.scramble = () => {
   const num = Number.isInteger(v);
   const scoreWord = num ? E.scoreName(v, h.par) : '';
   html += sec(label('Score'), `<div class="bugs b0 scr-score" aria-label="Team score"><div class="pr ptile">
-    <div class="pr-top"><span class="nm"><span class="nmrow">${esc(gc.name)}</span></span></div>${scrStanding(gc) ? `<span class="sub scr-topar">${scrStanding(gc)}</span>` : ''}
+    <div class="pr-top"><span class="nm"><span class="nmrow">${esc(gc.name)}</span></span></div><span class="scr-topar num">${E.toParLabel(gc.toPar)}${gc.played ? ` thru ${gc.played}` : ''}</span>
     <div class="stepper" role="group" aria-label="Team strokes">
     ${num ? `<button class="stv" data-act="scr-clear" aria-label="Team score ${v} strokes, ${esc(scoreWord)}. Tap to clear"${final ? ' disabled' : ''}><b><span class="scr-val">${v}</span></b><small>${scoreWord}</small></button>` : `<div class="stv none">Par ${h.par}</div>`}
     <button class="st" data-act="scr-score" data-dir="down" aria-label="One less for the team"${final ? ' disabled' : ''}>−</button>
