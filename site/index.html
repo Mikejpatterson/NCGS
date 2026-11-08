@@ -2363,7 +2363,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .scr-sc td:last-child, .scr-sc th:last-child { padding-right: 4px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611052049","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611081100","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -5769,7 +5769,7 @@ VIEWS.rejected = () => {
   const list = (DB.prefs.rejected || []).slice().reverse();
   const when = at => { const d = new Date(at); return isNaN(d) ? '' : d.toLocaleString('en-GB', { weekday: 'short', hour: '2-digit', minute: '2-digit' }); };
   return {
-    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Not saved</h1></div><p class="sub">${list.length ? 'The server refused these, so they are only on this phone. The organiser can see them in the log.' : 'Nothing waiting.'}</p></header>
+    html: `<header class="hero s">${navBack(backLabel())}<div class="head"><h1 class="title">Not saved</h1></div><p class="sub">${list.length ? 'These didn\'t reach the scores, so they are only on this phone. The organiser can see them too and will correct the card if they should count.' : 'Nothing waiting.'}</p></header>
       ${list.length ? sec('', cardOf(list.map(x => `<div class="row tall"><span class="two"><span>${esc(x.what || rejectedWhat(x.req))}</span><span class="sub">Not saved because ${esc(x.why || x.message || x.error)}${when(x.at) ? ` · ${esc(when(x.at))}` : ''}</span></span></div>`).join('')), true) +
         `<button class="btn quiet" data-act="rejected-clear">${UI.confirm === 'rej-clear' ? 'Tap again: the organiser has these' : 'Clear this list'}</button>` : ''}`
   };
@@ -7416,8 +7416,12 @@ ORG.round = p => {
     ${r.trip ? `<button class="row tall" data-act="org-tripboard" data-rid="${r.id}"><span class="two"><span>Trip leaderboard</span><span class="sub">${tripBoardOn(r) ? `${esc(r.trip)} adds up the days` : `No combined board for ${esc(r.trip)}: each day has its own results`}</span></span><span class="pill ${tripBoardOn(r) ? 'g' : 'n'}">${tripBoardOn(r) ? 'On' : 'Off'}</span></button>` : ''}
     ${isScramble(r) ? '' : `<button class="row tall" data-act="org-go" data-v="kb" data-rid="${r.id}"><span class="two"><span>KBs</span><span class="sub">${E.kbOff(r) ? 'Off' : r.kb && r.kb.length ? plural(r.kb.length, 'pair') : 'None'}</span></span>${chev}</button>`}`), true);
   // Scores a phone sent after this round was final (or otherwise refused): they never reached the scores (review H1).
-  const refused = D.log().filter(l => String(l.id).startsWith(`rej:${r.id}:`));
-  if (refused.length) html += `<div class="banner warn"><b>${plural(refused.length, 'score')} sent by a phone ${refused.length === 1 ? 'was' : 'were'} not saved.</b>${refused.map(l => `<br>${esc(l.by)}: ${esc(l.detail)}`).join('')}<br>Correct the card here if they should count.</div>`;
+  // Once the organiser has dealt with them (corrected the card, or decided they don't count) they stop showing (owner follow-up).
+  const dealt = (() => { try { return JSON.parse(D.setting('rejdealt:' + r.id, '[]')); } catch (e) { return []; } })();
+  const refused = D.log().filter(l => String(l.id).startsWith(`rej:${r.id}:`) && !dealt.includes(l.id));
+  // Two taps, like clearing a phone's list: one stray tap must not hide a lost-score warning (reviewer). Only the scores
+  // on screen are marked, so a refusal that arrives later shows the warning again.
+  if (refused.length) html += `<div class="banner warn rej-org"><b>${plural(refused.length, 'score')} sent by a phone didn't reach the scores.</b>${refused.map(l => `<br>${esc(l.by)}: ${esc(l.detail)}`).join('')}<br>Correct the card here if ${refused.length === 1 ? 'it should' : 'they should'} count, then tap Dealt with.<div><button class="btn quiet" data-act="rej-dealt" data-rid="${r.id}" data-ids="${esc(JSON.stringify(refused.map(l => l.id)))}">${UI.confirm === 'rejdealt-' + r.id ? 'Tap again: these are dealt with' : 'Dealt with'}</button></div></div>`;
   if (c && (!c.holes || !tee)) html += `<div class="banner note">${esc(c.name)} needs ${!c.holes ? 'its par and stroke index for each hole' : 'tee details'} before scores can be entered. <button class="link inline" data-act="org-go" data-v="course" data-cid="${c.id}">Add them</button></div>`;
   const comp = progressOf(r.id);
   if (comp && r.status !== 'upcoming') {
@@ -8684,6 +8688,16 @@ function ensureLibraryCourses() {
   return rows.length;
 }
 ACT.rejected = () => go('rejected');
+ACT['rej-dealt'] = el => {
+  const rid = el.dataset.rid;
+  if (UI.confirm !== 'rejdealt-' + rid) { UI.confirm = 'rejdealt-' + rid; render(); return; }
+  UI.confirm = null;
+  let dealt = []; try { dealt = JSON.parse(D.setting('rejdealt:' + rid, '[]')); } catch (e) { dealt = []; }
+  let ids = []; try { ids = JSON.parse(el.dataset.ids || '[]'); } catch (e) { ids = []; }   // only the scores that were on screen
+  const fresh = ids.filter(i => !dealt.includes(i));
+  put('settings', [{ key: 'rejdealt:' + rid, value: JSON.stringify(dealt.concat(fresh)) }], { action: 'Scores not saved: dealt with', detail: `${roundName(D.round(rid))}: ${plural(fresh.length, 'score')}` });
+  render(); toast('Marked as dealt with');
+};
 ACT['rejected-clear'] = () => { if (UI.confirm !== 'rej-clear') { UI.confirm = 'rej-clear'; render(); return; } UI.confirm = null; clearRejected(); render(); toast('Cleared'); };
 Object.assign(ACT, DRAW_ACT, GROUP_ACT, SCORER_ACT);
 

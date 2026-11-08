@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   checks:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # pinned: Playwright 1.56.1 cannot install on ubuntu-latest (26.04) since November 2026
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -74,7 +74,7 @@ jobs:
     # Split into parallel jobs, as all of it takes about 40 minutes on one machine.
     # Required (reviewer, before the January freeze): its false alarms are cleared in the crawler itself, and the contest
     # card now closes with a tap outside it. A dead end, a dead button, a script error or broken text fails the change.
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # pinned: Playwright 1.56.1 cannot install on ubuntu-latest (26.04) since November 2026
     timeout-minutes: 60
     strategy:
       fail-fast: false
