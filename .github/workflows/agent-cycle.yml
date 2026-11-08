@@ -41,7 +41,7 @@ jobs:
         (startsWith(github.event.comment.body, '/agent-task') || startsWith(github.event.comment.body, '/agent-continue')) &&
         github.event.comment.author_association == 'OWNER' &&
         github.event.comment.user.type == 'User')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # pinned: Playwright 1.56.1 cannot install on ubuntu-latest (26.04) since November 2026
     timeout-minutes: 120
     permissions:
       contents: write        # push agent/run-* and, when approved, the design branch (never main)
