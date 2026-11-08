@@ -137,6 +137,15 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
       check(`the scramble share card fits a ${w}px phone`, fits);
     }
     await page.setViewportSize({ width: 390, height: 844 });
+    // Owner, 8 November: the line under the team name says where the team stands in plain words, not "E thru 1".
+    const words = [];
+    for (const g of ['g1', 'g2', 'g3', 'g4']) {
+      const w = await page.evaluate(gid => { const n = window.__ncgs, r = n.D.round('fx-wp2'), grp = r.groups.find(x => x.id === gid); if (!grp) return null; n.DB.prefs.me = grp.teams.flat()[0]; n.DB.prefs.scorer = { 'fx-wp2': true }; n.DB.prefs.intro = { all: true }; n.UI.org = false; n.UI.edit = false; n.UI.teeHole = null; n.UI.stack = [{ v: 'home', p: {} }, { v: 'tee', p: { rid: 'fx-wp2' } }]; n.render(); const e = document.querySelector('.scr-score .scr-topar'); return e ? e.textContent.trim() : ''; }, g);
+      if (w !== null) words.push(w);
+    }
+    check('the team line reads Level / N under / N over after N holes', words.length > 0 && words.every(w => w === '' || /^(Level|\d+ (under|over)) after \d+ holes?$/.test(w)) && words.some(w => /^Level /.test(w)) && words.some(w => / under /.test(w)) && words.some(w => / over /.test(w)), JSON.stringify(words));
+    const none = await page.evaluate(() => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const b = n.D.round('fx-wp2'); n.put('rounds', [Object.assign({}, b, { id: 'wp-new', name: 'Fresh scramble', status: 'live' })]); n.put('settings', [{ key: 'format:wp-new', value: 'scramble' }]); n.DB.prefs.me = b.groups[0].teams.flat()[0]; n.DB.prefs.scorer = { 'wp-new': true }; n.UI.stack = [{ v: 'home', p: {} }, { v: 'tee', p: { rid: 'wp-new' } }]; n.render(); return { line: !!document.querySelector('.scr-score .scr-topar'), entry: !!document.querySelector('.scr-score') }; });
+    check('before the first hole is saved there is no standing line', none.entry && !none.line, JSON.stringify(none));
     // Stroke play (owner, 2 November): no pick-up. A draft from before the change holding one is never saved.
     const pu = await page.evaluate(() => {
       const n = window.__ncgs, r = n.D.round('fx-wp2'), g = r.groups[0], pid = g.teams.flat()[0], hole = 18;

@@ -36,7 +36,7 @@ const check = (name, good) => { console.log((good ? 'PASS  ' : 'FAIL  ') + name)
     // Stroke play (owner, 2 November): strokes only, no points and no Pick up.
     check(label + ': team strokes use the shared score row, with no points', await p.locator('.scr-score .scr-val').innerText() === '4' && await p.locator('.scr-score .stv sup').count() === 0);
     check(label + ': no Pick up in a scramble', await p.locator('[data-act="scr-pickup"]').count() === 0);
-    check(label + ': the team\'s score against par sits by its name and fits', await p.locator('.scr-score .scr-topar').evaluate(e => /^(E|[+\u2212]\d+)( thru \d+)?$/.test(e.textContent.trim()) && e.scrollWidth <= e.clientWidth && e.getBoundingClientRect().right <= innerWidth));
+    check(label + ': the team\'s standing reads in plain words on its own line under the name, and fits', await p.locator('.scr-score .scr-topar').evaluate(e => { const nm = e.parentElement.querySelector('.nmrow').getBoundingClientRect(), r = e.getBoundingClientRect(); return /^(Level|\d+ (under|over)) after \d+ holes?$/.test(e.textContent.trim()) && r.top >= nm.bottom - 1 && Math.abs(r.left - nm.left) < 2 && e.scrollWidth <= e.clientWidth + 1 && r.right <= innerWidth; }));
     await p.locator('[data-act="scr-score"][data-dir="up"]').click();
     check(label + ': changing strokes keeps the chosen drive', await p.locator('.scr-score .scr-val').innerText() === '5' && await p.locator('[data-act="scr-driver"][aria-checked="true"]').count() === 1);
     await p.locator('[data-act="scr-clear"]').click();

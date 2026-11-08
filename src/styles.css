@@ -2351,3 +2351,9 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 /* The team card has one more column than a player's: keep every heading whole at 360px and 135% text (reviewer). */
 .scr-sc thead th { padding-left: 1px; padding-right: 1px; }
 .scr-sc td:last-child, .scr-sc th:last-child { padding-right: 4px; }
+
+/* The team's standing sits on its own line directly under the team name (owner, 8 November), in the slot a scramble no
+   longer uses for Pick up, so it adds no height to the screen. */
+.entry .bugs.scr-score .pr.ptile:not(.long) { grid-template-columns: minmax(0, 1fr) 48px minmax(64px, max-content) 48px; grid-template-areas: "nm dn sc up" "pu dn sc up"; }
+.entry .bugs.scr-score .scr-topar { grid-area: pu; align-self: start; margin: 1px 0 0; text-align: left; font-size: var(--t-cap); line-height: 1.15; font-variant-numeric: tabular-nums; min-width: 0; }
+.entry .bugs.scr-score .pr.ptile { padding-block: 5px; }
