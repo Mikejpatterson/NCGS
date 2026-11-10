@@ -2363,7 +2363,7 @@ form[data-form="details"] > .course-fold { margin-top: 20px; }
 .scr-sc td:last-child, .scr-sc th:last-child { padding-right: 4px; }
 </style></head><body><main id="app" aria-live="polite"></main>
 <nav id="tabs" class="tabs" aria-label="Sections" hidden></nav>
-<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611052304","server":"5d110ed7"};</script>
+<script>window.NCGS_BOOT = {"mode":"live","api":"https://script.google.com/macros/s/AKfycbwdV8AypHqDeLaXdFB4HR5kimAgzj7Zs8C2cyFB8Dl_HvC3EFgVS_2rdkuCnrF6VLyG/exec","version":"202611081100","server":"5d110ed7"};</script>
 
 <script>/* Golf trip scoring engine.
  * Pure functions only: no screen code and no storage, so every rule can be tested on its own.
@@ -8388,7 +8388,9 @@ const ACT = {
     savePrefs(); tick(); render();
   },
   'intro-go': el => { const rid = playRid(), g = myGroup(rid); (DB.prefs.intro = DB.prefs.intro || {})[contestKey(rid, g.id, Number(el.dataset.n))] = true; savePrefs(); render(); },
-  'intro-scrim': () => {},
+  // A tap outside the contest card closes it, the same as Let's play (stress test item 4): a card that only one button
+  // closes reads as stuck.
+  'intro-scrim': (el, e) => { if (e && e.target !== el) return; const go = el.querySelector('[data-act="intro-go"]'); if (go) ACT['intro-go'](go); },
   save: () => saveHole(),
   'scr-score': el => scrScore(el.dataset.dir),
   'scr-clear': () => scrClear(),

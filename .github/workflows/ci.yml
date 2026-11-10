@@ -61,6 +61,7 @@ jobs:
           node test/courses.run.js
           node test/screen-journeys.run.js
           node test/who.run.js
+          node test/contest-card.run.js
           node test/scorer.run.js
           node test/checklist-draw.run.js
           node test/fault-log.run.js
@@ -71,17 +72,15 @@ jobs:
     # Taps every visible control on every reachable screen, from ordinary and awkward starting points (reviewer's stress
     # test, 1 November). Fails on a dead end, a dead button, a script error or "undefined"/"NaN" on screen.
     # Split into parallel jobs, as all of it takes about 40 minutes on one machine.
-    # Report-only for now: on main it still flags taps the reviewer judged harmless by hand (an already-open tab, a
-    # second tap on a confirmed Save) and the contest card that only "Let's play" closes (stress test item 4). It runs
-    # on every change and keeps its findings; it becomes a required check once those are cleared.
+    # Required (reviewer, before the January freeze): its false alarms are cleared in the crawler itself, and the contest
+    # card now closes with a tap outside it. A dead end, a dead button, a script error or broken text fails the change.
     runs-on: ubuntu-24.04   # pinned: Playwright 1.56.1 cannot install on ubuntu-latest (26.04) since November 2026
     timeout-minutes: 60
-    continue-on-error: true
     strategy:
       fail-fast: false
       matrix:
         scenarios:
-          - player,known
+          - player,known,follower
           - organiser,deep
           - nogroups,nogroups-org,pots1,pots1-org
           - outsider,allfinal,nocard

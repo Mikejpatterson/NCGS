@@ -61,6 +61,8 @@ const INPAGE = {
         nogroups: () => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const b = n.D.round('fx-r3'); n.put('rounds', [Object.assign({}, b, { id: 'aw-ng', name: 'Today no groups', date: n.todayIso(), status: 'upcoming', groups: null, kb: null })]); n.put('rounds', [Object.assign({}, n.D.round('demo-cabopino'), { status: 'final' })]); n.DB.prefs.me = 'brian'; },
         pots1: () => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; const b = n.D.round('fx-r3'); n.put('rounds', [Object.assign({}, b, { id: 'aw-p1', name: 'Breakfast draw day', date: n.todayIso(), status: 'upcoming', groups: null, kb: null })]); n.put('settings', [{ key: 'pots:aw-p1', value: JSON.stringify({ pots: [['sean'], ['colin'], [], []], show: true }) }]); n.put('rounds', [Object.assign({}, n.D.round('demo-cabopino'), { status: 'final' })]); n.DB.prefs.me = 'brian'; },
         outsider: () => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; n.put('members', [{ id: 'zz-out', name: 'Zed', full: 'Zed Outsider', index: 20, active: true }]); n.DB.prefs.me = 'zz-out'; },
+        // A phone in a group that answered 'No, just following' (owner's option A, 1 November).
+        follower: () => { const n = window.__ncgs; const rid = n.liveRid(); n.DB.prefs.me = n.D.round(rid).groups[0].teams.flat()[1]; n.DB.prefs.scorer = { [rid]: false }; n.render(); },
         allfinal: () => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; n.put('rounds', [Object.assign({}, n.D.round('demo-cabopino'), { status: 'final' })]); n.DB.prefs.me = 'brian'; },
         nocard: () => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; n.put('courses', [{ id: 'aw-nc', name: 'Carne', area: 'Mayo', tees: null, holes: null }]); const b = n.D.round('fx-r3'); n.put('rounds', [Object.assign({}, b, { id: 'aw-nc-r', name: 'Carne day', course: 'aw-nc', tee: null, date: n.todayIso(), status: 'upcoming', kb: null })]); n.put('rounds', [Object.assign({}, n.D.round('demo-cabopino'), { status: 'final' })]); n.DB.prefs.me = 'brian'; },
         newseason: () => { const n = window.__ncgs; n.ORGPIN.pin = '1234'; n.put('rounds', [Object.assign({}, n.D.round('demo-cabopino'), { status: 'final' })]); n.put('settings', [{ key: 'season', value: String(new Date().getFullYear() + 1) }]); n.DB.prefs.me = 'brian'; },
@@ -100,10 +102,14 @@ const INPAGE = {
     const tap = async (pg, step) => {
       if (step.fill) { await fillForms(pg); await pg.waitForTimeout(200); }
       let el = (await visibleControls(pg))[step.i]; if (!el) return false;
+      // (1) a control that is already the selected one (tab, pill, choice) is allowed to do nothing
+      // Only tabs, pills and one-of-two switches (.seg) count: an on/off toggle must still do something when tapped again (reviewer).
+      pg.wasActive = await el.evaluate(x => x.getAttribute('aria-selected') === 'true' || !!x.getAttribute('aria-current') || ((x.getAttribute('role') === 'tab' || /\b(tab|pill)\b/.test(x.className) || !!x.closest('.seg, .pills') || ['tab', 'rtab', 'respill', 'year'].includes(x.dataset.act)) && (x.classList.contains('on') || x.classList.contains('active') || x.classList.contains('sel')))).catch(() => false);
       const href = await el.evaluate(x => x.getAttribute('href') || '').catch(() => ''); const actName = await el.evaluate(x => x.dataset.act || '').catch(() => '');
       if (/^(https?:|mailto:|tel:|sms:|whatsapp:)/i.test(href) && !href.includes('localhost')) return 'external';
       for (let tries = 0; ; tries++) {
-        try { await el.evaluate(x => x.scrollIntoView({ block: 'center' })); await el.click({ timeout: 4000, noWaitAfter: true }); break; }
+        // a scrim (the dark area round a card) is tapped outside the card, near its top-left corner, as a person would
+        try { await el.evaluate(x => x.scrollIntoView({ block: 'center' })); await el.click(/-scrim$/.test(actName) ? { timeout: 4000, noWaitAfter: true, position: { x: 6, y: 6 } } : { timeout: 4000, noWaitAfter: true }); break; }
         catch (e) {
           if (tries < 3 && /not attached|detached|Execution context/.test(e.message)) { await pg.waitForTimeout(250); el = (await visibleControls(pg))[step.i]; if (!el) return false; continue; }
           if (/intercepts pointer|Timeout/.test(e.message)) { pg.covered = true; } else pg.errs.push('click failed: ' + e.message.split('\n')[0]);
@@ -113,7 +119,7 @@ const INPAGE = {
       await pg.waitForTimeout(/share-card|restore|backup-now/.test(href + actName) ? 900 : 160);
       return true;
     };
-    const snap = pg => pg.evaluate(() => ({ html: (document.getElementById('app') || document.body).innerHTML + '||' + [...document.querySelectorAll('.tabbar,.toast,.sheet,.banner,[role=dialog],[role=alert]')].map(e => e.outerHTML).join(''), toast: ((document.querySelector('.toast') || {}).textContent || ''), y: window.scrollY, sig: (function () { const n = window.__ncgs; const s = n.UI.org ? n.UI.orgStack : n.UI.stack; const t = s[s.length - 1] || {}; return (n.UI.org ? 'O:' : 'P:') + t.v + (n.UI.confirm ? '|c' : '') + (n.UI.contestSheet ? '|sheet' : ''); })(), depth: (function () { const n = window.__ncgs; return (n.UI.org ? n.UI.orgStack : n.UI.stack).length; })(), text: document.body.innerText }));
+    const snap = pg => pg.evaluate(() => ({ html: (document.getElementById('app') || document.body).innerHTML + '||' + [...document.querySelectorAll('.tabbar,.toast,.sheet,.banner,[role=dialog],[role=alert]')].map(e => e.outerHTML).join(''), toast: ((document.querySelector('.toast') || {}).textContent || ''), y: window.scrollY, sig: (function () { const n = window.__ncgs; const s = n.UI.org ? n.UI.orgStack : n.UI.stack; const t = s[s.length - 1] || {}; return (n.UI.org ? 'O:' : 'P:') + t.v + (n.UI.confirm ? '|c' : '') + (n.UI.contestSheet ? '|sheet' : ''); })(), confirm: String(window.__ncgs.UI.confirm || ''), hasToast: !!document.querySelector('.toast:not([hidden])') && !!((document.querySelector('.toast') || {}).textContent || '').trim(), depth: (function () { const n = window.__ncgs; return (n.UI.org ? n.UI.orgStack : n.UI.stack).length; })(), text: document.body.innerText }));
     const replay = async (pg, path) => { for (const st of path) { const r = await tap(pg, st); if (!r) return false; } return true; };
     const badText = txt => { const m = txt.match(/\b(undefined|NaN|\[object Object\]|Infinity)\b|\bnull\b(?!\s*-)/); return m ? m[0] : null; };
 
@@ -122,7 +128,7 @@ const INPAGE = {
       for (let k = 0; k < 8; k++) {
         const s = await pg.evaluate(() => { const n = window.__ncgs; const st = n.UI.org ? n.UI.orgStack : n.UI.stack; return { top: (st[st.length - 1] || {}).v, org: n.UI.org, len: st.length, conf: !!n.UI.confirm }; });
         if (!s.org && s.top === 'home' && s.len === 1) return true;
-        const sel = ['[data-act="holes-close"]', '[data-act="contest-close"]', '[data-act="sheet-close"]', '[data-act="share-close"]', '[data-act="photo-close"]', '[data-act="fix-cancel"]', '[data-act="late-cancel"]', '[data-act="ask-cancel"]', '[data-act="entry-back"]', '[data-act="org-exit"]', '[data-act="back"]', '[data-act="home"]', '#tabs:not([hidden]) .tab[data-tab="home"]', '.tab[data-tab="hole"]'];
+        const sel = ['[data-act="holes-close"]', '[data-act="intro-go"]', '[data-act="contest-close"]', '[data-act="sheet-close"]', '[data-act="share-close"]', '[data-act="photo-close"]', '[data-act="fix-cancel"]', '[data-act="late-cancel"]', '[data-act="ask-cancel"]', '[data-act="entry-back"]', '[data-act="org-exit"]', '[data-act="back"]', '[data-act="home"]', '#tabs:not([hidden]) .tab[data-tab="home"]', '.tab[data-tab="hole"]'];
         let hit = null;
         for (const q of sel) { const e = await pg.$(q); if (e && await e.isVisible()) { hit = e; break; } }
         if (!hit) return false;
@@ -170,14 +176,22 @@ const INPAGE = {
         if (cur.errs.length) note(sc, 'ERROR', label, cur.errs.slice(0, 2).join(' | '));
         if (!/^0:/.test(faults)) note(sc, 'RENDER', label, faults);
         const bt2 = badText(after.text); if (bt2 && !badText(before.text)) note(sc, 'TEXT', label, `screen shows "${bt2}"`);
-        const changed = after.html !== before.html || after.sig !== before.sig || after.toast !== before.toast;
-        const selfOk = ['tab', 'respill', 'year'].includes((names[step.i] || '').split(' ')[0]) || /already|blocked/.test(after.toast);
+        // (2) a message shown or a change to the two-tap confirm counts as an effect
+        const effect = (b, a) => a.html !== b.html || a.sig !== b.sig || a.toast !== b.toast || a.confirm !== b.confirm || (a.hasToast && !b.hasToast);
+        const changed = effect(before, after);
+        const selfOk = cur.wasActive || ['tab', 'respill', 'year'].includes((names[step.i] || '').split(' ')[0]) || /already|blocked/.test(after.toast);
         if (!changed && !selfOk) {
-          // allowed: re-selecting what is already selected, ticking nothing, scrolling links
-          note(sc, 'NOEFFECT', label, 'nothing visibly happened');
+          // (3) try once more from a fresh start before calling it dead: a slow redraw is not a dead button
+          let second = false;
+          const re = await fresh();
+          if (await replay(re, path)) { const b2 = await snap(re); const r2 = await tap(re, step); await re.waitForTimeout(300); if (r2) { const a2 = await snap(re); second = effect(b2, a2) || re.wasActive; } }
+          await re.context().close();
+          if (!second) note(sc, 'NOEFFECT', label, 'nothing visibly happened (twice)');
+          else note(sc, 'FLAKY', label, 'did nothing at first, worked on a second try');
         }
         // two-step confirm: tap the same control again
-        if (await cur.evaluate(() => !!window.__ncgs.UI.confirm)) {
+        // only a confirm this tap started (one already open before it is not this control's second step)
+        if (after.confirm && after.confirm !== before.confirm) {
           const again = await tap(cur, step);
           await cur.waitForTimeout(150);
           const a2 = await snap(cur);

@@ -76,7 +76,9 @@ const ACT = {
     savePrefs(); tick(); render();
   },
   'intro-go': el => { const rid = playRid(), g = myGroup(rid); (DB.prefs.intro = DB.prefs.intro || {})[contestKey(rid, g.id, Number(el.dataset.n))] = true; savePrefs(); render(); },
-  'intro-scrim': () => {},
+  // A tap outside the contest card closes it, the same as Let's play (stress test item 4): a card that only one button
+  // closes reads as stuck.
+  'intro-scrim': (el, e) => { if (e && e.target !== el) return; const go = el.querySelector('[data-act="intro-go"]'); if (go) ACT['intro-go'](go); },
   save: () => saveHole(),
   'scr-score': el => scrScore(el.dataset.dir),
   'scr-clear': () => scrClear(),
