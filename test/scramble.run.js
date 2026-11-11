@@ -137,6 +137,18 @@ const URL = process.env.NCGS_TEST_URL || 'http://localhost:8765/preview.html';
       check(`the scramble share card fits a ${w}px phone`, fits);
     }
     await page.setViewportSize({ width: 390, height: 844 });
+    // Owner, 8 November: the team's score so far keeps its wording ("E thru 1", "−2 thru 5") and sits flush under the
+    // team name, whole and readable, not as a small indented label.
+    const teamLines = [];
+    for (const g of ['g1', 'g2', 'g3', 'g4']) {
+      const w = await page.evaluate(gid => { const n = window.__ncgs, r = n.D.round('fx-wp2'), grp = r.groups.find(x => x.id === gid); if (!grp) return null; n.DB.prefs.me = grp.teams.flat()[0]; n.DB.prefs.scorer = { 'fx-wp2': true }; n.DB.prefs.intro = { all: true }; n.UI.org = false; n.UI.edit = false; n.UI.teeHole = null; n.UI.stack = [{ v: 'home', p: {} }, { v: 'tee', p: { rid: 'fx-wp2' } }]; n.render();
+        const e = document.querySelector('.scr-score .scr-topar'), nm = document.querySelector('.scr-score .nmrow'); if (!e || !nm) return { text: '', ok: false };
+        const rb = e.getBoundingClientRect(), q = nm.getBoundingClientRect(), cs = getComputedStyle(e);
+        return { text: e.textContent.trim(), ok: Math.abs(rb.left - q.left) < 2 && rb.top >= q.bottom - 1 && e.scrollWidth <= e.clientWidth + 1 && rb.right <= innerWidth && parseFloat(cs.fontSize) >= 15 && cs.fontVariantNumeric.includes('tabular-nums') }; }, g);
+      if (w) teamLines.push(w);
+    }
+    check('the team line keeps its wording (E / \u2212n / +n thru n)', teamLines.length > 0 && teamLines.every(l => /^(E|[+\u2212]\d+)( thru \d+)?$/.test(l.text)), JSON.stringify(teamLines.map(l => l.text)));
+    check('and sits flush under the team name, whole, readable size, tabular figures', teamLines.every(l => l.ok), JSON.stringify(teamLines));
     // Stroke play (owner, 2 November): no pick-up. A draft from before the change holding one is never saved.
     const pu = await page.evaluate(() => {
       const n = window.__ncgs, r = n.D.round('fx-wp2'), g = r.groups[0], pid = g.teams.flat()[0], hole = 18;

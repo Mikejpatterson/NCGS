@@ -124,7 +124,7 @@ VIEWS.scramble = () => {
   const num = Number.isInteger(v);
   const scoreWord = num ? E.scoreName(v, h.par) : '';
   html += sec(label('Score'), `<div class="bugs b0 scr-score" aria-label="Team score"><div class="pr ptile">
-    <div class="pr-top"><span class="nm"><span class="nmrow">${esc(gc.name)}</span></span><span class="sub scr-topar num">${E.toParLabel(gc.toPar)}${gc.played ? ` thru ${gc.played}` : ''}</span></div>
+    <div class="pr-top"><span class="nm"><span class="nmrow">${esc(gc.name)}</span></span></div><span class="scr-topar num">${E.toParLabel(gc.toPar)}${gc.played ? ` thru ${gc.played}` : ''}</span>
     <div class="stepper" role="group" aria-label="Team strokes">
     ${num ? `<button class="stv" data-act="scr-clear" aria-label="Team score ${v} strokes, ${esc(scoreWord)}. Tap to clear"${final ? ' disabled' : ''}><b><span class="scr-val">${v}</span></b><small>${scoreWord}</small></button>` : `<div class="stv none">Par ${h.par}</div>`}
     <button class="st" data-act="scr-score" data-dir="down" aria-label="One less for the team"${final ? ' disabled' : ''}>−</button>
